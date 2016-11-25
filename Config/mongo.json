@@ -1,0 +1,7 @@
+{
+    "user": "admin",
+    "password": "aaaaaa",
+    "database": "boost",
+    "port": "27017",
+    "host": "127.0.0.1"
+}
