@@ -14,29 +14,11 @@ let drop = Droplet()
 
 try drop.addProvider(VaporMongo.Provider.self)
 
-
-//drop.get { req in
-//    return try drop.view.make("welcome", [
-//        "message": drop.localization[req.lang, "welcome", "title"]
-//        ])
-//}
-
-drop.get("users") { req in
-    return JSON(["fuck": [["who": "you"], ["who": "him"]]])
-}
-
-//drop.get("apps") { req in
-//    if let db = drop.database?.driver as? MongoDriver {
-//        let version = try db.raw("SELECT version()")
-//        return try JSON(node: version)
-//    }
-//    else {
-//        return "No db connection"
-//    }
-//}
-
-
-
-drop.resource("posts", PostController())
+drop.register(controller: AppController())
+drop.register(controller: AppsController())
+drop.register(controller: VersionsController())
+drop.register(controller: UsersController())
+drop.register(controller: HistoryController())
+drop.register(controller: SettingsController())
 
 drop.run()

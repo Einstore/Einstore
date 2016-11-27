@@ -10,19 +10,34 @@ import Vapor
 import HTTP
 
 
-final class UsersController: ResourceRepresentable {
+final class UsersController: ControllerProtocol, ResourceRepresentable {
     
-    static func sayHello(_ req: Request) throws -> ResponseRepresentable {
-        guard let name = req.data["name"] else {
-            throw Abort.badRequest
+    // MARK: Routing
+    
+    func configureRoutes(_ drop: Droplet) {
+        let v1 = drop.grouped("v1")
+        v1.get(handler: self.root)
+        
+        let basic = v1.grouped("users")
+        basic.get(handler: self.index)
+        basic.get(Int.self) { request, appId in
+            return try self.view(request: request, appId: appId)
         }
-        return "Hello, \(name)"
     }
     
-    func makeResource() -> Resource<Post> {
-        return Resource(
-            index: UsersController.sayHello
-        )
+    // MARK: Data pages
+    
+    func root(request: Request) throws -> ResponseRepresentable {
+        return JSON(["Message": "Welcome to Boost Enterprise AppStore API", "documentation": ""])
     }
+    
+    func index(request: Request) throws -> ResponseRepresentable {
+        return JSON([":)"])
+    }
+    
+    func view(request: Request, appId: Int) throws -> ResponseRepresentable {
+        return "You requested App #\(appId)"
+    }
+
     
 }

@@ -1,21 +1,27 @@
 //
-//  AppsController.swift
+//  HistoryController.swift
 //  Boost
 //
-//  Created by Ondrej Rafaj on 25/11/2016.
-//  Copyright © 2016 manGoweb UK Ltd. All rights reserved.
+//  Created by Ondrej Rafaj on 26/11/2016.
+//
 //
 
 import Vapor
 import HTTP
 
 
-final class AppsController: ControllerProtocol {
+enum HistoryEvent: String {
+    case uploadedApp = "APU"
+    case deletedApp = "APD"
+}
+
+
+final class HistoryController: ControllerProtocol {
     
     // MARK: Routing
     
     func configureRoutes(_ drop: Droplet) {
-        let basic = drop.grouped("v1", "apps")
+        let basic = drop.grouped("v1", "history")
         basic.get(handler: self.index)
         basic.get(Int.self) { request, appId in
             return try self.view(request: request, appId: appId)
@@ -29,7 +35,7 @@ final class AppsController: ControllerProtocol {
     }
     
     func view(request: Request, appId: Int) throws -> ResponseRepresentable {
-        return "You requested App #\(appId)"
+        return "You requested User #\(appId)"
     }
     
 }
