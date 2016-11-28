@@ -7,12 +7,11 @@
 //
 
 import Vapor
-import VaporMongo
 
 
 let drop = Droplet()
 
-try drop.addProvider(VaporMongo.Provider.self)
+Db.shared.setup()
 
 drop.register(controller: AppController())
 drop.register(controller: AppsController())
@@ -20,5 +19,7 @@ drop.register(controller: VersionsController())
 drop.register(controller: UsersController())
 drop.register(controller: HistoryController())
 drop.register(controller: SettingsController())
+drop.register(controller: InstallController())
+
 
 drop.run()

@@ -1,8 +1,8 @@
 //
-//  SettingsController.swift
+//  CompaniesController.swift
 //  Boost
 //
-//  Created by Ondrej Rafaj on 26/11/2016.
+//  Created by Ondrej Rafaj on 27/11/2016.
 //  Copyright © 2016 manGoweb UK Ltd. All rights reserved.
 //
 
@@ -10,19 +10,19 @@ import Vapor
 import HTTP
 
 
-final class SettingsController: ControllerProtocol {
+final class CompaniesController: ControllerProtocol {
     
     // MARK: Routing
     
     func configureRoutes(_ drop: Droplet) {
-        let basic = drop.grouped("v1", "settings")
-        basic.get(handler: self.index)
+        drop.get("v1", "companies", handler: self.index)
     }
     
     // MARK: Data pages
     
     func index(request: Request) throws -> ResponseRepresentable {
-        return JSON([":)"])
+        // TODO: Install basic user and any other database stuff
+        return JSON(["result": "success"])
     }
     
 }
