@@ -15,7 +15,7 @@
 
 
 # Tools
-Toad is a nice GUI client for MongoDB for mac: 
+[Toad](https://itunes.apple.com/gb/app/toad/id747961939?mt=12) is a nice GUI client for MongoDB for mac
 
 ## 📖 Vapor Documentation
 
