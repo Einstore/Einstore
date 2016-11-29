@@ -16,7 +16,7 @@ enum HistoryEvent: String {
 }
 
 
-final class HistoryController: ControllerProtocol {
+final class HistoryController: RootController, ControllerProtocol {
     
     // MARK: Routing
     

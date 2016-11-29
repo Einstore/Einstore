@@ -8,6 +8,7 @@
 
 import Vapor
 import Fluent
+import HTTP
 
 
 enum UserType: String {
@@ -23,7 +24,7 @@ final class User: Model {
     var exists: Bool = false
     
     var id: Node?
-    var type: UserType?
+    var type: UserType? = .tester
     var email: String?
     var password: String?
     var firstname: String?
@@ -63,7 +64,6 @@ final class User: Model {
             "lastname": self.lastname,
             "company": self.company,
             "phone": self.phone,
-            //"ims": self.ims,
             "timezone": self.timezone?.makeNode()
             ])
     }
@@ -78,6 +78,63 @@ extension User: Preparation {
     
     static func revert(_ database: Database) throws {
         
+    }
+    
+}
+
+// MARK: - Helpers
+
+extension User {
+    
+    // MARK: Get
+    
+    static func getOne(idString id: String) throws -> User? {
+        return try User.query().filter("id", id).first()
+    }
+    
+    static func getOne(id: Node) throws -> User? {
+        return try User.query().filter("id", id).first()
+    }
+    
+    static func getOne(email: String, password: String) throws -> User? {
+        return try User.query().filter("email", email).filter("password", password).first()
+    }
+    
+    // MARK: Save / update
+    
+    func update(fromRequest request: Request) throws {
+        if let email = request.data["email"]?.string {
+            self.email = email
+        }
+        if let password = request.data["password"]?.string {
+            self.password = try drop.hash.make(password)
+        }
+        if let firstname = request.data["firstname"]?.string {
+            self.firstname = firstname
+        }
+        if let lastname = request.data["lastname"]?.string {
+            self.lastname = lastname
+        }
+        if let phone = request.data["phone"]?.string {
+            self.phone = phone
+        }
+        if var timezone = request.data["timezone"]?.int {
+            if timezone < -12 {
+                timezone = -12
+            }
+            else if timezone > 14 {
+                timezone = 14
+            }
+            self.timezone = timezone
+        }
+        if let rawType = request.data["type"]?.string {
+            guard let type = UserType(rawValue: rawType) else {
+                return
+            }
+            if Me.shared.type(min: type) && Me.shared.user?.id != self.id {
+                self.type = type
+            }
+        }
     }
     
 }

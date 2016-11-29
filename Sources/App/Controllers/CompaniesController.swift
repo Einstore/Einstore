@@ -10,7 +10,7 @@ import Vapor
 import HTTP
 
 
-final class CompaniesController: ControllerProtocol {
+final class CompaniesController: RootController, ControllerProtocol {
     
     // MARK: Routing
     

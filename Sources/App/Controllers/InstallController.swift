@@ -10,7 +10,7 @@ import Vapor
 import HTTP
 
 
-final class InstallController: ControllerProtocol {
+final class InstallController: RootController, ControllerProtocol {
     
     // MARK: Routing
     
@@ -22,23 +22,32 @@ final class InstallController: ControllerProtocol {
     
     func index(request: Request) throws -> ResponseRepresentable {
         // TODO: Install basic user and any other database stuff
-        var user = User()
-        user.email = "admin@boost"
-        user.type = .superAdmin
-        user.firstname = "Super"
-        user.lastname = "Admin"
-        user.company = nil
-        user.password = try drop.hash.make("password")
-        user.phone = nil
-        user.timezone = 0
+        // TODO: Install should be only available if there is no SU available
         
-        do {
-            try user.save()
+        let superUsers = try User.query().filter("type", "su")
+        
+        if try superUsers.all().count == 0 {
+            var user = User()
+            user.email = "admin@boost"
+            user.type = .superAdmin
+            user.firstname = "Super"
+            user.lastname = "Admin"
+            user.company = nil
+            user.password = try drop.hash.make("password")
+            user.phone = nil
+            user.timezone = 0
             
-            return JSON(["result": "success", "user": try user.makeNode()])
+            do {
+                try user.save()
+                
+                return JSON(["result": "success", "user": try user.makeNode()])
+            }
+            catch {
+                return JSON(["result": "failure"])
+            }
         }
-        catch {
-            return JSON(["result": "failure"])
+        else {
+            return JSON(["error": "Install is locked"])
         }
     }
     

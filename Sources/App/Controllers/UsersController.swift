@@ -11,7 +11,7 @@ import Vapor
 import HTTP
 
 
-final class UsersController: ControllerProtocol {
+final class UsersController: RootController, ControllerProtocol {
     
     // MARK: Routing
     
@@ -19,12 +19,19 @@ final class UsersController: ControllerProtocol {
         let v1 = drop.grouped("v1")
         v1.post("auth", handler: self.auth)
         v1.get("logout", handler: self.logout)
+        v1.post("register", handler: self.register)
         
         let basic = v1.grouped("users")
         basic.get(handler: self.index)
-        basic.get(Int.self) { request, appId in
-            return try self.view(request: request, appId: appId)
+        basic.post(handler: self.create)
+        basic.get(String.self) { request, appId in
+            return try self.view(request: request, userId: appId)
         }
+        basic.put(String.self) { request, appId in
+            return try self.update(request: request, userId: appId)
+        }
+        basic.get("types", handler: self.userTypes)
+        basic.get("types", "full", handler: self.userTypesFull)
     }
     
     // MARK: Authentication
@@ -38,15 +45,13 @@ final class UsersController: ControllerProtocol {
             pass = try drop.hash.make(password)
         }
         
-        guard let user: User = try User.query().filter("email", email).filter("password", pass).first() else {
+        guard let user: User = try User.getOne(email: email, password: pass) else {
             return nil
         }
         
-        var auth: Auth? = try Auth.query().filter("user", user).first()
-        if auth == nil {
-            auth = Auth(user: user)
-        }
-        try auth!.save()
+        try Auth.delete(userId: user.id!)
+        var auth = Auth(user: user)
+        try auth.save()
         
         return auth
     }
@@ -64,9 +69,7 @@ final class UsersController: ControllerProtocol {
         }
         
         do {
-            auth.id = nil
-            let authNode: Node = try auth.makeNode()
-            return JSON(authNode)
+            return try auth.makeJSON()
         }
         catch {
             let response = Response(status: .other(statusCode: 500, reasonPhrase: "Login failure"))
@@ -75,13 +78,17 @@ final class UsersController: ControllerProtocol {
     }
     
     func logout(request: Request) throws -> ResponseRepresentable {
-        // TODO: Kill active token
+        let hashedToken = try drop.hash.make(request.tokenString ?? "")
+        try Auth.delete(token: hashedToken)
         return Responses.okNoContent
     }
     
     func register(request: Request) throws -> ResponseRepresentable {
         var user = User()
-        user.email = "rafaj@mangoweb.cz"
+        try user.update(fromRequest: request)
+        // TODO: Set to tester only if the user hasn't been invited
+        user.type = .tester
+        // TODO: Validate user
         try user.save()
         return user
     }
@@ -89,12 +96,78 @@ final class UsersController: ControllerProtocol {
     // MARK: Users
     
     func index(request: Request) throws -> ResponseRepresentable {
-        return JSON([":)"])
+        if let response = super.kickOut(request) {
+            return response
+        }
+        // TODO: Select only users I can see
+        let users = try User.query()
+        return JSON(try users.all().makeNode())
     }
     
-    func view(request: Request, appId: Int) throws -> ResponseRepresentable {
-        return "You requested App #\(appId)"
+    func view(request: Request, userId: String) throws -> ResponseRepresentable {
+        if let response = super.kickOut(request) {
+            return response
+        }
+        guard let user = try User.getOne(idString: userId) else {
+            return Responses.notFound
+        }
+        return user
     }
-
+    
+    func update(request: Request, userId: String) throws -> ResponseRepresentable {
+        if let response = super.kickOut(request) {
+            return response
+        }
+        
+        let me: User? = Me.shared.user
+        guard me?.type == .admin || me?.type == .superAdmin || me?.id?.string == userId else {
+            return Responses.notAuthorised
+        }
+        
+        guard var user = try User.getOne(idString: userId) else {
+            return Responses.notFound
+        }
+        
+        try user.update(fromRequest: request)
+        
+        do {
+            try user.save()
+        }
+        catch {
+            print(error)
+        }
+        
+        return user
+    }
+    
+    func create(request: Request) throws -> ResponseRepresentable {
+        if let response = super.kickOut(request) {
+            return response
+        }
+        
+        let me: User? = Me.shared.user
+        guard me?.type == .admin || me?.type == .superAdmin else {
+            return Responses.notAuthorised
+        }
+        
+        var user = User()
+        try user.update(fromRequest: request)
+        // TODO: Validate user
+        try user.save()
+        try user.save()
+        
+        return user
+    }
+    
+    func userTypes(request: Request) throws -> ResponseRepresentable {
+        let types: [String] = [UserType.superAdmin.rawValue, UserType.admin.rawValue, UserType.developer.rawValue, UserType.tester.rawValue]
+        return JSON(try types.makeNode())
+    }
+    
+    func userTypesFull(request: Request) throws -> ResponseRepresentable {
+        let types: [String: String] = [UserType.superAdmin.rawValue: "SuperAdmin", UserType.admin.rawValue: "Admin", UserType.developer.rawValue: "Developer", UserType.tester.rawValue: "Tester"]
+        return JSON(try types.makeNode())
+    }
+    
     
 }

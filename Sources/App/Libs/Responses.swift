@@ -23,4 +23,16 @@ struct Responses {
         }
     }
     
+    static var notFound: ResponseRepresentable {
+        get {
+            return Response(status: .other(statusCode: 404, reasonPhrase: "Not found"))
+        }
+    }
+    
+    static var notAuthorised: ResponseRepresentable {
+        get {
+            return Response(status: .other(statusCode: 403, reasonPhrase: "Not authorised"))
+        }
+    }
+    
 }
