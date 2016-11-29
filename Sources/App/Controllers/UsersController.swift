@@ -24,10 +24,10 @@ final class UsersController: RootController, ControllerProtocol {
         let basic = v1.grouped("users")
         basic.get(handler: self.index)
         basic.post(handler: self.create)
-        basic.get(String.self) { request, appId in
+        basic.get(IdType.self) { request, appId in
             return try self.view(request: request, userId: appId)
         }
-        basic.put(String.self) { request, appId in
+        basic.put(IdType.self) { request, appId in
             return try self.update(request: request, userId: appId)
         }
         basic.get("types", handler: self.userTypes)
@@ -45,7 +45,7 @@ final class UsersController: RootController, ControllerProtocol {
             pass = try drop.hash.make(password)
         }
         
-        guard let user: User = try User.getOne(email: email, password: pass) else {
+        guard let user: User = try User.find(email: email, password: pass) else {
             return nil
         }
         
@@ -104,27 +104,30 @@ final class UsersController: RootController, ControllerProtocol {
         return JSON(try users.all().makeNode())
     }
     
-    func view(request: Request, userId: String) throws -> ResponseRepresentable {
+    func view(request: Request, userId: IdType) throws -> ResponseRepresentable {
         if let response = super.kickOut(request) {
             return response
         }
-        guard let user = try User.getOne(idString: userId) else {
+        guard let user = try User.find(userId) else {
             return Responses.notFound
         }
         return user
     }
     
-    func update(request: Request, userId: String) throws -> ResponseRepresentable {
+    func update(request: Request, userId: IdType) throws -> ResponseRepresentable {
         if let response = super.kickOut(request) {
             return response
         }
         
         let me: User? = Me.shared.user
-        guard me?.type == .admin || me?.type == .superAdmin || me?.id?.string == userId else {
+        let userIdNode = try userId.makeNode()
+        
+        // TODO: Verify node comparison works!!!
+        guard me?.type == .admin || me?.type == .superAdmin || me?.id == userIdNode else {
             return Responses.notAuthorised
         }
         
-        guard var user = try User.getOne(idString: userId) else {
+        guard var user = try User.find(userId) else {
             return Responses.notFound
         }
         

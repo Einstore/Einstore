@@ -42,7 +42,7 @@ final class User: Model {
     }
     
     init(node: Node, in context: Context) throws {
-        self.id = try node.extract("id")
+        self.id = try node.extract("_id")
         self.type = try UserType(rawValue: node.extract("type"))
         self.email = try node.extract("email")
         self.password = try node.extract("password")
@@ -56,7 +56,7 @@ final class User: Model {
     
     func makeNode(context: Context) throws -> Node {
         return try Node(node: [
-            "id": self.id,
+            "_id": self.id,
             "type": self.type?.rawValue,
             "email": self.email,
             "password": self.password,
@@ -88,15 +88,7 @@ extension User {
     
     // MARK: Get
     
-    static func getOne(idString id: String) throws -> User? {
-        return try User.query().filter("id", id).first()
-    }
-    
-    static func getOne(id: Node) throws -> User? {
-        return try User.query().filter("id", id).first()
-    }
-    
-    static func getOne(email: String, password: String) throws -> User? {
+    static func find(email: String, password: String) throws -> User? {
         return try User.query().filter("email", email).filter("password", password).first()
     }
     

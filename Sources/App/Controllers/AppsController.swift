@@ -17,7 +17,7 @@ final class AppsController: RootController, ControllerProtocol {
     func configureRoutes(_ drop: Droplet) {
         let basic = drop.grouped("v1", "apps")
         basic.get(handler: self.index)
-        basic.get(Int.self) { request, appId in
+        basic.get(IdType.self) { request, appId in
             return try self.view(request: request, appId: appId)
         }
     }
@@ -28,7 +28,7 @@ final class AppsController: RootController, ControllerProtocol {
         return JSON([":)"])
     }
     
-    func view(request: Request, appId: Int) throws -> ResponseRepresentable {
+    func view(request: Request, appId: IdType) throws -> ResponseRepresentable {
         return "You requested App #\(appId)"
     }
     

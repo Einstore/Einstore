@@ -16,21 +16,21 @@ final class VersionsController: RootController, ControllerProtocol {
     
     func configureRoutes(_ drop: Droplet) {
         let basic = drop.grouped("v1", "apps")
-        basic.get(Int.self, "versions") { request, appId in
+        basic.get(IdType.self, "versions") { request, appId in
             return try self.index(request: request, appId: appId)
         }
-        basic.get(Int.self, "versions", Int.self) { request, appId, versionId in
+        basic.get(IdType.self, "versions", IdType.self) { request, appId, versionId in
             return try self.viewVersion(request: request, appId: appId, versionId: versionId)
         }
     }
     
     // MARK: Data pages
     
-    func index(request: Request, appId: Int) throws -> ResponseRepresentable {
+    func index(request: Request, appId: IdType) throws -> ResponseRepresentable {
         return JSON([":)"])
     }
     
-    func viewVersion(request: Request, appId: Int, versionId: Int) throws -> ResponseRepresentable {
+    func viewVersion(request: Request, appId: IdType, versionId: IdType) throws -> ResponseRepresentable {
         return "You requested App #\(appId) Version #\(versionId)"
     }
     

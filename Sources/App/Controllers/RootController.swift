@@ -19,8 +19,7 @@ class RootController {
         if let token = request.tokenString {
             do {
                 // TODO: Can we merge the following into one query?
-                let hashedToken = try drop.hash.make(token)
-                Me.shared.auth = try Auth.query().filter("token", hashedToken).first()
+                Me.shared.auth = try Auth.find(tokenString: token)
                 if Me.shared.auth != nil {
                     Me.shared.user = try User.find(Me.shared.auth!.userId!)
                     if Me.shared.user != nil {
@@ -32,7 +31,7 @@ class RootController {
                 
             }
         }
-        return Responses.notFound
+        return Responses.notAuthorised
     }
     
 }

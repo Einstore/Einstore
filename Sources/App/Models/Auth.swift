@@ -32,7 +32,7 @@ final class Auth: Model {
     }
     
     init(node: Node, in context: Context) throws {
-        self.id = try node.extract("id")
+        self.id = try node.extract("_id")
         self.token = try node.extract("token")
         self.created = try Date(rfc1123: node.extract("created"))
         
@@ -45,7 +45,7 @@ final class Auth: Model {
         // It's important we only save a hashed token to the DB
         let tokenHash = try drop.hash.make(self.token!)
         return try Node(node: [
-            "id": self.id,
+            "_id": self.id,
             "token": tokenHash,
             "created": self.created?.rfc1123,
             "user_id": self.userId
@@ -79,12 +79,22 @@ extension Auth {
     
     // MARK: Get
     
-    static func getOne(tokenString token: String) throws -> User? {
-        return try User.query().filter("token", token).first()
+    static func find(tokenString token: String) throws -> Auth? {
+        let hashedToken: String = try drop.hash.make(token)
+        return try self.find(hashedTokenString: hashedToken)
     }
     
-    static func getOne(token: Node) throws -> User? {
-        return try User.query().filter("token", token).first()
+    static func find(token: Node) throws -> Auth? {
+        let hashedToken: String = try drop.hash.make(token.string ?? "")
+        return try self.find(hashedTokenString: hashedToken)
+    }
+    
+    static func find(hashedTokenString token: String) throws -> Auth? {
+        return try Auth.query().filter("token", token).first()
+    }
+    
+    static func find(hashedToken token: Node) throws -> Auth? {
+        return try Auth.query().filter("token", token).first()
     }
     
     // MARK: Delete
