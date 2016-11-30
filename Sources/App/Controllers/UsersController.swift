@@ -23,6 +23,7 @@ final class UsersController: RootController, ControllerProtocol {
         
         let basic = v1.grouped("users")
         basic.get(handler: self.index)
+        basic.post("invite", handler: self.invite)
         basic.post(handler: self.create)
         basic.get(IdType.self) { request, appId in
             return try self.view(request: request, userId: appId)
@@ -89,12 +90,11 @@ final class UsersController: RootController, ControllerProtocol {
     func register(request: Request) throws -> ResponseRepresentable {
         var user = User()
         try user.update(fromRequest: request)
+        
         // TODO: Set to tester only if the user hasn't been invited
         user.type = .tester
-        // TODO: Validate user
-        try user.save()
         
-        return ResponseBuilder.build(model: user)
+        return try self.createUserResponse(request: request, user: &user)
     }
     
     // MARK: Users
@@ -193,11 +193,24 @@ final class UsersController: RootController, ControllerProtocol {
         }
         
         var user = User()
-        try user.update(fromRequest: request)
-        // TODO: Validate user
-        try user.save()
         
-        return ResponseBuilder.build(model: user, statusCode: StatusCodes.created)
+        return try self.createUserResponse(request: request, user: &user)
+    }
+    
+    func invite(request: Request) throws -> ResponseRepresentable {
+        if let response = super.kickOut(request) {
+            return response
+        }
+        
+        guard Me.shared.type(min: .admin) else {
+            return ResponseBuilder.notAuthorised
+        }
+        
+        var user = User()
+        
+        user.token = UUID().uuidString
+        
+        return try self.createUserResponse(request: request, user: &user, validationFields: User.inviteValidationFields, forgetPassword: true)
     }
     
     func userTypes(request: Request) throws -> ResponseRepresentable {
@@ -210,5 +223,29 @@ final class UsersController: RootController, ControllerProtocol {
         return ResponseBuilder.build(node: try types.makeNode())
     }
     
+    
+}
+
+// MARK: - Helper methods
+
+extension UsersController {
+    
+    func createUserResponse(request: Request, user: inout User, validationFields: [Field] = User.validationFields, forgetPassword: Bool = false) throws -> ResponseRepresentable {
+        let validated: [ValidationError] = request.isCool(forValues: validationFields)
+        if validated.count == 0 {
+            user.created = Date()
+            try user.update(fromRequest: request, forgetPassword: forgetPassword)
+            try user.save()
+            
+            return ResponseBuilder.build(model: user, statusCode: StatusCodes.created)
+        }
+        else {
+            return ResponseBuilder.validationErrorResponse(errors: validated)
+        }
+    }
+    
+    func createUserResponse(request: Request, user: inout User, forgetPassword: Bool) throws -> ResponseRepresentable {
+        return try self.createUserResponse(request: request, user: &user, validationFields: User.validationFields, forgetPassword: forgetPassword)
+    }
     
 }

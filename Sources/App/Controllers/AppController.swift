@@ -14,8 +14,7 @@ final class AppController: RootController, ControllerProtocol {
     
     // MARK: Routing
     
-    func configureRoutes(_ drop: Droplet) {
-        drop.get(handler: self.root)
+    func setupGenericRouteForAllNonRoutedPaths() {
         drop.get("*") { request in
             return ResponseBuilder.notImplemented
         }
@@ -31,6 +30,13 @@ final class AppController: RootController, ControllerProtocol {
         drop.patch("*") { request in
             return ResponseBuilder.notImplemented
         }
+    }
+    
+    func configureRoutes(_ drop: Droplet) {
+        drop.get(handler: self.root)
+        
+        self.setupGenericRouteForAllNonRoutedPaths()
+        
         drop.get("v1", handler: self.root)
         drop.get("v1", "ping", handler: self.ping)
     }

@@ -23,7 +23,7 @@ extension Request {
             var ok: Bool = true
             
             if v == nil {
-                ok = true
+                ok = false
             }
             else {
                 if field.validationType == .empty {

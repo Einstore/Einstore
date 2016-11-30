@@ -37,10 +37,21 @@ final class InstallController: RootController, ControllerProtocol {
             user.phone = nil
             user.timezone = 0
             
+            var team = Team()
+            team.name = "Main"
+            
+            
             do {
                 try user.save()
+                try team.save()
                 
-                return ResponseBuilder.build(json: JSON(["admin": try user.makeNode()]), statusCode: StatusCodes.created)
+                team.users = [(user.id?.string)!]
+                user.teams = [(team.id?.string)!]
+                
+                try user.save()
+                try team.save()
+                
+                return ResponseBuilder.build(json: JSON(["admin": try user.makeNode(), "team": try team.makeNode()]), statusCode: StatusCodes.created)
             }
             catch {
                 return ResponseBuilder.actionFailed

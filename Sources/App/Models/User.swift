@@ -6,6 +6,7 @@
 //  Copyright © 2016 manGoweb UK Ltd. All rights reserved.
 //
 
+import Foundation
 import Vapor
 import Fluent
 import HTTP
@@ -29,10 +30,13 @@ final class User: Model {
     var password: String?
     var firstname: String?
     var lastname: String?
-    var company: Company?
+    var company: IdType?
     var phone: String?
-    //var ims: [String: String]?
+    var ims: [String: String]?
     var timezone: Int?
+    var token: String?
+    var created: Date?
+    var teams: [IdType]?
     
     
     // MARK: Initialization
@@ -48,10 +52,13 @@ final class User: Model {
         self.password = try node.extract("password")
         self.firstname = try node.extract("firstname")
         self.lastname = try node.extract("lastname")
-        self.company = try node.extract("company")
+        self.company = try node.extract("company_id")
         self.phone = try node.extract("phone")
-        //self.ims = try node.extract("ims")
+        self.ims = try node.extract("ims")
         self.timezone = try node.extract("timezone")
+        self.token = try node.extract("token")
+        self.created = Date.init(timeIntervalSince1970: try node.extract("created"))
+        self.teams = try node.extract("teams")
     }
     
     func makeNode(context: Context) throws -> Node {
@@ -62,9 +69,13 @@ final class User: Model {
             "password": self.password,
             "firstname": self.firstname,
             "lastname": self.lastname,
-            "company": self.company,
+            "company_id": self.company,
             "phone": self.phone,
-            "timezone": self.timezone?.makeNode()
+            "ims": self.ims?.makeNode(),
+            "timezone": self.timezone?.makeNode(),
+            "token": self.token,
+            "created": self.created?.timeIntervalSince1970.makeNode(),
+            "teams": self.teams?.makeNode()
             ])
     }
     
@@ -94,12 +105,14 @@ extension User {
     
     // MARK: Save / update
     
-    func update(fromRequest request: Request) throws {
+    func update(fromRequest request: Request, forgetPassword: Bool = false) throws {
         if let email = request.data["email"]?.string {
             self.email = email
         }
-        if let password = request.data["password"]?.string {
-            self.password = try drop.hash.make(password)
+        if !forgetPassword {
+            if let password = request.data["password"]?.string {
+                self.password = try drop.hash.make(password)
+            }
         }
         if let firstname = request.data["firstname"]?.string {
             self.firstname = firstname
@@ -126,6 +139,38 @@ extension User {
             if Me.shared.type(min: type) && Me.shared.user?.id != self.id {
                 self.type = type
             }
+        }
+    }
+    
+}
+
+// MARK: Validation
+
+extension User {
+    
+    
+    static var validationFields: [Field] {
+        get {
+            var fields: [Field] = []
+            
+            fields.append(Field(name: "firstname", validationType: .empty, errorMessage: "First name can not be empty"))
+            fields.append(Field(name: "lastname", validationType: .empty, errorMessage: "Last name can not be empty"))
+            fields.append(Field(name: "email", validationType: .email, errorMessage: "Please provide a valid email"))
+            fields.append(Field(name: "password", validationType: .password, errorMessage: "Password needs to be at least six characters long"))
+            
+            return fields
+        }
+    }
+    
+    static var inviteValidationFields: [Field] {
+        get {
+            var fields: [Field] = []
+            
+            fields.append(Field(name: "firstname", validationType: .empty, errorMessage: "First name can not be empty"))
+            fields.append(Field(name: "lastname", validationType: .empty, errorMessage: "Last name can not be empty"))
+            fields.append(Field(name: "email", validationType: .email, errorMessage: "Please provide a valid email"))
+            
+            return fields
         }
     }
     

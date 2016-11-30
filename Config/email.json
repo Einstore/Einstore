@@ -1,0 +1,7 @@
+{
+    "host": "email-smtp.eu-west-1.amazonaws.com",
+    "port": 465,
+    "username": "---------------",
+    "password": "---------------",
+    "from": "test@appstorehq.net"
+}

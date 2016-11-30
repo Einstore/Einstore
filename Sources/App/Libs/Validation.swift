@@ -9,10 +9,11 @@
 import Foundation
 
 
-enum ValidationType {
-    case exists
-    case empty
-    case email
+enum ValidationType: String {
+    case exists = "DataExists"
+    case empty = "DataNotEmpty"
+    case email = "DataValidEmail"
+    case password = "DataValidPassword"
 }
 
 
@@ -36,10 +37,12 @@ struct Field {
 struct ValidationError {
     
     let name: String
+    let validationType: ValidationType
     let errorMessage: String
     
     init(field: Field) {
         self.name = field.name
+        self.validationType = field.validationType
         self.errorMessage = field.errorMessage
     }
     

@@ -22,7 +22,8 @@ struct Db {
         drop.preparations = [
             Auth.self,
             User.self,
-            Company.self
+            Company.self,
+            Team.self
         ]
         
         do {

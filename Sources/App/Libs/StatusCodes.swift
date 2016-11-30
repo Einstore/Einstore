@@ -16,6 +16,7 @@ struct StatusCodes {
     static let notFound = 404
     static let notAuthorised = 401
     static let forbidden = 403
+    static let preconditionNotMet = 412
     static let internalServerError = 500
     static let notImplemented = 501
 }

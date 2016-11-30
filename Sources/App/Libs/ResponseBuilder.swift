@@ -49,6 +49,25 @@ struct ResponseBuilder {
         }
     }
     
+    // MARK: Validation responses
+    
+    static func validationErrorResponse(errors: [ValidationError]) -> ResponseRepresentable {
+        do {
+            let status: Status = .other(statusCode: StatusCodes.preconditionNotMet, reasonPhrase: "Validation error")
+            var formattedErrors: [Node] = []
+            for e: ValidationError in errors {
+                let errorDetailNode = try ["type": e.validationType.rawValue, "localized": e.errorMessage].makeNode()
+                let errorNode = try [e.name: errorDetailNode].makeNode()
+                formattedErrors.append(errorNode)
+            }
+            let response: Response = try Response.init(status: status, json: JSON(formattedErrors.makeNode()))
+            return response
+        }
+        catch {
+            return self.internalServerError
+        }
+    }
+    
     // MARK: Default responses
     
     static var okNoContent: ResponseRepresentable {
@@ -95,7 +114,7 @@ struct ResponseBuilder {
     
     static var notImplemented: ResponseRepresentable {
         get {
-            let response = Response(status: .other(statusCode: StatusCodes.notImplemented, reasonPhrase: "Sorry :("))
+            let response = Response(status: .other(statusCode: StatusCodes.notImplemented, reasonPhrase: "Stumbling?"))
             response.headers["Content-Type"] = "application/json"
             response.body = try! Body(JSON(["error": "Not implemented"]))
             return response
