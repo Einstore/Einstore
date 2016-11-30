@@ -27,7 +27,7 @@ final class VersionsController: RootController, ControllerProtocol {
     // MARK: Data pages
     
     func index(request: Request, appId: IdType) throws -> ResponseRepresentable {
-        return JSON([":)"])
+        return ":)"
     }
     
     func viewVersion(request: Request, appId: IdType, versionId: IdType) throws -> ResponseRepresentable {

@@ -25,7 +25,7 @@ final class AppsController: RootController, ControllerProtocol {
     // MARK: Data pages
     
     func index(request: Request) throws -> ResponseRepresentable {
-        return JSON([":)"])
+        return ":)"
     }
     
     func view(request: Request, appId: IdType) throws -> ResponseRepresentable {

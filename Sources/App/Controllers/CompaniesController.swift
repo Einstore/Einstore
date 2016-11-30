@@ -22,7 +22,7 @@ final class CompaniesController: RootController, ControllerProtocol {
     
     func index(request: Request) throws -> ResponseRepresentable {
         // TODO: Install basic user and any other database stuff
-        return JSON(["result": "success"])
+        return ":)"
     }
     
 }

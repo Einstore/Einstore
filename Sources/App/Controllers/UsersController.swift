@@ -30,6 +30,9 @@ final class UsersController: RootController, ControllerProtocol {
         basic.put(IdType.self) { request, appId in
             return try self.update(request: request, userId: appId)
         }
+        basic.delete(IdType.self) { request, appId in
+            return try self.delete(request: request, userId: appId)
+        }
         basic.get("types", handler: self.userTypes)
         basic.get("types", "full", handler: self.userTypesFull)
     }
@@ -58,29 +61,29 @@ final class UsersController: RootController, ControllerProtocol {
     
     func auth(request: Request) throws -> ResponseRepresentable {
         guard let email = request.data["email"]?.string else {
-            return Responses.invalidAuthentication
+            return ResponseBuilder.notAuthorised
         }
         guard let password = request.data["password"]?.string else {
-            return Responses.invalidAuthentication
+            return ResponseBuilder.notAuthorised
         }
         
         guard let auth = try self.login(email: email, password: password) else {
-            return Responses.invalidAuthentication
+            return ResponseBuilder.notAuthorised
         }
         
         do {
-            return try auth.makeJSON()
+            let json: JSON = try auth.makeJSON()
+            return ResponseBuilder.build(json: json)
         }
         catch {
-            let response = Response(status: .other(statusCode: 500, reasonPhrase: "Login failure"))
-            return response
+            return ResponseBuilder.notAuthorised
         }
     }
     
     func logout(request: Request) throws -> ResponseRepresentable {
         let hashedToken = try drop.hash.make(request.tokenString ?? "")
         try Auth.delete(token: hashedToken)
-        return Responses.okNoContent
+        return ResponseBuilder.okNoContent
     }
     
     func register(request: Request) throws -> ResponseRepresentable {
@@ -90,7 +93,8 @@ final class UsersController: RootController, ControllerProtocol {
         user.type = .tester
         // TODO: Validate user
         try user.save()
-        return user
+        
+        return ResponseBuilder.build(model: user)
     }
     
     // MARK: Users
@@ -99,7 +103,11 @@ final class UsersController: RootController, ControllerProtocol {
         if let response = super.kickOut(request) {
             return response
         }
-        // TODO: Select only users I can see
+        
+        guard Me.shared.type(min: .developer) else {
+            return ResponseBuilder.notAuthorised
+        }
+        
         let users = try User.query()
         return JSON(try users.all().makeNode())
     }
@@ -108,10 +116,15 @@ final class UsersController: RootController, ControllerProtocol {
         if let response = super.kickOut(request) {
             return response
         }
-        guard let user = try User.find(userId) else {
-            return Responses.notFound
+        
+        guard Me.shared.type(min: .developer) else {
+            return ResponseBuilder.notAuthorised
         }
-        return user
+
+        guard let user = try User.find(userId) else {
+            return ResponseBuilder.notFound
+        }
+        return ResponseBuilder.build(model: user)
     }
     
     func update(request: Request, userId: IdType) throws -> ResponseRepresentable {
@@ -120,15 +133,15 @@ final class UsersController: RootController, ControllerProtocol {
         }
         
         let me: User? = Me.shared.user
-        let userIdNode = try userId.makeNode()
+        let userIdNode = userId.makeNode()
         
         // TODO: Verify node comparison works!!!
-        guard me?.type == .admin || me?.type == .superAdmin || me?.id == userIdNode else {
-            return Responses.notAuthorised
+        guard Me.shared.type(min: .admin) || me?.id == userIdNode else {
+            return ResponseBuilder.notAuthorised
         }
         
         guard var user = try User.find(userId) else {
-            return Responses.notFound
+            return ResponseBuilder.notFound
         }
         
         try user.update(fromRequest: request)
@@ -140,7 +153,34 @@ final class UsersController: RootController, ControllerProtocol {
             print(error)
         }
         
-        return user
+        return ResponseBuilder.build(model: user)
+    }
+    
+    func delete(request: Request, userId: IdType) throws -> ResponseRepresentable {
+        if let response = super.kickOut(request) {
+            return response
+        }
+        
+        guard Me.shared.type(min: .admin) else {
+            return ResponseBuilder.notAuthorised
+        }
+        
+        let userIdNode = userId.makeNode()
+        if Me.shared.user?.id == userIdNode {
+            return ResponseBuilder.selfHarm
+        }
+        
+        guard let user = try User.find(userId) else {
+            return ResponseBuilder.notFound
+        }
+        do {
+            try user.delete()
+        }
+        catch {
+            return ResponseBuilder.actionFailed
+        }
+        
+        return ResponseBuilder.okNoContent
     }
     
     func create(request: Request) throws -> ResponseRepresentable {
@@ -148,28 +188,26 @@ final class UsersController: RootController, ControllerProtocol {
             return response
         }
         
-        let me: User? = Me.shared.user
-        guard me?.type == .admin || me?.type == .superAdmin else {
-            return Responses.notAuthorised
+        guard Me.shared.type(min: .admin) else {
+            return ResponseBuilder.notAuthorised
         }
         
         var user = User()
         try user.update(fromRequest: request)
         // TODO: Validate user
         try user.save()
-        try user.save()
         
-        return user
+        return ResponseBuilder.build(model: user, statusCode: StatusCodes.created)
     }
     
     func userTypes(request: Request) throws -> ResponseRepresentable {
         let types: [String] = [UserType.superAdmin.rawValue, UserType.admin.rawValue, UserType.developer.rawValue, UserType.tester.rawValue]
-        return JSON(try types.makeNode())
+        return ResponseBuilder.build(node: try types.makeNode())
     }
     
     func userTypesFull(request: Request) throws -> ResponseRepresentable {
         let types: [String: String] = [UserType.superAdmin.rawValue: "SuperAdmin", UserType.admin.rawValue: "Admin", UserType.developer.rawValue: "Developer", UserType.tester.rawValue: "Tester"]
-        return JSON(try types.makeNode())
+        return ResponseBuilder.build(node: try types.makeNode())
     }
     
     

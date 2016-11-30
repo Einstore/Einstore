@@ -1,5 +1,5 @@
 # Boost
-## Mobile enterprise distribution platform in Swift
+## Mobile enterprise distribution platform written in Swift
 
 
 # Installation
@@ -23,4 +23,4 @@ Visit the Vapor web framework's [documentation](http://docs.vapor.codes) for ins
 
 ## 🔧 Compatibility
 
-This package has been tested on macOS and Ubuntu.
+This package has been tested on macOS and should work on Ubuntu too :)

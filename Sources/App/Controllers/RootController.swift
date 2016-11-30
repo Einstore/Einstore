@@ -31,7 +31,7 @@ class RootController {
                 
             }
         }
-        return Responses.notAuthorised
+        return ResponseBuilder.notAuthorised
     }
     
 }

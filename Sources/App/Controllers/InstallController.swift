@@ -40,14 +40,14 @@ final class InstallController: RootController, ControllerProtocol {
             do {
                 try user.save()
                 
-                return JSON(["result": "success", "user": try user.makeNode()])
+                return ResponseBuilder.build(json: JSON(["admin": try user.makeNode()]), statusCode: StatusCodes.created)
             }
             catch {
-                return JSON(["result": "failure"])
+                return ResponseBuilder.actionFailed
             }
         }
         else {
-            return JSON(["error": "Install is locked"])
+            return ResponseBuilder.setupLocked
         }
     }
     
