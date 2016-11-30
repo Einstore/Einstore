@@ -1,0 +1,322 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Boost",
+		"_postman_id": "79592d1f-49da-ce1d-7c16-b45b4321ec6d",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"request": {
+				"url": "http://localhost:8080/v1/auth",
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "admin@boost",
+							"type": "text",
+							"enabled": true
+						},
+						{
+							"key": "password",
+							"value": "password",
+							"type": "text",
+							"enabled": true
+						}
+					]
+				},
+				"description": "POST"
+			},
+			"response": []
+		},
+		{
+			"name": "Auth (invalid)",
+			"request": {
+				"url": "http://localhost:8080/v1/auth",
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "admin@boost",
+							"type": "text",
+							"enabled": true
+						},
+						{
+							"key": "password",
+							"value": "bad_password",
+							"type": "text",
+							"enabled": true
+						}
+					]
+				},
+				"description": "POST"
+			},
+			"response": []
+		},
+		{
+			"name": "Auth (Tester)",
+			"request": {
+				"url": "http://localhost:8080/v1/auth",
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "rafaj@mangoweb.cz",
+							"type": "text",
+							"enabled": true
+						},
+						{
+							"key": "password",
+							"value": "exploited",
+							"type": "text",
+							"enabled": true
+						}
+					]
+				},
+				"description": "POST"
+			},
+			"response": []
+		},
+		{
+			"name": "Install (no auth)",
+			"request": {
+				"url": "http://localhost:8080/v1/install",
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Users",
+			"request": {
+				"url": "http://localhost:8080/v1/users",
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Users",
+			"request": {
+				"url": "http://localhost:8080/v1/users/",
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"firstname\": \"Billy\",\n\t\"lastname\": \"Bob\",\n\t\"email\": \"billy@bobek.com\",\n\t\"password\": \"superP4ssword\",\n\t\"mobile\": \"07972574949\",\n\t\"type\": \"a\",\n\t\"timezone\": 1\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Users/:id",
+			"request": {
+				"url": "http://localhost:8080/v1/users/cec43d58d936d44820119400",
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Users/:id",
+			"request": {
+				"url": "http://localhost:8080/v1/users/cec43d58d936d44820119400",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"firstname\": \"Finally 2\",\n\t\"lastname\": \"success?\",\n\t\"type\": \"su\",\n\t\"email\": \"admin@boost\",\n\t\"phone\": \"07972574949\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Users/:id",
+			"request": {
+				"url": "http://localhost:8080/v1/users/f7603f58a9966a3788857a3a",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"firstname\": \"Finally 2\",\n\t\"lastname\": \"success?\",\n\t\"type\": \"su\",\n\t\"email\": \"admin@boost\",\n\t\"phone\": \"07972574949\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Users/register (no auth)",
+			"request": {
+				"url": "http://localhost:8080/v1/users/register",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"firstname\": \"Billy\",\n\t\"lastname\": \"Bob\",\n\t\"email\": \"billy2@bobek.com\",\n\t\"password\": \"superP4ssword\",\n\t\"mobile\": \"07972574949\",\n\t\"type\": \"a\",\n\t\"timezone\": 1\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Users/invite",
+			"request": {
+				"url": "http://localhost:8080/v1/users/invite",
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"firstname\": \"Billy\",\n\t\"lastname\": \"Bob\",\n\t\"email\": \"billy@bobek.com\",\n\t\"password\": \"superP4ssword\",\n\t\"mobile\": \"07972574949\",\n\t\"type\": \"a\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Users/types",
+			"request": {
+				"url": "http://localhost:8080/v1/users/types",
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Users/types/full",
+			"request": {
+				"url": "http://localhost:8080/v1/users/types/full",
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Users/logout",
+			"request": {
+				"url": "http://localhost:8080/v1/users/logout?token=37FBB534-F728-4BD5-A316-070C1BEF1A9F",
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Tea",
+			"request": {
+				"url": "http://localhost:8080/v1/tea",
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

@@ -39,6 +39,9 @@ final class AppController: RootController, ControllerProtocol {
         
         drop.get("v1", handler: self.root)
         drop.get("v1", "ping", handler: self.ping)
+        drop.get("v1", "tea") { request in
+            return ResponseBuilder.teapot
+        }
     }
     
     // MARK: Intro

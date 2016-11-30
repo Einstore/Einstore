@@ -42,7 +42,7 @@ final class User: Model {
     // MARK: Initialization
     
     init() {
-        
+        self.created = Date()
     }
     
     init(node: Node, in context: Context) throws {
@@ -101,6 +101,10 @@ extension User {
     
     static func find(email: String, password: String) throws -> User? {
         return try User.query().filter("email", email).filter("password", password).first()
+    }
+    
+    static func find(email: String) throws -> User? {
+        return try User.query().filter("email", email).first()
     }
     
     // MARK: Save / update

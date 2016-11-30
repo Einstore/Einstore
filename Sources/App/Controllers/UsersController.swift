@@ -18,10 +18,10 @@ final class UsersController: RootController, ControllerProtocol {
     func configureRoutes(_ drop: Droplet) {
         let v1 = drop.grouped("v1")
         v1.post("auth", handler: self.auth)
-        v1.get("logout", handler: self.logout)
-        v1.post("register", handler: self.register)
         
         let basic = v1.grouped("users")
+        basic.get("logout", handler: self.logout)
+        basic.post("register", handler: self.register)
         basic.get(handler: self.index)
         basic.post("invite", handler: self.invite)
         basic.post(handler: self.create)
@@ -173,6 +173,11 @@ final class UsersController: RootController, ControllerProtocol {
         guard let user = try User.find(userId) else {
             return ResponseBuilder.notFound
         }
+        
+        if user.type == .superAdmin && !Me.shared.type(min: .superAdmin) {
+            return ResponseBuilder.notAuthorised
+        }
+        
         do {
             try user.delete()
         }
@@ -235,6 +240,11 @@ extension UsersController {
         if validated.count == 0 {
             user.created = Date()
             try user.update(fromRequest: request, forgetPassword: forgetPassword)
+            
+            if let _ = try User.find(email: user.email!) {
+                return ResponseBuilder.emailExists
+            }
+            
             try user.save()
             
             return ResponseBuilder.build(model: user, statusCode: StatusCodes.created)

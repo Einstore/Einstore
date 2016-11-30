@@ -85,6 +85,15 @@ struct ResponseBuilder {
         }
     }
     
+    static var emailExists: ResponseRepresentable {
+        get {
+            let response = Response(status: .other(statusCode: StatusCodes.notAuthorised, reasonPhrase: "Email already registered"))
+            response.headers["Content-Type"] = "application/json"
+            response.body = try! Body(JSON(["error": "Email already registered"]))
+            return response
+        }
+    }
+    
     static var notAuthorised: ResponseRepresentable {
         get {
             let response = Response(status: .other(statusCode: StatusCodes.notAuthorised, reasonPhrase: "Not authorised"))
@@ -96,9 +105,18 @@ struct ResponseBuilder {
     
     static var actionFailed: ResponseRepresentable {
         get {
-            let response = Response(status: .other(statusCode: 403, reasonPhrase: "Action failed"))
+            let response = Response(status: .other(statusCode: StatusCodes.forbidden, reasonPhrase: "Action failed"))
             response.headers["Content-Type"] = "application/json"
             response.body = try! Body(JSON(["error": "Action failed"]))
+            return response
+        }
+    }
+    
+    static var teapot: ResponseRepresentable {
+        get {
+            let response = Response(status: .other(statusCode: StatusCodes.teapot, reasonPhrase: "I'm a teapot"))
+            response.headers["Content-Type"] = "application/json"
+            response.body = try! Body(JSON(["error": "I'm a teapot"]))
             return response
         }
     }
@@ -125,7 +143,7 @@ struct ResponseBuilder {
         get {
             let response = Response(status: .other(statusCode: StatusCodes.forbidden, reasonPhrase: "Self harming?!"))
             response.headers["Content-Type"] = "application/json"
-            response.body = try! Body(JSON(["error": "Don't do this to yourself"]))
+            response.body = try! Body(JSON(["error": "Don't do this to yourself!"]))
             return response
         }
     }
