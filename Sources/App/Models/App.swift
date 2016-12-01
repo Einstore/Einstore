@@ -1,9 +1,9 @@
 //
-//  Company.swift
+//  App.swift
 //  Boost
 //
-//  Created by Ondrej Rafaj on 27/11/2016.
-//  Copyright © 2016 manGoweb UK Ltd. All rights reserved.
+//  Created by Ondrej Rafaj on 01/12/2016.
+//
 //
 
 import Foundation
@@ -12,17 +12,23 @@ import Fluent
 import HTTP
 
 
-final class Company: Model {
-    
-    static var entity = "companies"
+enum Platform: String {
+    case iOS = "iOS"
+    case tvOS = "tvOS"
+    case simulator = "simulator"
+    case android = "android"
+    case macOS = "macOS"
+}
+
+
+final class App: Model {
     
     var exists: Bool = false
     
     var id: Node?
     var name: String?
-    var address: String?
-    var url: String?
-    var phone: String?
+    var token: String?
+    var platform: Platform?
     var created: Date?
     var users: [IdType]?
     
@@ -36,9 +42,8 @@ final class Company: Model {
     init(node: Node, in context: Context) throws {
         self.id = try node.extract("_id")
         self.name = try node.extract("name")
-        self.address = try node.extract("address")
-        self.url = try node.extract("url")
-        self.phone = try node.extract("phone")
+        self.token = try node.extract("token")
+        self.platform = Platform(rawValue: try node.extract("token"))
         self.created = Date.init(timeIntervalSince1970: try node.extract("created"))
         self.users = try node.extract("users")
     }
@@ -47,9 +52,8 @@ final class Company: Model {
         let nodes = try Node(node: [
             "_id": self.id,
             "name": self.name,
-            "address": self.address,
-            "url": self.url,
-            "phone": self.phone,
+            "token": self.token,
+            "platform": self.platform?.rawValue,
             "created": self.created?.timeIntervalSince1970.makeNode(),
             "users": self.users?.makeNode()
             ])
@@ -58,7 +62,7 @@ final class Company: Model {
     
 }
 
-extension Company: Preparation {
+extension App: Preparation {
     
     static func prepare(_ database: Database) throws {
         
@@ -72,7 +76,7 @@ extension Company: Preparation {
 
 // MARK: - Helpers
 
-extension Company {
+extension App {
     
     // MARK: Get
     
@@ -86,15 +90,6 @@ extension Company {
         if let name = request.data["name"]?.string {
             self.name = name
         }
-        if let address = request.data["address"]?.string {
-            self.address = address
-        }
-        if let url = request.data["url"]?.string {
-            self.url = url
-        }
-        if let phone = request.data["phone"]?.string {
-            self.phone = phone
-        }
         if let users = request.data["users"]?.array {
             self.users = users as? [IdType]
         }
@@ -104,14 +99,14 @@ extension Company {
 
 // MARK: Validation
 
-extension Company {
+extension App {
     
     
     static var validationFields: [Field] {
         get {
             var fields: [Field] = []
             
-            fields.append(Field(name: "name", validationType: .empty, errorMessage: Lang.get("Company name can not be empty")))
+            fields.append(Field(name: "name", validationType: .empty, errorMessage: Lang.get("App name can not be empty")))
             
             return fields
         }

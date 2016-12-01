@@ -15,7 +15,6 @@ Db.shared.setup()
 
 drop.register(controller: AppController())
 drop.register(controller: AppsController())
-drop.register(controller: VersionsController())
 drop.register(controller: TeamsController())
 drop.register(controller: UsersController())
 drop.register(controller: CompaniesController())

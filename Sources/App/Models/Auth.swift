@@ -13,6 +13,8 @@ import Fluent
 
 final class Auth: Model {
     
+    static var entity = "auth"
+    
     var exists: Bool = false
     
     var id: Node?

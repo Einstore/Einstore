@@ -23,7 +23,8 @@ struct Db {
             Auth.self,
             User.self,
             Company.self,
-            Team.self
+            Team.self,
+            App.self
         ]
         
         do {
