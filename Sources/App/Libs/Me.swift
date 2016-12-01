@@ -32,7 +32,12 @@ final class Me {
             }
             return true
         case .tester:
-            if min == .tester {
+            if min == .tester || min == .client {
+                return true
+            }
+            return false
+        case .client:
+            if min == .tester || min == .client {
                 return true
             }
             return false

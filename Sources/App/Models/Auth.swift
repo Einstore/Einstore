@@ -55,7 +55,7 @@ final class Auth: Model {
     func makeJSON() throws -> JSON {
         let user: User = self.user!
         user.password = nil
-        return JSON(["token": self.token!.makeNode(), "user": try user.makeNode()])
+        return JSON(["access_token": self.token!.makeNode(), "user": try user.makeNode()])
     }
     
 }

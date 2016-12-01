@@ -135,7 +135,6 @@ final class UsersController: RootController, ControllerProtocol {
         let me: User? = Me.shared.user
         let userIdNode = userId.makeNode()
         
-        // TODO: Verify node comparison works!!!
         guard Me.shared.type(min: .admin) || me?.id == userIdNode else {
             return ResponseBuilder.notAuthorised
         }
@@ -144,13 +143,14 @@ final class UsersController: RootController, ControllerProtocol {
             return ResponseBuilder.notFound
         }
         
+        // TODO: Check if new email exists
         try user.update(fromRequest: request)
         
         do {
             try user.save()
         }
         catch {
-            print(error)
+            return ResponseBuilder.internalServerError
         }
         
         return ResponseBuilder.build(model: user)

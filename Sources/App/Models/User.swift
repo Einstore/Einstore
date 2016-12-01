@@ -17,6 +17,7 @@ enum UserType: String {
     case admin = "a"
     case developer = "d"
     case tester = "t"
+    case client = "c"
 }
 
 
