@@ -20,8 +20,8 @@ final class HistoryController: RootController, ControllerProtocol {
     
     // MARK: Routing
     
-    func configureRoutes(_ drop: Droplet) {
-        let basic = drop.grouped("v1", "history")
+    func configureRoutes() {
+        let basic = self.baseRoute.grouped("history")
         basic.get(handler: self.index)
         basic.get(IdType.self) { request, appId in
             return try self.view(request: request, appId: appId)

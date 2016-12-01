@@ -14,8 +14,8 @@ final class AppsController: RootController, ControllerProtocol {
     
     // MARK: Routing
     
-    func configureRoutes(_ drop: Droplet) {
-        let basic = drop.grouped("v1", "apps")
+    func configureRoutes() {
+        let basic = self.baseRoute.grouped("apps")
         basic.get(handler: self.index)
         basic.get(IdType.self) { request, appId in
             return try self.view(request: request, appId: appId)

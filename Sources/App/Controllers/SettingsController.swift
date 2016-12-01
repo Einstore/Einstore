@@ -14,8 +14,8 @@ final class SettingsController: RootController, ControllerProtocol {
     
     // MARK: Routing
     
-    func configureRoutes(_ drop: Droplet) {
-        let basic = drop.grouped("v1", "settings")
+    func configureRoutes() {
+        let basic = self.baseRoute.grouped("settings")
         basic.get(handler: self.index)
     }
     

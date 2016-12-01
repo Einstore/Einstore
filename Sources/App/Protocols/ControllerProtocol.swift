@@ -11,6 +11,6 @@ import Vapor
 
 protocol ControllerProtocol {
     
-    func configureRoutes(_ drop: Droplet)
+    func configureRoutes()
     
 }

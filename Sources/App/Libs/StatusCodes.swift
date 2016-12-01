@@ -9,15 +9,15 @@
 import Foundation
 
 
-struct StatusCodes {
-    static let success = 200
-    static let created = 201
-    static let successNoData = 204
-    static let notAuthorised = 401
-    static let forbidden = 403
-    static let notFound = 404
-    static let preconditionNotMet = 412
-    static let teapot = 418
-    static let internalServerError = 500
-    static let notImplemented = 501
+enum StatusCodes: Int {
+    case success = 200
+    case created = 201
+    case successNoData = 204
+    case notAuthorised = 401
+    case forbidden = 403
+    case notFound = 404
+    case preconditionNotMet = 412
+    case teapot = 418
+    case internalServerError = 500
+    case notImplemented = 501
 }

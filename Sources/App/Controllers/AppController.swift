@@ -32,14 +32,14 @@ final class AppController: RootController, ControllerProtocol {
         }
     }
     
-    func configureRoutes(_ drop: Droplet) {
+    func configureRoutes() {
         drop.get(handler: self.root)
         
         self.setupGenericRouteForAllNonRoutedPaths()
         
-        drop.get("v1", handler: self.root)
-        drop.get("v1", "ping", handler: self.ping)
-        drop.get("v1", "tea") { request in
+        self.baseRoute.get(handler: self.root)
+        self.baseRoute.get(handler: self.ping)
+        self.baseRoute.get("tea") { request in
             return ResponseBuilder.teapot
         }
     }
@@ -53,7 +53,7 @@ final class AppController: RootController, ControllerProtocol {
     // MARK: Data pages
     
     func ping(request: Request) throws -> ResponseRepresentable {
-        return ResponseBuilder.build(json: JSON(["result": "success", "message": "Johnny 5 is alive"]))
+        return ResponseBuilder.build(json: JSON(["result": "success", "message": Lang.get("Johnny 5 is alive").makeNode()]))
     }
     
 }

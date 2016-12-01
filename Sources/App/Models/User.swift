@@ -37,7 +37,7 @@ final class User: Model {
     var timezone: Int?
     var token: String?
     var created: Date?
-    var teams: [IdType]?
+    //var teams: [IdType]?
     
     
     // MARK: Initialization
@@ -59,7 +59,7 @@ final class User: Model {
         self.timezone = try node.extract("timezone")
         self.token = try node.extract("token")
         self.created = Date.init(timeIntervalSince1970: try node.extract("created"))
-        self.teams = try node.extract("teams")
+        //self.teams = try node.extract("teams")
     }
     
     func makeNode(context: Context) throws -> Node {
@@ -76,7 +76,7 @@ final class User: Model {
             "timezone": self.timezone?.makeNode(),
             "token": self.token,
             "created": self.created?.timeIntervalSince1970.makeNode(),
-            "teams": self.teams?.makeNode()
+            //"teams": self.teams?.makeNode()
             ])
     }
     
@@ -156,12 +156,9 @@ extension User {
     
     static var validationFields: [Field] {
         get {
-            var fields: [Field] = []
+            var fields: [Field] = self.inviteValidationFields
             
-            fields.append(Field(name: "firstname", validationType: .empty, errorMessage: "First name can not be empty"))
-            fields.append(Field(name: "lastname", validationType: .empty, errorMessage: "Last name can not be empty"))
-            fields.append(Field(name: "email", validationType: .email, errorMessage: "Please provide a valid email"))
-            fields.append(Field(name: "password", validationType: .password, errorMessage: "Password needs to be at least six characters long"))
+            fields.append(Field(name: "password", validationType: .password, errorMessage: Lang.get("Password needs to be at least six characters long")))
             
             return fields
         }
@@ -171,9 +168,9 @@ extension User {
         get {
             var fields: [Field] = []
             
-            fields.append(Field(name: "firstname", validationType: .empty, errorMessage: "First name can not be empty"))
-            fields.append(Field(name: "lastname", validationType: .empty, errorMessage: "Last name can not be empty"))
-            fields.append(Field(name: "email", validationType: .email, errorMessage: "Please provide a valid email"))
+            fields.append(Field(name: "firstname", validationType: .empty, errorMessage: Lang.get("First name can not be empty")))
+            fields.append(Field(name: "lastname", validationType: .empty, errorMessage: Lang.get("Last name can not be empty")))
+            fields.append(Field(name: "email", validationType: .email, errorMessage: Lang.get("Please provide a valid email")))
             
             return fields
         }

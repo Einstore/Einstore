@@ -1,360 +1,556 @@
 {
-	"id": "79592d1f-49da-ce1d-7c16-b45b4321ec6d",
-	"name": "Boost",
-	"description": "",
-	"order": [
-		"bcd5336d-a24c-99f1-845c-a489f649d280",
-		"ae74f54f-381a-2941-5284-c7c5374ebe24",
-		"6f8d22ac-6822-e886-119b-bc33f0c99c01",
-		"e963ef1e-e417-36f7-6da4-5b9384e9b258",
-		"8356e7dc-3a8f-ec1c-5f30-13971b26d318",
-		"0e5883ee-d12d-e1c3-7ef4-5075fae06bbe",
-		"fde5b953-e6d0-45d7-f79e-2920a195c8fa",
-		"9b36e611-567a-4c3f-be2b-223fb7330cc9",
-		"77d3bd6b-33aa-fa9a-ee49-0d6c971191c2",
-		"e7d815d8-bc03-c75a-ced8-31935ab41096",
-		"922a1ddb-ac9f-f74a-f9d1-43395322681b",
-		"a9fa5070-1175-a64a-aac8-a2a43b56abb7",
-		"491192b8-e8e5-8921-24db-e354dc26526b",
-		"906e1299-bb9b-0a77-cf77-ff06bd585951",
-		"0168440a-2aa5-8d7e-4986-b8697a04eaba"
-	],
-	"folders": [],
-	"timestamp": "2016-11-27T18:28:28.205Z",
-	"owner": "41999",
-	"public": false,
-	"requests": [
+	"variables": [],
+	"info": {
+		"name": "Boost",
+		"_postman_id": "79592d1f-49da-ce1d-7c16-b45b4321ec6d",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
 		{
-			"id": "0168440a-2aa5-8d7e-4986-b8697a04eaba",
-			"headers": "",
-			"url": "http://localhost:8080/v1/tea",
-			"preRequestScript": null,
-			"pathVariables": {},
-			"method": "GET",
-			"data": null,
-			"dataMode": "params",
-			"version": 2,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1480548041920,
-			"name": "Tea",
-			"description": "",
-			"collectionId": "79592d1f-49da-ce1d-7c16-b45b4321ec6d",
-			"responses": []
-		},
-		{
-			"id": "0e5883ee-d12d-e1c3-7ef4-5075fae06bbe",
-			"headers": "X-AuthToken: AFE2BA61-C2B9-4091-822E-425F406F6FBA\nContent-Type: application/json\n",
-			"url": "http://localhost:8080/v1/users/",
-			"preRequestScript": null,
-			"pathVariables": {},
-			"method": "POST",
-			"data": [],
-			"dataMode": "raw",
-			"version": 2,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1480548448858,
-			"name": "Users",
-			"description": "",
-			"collectionId": "79592d1f-49da-ce1d-7c16-b45b4321ec6d",
-			"responses": [],
-			"rawModeData": "{\n\t\"firstname\": \"Billy\",\n\t\"lastname\": \"Bob\",\n\t\"email\": \"billy@bobek.com\",\n\t\"password\": \"superP4ssword\",\n\t\"mobile\": \"07972574949\",\n\t\"type\": \"a\",\n\t\"timezone\": 1\n}"
-		},
-		{
-			"id": "491192b8-e8e5-8921-24db-e354dc26526b",
-			"headers": "",
-			"url": "http://localhost:8080/v1/users/types/full",
-			"preRequestScript": null,
-			"pathVariables": {},
-			"method": "GET",
-			"data": null,
-			"dataMode": "params",
-			"version": 2,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1480362727276,
-			"name": "Users/types/full",
-			"description": "",
-			"collectionId": "79592d1f-49da-ce1d-7c16-b45b4321ec6d",
-			"responses": []
-		},
-		{
-			"id": "6f8d22ac-6822-e886-119b-bc33f0c99c01",
-			"headers": "",
-			"url": "http://localhost:8080/v1/auth",
-			"preRequestScript": null,
-			"pathVariables": {},
-			"method": "POST",
-			"data": [
-				{
-					"key": "email",
-					"value": "rafaj@mangoweb.cz",
-					"type": "text",
-					"enabled": true
-				},
-				{
-					"key": "password",
-					"value": "exploited",
-					"type": "text",
-					"enabled": true
-				}
-			],
-			"dataMode": "params",
-			"version": 2,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1480363326316,
-			"name": "Auth (Tester)",
-			"description": "POST",
-			"collectionId": "79592d1f-49da-ce1d-7c16-b45b4321ec6d",
-			"responses": []
-		},
-		{
-			"id": "77d3bd6b-33aa-fa9a-ee49-0d6c971191c2",
-			"headers": "X-AuthToken: AFE2BA61-C2B9-4091-822E-425F406F6FBA\nContent-Type: application/json\n",
-			"url": "http://localhost:8080/v1/users/f7603f58a9966a3788857a3a",
-			"preRequestScript": null,
-			"pathVariables": {},
-			"method": "DELETE",
-			"data": [],
-			"dataMode": "raw",
-			"version": 2,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1480548646033,
-			"name": "Users/:id",
-			"description": "",
-			"collectionId": "79592d1f-49da-ce1d-7c16-b45b4321ec6d",
-			"responses": [],
-			"rawModeData": "{\n\t\"firstname\": \"Finally 2\",\n\t\"lastname\": \"success?\",\n\t\"type\": \"su\",\n\t\"email\": \"admin@boost\",\n\t\"phone\": \"07972574949\"\n}"
-		},
-		{
-			"id": "8356e7dc-3a8f-ec1c-5f30-13971b26d318",
-			"headers": "X-AuthToken: AFE2BA61-C2B9-4091-822E-425F406F6FBA\n",
-			"url": "http://localhost:8080/v1/users",
-			"preRequestScript": null,
-			"pathVariables": {},
-			"method": "GET",
-			"data": null,
-			"dataMode": "params",
-			"version": 2,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1480548525395,
-			"name": "Users",
-			"description": "",
-			"collectionId": "79592d1f-49da-ce1d-7c16-b45b4321ec6d",
-			"responses": []
-		},
-		{
-			"id": "906e1299-bb9b-0a77-cf77-ff06bd585951",
-			"headers": "",
-			"url": "http://localhost:8080/v1/users/logout?token=37FBB534-F728-4BD5-A316-070C1BEF1A9F",
-			"preRequestScript": null,
-			"pathVariables": {},
-			"method": "GET",
-			"data": null,
-			"dataMode": "params",
-			"version": 2,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1480549816151,
-			"name": "Users/logout",
-			"description": "",
-			"collectionId": "79592d1f-49da-ce1d-7c16-b45b4321ec6d",
-			"responses": []
-		},
-		{
-			"id": "922a1ddb-ac9f-f74a-f9d1-43395322681b",
-			"headers": "X-AuthToken: AFE2BA61-C2B9-4091-822E-425F406F6FBA\nContent-Type: application/json\n",
-			"url": "http://localhost:8080/v1/users/invite",
-			"preRequestScript": null,
-			"pathVariables": {},
-			"method": "POST",
-			"data": [],
-			"dataMode": "raw",
-			"version": 2,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1480536652627,
-			"name": "Users/invite",
-			"description": "",
-			"collectionId": "79592d1f-49da-ce1d-7c16-b45b4321ec6d",
-			"responses": [],
-			"rawModeData": "{\n\t\"firstname\": \"Billy\",\n\t\"lastname\": \"Bob\",\n\t\"email\": \"billy@bobek.com\",\n\t\"password\": \"superP4ssword\",\n\t\"mobile\": \"07972574949\",\n\t\"type\": \"a\"\n}"
-		},
-		{
-			"id": "9b36e611-567a-4c3f-be2b-223fb7330cc9",
-			"headers": "X-AuthToken: AFE2BA61-C2B9-4091-822E-425F406F6FBA\nContent-Type: application/json\n",
-			"url": "http://localhost:8080/v1/users/cec43d58d936d44820119400",
-			"preRequestScript": null,
-			"pathVariables": {},
-			"method": "PUT",
-			"data": [],
-			"dataMode": "raw",
-			"version": 2,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": "{}",
-			"time": 1480455179049,
-			"name": "Users/:id",
-			"description": "",
-			"collectionId": "79592d1f-49da-ce1d-7c16-b45b4321ec6d",
-			"responses": [],
-			"folder": null,
-			"folderId": null,
-			"timestamp": null,
-			"rawModeData": "{\n\t\"firstname\": \"Finally 2\",\n\t\"lastname\": \"success?\",\n\t\"type\": \"su\",\n\t\"email\": \"admin@boost\",\n\t\"phone\": \"07972574949\"\n}"
-		},
-		{
-			"id": "a9fa5070-1175-a64a-aac8-a2a43b56abb7",
-			"headers": "",
-			"url": "http://localhost:8080/v1/users/types",
-			"preRequestScript": null,
-			"pathVariables": {},
-			"method": "GET",
-			"data": null,
-			"dataMode": "params",
-			"version": 2,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1480362532727,
-			"name": "Users/types",
-			"description": "",
-			"collectionId": "79592d1f-49da-ce1d-7c16-b45b4321ec6d",
-			"responses": []
-		},
-		{
-			"id": "ae74f54f-381a-2941-5284-c7c5374ebe24",
-			"headers": "",
-			"url": "http://localhost:8080/v1/auth",
-			"preRequestScript": null,
-			"pathVariables": {},
-			"method": "POST",
-			"data": [
-				{
-					"key": "email",
-					"value": "admin@boost",
-					"type": "text",
-					"enabled": true
-				},
-				{
-					"key": "password",
-					"value": "bad_password",
-					"type": "text",
-					"enabled": true
-				}
-			],
-			"dataMode": "params",
-			"version": 2,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1480288877844,
-			"name": "Auth (invalid)",
-			"description": "POST",
-			"collectionId": "79592d1f-49da-ce1d-7c16-b45b4321ec6d",
-			"responses": []
-		},
-		{
-			"id": "bcd5336d-a24c-99f1-845c-a489f649d280",
-			"headers": "",
-			"url": "http://localhost:8080/v1/auth",
-			"preRequestScript": null,
-			"pathVariables": {},
-			"method": "POST",
-			"data": [
-				{
-					"key": "email",
-					"value": "admin@boost",
-					"type": "text",
-					"enabled": true
-				},
-				{
-					"key": "password",
-					"value": "password",
-					"type": "text",
-					"enabled": true
-				}
-			],
-			"dataMode": "params",
-			"version": 2,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1480346497810,
 			"name": "Auth",
-			"description": "POST",
-			"collectionId": "79592d1f-49da-ce1d-7c16-b45b4321ec6d",
-			"responses": []
+			"request": {
+				"url": "http://localhost:8080/v1/auth",
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "admin@boost",
+							"type": "text",
+							"enabled": true
+						},
+						{
+							"key": "password",
+							"value": "password",
+							"type": "text",
+							"enabled": true
+						}
+					]
+				},
+				"description": "POST"
+			},
+			"response": []
 		},
 		{
-			"id": "e7d815d8-bc03-c75a-ced8-31935ab41096",
-			"headers": "Content-Type: application/json\n",
-			"url": "http://localhost:8080/v1/users/register",
-			"preRequestScript": null,
-			"pathVariables": {},
-			"method": "POST",
-			"data": [],
-			"dataMode": "raw",
-			"version": 2,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1480549829914,
-			"name": "Users/register (no auth)",
-			"description": "",
-			"collectionId": "79592d1f-49da-ce1d-7c16-b45b4321ec6d",
-			"responses": [],
-			"rawModeData": "{\n\t\"firstname\": \"Billy\",\n\t\"lastname\": \"Bob\",\n\t\"email\": \"billy2@bobek.com\",\n\t\"password\": \"superP4ssword\",\n\t\"mobile\": \"07972574949\",\n\t\"type\": \"a\",\n\t\"timezone\": 1\n}"
+			"name": "Auth (invalid)",
+			"request": {
+				"url": "http://localhost:8080/v1/auth",
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "admin@boost",
+							"type": "text",
+							"enabled": true
+						},
+						{
+							"key": "password",
+							"value": "bad_password",
+							"type": "text",
+							"enabled": true
+						}
+					]
+				},
+				"description": "POST"
+			},
+			"response": []
 		},
 		{
-			"id": "e963ef1e-e417-36f7-6da4-5b9384e9b258",
-			"headers": "",
-			"url": "http://localhost:8080/v1/install",
-			"preRequestScript": null,
-			"pathVariables": {},
-			"method": "GET",
-			"data": null,
-			"dataMode": "params",
-			"version": 2,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1480549926389,
+			"name": "Auth (Tester)",
+			"request": {
+				"url": "http://localhost:8080/v1/auth",
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "rafaj@mangoweb.cz",
+							"type": "text",
+							"enabled": true
+						},
+						{
+							"key": "password",
+							"value": "exploited",
+							"type": "text",
+							"enabled": true
+						}
+					]
+				},
+				"description": "POST"
+			},
+			"response": []
+		},
+		{
 			"name": "Install (no auth)",
-			"description": "",
-			"collectionId": "79592d1f-49da-ce1d-7c16-b45b4321ec6d",
-			"responses": []
+			"request": {
+				"url": "http://localhost:8080/v1/install",
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
 		},
 		{
-			"id": "fde5b953-e6d0-45d7-f79e-2920a195c8fa",
-			"headers": "X-AuthToken: AFE2BA61-C2B9-4091-822E-425F406F6FBA\n",
-			"url": "http://localhost:8080/v1/users/cec43d58d936d44820119400",
-			"preRequestScript": null,
-			"pathVariables": {},
-			"method": "GET",
-			"data": null,
-			"dataMode": "params",
-			"version": 2,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1480455174596,
+			"name": "Users",
+			"request": {
+				"url": "http://localhost:8080/v1/users",
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Users (url token)",
+			"request": {
+				"url": "http://localhost:8080/v1/users?token=AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Users (create)",
+			"request": {
+				"url": "http://localhost:8080/v1/users/",
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"firstname\": \"Billy\",\n\t\"lastname\": \"Bob\",\n\t\"email\": \"billy@bobek.com\",\n\t\"password\": \"superP4ssword\",\n\t\"mobile\": \"07972574949\",\n\t\"type\": \"a\",\n\t\"timezone\": 1\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
 			"name": "Users/:id",
-			"description": "",
-			"collectionId": "79592d1f-49da-ce1d-7c16-b45b4321ec6d",
-			"responses": []
+			"request": {
+				"url": "http://localhost:8080/v1/users/cec43d58d936d44820119400",
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Users/:id",
+			"request": {
+				"url": "http://localhost:8080/v1/users/92424058b818a953c5568d17",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"firstname\": \"Finally 2\",\n\t\"lastname\": \"success?\",\n\t\"type\": \"su\",\n\t\"email\": \"admin@boost\",\n\t\"phone\": \"07972574949\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Users/:id",
+			"request": {
+				"url": "http://localhost:8080/v1/users/4f5f3f580efcc9573e8ff9ea",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"firstname\": \"Finally 2\",\n\t\"lastname\": \"success?\",\n\t\"type\": \"su\",\n\t\"email\": \"admin@boost\",\n\t\"phone\": \"07972574949\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Users/register (no auth)",
+			"request": {
+				"url": "http://localhost:8080/v1/users/register",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"firstname\": \"Billy\",\n\t\"lastname\": \"Bob\",\n\t\"email\": \"billy2@bobek.com\",\n\t\"password\": \"superP4ssword\",\n\t\"mobile\": \"07972574949\",\n\t\"type\": \"a\",\n\t\"timezone\": 1\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Users/invite",
+			"request": {
+				"url": "http://localhost:8080/v1/users/invite",
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"firstname\": \"Billy\",\n\t\"lastname\": \"Bob\",\n\t\"email\": \"billy@bobek.com\",\n\t\"password\": \"superP4ssword\",\n\t\"mobile\": \"07972574949\",\n\t\"type\": \"a\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Users/types",
+			"request": {
+				"url": "http://localhost:8080/v1/users/types",
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Users/types/full",
+			"request": {
+				"url": "http://localhost:8080/v1/users/types/full",
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Users/logout",
+			"request": {
+				"url": "http://localhost:8080/v1/users/logout?token=37FBB534-F728-4BD5-A316-070C1BEF1A9F",
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Tea",
+			"request": {
+				"url": "http://localhost:8080/v1/tea",
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Teams",
+			"request": {
+				"url": "http://localhost:8080/v1/teams",
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Teams (create)",
+			"request": {
+				"url": "http://localhost:8080/v1/teams",
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Another team\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Teams/:id",
+			"request": {
+				"url": "http://localhost:8080/v1/teams/62254058296038d52088e0ce",
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Teams/:id",
+			"request": {
+				"url": "http://localhost:8080/v1/teams/62254058296038d52088e0ce",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Super team!\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Teams/:id",
+			"request": {
+				"url": "http://localhost:8080/v1/teams/225940585ab3dcd190245b83",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Companies",
+			"request": {
+				"url": "http://localhost:8080/v1/companies",
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Companies (create)",
+			"request": {
+				"url": "http://localhost:8080/v1/companies",
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"manGoweb UK Ltd\",\n\t\"address\": \"71 Avondale Avenue\\nEN4 8NB\\nLondon, UK\",\n\t\"url\": \"http://www.mangoweb.cz/en\",\n\t\"phone\": \"07972574949\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Companies/:id",
+			"request": {
+				"url": "http://localhost:8080/v1/companies/a26b4058fea6f62a67c14491",
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Companies/:id",
+			"request": {
+				"url": "http://localhost:8080/v1/companies/a26b4058fea6f62a67c14491",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"manGoweb sro\",\n\t\"address\": \"Jungmanovo namesti, Praha 1\",\n\t\"url\": \"http://www.mangoweb.cz\",\n\t\"phone\": \"004202341253453\",\n\t\"users\": [\n      \"62254058296038d51f88e0ce\",\n      \"db5940585ab3dcd192245b83\"\n    ]\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Companies/:id",
+			"request": {
+				"url": "http://localhost:8080/v1/companies/766c4058fea6f62a68c14491",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
 		}
 	]
 }

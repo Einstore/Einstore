@@ -15,11 +15,10 @@ final class UsersController: RootController, ControllerProtocol {
     
     // MARK: Routing
     
-    func configureRoutes(_ drop: Droplet) {
-        let v1 = drop.grouped("v1")
-        v1.post("auth", handler: self.auth)
+    func configureRoutes() {
+        self.baseRoute.post("auth", handler: self.auth)
         
-        let basic = v1.grouped("users")
+        let basic = self.baseRoute.grouped("users")
         basic.get("logout", handler: self.logout)
         basic.post("register", handler: self.register)
         basic.get(handler: self.index)
@@ -224,7 +223,7 @@ final class UsersController: RootController, ControllerProtocol {
     }
     
     func userTypesFull(request: Request) throws -> ResponseRepresentable {
-        let types: [String: String] = [UserType.superAdmin.rawValue: "SuperAdmin", UserType.admin.rawValue: "Admin", UserType.developer.rawValue: "Developer", UserType.tester.rawValue: "Tester"]
+        let types: [String: String] = [UserType.superAdmin.rawValue: Lang.get("SuperAdmin"), UserType.admin.rawValue: Lang.get("Admin"), UserType.developer.rawValue: Lang.get("Developer"), UserType.tester.rawValue: Lang.get("Tester")]
         return ResponseBuilder.build(node: try types.makeNode())
     }
     
@@ -245,7 +244,12 @@ extension UsersController {
                 return ResponseBuilder.emailExists
             }
             
-            try user.save()
+            do {
+                try user.save()
+            }
+            catch {
+                return ResponseBuilder.internalServerError
+            }
             
             return ResponseBuilder.build(model: user, statusCode: StatusCodes.created)
         }

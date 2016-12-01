@@ -12,7 +12,7 @@ import Vapor
 extension Droplet {
     
     func register(controller: ControllerProtocol) {
-        controller.configureRoutes(self)
+        controller.configureRoutes()
     }
     
 }

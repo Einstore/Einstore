@@ -8,14 +8,20 @@
 
 import Vapor
 import HTTP
+import Routing
 
 
 class RootController {
     
     
+    // MARK: Routing
+    
+    var baseRoute: Routing.RouteGroup = drop.grouped("v1")
+    
     // MARK: Authentication
     
     func kickOut(_ request: Request) -> ResponseRepresentable? {
+        
         if let token = request.tokenString {
             do {
                 // TODO: Can we merge the following into one query?

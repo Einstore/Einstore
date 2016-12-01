@@ -6,6 +6,7 @@
 //  Copyright © 2016 manGoweb UK Ltd. All rights reserved.
 //
 
+import Foundation
 import Vapor
 import HTTP
 
@@ -14,8 +15,8 @@ final class InstallController: RootController, ControllerProtocol {
     
     // MARK: Routing
     
-    func configureRoutes(_ drop: Droplet) {
-        drop.get("v1", "install", handler: self.index)
+    func configureRoutes() {
+        self.baseRoute.get("install", handler: self.index)
     }
     
     // MARK: Data pages
@@ -38,17 +39,18 @@ final class InstallController: RootController, ControllerProtocol {
             user.timezone = 0
             
             var team = Team()
-            team.name = "Main"
-            
+            team.created = Date()
+            team.name = "Admin"
+            team.adminTeam = true
             
             do {
                 try user.save()
                 try team.save()
                 
                 team.users = [(user.id?.string)!]
-                user.teams = [(team.id?.string)!]
+                //user.teams = [(team.id?.string)!]
                 
-                try user.save()
+                //try user.save()
                 try team.save()
                 
                 return ResponseBuilder.build(json: JSON(["admin": try user.makeNode(), "team": try team.makeNode()]), statusCode: StatusCodes.created)

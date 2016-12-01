@@ -14,8 +14,8 @@ final class VersionsController: RootController, ControllerProtocol {
     
     // MARK: Routing
     
-    func configureRoutes(_ drop: Droplet) {
-        let basic = drop.grouped("v1", "apps")
+    func configureRoutes() {
+        let basic = self.baseRoute.grouped("apps")
         basic.get(IdType.self, "versions") { request, appId in
             return try self.index(request: request, appId: appId)
         }

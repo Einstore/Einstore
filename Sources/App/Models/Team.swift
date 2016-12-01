@@ -6,6 +6,7 @@
 //
 //
 
+import Foundation
 import Vapor
 import Fluent
 import HTTP
@@ -17,6 +18,8 @@ final class Team: Model {
     
     var id: Node?
     var name: String?
+    var created: Date?
+    var adminTeam: Bool? = false
     var users: [IdType]?
     
     
@@ -29,6 +32,8 @@ final class Team: Model {
     init(node: Node, in context: Context) throws {
         self.id = try node.extract("_id")
         self.name = try node.extract("name")
+        self.created = Date.init(timeIntervalSince1970: try node.extract("created"))
+        self.adminTeam = try node.extract("admin")
         self.users = try node.extract("users")
     }
     
@@ -36,6 +41,8 @@ final class Team: Model {
         return try Node(node: [
             "_id": self.id,
             "name": self.name,
+            "created": self.created?.timeIntervalSince1970.makeNode(),
+            "admin": self.adminTeam,
             "users": self.users?.makeNode()
             ])
     }
@@ -70,6 +77,9 @@ extension Team {
         if let name = request.data["name"]?.string {
             self.name = name
         }
+        if let users = request.data["users"]?.array {
+            self.users = users as? [IdType]
+        }
     }
     
 }
@@ -83,7 +93,7 @@ extension Team {
         get {
             var fields: [Field] = []
             
-            fields.append(Field(name: "name", validationType: .empty, errorMessage: "Team name can not be empty"))
+            fields.append(Field(name: "name", validationType: .empty, errorMessage: Lang.get("Team name can not be empty")))
             
             return fields
         }

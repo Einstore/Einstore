@@ -16,9 +16,9 @@ struct ResponseBuilder {
     
     // MARK: Response builders
     
-    static func build<M: Model>(model: M, statusCode: Int = StatusCodes.success) -> ResponseRepresentable {
+    static func build<M: Model>(model: M, statusCode: StatusCodes = .success) -> ResponseRepresentable {
         do {
-            let status: Status = .other(statusCode: statusCode, reasonPhrase: "Success")
+            let status: Status = .other(statusCode: statusCode.rawValue, reasonPhrase: Lang.get("Success"))
             let response: Response = try Response.init(status: status, json: JSON(model.makeNode()))
             return response
         }
@@ -27,9 +27,9 @@ struct ResponseBuilder {
         }
     }
     
-    static func build(json: JSON, statusCode: Int = StatusCodes.success) -> ResponseRepresentable {
+    static func build(json: JSON, statusCode: StatusCodes = .success) -> ResponseRepresentable {
         do {
-            let status: Status = .other(statusCode: statusCode, reasonPhrase: "Success")
+            let status: Status = .other(statusCode: statusCode.rawValue, reasonPhrase: Lang.get("Success"))
             let response: Response = try Response.init(status: status, json: json)
             return response
         }
@@ -38,9 +38,9 @@ struct ResponseBuilder {
         }
     }
     
-    static func build(node: Node, statusCode: Int = StatusCodes.success) -> ResponseRepresentable {
+    static func build(node: Node, statusCode: StatusCodes = .success) -> ResponseRepresentable {
         do {
-            let status: Status = .other(statusCode: statusCode, reasonPhrase: "Success")
+            let status: Status = .other(statusCode: statusCode.rawValue, reasonPhrase: Lang.get("Success"))
             let response: Response = try Response.init(status: status, json: JSON(node))
             return response
         }
@@ -53,7 +53,7 @@ struct ResponseBuilder {
     
     static func validationErrorResponse(errors: [ValidationError]) -> ResponseRepresentable {
         do {
-            let status: Status = .other(statusCode: StatusCodes.preconditionNotMet, reasonPhrase: "Validation error")
+            let status: Status = .other(statusCode: StatusCodes.preconditionNotMet.rawValue, reasonPhrase: Lang.get("Validation error"))
             var formattedErrors: [Node] = []
             for e: ValidationError in errors {
                 let errorDetailNode = try ["type": e.validationType.rawValue, "localized": e.errorMessage].makeNode()
@@ -70,90 +70,70 @@ struct ResponseBuilder {
     
     // MARK: Default responses
     
+    static func customErrorResponse(statusCode code: StatusCodes, message: String, bodyMessage: String? = nil) -> ResponseRepresentable {
+        let response = Response(status: .other(statusCode: code.rawValue, reasonPhrase: message))
+        response.headers["Content-Type"] = "application/json"
+        response.body = try! Body(JSON(["error": (bodyMessage != nil ? bodyMessage! : message).makeNode()]))
+        return response
+    }
+    
     static var okNoContent: ResponseRepresentable {
         get {
-            return Response(status: .other(statusCode: StatusCodes.successNoData, reasonPhrase: "Success"))
+            return Response(status: .other(statusCode: StatusCodes.successNoData.rawValue, reasonPhrase: Lang.get("Success")))
         }
     }
     
     static var notFound: ResponseRepresentable {
         get {
-            let response = Response(status: .other(statusCode: StatusCodes.notFound, reasonPhrase: "Not found"))
-            response.headers["Content-Type"] = "application/json"
-            response.body = try! Body(JSON(["error": "Not found"]))
-            return response
+            return self.customErrorResponse(statusCode: .notFound, message: Lang.get("Not found"))
         }
     }
     
     static var emailExists: ResponseRepresentable {
         get {
-            let response = Response(status: .other(statusCode: StatusCodes.notAuthorised, reasonPhrase: "Email already registered"))
-            response.headers["Content-Type"] = "application/json"
-            response.body = try! Body(JSON(["error": "Email already registered"]))
-            return response
+            return self.customErrorResponse(statusCode: .notAuthorised, message: Lang.get("Email already registered"))
         }
     }
     
     static var notAuthorised: ResponseRepresentable {
         get {
-            let response = Response(status: .other(statusCode: StatusCodes.notAuthorised, reasonPhrase: "Not authorised"))
-            response.headers["Content-Type"] = "application/json"
-            response.body = try! Body(JSON(["error": "Not authorised"]))
-            return response
+            return self.customErrorResponse(statusCode: .notAuthorised, message: Lang.get("Not authorised"))
         }
     }
     
     static var actionFailed: ResponseRepresentable {
         get {
-            let response = Response(status: .other(statusCode: StatusCodes.forbidden, reasonPhrase: "Action failed"))
-            response.headers["Content-Type"] = "application/json"
-            response.body = try! Body(JSON(["error": "Action failed"]))
-            return response
+            return self.customErrorResponse(statusCode: .forbidden, message: Lang.get("Action failed"))
         }
     }
     
     static var teapot: ResponseRepresentable {
         get {
-            let response = Response(status: .other(statusCode: StatusCodes.teapot, reasonPhrase: "I'm a teapot"))
-            response.headers["Content-Type"] = "application/json"
-            response.body = try! Body(JSON(["error": "I'm a teapot"]))
-            return response
+            return self.customErrorResponse(statusCode: .teapot, message: Lang.get("I'm a teapot"))
         }
     }
     
     static var internalServerError: ResponseRepresentable {
         get {
-            let response = Response(status: .other(statusCode: StatusCodes.internalServerError, reasonPhrase: "Fuck!"))
-            response.headers["Content-Type"] = "application/json"
-            response.body = try! Body(JSON(["error": "Internal server error"]))
-            return response
+            return self.customErrorResponse(statusCode: .internalServerError, message: Lang.get("Fuck!"), bodyMessage: Lang.get("Internal server error"))
         }
     }
     
     static var notImplemented: ResponseRepresentable {
         get {
-            let response = Response(status: .other(statusCode: StatusCodes.notImplemented, reasonPhrase: "Stumbling?"))
-            response.headers["Content-Type"] = "application/json"
-            response.body = try! Body(JSON(["error": "Not implemented"]))
-            return response
+            return self.customErrorResponse(statusCode: .notFound, message: Lang.get("Stumbling?"), bodyMessage: Lang.get("Not implemented"))
         }
     }
     
     static var selfHarm: ResponseRepresentable {
         get {
-            let response = Response(status: .other(statusCode: StatusCodes.forbidden, reasonPhrase: "Self harming?!"))
-            response.headers["Content-Type"] = "application/json"
-            response.body = try! Body(JSON(["error": "Don't do this to yourself!"]))
-            return response
+            return self.customErrorResponse(statusCode: .forbidden, message: Lang.get("Self harming?!"), bodyMessage: Lang.get("Don't do this to yourself!"))
         }
     }
     
     static var setupLocked: ResponseRepresentable {
         get {
-            let response = Response(status: .other(statusCode: StatusCodes.forbidden, reasonPhrase: "Go away!"))
-            response.headers["Content-Type"] = "application/json"
-            response.body = try! Body(JSON(["error": "Setup has been locked"]))
-            return response
+            return self.customErrorResponse(statusCode: .forbidden, message: Lang.get("Go away!"), bodyMessage: Lang.get("Setup has been locked"))
         }
     }
     
