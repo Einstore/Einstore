@@ -70,10 +70,15 @@ final class AppsController: RootController, ControllerProtocol {
             return response
         }
         
-        var object = App()
-        object.created = Date()
-        object.token = UUID().uuidString
-        return try self.createResponse(request: request, object: &object)
+        let s3: S3 = S3(accessKey: "AKIAIYON2EAL2ORHHDWA", secretKey: "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")
+        let info = try s3.get(infoForFilePath: "liveui.sql", bucketName: "booststore")
+        print(info!)
+        exit(0)
+//        
+//        var object = App()
+//        object.created = Date()
+//        object.token = UUID().uuidString
+//        return try self.createResponse(request: request, object: &object)
     }
     
     func delete(request: Request, objectId: IdType) throws -> ResponseRepresentable {
