@@ -70,11 +70,25 @@ final class AppsController: RootController, ControllerProtocol {
             return response
         }
         
+        guard let multipart: Multipart = request.multipart?["app"] else {
+            return ResponseBuilder.incompleteData
+        }
+        
+        let decoder: DecoderProtocol = Decoder.decoderForFile(multipart: multipart)
+        try decoder.prepare()
+        try decoder.parse()
+        
+        let icon: Data? = decoder.iconData
+        
+        
         let s3: S3 = S3(accessKey: "AKIAIYON2EAL2ORHHDWA", secretKey: "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")
         let info = try s3.get(infoForFilePath: "liveui.sql", bucketName: "booststore")
-        print(info!)
-        exit(0)
-//        
+        print(info)
+        
+        //exit(9)
+        
+        return ResponseBuilder.actionFailed
+        
 //        var object = App()
 //        object.created = Date()
 //        object.token = UUID().uuidString
