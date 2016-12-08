@@ -15,29 +15,15 @@ final class ApkDecoder: Decoder, DecoderProtocol {
     
     // MARK: Protocol data
     
-    var iconData: Data? {
-        get {
-            return nil
-        }
-    }
+    private(set) var iconData: Data?
+    private(set) var appName: String?
+    private(set) var appIdentifier: String?
+    private(set) var platform: Platform? = .android
+    private(set) var versionShort: String?
+    private(set) var versionLong: String?
     
-    var appName: String {
-        get {
-            return "App"
-        }
-    }
-    
-    var bundleId: String? {
-        get {
-            return "com.app-developer.app"
-        }
-    }
-    
-    var platform: Platform {
-        get {
-            return .android
-        }
-    }
+    private(set) var appPermissions: [String] = []
+    private(set) var appFeatures: [String] = []
     
     // MARK: URL's
     
@@ -81,10 +67,113 @@ final class ApkDecoder: Decoder, DecoderProtocol {
         }
     }
     
+    private func getApplicationName() {
+        var pathUrl: URL = self.extractedApkFolder
+        pathUrl.appendPathComponent("res")
+        pathUrl.appendPathComponent("values")
+        pathUrl.appendPathComponent("strings.xml")
+        if FileManager.default.fileExists(atPath:pathUrl.path) {
+            let strings: XMLNode? = XML(contentsOf: pathUrl)?.children[0]
+            for string: XMLNode in strings!.children {
+                if let attributeName: String = string.attributes["name"] {
+                    if attributeName == self.appNameId {
+                        self.appName = string.text
+                        continue
+                    }
+                    else if attributeName == "app_name" {
+                        self.appName = string.text
+                        continue
+                    }
+                }
+            }
+        }
+        
+        if self.appName == nil {
+            let file: Multipart.File = self.multiPartFile.file!
+            self.appName = file.name?.replacingOccurrences(of: ".apk", with: "")
+        }
+    }
+    
+    private func getApplicationIcon() throws {
+        var pathUrl: URL = self.extractedApkFolder
+        pathUrl.appendPathComponent("res")
+        let folders: [String] = try FileManager.default.contentsOfDirectory(atPath: pathUrl.path)
+        let iconInfo: [String]? = self.appIconId?.components(separatedBy: "/")
+        for folder: String in folders {
+            if ic
+        }
+    }
+    
+    private var appIconId: String?
+    private var appNameId: String?
+    
+    private func parseApplicationNode(_ node: XMLNode) {
+        if let name = node.attributes["android:label"] {
+            self.appNameId = name.replacingOccurrences(of: "@string/", with: "")
+        }
+        if let icon = node.attributes["android:icon"] {
+            self.appIconId = icon.replacingOccurrences(of: "@", with: "")
+        }
+    }
+    
+    private func parsePermission(_ node: XMLNode) {
+        if let value: String = node.attributes["android:name"] {
+            self.appPermissions.append(value)
+        }
+    }
+    
+    private func parseFeature(_ node: XMLNode) {
+        if let value: String = node.attributes["android:name"] {
+            self.appFeatures.append(value)
+        }
+    }
+    
     func parse() throws {
         guard FileManager.default.fileExists(atPath: self.manifestFileUrl.path) else {
             throw BoostError(.missingManifestFile)
         }
+        
+        let manifestXml = XML(contentsOf: self.manifestFileUrl)
+        guard let manifestContent = manifestXml?["manifest"] else {
+            throw BoostError(.corruptedManifestFile)
+        }
+        
+        for node: XMLNode in manifestContent.children {
+            if node.name == "application" {
+                self.parseApplicationNode(node)
+            }
+            else if node.name == "uses-permission" {
+                self.parsePermission(node)
+            }
+            else if node.name == "uses-feature" {
+                self.parseFeature(node)
+            }
+        }
+        
+        for nodeKey: String in manifestContent.attributes.keys {
+            let nodeValue: String = manifestContent.attributes[nodeKey]!
+            if nodeKey == "platformBuildVersionCode" {
+                self.versionShort = nodeValue
+            }
+            if nodeKey == "platformBuildVersionName" {
+                self.versionLong = nodeValue
+            }
+            if nodeKey == "package" {
+                self.appIdentifier = nodeValue
+            }
+        }
+        
+        self.getApplicationName()
+        try self.getApplicationIcon()
+    }
+    
+    // MARK: Data conversion
+    
+    func toJSON() throws -> JSON {
+        var data: Node = try Decoder.basicData(decoder: self)
+        data["permissions"] = try self.appPermissions.makeNode()
+        data["features"] = try self.appFeatures.makeNode()
+        return JSON(data)
     }
     
 }

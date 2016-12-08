@@ -27,6 +27,7 @@ final class App: Model {
     
     var id: Node?
     var name: String?
+    var identifier: String?
     var token: String?
     var platform: Platform?
     var created: Date?
@@ -42,6 +43,7 @@ final class App: Model {
     init(node: Node, in context: Context) throws {
         self.id = try node.extract("_id")
         self.name = try node.extract("name")
+        self.identifier = try node.extract("identifier")
         self.token = try node.extract("token")
         self.platform = Platform(rawValue: try node.extract("token"))
         self.created = Date.init(timeIntervalSince1970: try node.extract("created"))
@@ -52,6 +54,7 @@ final class App: Model {
         let nodes = try Node(node: [
             "_id": self.id,
             "name": self.name,
+            "identifier": self.identifier,
             "token": self.token,
             "platform": self.platform?.rawValue,
             "created": self.created?.timeIntervalSince1970.makeNode(),
@@ -80,8 +83,8 @@ extension App {
     
     // MARK: Get
     
-    static func find(name: String) throws -> Team? {
-        return try Team.query().filter("name", name).first()
+    static func find(identifier: String, platform: Platform) throws -> App? {
+        return try App.query().filter("identifier", identifier).filter("platform", platform.rawValue).first()
     }
     
     // MARK: Save / update
@@ -100,7 +103,6 @@ extension App {
 // MARK: Validation
 
 extension App {
-    
     
     static var validationFields: [Field] {
         get {

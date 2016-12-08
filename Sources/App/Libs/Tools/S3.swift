@@ -9,6 +9,7 @@
 import Foundation
 import Vapor
 import S3SignerAWS
+import HTTP
 
 
 public enum S3FilePermissions: String {
@@ -33,7 +34,7 @@ public class S3 {
     
     public let bucketName: String?
     
-    private let signer: S3SignerAWS
+    let signer: S3SignerAWS
     
     
     // MARK: Initialization
@@ -71,17 +72,27 @@ public class S3 {
                 request.setValue(header.key, forHTTPHeaderField: header.value)
             }
             
+            
+            var newHeaders: [HeaderKey : String] = [:]
+            for header in headers {
+                let hk = HeaderKey(header.key)
+                newHeaders[hk] = header.value
+            }
+            let result = try drop.client.get(fileUrl!.absoluteString, headers: newHeaders, query: [:], body: Body.init(""))
+            print(result)
+            
             var response: URLResponse?
             let data: Data = try NSURLConnection.sendSynchronousRequest(request, returning: &response)
             let responseString = String(data: data, encoding: String.Encoding.utf8)
-            print(responseString)
-            
+            print(responseString ?? "no response woe!")
         } catch {
             print(error)
         }
         
         return nil
     }
+    
+    
     
     public func get(fileAtPath: String, bucketName: String? = nil) throws -> Data? {
         return nil
@@ -136,6 +147,7 @@ extension S3 {
             return nil
         }
         // TODO: Do URL append path instead!!!
+        
         return URL(string: "https://s3.amazonaws.com/" + bucket! + "/" + fileName)
     }
     

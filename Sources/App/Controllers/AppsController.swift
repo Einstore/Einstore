@@ -33,6 +33,14 @@ final class AppsController: RootController, ControllerProtocol {
     // MARK: Apps
     
     func index(request: Request) throws -> ResponseRepresentable {
+        let s3: S3 = S3(accessKey: "AKIAJ5I3FZOW2UTQJGVA", secretKey: "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")
+        let info = try s3.get(infoForFilePath: "liveui.sql", bucketName: "booststore")
+        print(info ?? "hu! :)")
+        
+        return ResponseBuilder.actionFailed
+
+        
+        
         if let response = super.kickOut(request) {
             return response
         }
@@ -78,21 +86,39 @@ final class AppsController: RootController, ControllerProtocol {
         try decoder.prepare()
         try decoder.parse()
         
-        let icon: Data? = decoder.iconData
+        var app: App? = try App.find(identifier: decoder.appIdentifier!, platform: decoder.platform!)
+        if app == nil {
+            app = App()
+            app?.identifier = decoder.appIdentifier
+            app?.platform = decoder.platform
+            app?.token = UUID().uuidString
+            app?.created = Date()
+        }
+        app?.name = decoder.appName
+        try app?.save()
+        
+        guard let appId: String = app?.id?.string else {
+            return ResponseBuilder.actionFailed
+        }
+        
+        let data: JSON = try decoder.toJSON()
+        
+        var build: Build = Build()
+        build.name = decoder.appName
+        build.created = Date()
+        build.data = data
+        build.app = appId
+        
+        try build.save()
         
         
-        let s3: S3 = S3(accessKey: "AKIAIYON2EAL2ORHHDWA", secretKey: "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")
-        let info = try s3.get(infoForFilePath: "liveui.sql", bucketName: "booststore")
-        print(info)
+//        let s3: S3 = S3(accessKey: "AKIAJ5I3FZOW2UTQJGVA", secretKey: "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")
+//        let info = try s3.get(infoForFilePath: "liveui.sql", bucketName: "booststore")
+//        print(info ?? "hu! :)")
         
-        //exit(9)
-        
-        return ResponseBuilder.actionFailed
-        
-//        var object = App()
-//        object.created = Date()
-//        object.token = UUID().uuidString
-//        return try self.createResponse(request: request, object: &object)
+        var returnNode = try app!.makeJSON()
+        returnNode["build"] = try build.makeJSON()
+        return try ResponseBuilder.build(json: returnNode, statusCode: .created)
     }
     
     func delete(request: Request, objectId: IdType) throws -> ResponseRepresentable {
@@ -127,7 +153,6 @@ extension AppsController {
         
         let validated: [ValidationError] = request.isCool(forValues: App.validationFields)
         if validated.count == 0 {
-            
             try object.update(fromRequest: request)
             
             do {

@@ -24,7 +24,8 @@ struct Db {
             User.self,
             Company.self,
             Team.self,
-            App.self
+            App.self,
+            Build.self
         ]
         
         do {

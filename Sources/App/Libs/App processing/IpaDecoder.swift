@@ -15,29 +15,12 @@ final class IpaDecoder: Decoder, DecoderProtocol {
     
     // MARK: Protocol data
     
-    var iconData: Data? {
-        get {
-            return nil
-        }
-    }
-    
-    var appName: String {
-        get {
-            return "App"
-        }
-    }
-    
-    var bundleId: String? {
-        get {
-            return "com.app-developer.app"
-        }
-    }
-    
-    var platform: Platform {
-        get {
-            return .android
-        }
-    }
+    private(set) var iconData: Data?
+    private(set) var appName: String?
+    private(set) var appIdentifier: String?
+    private(set) var platform: Platform?
+    private(set) var versionShort: String?
+    private(set) var versionLong: String?
     
     // MARK: Prepare
     
@@ -51,8 +34,16 @@ final class IpaDecoder: Decoder, DecoderProtocol {
         }
     }
     
+    // MARK: Parse
+    
     func parse() throws {
         
+    }
+    
+    // MARK: Data conversion
+    
+    func toJSON() throws -> JSON {
+        return JSON([])
     }
     
 }

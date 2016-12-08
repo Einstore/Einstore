@@ -16,6 +16,7 @@ enum ErrorReason {
     case unarchivingFailed
     case cacheNotAccessible
     case missingManifestFile
+    case corruptedManifestFile
     
     case generic(String)
     

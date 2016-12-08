@@ -72,4 +72,16 @@ class Decoder {
         }
     }
     
+    // MARK: JSONising
+    
+    static func basicData(decoder: DecoderProtocol) throws -> Node {
+        var data: [String: String] = [:]
+        data["name"] = decoder.appName
+        data["identifier"] = decoder.appIdentifier
+        data["platform"] = decoder.platform!.rawValue
+        data["version-short"] = decoder.versionShort
+        data["version-long"] = decoder.versionLong
+        return try data.makeNode()
+    }
+    
 }

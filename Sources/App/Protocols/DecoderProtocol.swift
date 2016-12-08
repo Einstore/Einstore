@@ -15,11 +15,15 @@ protocol DecoderProtocol {
     init(_ file: Multipart)
     
     var iconData: Data? { get }
-    var appName: String { get }
-    var bundleId: String? { get }
-    var platform: Platform { get }
+    var appName: String? { get }
+    var appIdentifier: String? { get }
+    var platform: Platform? { get }
+    var versionShort: String? { get }
+    var versionLong: String? { get }
     
     func prepare() throws
     func parse() throws
+    
+    func toJSON() throws -> JSON
     
 }
