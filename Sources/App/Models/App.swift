@@ -27,6 +27,7 @@ final class App: Model {
     
     var id: Node?
     var name: String?
+    var iconUrl: String?
     var identifier: String?
     var token: String?
     var platform: Platform?
@@ -43,6 +44,7 @@ final class App: Model {
     init(node: Node, in context: Context) throws {
         self.id = try node.extract("_id")
         self.name = try node.extract("name")
+        self.iconUrl = try node.extract("icon")
         self.identifier = try node.extract("identifier")
         self.token = try node.extract("token")
         self.platform = Platform(rawValue: try node.extract("token"))
@@ -54,6 +56,7 @@ final class App: Model {
         let nodes = try Node(node: [
             "_id": self.id,
             "name": self.name,
+            "icon": self.iconUrl,
             "identifier": self.identifier,
             "token": self.token,
             "platform": self.platform?.rawValue,

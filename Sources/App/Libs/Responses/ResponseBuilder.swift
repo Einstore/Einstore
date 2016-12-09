@@ -101,6 +101,12 @@ struct ResponseBuilder {
         }
     }
     
+    static var awsNotAuthorised: ResponseRepresentable {
+        get {
+            return self.customErrorResponse(statusCode: .notAuthorised, message: Lang.get("Not authorised to access AWS"))
+        }
+    }
+    
     static var actionFailed: ResponseRepresentable {
         get {
             return self.customErrorResponse(statusCode: .forbidden, message: Lang.get("Action failed"))

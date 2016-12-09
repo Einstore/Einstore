@@ -9,9 +9,12 @@
 import Foundation
 import Vapor
 import HTTP
+import S3
 
 
 final class AppsController: RootController, ControllerProtocol {
+    
+    
     
     
     // MARK: Routing
@@ -30,17 +33,35 @@ final class AppsController: RootController, ControllerProtocol {
         }
     }
     
+    // MARK: S3
+    
+    private func s3() throws -> S3 {
+        let s3: S3 = try S3(droplet: drop)
+        return s3
+    }
+    
     // MARK: Apps
     
     func index(request: Request) throws -> ResponseRepresentable {
-        let s3: S3 = S3(accessKey: "AKIAJ5I3FZOW2UTQJGVA", secretKey: "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")
-        let info = try s3.get(infoForFilePath: "liveui.sql", bucketName: "booststore")
-        print(info ?? "hu! :)")
+        let s3: S3 = try S3(droplet: drop)
         
-        return ResponseBuilder.actionFailed
-
+        let url = URL.init(fileURLWithPath: "/Users/pro/Dropbox (Personal)/agile-android-software-development.pdf")
+        try s3.put(fileAtUrl: url, filePath: "books/book.pdf", bucketName: "booststore", accessControl: .publicRead)
         
+        let fileData: Data = try s3.get(fileAtPath: "books/book.pdf", bucketName: "booststore")
+        print(fileData.count)
         
+        try s3.delete(fileAtPath: "books/book.pdf", bucketName: "booststore")
+        
+//        
+//        
+//        let resultString: String? = String.init(data: fileData, encoding: String.Encoding.utf8)
+//        print(resultString ?? "empty :(")
+//        
+//        return ResponseBuilder.actionFailed
+//
+//        
+//
         if let response = super.kickOut(request) {
             return response
         }
@@ -48,6 +69,8 @@ final class AppsController: RootController, ControllerProtocol {
         let data = try App.query()
         return JSON(try data.all().makeNode())
     }
+    
+    
     
     func get(request: Request, objectId: IdType) throws -> ResponseRepresentable {
         if let response = super.kickOut(request) {
@@ -111,17 +134,21 @@ final class AppsController: RootController, ControllerProtocol {
         
         try build.save()
         
-        
-//        let s3: S3 = S3(accessKey: "AKIAJ5I3FZOW2UTQJGVA", secretKey: "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")
-//        let info = try s3.get(infoForFilePath: "liveui.sql", bucketName: "booststore")
-//        print(info ?? "hu! :)")
-        
+        if let iconData: Data = decoder.iconData {
+            let s3: S3 = try self.s3()
+            try s3.put(data: iconData, filePath: "icon.png", bucketName: "booststore")
+        }
+    
         var returnNode = try app!.makeJSON()
         returnNode["build"] = try build.makeJSON()
-        return try ResponseBuilder.build(json: returnNode, statusCode: .created)
+        return ResponseBuilder.build(json: returnNode, statusCode: .created)
     }
     
     func delete(request: Request, objectId: IdType) throws -> ResponseRepresentable {
+        let s3: S3 = try self.s3()
+        try s3.delete(fileAtPath: "photo.JPG", bucketName: "booststore")
+        
+        
         if let response = super.kickOut(request) {
             return response
         }

@@ -1,0 +1,16 @@
+{
+  "ignore" : [
+    ".git",
+    ".gitignore",
+    ".overlook"
+  ],
+  "env" : {
+    "example" : "variable"
+  },
+  "execute" : "ls -la",
+  "directories" : [
+    "build",
+    "tests"
+  ],
+  "verbose" : true
+}

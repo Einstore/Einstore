@@ -98,9 +98,24 @@ final class ApkDecoder: Decoder, DecoderProtocol {
         var pathUrl: URL = self.extractedApkFolder
         pathUrl.appendPathComponent("res")
         let folders: [String] = try FileManager.default.contentsOfDirectory(atPath: pathUrl.path)
-        let iconInfo: [String]? = self.appIconId?.components(separatedBy: "/")
+        let ici: [String]? = self.appIconId?.components(separatedBy: "/")
+        guard let iconInfo: [String] = ici else {
+            return
+        }
         for folder: String in folders {
-            if ic
+            if folder.contains(iconInfo[0]) {
+                var iconUrl: URL = pathUrl
+                iconUrl.appendPathComponent(folder)
+                iconUrl.appendPathComponent(iconInfo[1])
+                iconUrl.appendPathExtension("png")
+                
+                if FileManager.default.fileExists(atPath: iconUrl.path) {
+                    let data: Data = try Data.init(contentsOf: iconUrl)
+                    if data.count > (self.iconData?.count ?? 0) {
+                        self.iconData = data
+                    }
+                }
+            }
         }
     }
     

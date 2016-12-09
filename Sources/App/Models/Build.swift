@@ -18,6 +18,7 @@ final class Build: Model {
     
     var id: Node?
     var name: String?
+    var iconUrl: String?
     var created: Date?
     var data: JSON?
     var app: IdType?
@@ -32,6 +33,7 @@ final class Build: Model {
     init(node: Node, in context: Context) throws {
         self.id = try node.extract("_id")
         self.name = try node.extract("name")
+        self.iconUrl = try node.extract("icon")
         self.data = try node.extract("data")
         self.created = Date.init(timeIntervalSince1970: try node.extract("created"))
         self.app = try node.extract("app")
@@ -41,6 +43,7 @@ final class Build: Model {
         let nodes = try Node(node: [
             "_id": self.id,
             "name": self.name,
+            "icon": self.iconUrl,
             "data": self.data,
             "created": self.created?.timeIntervalSince1970,
             "app": self.app
