@@ -18,6 +18,7 @@ enum Platform: String {
     case simulator = "simulator"
     case android = "android"
     case macOS = "macOS"
+    case windows = "windows"
 }
 
 

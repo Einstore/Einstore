@@ -104,15 +104,31 @@ final class ApkDecoder: Decoder, DecoderProtocol {
         }
         for folder: String in folders {
             if folder.contains(iconInfo[0]) {
-                var iconUrl: URL = pathUrl
-                iconUrl.appendPathComponent(folder)
-                iconUrl.appendPathComponent(iconInfo[1])
+                var iconBaseUrl: URL = pathUrl
+                iconBaseUrl.appendPathComponent(folder)
+                
+                // Search for rounded icon first
+                var iconUrl: URL = iconBaseUrl
+                iconUrl.appendPathComponent(iconInfo[1] + "_round")
                 iconUrl.appendPathExtension("png")
                 
                 if FileManager.default.fileExists(atPath: iconUrl.path) {
                     let data: Data = try Data.init(contentsOf: iconUrl)
                     if data.count > (self.iconData?.count ?? 0) {
                         self.iconData = data
+                    }
+                }
+                else {
+                    // If not found, look for normal one
+                    iconUrl = iconBaseUrl
+                    iconUrl.appendPathComponent(iconInfo[1])
+                    iconUrl.appendPathExtension("png")
+                    
+                    if FileManager.default.fileExists(atPath: iconUrl.path) {
+                        let data: Data = try Data.init(contentsOf: iconUrl)
+                        if data.count > (self.iconData?.count ?? 0) {
+                            self.iconData = data
+                        }
                     }
                 }
             }

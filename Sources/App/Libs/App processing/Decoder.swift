@@ -44,7 +44,7 @@ class Decoder {
     }
     
     static func decoderForFile(multipart: Multipart) -> DecoderProtocol {
-        return ApkDecoder(multipart)
+        return IpaDecoder(multipart)
     }
     
     // MARK: Working with files

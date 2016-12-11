@@ -25,7 +25,8 @@ struct Db {
             Company.self,
             Team.self,
             App.self,
-            Build.self
+            Build.self,
+            UploadToken.self
         ]
         
         do {

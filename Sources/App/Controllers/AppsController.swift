@@ -43,25 +43,6 @@ final class AppsController: RootController, ControllerProtocol {
     // MARK: Apps
     
     func index(request: Request) throws -> ResponseRepresentable {
-        let s3: S3 = try S3(droplet: drop)
-        
-        let url = URL.init(fileURLWithPath: "/Users/pro/Dropbox (Personal)/agile-android-software-development.pdf")
-        try s3.put(fileAtUrl: url, filePath: "books/book.pdf", bucketName: "booststore", accessControl: .publicRead)
-        
-        let fileData: Data = try s3.get(fileAtPath: "books/book.pdf", bucketName: "booststore")
-        print(fileData.count)
-        
-        try s3.delete(fileAtPath: "books/book.pdf", bucketName: "booststore")
-        
-//        
-//        
-//        let resultString: String? = String.init(data: fileData, encoding: String.Encoding.utf8)
-//        print(resultString ?? "empty :(")
-//        
-//        return ResponseBuilder.actionFailed
-//
-//        
-//
         if let response = super.kickOut(request) {
             return response
         }
@@ -69,8 +50,6 @@ final class AppsController: RootController, ControllerProtocol {
         let data = try App.query()
         return JSON(try data.all().makeNode())
     }
-    
-    
     
     func get(request: Request, objectId: IdType) throws -> ResponseRepresentable {
         if let response = super.kickOut(request) {
@@ -134,14 +113,15 @@ final class AppsController: RootController, ControllerProtocol {
         
         try build.save()
         
+        let s3: S3 = try self.s3()
+        let path: String = "data/" + app!.platform!.rawValue + "/" + app!.id!.string! + "/" + build.id!.string!
         if let iconData: Data = decoder.iconData {
-            let s3: S3 = try self.s3()
-            try s3.put(data: iconData, filePath: "icon.png", bucketName: "booststore")
+            try s3.put(data: iconData, filePath: (path + "/icon.png"), bucketName: "booststore", accessControl: .publicRead)
         }
+        try s3.put(bytes: (multipart.file?.data)!, filePath: (path + "/app.data"), bucketName: "booststore", accessControl: .publicRead)
     
-        var returnNode = try app!.makeJSON()
-        returnNode["build"] = try build.makeJSON()
-        return ResponseBuilder.build(json: returnNode, statusCode: .created)
+        let ret: [String: Node] = try ["app": app!.makeNode(), "build": build.makeNode()]
+        return try ResponseBuilder.build(node: ret.makeNode(), statusCode: .created)
     }
     
     func delete(request: Request, objectId: IdType) throws -> ResponseRepresentable {
