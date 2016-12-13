@@ -1,15 +1,17 @@
+#!/usr/bin/env bash
+
 if [[ $(id -u) -ne 0 ]] ; then echo "Please run as root ( sudo install-ubuntu.sh )" ; exit 1 ; fi
 
 # Update all
 apt-get update
 
+VERSION="3.0.1"
 
 # Swift
 if hash swift 2>/dev/null; then
     echo "Swift is installed ✓"
 else
-    echo "Need to install Swift ..."
-    
+    echo "Need to install Swift ..."    
 	# Determine OS
 	UNAME=`uname`;
 	if [[ $UNAME == "Darwin" ]];
@@ -37,11 +39,11 @@ else
 	    sudo apt-get install -y clang libicu-dev uuid-dev
 	
 	    echo "🐦 Installing Swift";
-	    if [[ $OS == "ubuntu1510" ]];
+	    if [[ $OS == "ubuntu1604" ]];
 	    then
-	        SWIFTFILE="swift-$VERSION-RELEASE-ubuntu15.10";    
+	        SWIFTFILE="swift-$VERSION-RELEASE-ubuntu16.04";    
 	    else
-	        SWIFTFILE="swift-$VERSION-RELEASE-ubuntu14.04";
+	        SWIFTFILE="swift-$VERSION-RELEASE-ubuntu15.10";
 	    fi
 	    wget https://swift.org/builds/swift-$VERSION-release/$OS/swift-$VERSION-RELEASE/$SWIFTFILE.tar.gz
 	    tar -zxf $SWIFTFILE.tar.gz
