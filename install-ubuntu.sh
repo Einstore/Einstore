@@ -19,11 +19,11 @@ else
 	    if [[ $UNAME == "Linux" ]];
 	    then
 	        UBUNTU_RELEASE=`lsb_release -a 2>/dev/null`;
-	        if [[ $UBUNTU_RELEASE == *"15.10"* ]];
+	        if [[ $UBUNTU_RELEASE == *"16.04"* ]];
 	        then
-	            OS="ubuntu1510";
+	            OS="ubuntu1604";
 	        else
-	            OS="ubuntu1404";
+	            OS="ubuntu1510";
 	        fi
 	    else
 	        echo "Unsupported Operating System: $UNAME";
@@ -52,6 +52,9 @@ else
 	
     echo "Swift installation complete ✓"
 fi
+
+exit
+
 
 
 # Vapor
