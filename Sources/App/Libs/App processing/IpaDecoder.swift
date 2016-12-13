@@ -64,7 +64,7 @@ final class IpaDecoder: Decoder, DecoderProtocol {
     private func parseProvisioning() throws {
         var embeddedFile: URL = self.extractedIpaFolder
         embeddedFile.appendPathComponent("embedded.mobileprovision")
-        let provisioning: String = try String.init(contentsOfFile: embeddedFile.path)
+        let provisioning: String = try String.init(contentsOfFile: embeddedFile.path, encoding: String.Encoding.utf8)
         if provisioning.contains("ProvisionsAllDevices") {
             self.data["provisioning"] = "enterprise"
         }
@@ -83,7 +83,9 @@ final class IpaDecoder: Decoder, DecoderProtocol {
     // MARK: Data conversion
     
     func toJSON() throws -> JSON {
-        return JSON([])
+        var data: Node = try Decoder.basicData(decoder: self)
+        data["data"] = try self.data.makeNode()
+        return JSON(data)
     }
     
 }

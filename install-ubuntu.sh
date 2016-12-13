@@ -54,6 +54,16 @@ else
 fi
 
 
+# unzip
+if hash unzip 2>/dev/null; then
+    echo "unzip is installed ✓"
+else
+    echo "Need to install unzip ..."
+    apt-get -y install unzip
+    echo "unzip installation complete ✓"
+fi
+
+
 # CFPropertyList
 if hash CFPropertyList 2>/dev/null; then
     echo "CFPropertyList is installed ✓"

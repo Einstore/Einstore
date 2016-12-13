@@ -24,6 +24,8 @@ protocol DecoderProtocol {
     func prepare() throws
     func parse() throws
     
+    func cleanUp() throws
+    
     func toJSON() throws -> JSON
     
 }

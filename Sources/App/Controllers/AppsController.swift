@@ -119,6 +119,8 @@ final class AppsController: RootController, ControllerProtocol {
             try s3.put(data: iconData, filePath: (path + "/icon.png"), bucketName: "booststore", accessControl: .publicRead)
         }
         try s3.put(bytes: (multipart.file?.data)!, filePath: (path + "/app.data"), bucketName: "booststore", accessControl: .publicRead)
+        
+        try decoder.cleanUp()
     
         let ret: [String: Node] = try ["app": app!.makeNode(), "build": build.makeNode()]
         return try ResponseBuilder.build(node: ret.makeNode(), statusCode: .created)
