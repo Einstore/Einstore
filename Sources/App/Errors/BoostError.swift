@@ -17,6 +17,9 @@ enum ErrorReason {
     case cacheNotAccessible
     case missingManifestFile
     case corruptedManifestFile
+    case invalidAppContent
+    
+    case databaseError
     
     case generic(String)
     

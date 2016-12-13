@@ -113,6 +113,10 @@ final class AppsController: RootController, ControllerProtocol {
         
         try build.save()
         
+        guard app!.id != nil && build.id != nil else {
+            throw BoostError(.databaseError)
+        }
+        
         let s3: S3 = try self.s3()
         let path: String = "data/" + app!.platform!.rawValue + "/" + app!.id!.string! + "/" + build.id!.string!
         if let iconData: Data = decoder.iconData {
@@ -121,7 +125,7 @@ final class AppsController: RootController, ControllerProtocol {
         try s3.put(bytes: (multipart.file?.data)!, filePath: (path + "/app.data"), bucketName: "booststore", accessControl: .publicRead)
         
         try decoder.cleanUp()
-    
+        
         let ret: [String: Node] = try ["app": app!.makeNode(), "build": build.makeNode()]
         return try ResponseBuilder.build(node: ret.makeNode(), statusCode: .created)
     }

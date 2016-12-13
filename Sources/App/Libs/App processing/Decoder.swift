@@ -73,7 +73,8 @@ class Decoder {
     }
     
     func cleanUp() throws {
-        try FileManager.default.removeItem(at: self.archiveFolderUrl)
+        // TODO: Uncomment for release
+        //try FileManager.default.removeItem(at: self.archiveFolderUrl)
     }
     
     // MARK: JSONising

@@ -15,10 +15,10 @@ import HTTP
 enum Platform: String {
     case iOS = "iOS"
     case tvOS = "tvOS"
-    case simulator = "simulator"
-    case android = "android"
+    case simulator = "Simulator"
+    case android = "Android"
     case macOS = "macOS"
-    case windows = "windows"
+    case windows = "Windows"
 }
 
 

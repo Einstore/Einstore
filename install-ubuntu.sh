@@ -9,15 +9,47 @@ if hash swift 2>/dev/null; then
     echo "Swift is installed ✓"
 else
     echo "Need to install Swift ..."
-    apt-get -y install clang libicu-dev binutils git
-    mkdir ./tmp/
-    cd ./tmp/
-    wget https://swift.org/builds/swift-3.0.1-release/ubuntu1604/swift-3.0.1-RELEASE/swift-3.0.1-RELEASE-ubuntu16.04.tar.gz
-    tar -xvf ./swift-3.0.1-RELEASE-ubuntu16.04.tar.gz
-    mkdir /opt/swift/swift-3.0
-    mv ./swift-3.0.1-RELEASE-ubuntu16.04/usr/ /opt/swift/swift-3.0
-    # Follow the rest on http://blog.robkerr.com/install-swift-3-0-on-ubuntu-linux-16-04-lts/
-    cd ../
+    
+	# Determine OS
+	UNAME=`uname`;
+	if [[ $UNAME == "Darwin" ]];
+	then
+	    OS="macos";
+	else
+	    if [[ $UNAME == "Linux" ]];
+	    then
+	        UBUNTU_RELEASE=`lsb_release -a 2>/dev/null`;
+	        if [[ $UBUNTU_RELEASE == *"15.10"* ]];
+	        then
+	            OS="ubuntu1510";
+	        else
+	            OS="ubuntu1404";
+	        fi
+	    else
+	        echo "Unsupported Operating System: $UNAME";
+	    fi
+	fi
+	echo "🖥 Operating System: $OS";
+	
+	if [[ $OS != "macos" ]];
+	then
+	    echo "📚 Installing Dependencies"
+	    sudo apt-get install -y clang libicu-dev uuid-dev
+	
+	    echo "🐦 Installing Swift";
+	    if [[ $OS == "ubuntu1510" ]];
+	    then
+	        SWIFTFILE="swift-$VERSION-RELEASE-ubuntu15.10";    
+	    else
+	        SWIFTFILE="swift-$VERSION-RELEASE-ubuntu14.04";
+	    fi
+	    wget https://swift.org/builds/swift-$VERSION-release/$OS/swift-$VERSION-RELEASE/$SWIFTFILE.tar.gz
+	    tar -zxf $SWIFTFILE.tar.gz
+	    export PATH=$PWD/$SWIFTFILE/usr/bin:"${PATH}"
+	fi
+	
+	echo "📅 Version: `swift --version`";
+	
     echo "Swift installation complete ✓"
 fi
 

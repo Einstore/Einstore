@@ -22,7 +22,7 @@ final class IpaDecoder: Decoder, DecoderProtocol {
     private(set) var versionShort: String?
     private(set) var versionLong: String?
     
-    private(set) var data: [String: String] = [:]
+    private(set) var data: [String: Node] = [:]
     
     
     // MARK: URL's
@@ -76,8 +76,54 @@ final class IpaDecoder: Decoder, DecoderProtocol {
         }
     }
     
+    private func parseInfoPlistFile() throws {
+        var embeddedFile: URL = self.extractedIpaFolder
+        embeddedFile.appendPathComponent("Info.plist")
+        
+        guard let plist: NSDictionary = NSDictionary(contentsOfFile: embeddedFile.path) else {
+            throw BoostError(.invalidAppContent)
+        }
+        
+        // Bundle ID
+        guard let bundleId = plist["CFBundleIdentifier"] as? String else {
+            throw BoostError(.invalidAppContent)
+        }
+        self.appIdentifier = bundleId
+        
+        // Name
+        self.appName = plist["CFBundleDisplayName"] as? String
+        
+        // Versions
+        self.versionLong = plist["CFBundleShortVersionString"] as? String
+        self.versionShort = plist["CFBundleVersion"] as? String
+        
+        // Other plist data
+        if let minOS: String = plist["MinimumOSVersion"] as? String {
+            self.data["minOS"] = minOS.makeNode()
+        }
+        if let orientationPhone: [String] = plist["UISupportedInterfaceOrientations"] as? [String] {
+            self.data["orientationPhone"] = try orientationPhone.makeNode()
+        }
+        if let orientationTablet: [String] = plist["UISupportedInterfaceOrientations~ipad"] as? [String] {
+            self.data["orientationTablet"] = try orientationTablet.makeNode()
+        }
+        if let deviceCapabilities: [String] = plist["UIRequiredDeviceCapabilities"] as? [String] {
+            self.data["deviceCapabilities"] = try deviceCapabilities.makeNode()
+        }
+        if let deviceFamily: [String] = plist["UIDeviceFamily"] as? [String] {
+            self.data["deviceFamily"] = try deviceFamily.makeNode()
+        }
+    }
+    
+    private func parseIcon() throws {
+        let files: [String] = try FileManager.default.contentsOfDirectory(atPath: self.extractedIpaFolder.path)
+        
+    }
+    
     func parse() throws {
-        try self.parseProvisioning()
+        //try self.parseProvisioning()
+        try self.parseInfoPlistFile()
+        try self.parseIcon()
     }
     
     // MARK: Data conversion
