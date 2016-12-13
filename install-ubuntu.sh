@@ -48,16 +48,15 @@ else
 	    wget https://swift.org/builds/swift-$VERSION-release/$OS/swift-$VERSION-RELEASE/$SWIFTFILE.tar.gz
 	    tar -zxf $SWIFTFILE.tar.gz
 	    export PATH=$PWD/$SWIFTFILE/usr/bin:"${PATH}"
+
+        rm -rf $SWIFTFILE
+        rm $SWIFTFILE.tar.gz
 	fi
 	
 	echo "📅 Version: `swift --version`";
 	
     echo "Swift installation complete ✓"
 fi
-
-exit
-
-
 
 # Vapor
 if hash vapor 2>/dev/null; then
