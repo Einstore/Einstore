@@ -110,7 +110,7 @@
 				"header": [
 					{
 						"key": "X-AuthToken",
-						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"value": "{{AUTH}}",
 						"description": ""
 					}
 				],
@@ -125,7 +125,7 @@
 		{
 			"name": "Users (url token)",
 			"request": {
-				"url": "http://localhost:8080/v1/users?token=AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+				"url": "http://localhost:8080/v1/users?token={{AUTH}}",
 				"method": "GET",
 				"header": [],
 				"body": {
@@ -144,7 +144,7 @@
 				"header": [
 					{
 						"key": "X-AuthToken",
-						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"value": "{{AUTH}}",
 						"description": ""
 					},
 					{
@@ -164,12 +164,12 @@
 		{
 			"name": "Users/:id",
 			"request": {
-				"url": "http://localhost:8080/v1/users/cec43d58d936d44820119400",
+				"url": "http://localhost:8080/v1/users/62254058296038d51f88e0ce",
 				"method": "GET",
 				"header": [
 					{
 						"key": "X-AuthToken",
-						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"value": "{{AUTH}}",
 						"description": ""
 					}
 				],
@@ -189,7 +189,7 @@
 				"header": [
 					{
 						"key": "X-AuthToken",
-						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"value": "{{AUTH}}",
 						"description": ""
 					},
 					{
@@ -214,7 +214,7 @@
 				"header": [
 					{
 						"key": "X-AuthToken",
-						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"value": "{{AUTH}}",
 						"description": ""
 					},
 					{
@@ -259,7 +259,7 @@
 				"header": [
 					{
 						"key": "X-AuthToken",
-						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"value": "{{AUTH}}",
 						"description": ""
 					},
 					{
@@ -307,7 +307,7 @@
 		{
 			"name": "Users/logout",
 			"request": {
-				"url": "http://localhost:8080/v1/users/logout?token=37FBB534-F728-4BD5-A316-070C1BEF1A9F",
+				"url": "http://localhost:8080/v1/users/logout?token={{AUTH}}",
 				"method": "GET",
 				"header": [],
 				"body": {
@@ -340,7 +340,7 @@
 				"header": [
 					{
 						"key": "X-AuthToken",
-						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"value": "{{AUTH}}",
 						"description": ""
 					}
 				],
@@ -360,7 +360,7 @@
 				"header": [
 					{
 						"key": "X-AuthToken",
-						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"value": "{{AUTH}}",
 						"description": ""
 					},
 					{
@@ -385,7 +385,7 @@
 				"header": [
 					{
 						"key": "X-AuthToken",
-						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"value": "{{AUTH}}",
 						"description": ""
 					}
 				],
@@ -405,7 +405,7 @@
 				"header": [
 					{
 						"key": "X-AuthToken",
-						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"value": "{{AUTH}}",
 						"description": ""
 					},
 					{
@@ -425,12 +425,12 @@
 		{
 			"name": "Teams/:id",
 			"request": {
-				"url": "http://localhost:8080/v1/teams/225940585ab3dcd190245b83",
+				"url": "http://localhost:8080/v1/teams/a26b4058fea6f62a67c14491",
 				"method": "DELETE",
 				"header": [
 					{
 						"key": "X-AuthToken",
-						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"value": "{{AUTH}}",
 						"description": ""
 					}
 				],
@@ -450,7 +450,7 @@
 				"header": [
 					{
 						"key": "X-AuthToken",
-						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"value": "{{AUTH}}",
 						"description": ""
 					}
 				],
@@ -470,7 +470,7 @@
 				"header": [
 					{
 						"key": "X-AuthToken",
-						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"value": "{{AUTH}}",
 						"description": ""
 					},
 					{
@@ -490,12 +490,12 @@
 		{
 			"name": "Companies/:id",
 			"request": {
-				"url": "http://localhost:8080/v1/companies/a26b4058fea6f62a67c14491",
+				"url": "http://localhost:8080/v1/companies/766c4058fea6f62a68c14491",
 				"method": "GET",
 				"header": [
 					{
 						"key": "X-AuthToken",
-						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"value": "{{AUTH}}",
 						"description": ""
 					}
 				],
@@ -515,7 +515,7 @@
 				"header": [
 					{
 						"key": "X-AuthToken",
-						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"value": "{{AUTH}}",
 						"description": ""
 					},
 					{
@@ -535,12 +535,197 @@
 		{
 			"name": "Companies/:id",
 			"request": {
-				"url": "http://localhost:8080/v1/companies/766c4058fea6f62a68c14491",
+				"url": "http://localhost:8080/v1/companies/c1744058fea6f62a70c14491",
 				"method": "DELETE",
 				"header": [
 					{
 						"key": "X-AuthToken",
-						"value": "AFE2BA61-C2B9-4091-822E-425F406F6FBA",
+						"value": "{{AUTH}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Apps",
+			"request": {
+				"url": "http://localhost:8080/v1/apps",
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Apps (upload)",
+			"request": {
+				"url": "http://localhost:8080/v1/apps",
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Apps/:id",
+			"request": {
+				"url": "http://localhost:8080/v1/apps/0c7a5058473be9333af98c3a",
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Apps/:id",
+			"request": {
+				"url": "http://localhost:8080/v1/apps/aaaaaaa",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Apps/:id/builds",
+			"request": {
+				"url": "http://localhost:8080/v1/apps/0c7a5058473be9333af98c3a/builds?limit=1&offset=1",
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Apps/:id/builds/:id",
+			"request": {
+				"url": "http://localhost:8080/v1/apps/0c7a5058473be9333af98c3a/builds/c3815058ee95b99225970f8c",
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Apps/:id/builds/:id",
+			"request": {
+				"url": "http://localhost:8080/v1/apps/0c7a5058473be9333af98c3a/builds/c3815058ee95b99225970f8c",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Builds/:id",
+			"request": {
+				"url": "http://localhost:8080/v1/builds/c3815058ee95b99225970f8c",
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Builds/:id",
+			"request": {
+				"url": "http://localhost:8080/v1/builds/c3815058ee95b99225970f8c",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
 						"description": ""
 					}
 				],

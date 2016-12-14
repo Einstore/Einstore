@@ -3,7 +3,7 @@
 //  Boost
 //
 //  Created by Ondrej Rafaj on 02/12/2016.
-//
+//  Copyright © 2016 manGoweb UK Ltd. All rights reserved.
 //
 
 import Foundation
@@ -18,7 +18,7 @@ final class ApkDecoder: Decoder, DecoderProtocol {
     private(set) var iconData: Data?
     private(set) var appName: String?
     private(set) var appIdentifier: String?
-    private(set) var platform: Platform? = .android
+    private(set) var platform: Platform?
     private(set) var versionShort: String?
     private(set) var versionLong: String?
     
@@ -55,12 +55,14 @@ final class ApkDecoder: Decoder, DecoderProtocol {
     // MARK: Parsing
     
     func prepare() throws {
+        self.platform = .android
+        
         try super.saveToArchive()
         
         // Extract archive
         let result: TerminalResult = Terminal.execute("java", "-jar", self.apktoolUrl.path, "d", self.archiveFileUrl.path, "-o", self.extractedApkFolder.path, "-f")
         
-        let _ = Terminal.execute("open", self.archiveFolderUrl.path)
+        //let _ = Terminal.execute("open", self.archiveFolderUrl.path)
         
         if result.exitCode != 0 {
             throw BoostError(.unarchivingFailed)

@@ -3,7 +3,7 @@
 //  Boost
 //
 //  Created by Ondrej Rafaj on 05/12/2016.
-//
+//  Copyright © 2016 manGoweb UK Ltd. All rights reserved.
 //
 
 import Foundation
@@ -43,8 +43,23 @@ class Decoder {
         self.multiPartFile = multipart
     }
     
-    static func decoderForFile(multipart: Multipart) -> DecoderProtocol {
-        return IpaDecoder(multipart)
+    static func decoderForFile(multipart: Multipart) -> DecoderProtocol? {
+        guard let fileName: String = multipart.file?.name?.lowercased() else {
+            return nil
+        }
+        let fileExtension: String = URL.init(fileURLWithPath: fileName).pathExtension
+        switch fileExtension {
+        case "ipa":
+            return IpaDecoder(multipart)
+        case "apk":
+            return ApkDecoder(multipart)
+        case "app":
+            return nil
+        case "exe":
+            return nil
+        default:
+            return nil
+        }
     }
     
     // MARK: Working with files
@@ -73,8 +88,7 @@ class Decoder {
     }
     
     func cleanUp() throws {
-        // TODO: Uncomment for release
-        //try FileManager.default.removeItem(at: self.archiveFolderUrl)
+        try FileManager.default.removeItem(at: self.archiveFolderUrl)
     }
     
     // MARK: JSONising

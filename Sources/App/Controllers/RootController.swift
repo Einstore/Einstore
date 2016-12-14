@@ -3,7 +3,7 @@
 //  Boost
 //
 //  Created by Ondrej Rafaj on 28/11/2016.
-//
+//  Copyright © 2016 manGoweb UK Ltd. All rights reserved.
 //
 
 import Vapor
@@ -21,7 +21,6 @@ class RootController {
     // MARK: Authentication
     
     func kickOut(_ request: Request) -> ResponseRepresentable? {
-        
         if let token = request.tokenString {
             do {
                 // TODO: Can we merge the following into one query?

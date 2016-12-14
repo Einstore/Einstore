@@ -10,6 +10,7 @@ import Foundation
 import Vapor
 import HTTP
 import S3
+import Routing
 
 
 final class AppsController: RootController, ControllerProtocol {
@@ -20,6 +21,9 @@ final class AppsController: RootController, ControllerProtocol {
     // MARK: Routing
     
     func configureRoutes() {
+        let appGroup: Routing.RouteGroup = self.baseRoute.grouped("apps")
+        
+        // Apps
         self.baseRoute.get("apps", handler: self.index)
         self.baseRoute.post("apps", handler: self.upload)
         self.baseRoute.get("apps", IdType.self) { request, objectId in
@@ -31,12 +35,30 @@ final class AppsController: RootController, ControllerProtocol {
         self.baseRoute.delete("apps", IdType.self) { request, objectId in
             return try self.delete(request: request, objectId: objectId)
         }
+        
+        // Builds
+        self.baseRoute.get("builds", IdType.self) { request, objectId in
+            return try self.build(request: request, objectId: objectId)
+        }
+        self.baseRoute.delete("builds", IdType.self) { request, objectId in
+            return try self.deleteBuild(request: request, objectId: objectId)
+        }
+        appGroup.get(IdType.self, "builds") { request, objectId in
+            return try self.builds(request: request, objectId: objectId)
+        }
+        appGroup.get(IdType.self, "builds", IdType.self) { request, objectId, buildId in
+            return try self.build(request: request, objectId: buildId)
+        }
+        appGroup.delete(IdType.self, "builds", IdType.self) { request, objectId, buildId in
+            return try self.deleteBuild(request: request, objectId: buildId)
+        }
     }
     
     // MARK: S3
     
     private func s3() throws -> S3 {
         let s3: S3 = try S3(droplet: drop)
+        s3.bucketName = "booststore"
         return s3
     }
     
@@ -49,6 +71,11 @@ final class AppsController: RootController, ControllerProtocol {
         
         let data = try App.query()
         return JSON(try data.all().makeNode())
+        
+//        let build: Build = try Build.query().first()!
+//        let owner: App = try build.owner().get()! as App
+//        print(owner)
+//        return JSON(try owner.makeNode())
     }
     
     func get(request: Request, objectId: IdType) throws -> ResponseRepresentable {
@@ -61,6 +88,47 @@ final class AppsController: RootController, ControllerProtocol {
         }
         
         return ResponseBuilder.build(model: object)
+    }
+    
+    func build(request: Request, objectId: IdType) throws -> ResponseRepresentable {
+        if let response = super.kickOut(request) {
+            return response
+        }
+        
+        guard let object = try Build.find(objectId) else {
+            return ResponseBuilder.notFound
+        }
+        
+        return ResponseBuilder.build(model: object)
+    }
+    
+    func deleteBuild(request: Request, objectId: IdType) throws -> ResponseRepresentable {
+        if let response = super.kickOut(request) {
+            return response
+        }
+        
+        guard let object = try Build.find(objectId) else {
+            return ResponseBuilder.notFound
+        }
+        
+        return ResponseBuilder.build(model: object)
+    }
+    
+    func builds(request: Request, objectId: IdType) throws -> ResponseRepresentable {
+        if let response = super.kickOut(request) {
+            return response
+        }
+        
+        guard let object = try App.find(objectId) else {
+            return ResponseBuilder.notFound
+        }
+        
+        let limit: Int = request.query?["limit"]?.int ?? 20
+        let offset: Int = request.query?["offset"]?.int ?? 0
+        
+        let builds = try object.builds(limit, offset: offset)
+        
+        return ResponseBuilder.build(node: try builds.all().makeNode())
     }
     
     func update(request: Request, objectId: IdType) throws -> ResponseRepresentable {
@@ -84,15 +152,21 @@ final class AppsController: RootController, ControllerProtocol {
             return ResponseBuilder.incompleteData
         }
         
-        let decoder: DecoderProtocol = Decoder.decoderForFile(multipart: multipart)
+        guard let decoder: DecoderProtocol = Decoder.decoderForFile(multipart: multipart) else {
+            throw BoostError(.fileNotCompatible)
+        }
         try decoder.prepare()
         try decoder.parse()
         
-        var app: App? = try App.find(identifier: decoder.appIdentifier!, platform: decoder.platform!)
+        guard let platform: Platform = decoder.platform else {
+            throw BoostError(.missingPlatform)
+        }
+        
+        var app: App? = try App.find(identifier: decoder.appIdentifier!, platform: platform)
         if app == nil {
             app = App()
             app?.identifier = decoder.appIdentifier
-            app?.platform = decoder.platform
+            app?.platform = platform
             app?.token = UUID().uuidString
             app?.created = Date()
         }
@@ -118,11 +192,11 @@ final class AppsController: RootController, ControllerProtocol {
         }
         
         let s3: S3 = try self.s3()
-        let path: String = "data/" + app!.platform!.rawValue + "/" + app!.id!.string! + "/" + build.id!.string!
+        let path: String = "data/" + decoder.platform!.rawValue + "/" + app!.id!.string! + "/" + build.id!.string!
         if let iconData: Data = decoder.iconData {
-            try s3.put(data: iconData, filePath: (path + "/icon.png"), bucketName: "booststore", accessControl: .publicRead)
+            try s3.put(data: iconData, filePath: (path + "/icon.png"), accessControl: .publicRead)
         }
-        try s3.put(bytes: (multipart.file?.data)!, filePath: (path + "/app.data"), bucketName: "booststore", accessControl: .publicRead)
+        try s3.put(bytes: (multipart.file?.data)!, filePath: (path + "/app.data"), accessControl: .publicRead)
         
         try decoder.cleanUp()
         
@@ -131,10 +205,6 @@ final class AppsController: RootController, ControllerProtocol {
     }
     
     func delete(request: Request, objectId: IdType) throws -> ResponseRepresentable {
-        let s3: S3 = try self.s3()
-        try s3.delete(fileAtPath: "photo.JPG", bucketName: "booststore")
-        
-        
         if let response = super.kickOut(request) {
             return response
         }
@@ -144,6 +214,13 @@ final class AppsController: RootController, ControllerProtocol {
         }
         
         do {
+            // TODO: Make sure that the following actually does delete builds! Super important!
+            try object.builds().delete()
+            
+            let s3: S3 = try self.s3()
+            let path: String = "data/" + object.platform!.rawValue + "/" + object.id!.string!
+            try s3.delete(fileAtPath: path)
+            
             try object.delete()
         }
         catch {

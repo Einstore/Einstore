@@ -3,7 +3,7 @@
 //  Boost
 //
 //  Created by Ondrej Rafaj on 01/12/2016.
-//
+//  Copyright © 2016 manGoweb UK Ltd. All rights reserved.
 //
 
 import Foundation
@@ -28,7 +28,6 @@ final class App: Model {
     
     var id: Node?
     var name: String?
-    var iconUrl: String?
     var identifier: String?
     var token: String?
     var platform: Platform?
@@ -45,10 +44,9 @@ final class App: Model {
     init(node: Node, in context: Context) throws {
         self.id = try node.extract("_id")
         self.name = try node.extract("name")
-        self.iconUrl = try node.extract("icon")
         self.identifier = try node.extract("identifier")
         self.token = try node.extract("token")
-        self.platform = Platform(rawValue: try node.extract("token"))
+        self.platform = Platform(rawValue: try node.extract("platform"))
         self.created = Date.init(timeIntervalSince1970: try node.extract("created"))
         self.users = try node.extract("users")
     }
@@ -57,7 +55,6 @@ final class App: Model {
         let nodes = try Node(node: [
             "_id": self.id,
             "name": self.name,
-            "icon": self.iconUrl,
             "identifier": self.identifier,
             "token": self.token,
             "platform": self.platform?.rawValue,
@@ -89,6 +86,15 @@ extension App {
     
     static func find(identifier: String, platform: Platform) throws -> App? {
         return try App.query().filter("identifier", identifier).filter("platform", platform.rawValue).first()
+    }
+    
+    func builds(_ limit: Int = 20, offset: Int = 0) throws -> Fluent.Query<Build> {
+        guard let id: String = self.id?.string else {
+            throw BoostError(.missingId)
+        }
+        let query: Fluent.Query = try Build.query().filter("app", id)
+        query.limit = Limit(count: limit, offset: offset)
+        return try query.sort("created", .ascending)
     }
     
     // MARK: Save / update

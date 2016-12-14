@@ -5,6 +5,44 @@ if [[ $(id -u) -ne 0 ]] ; then echo "Please run as root ( sudo install-ubuntu.sh
 # Update all
 apt-get update
 
+# Curl
+if hash curl 2>/dev/null; then
+    echo "Curl is installed ✓"
+else
+    echo "Need to install Curl ..."
+    apt-get -y install curl
+    echo "Curl installation complete ✓"
+fi
+
+# Java
+if hash java 2>/dev/null; then
+    echo "Java is installed ✓"
+else
+    echo "Need to install Java ..."
+	apt-get -y install default-jre default-jdk
+    echo "Java installation complete ✓"
+fi
+
+
+# Ruby
+if hash ruby 2>/dev/null; then
+    echo "Ruby is installed ✓"
+else
+    echo "Need to install Ruby ..."
+    apt-get -y install ruby-full
+    echo "Ruby installation complete ✓"
+fi
+
+
+# unzip
+if hash unzip 2>/dev/null; then
+    echo "unzip is installed ✓"
+else
+    echo "Need to install unzip ..."
+    apt-get -y install unzip
+    echo "unzip installation complete ✓"
+fi
+
 VERSION="3.0.1"
 
 # Swift
@@ -37,7 +75,7 @@ else
 	then
 	    echo "📚 Installing Dependencies"
 	    sudo apt-get install -y clang libicu-dev uuid-dev
-	
+        
 	    echo "🐦 Installing Swift";
 	    if [[ $OS == "ubuntu1604" ]];
 	    then
@@ -47,7 +85,10 @@ else
 	    fi
 	    wget https://swift.org/builds/swift-$VERSION-release/$OS/swift-$VERSION-RELEASE/$SWIFTFILE.tar.gz
 	    tar -zxf $SWIFTFILE.tar.gz
+	    
+	    # following needs to be saved to ~/.profile
 	    export PATH=$PWD/$SWIFTFILE/usr/bin:"${PATH}"
+	    
 
         rm -rf $SWIFTFILE
         rm $SWIFTFILE.tar.gz
@@ -57,6 +98,7 @@ else
 	
     echo "Swift installation complete ✓"
 fi
+
 
 # Vapor
 if hash vapor 2>/dev/null; then
@@ -70,41 +112,6 @@ else
 fi
 
 
-# Java
-if hash java 2>/dev/null; then
-    echo "Java is installed ✓"
-else
-    echo "Need to install Java ..."
-    apt-get -y install openjdk-6-jre-headless
-    echo "Java installation complete ✓"
-fi
 
 
-# Ruby
-if hash ruby 2>/dev/null; then
-    echo "Ruby is installed ✓"
-else
-    echo "Need to install Ruby ..."
-    apt-get -y install ruby-full
-    echo "Ruby installation complete ✓"
-fi
 
-
-# unzip
-if hash unzip 2>/dev/null; then
-    echo "unzip is installed ✓"
-else
-    echo "Need to install unzip ..."
-    apt-get -y install unzip
-    echo "unzip installation complete ✓"
-fi
-
-
-# CFPropertyList
-if hash CFPropertyList 2>/dev/null; then
-    echo "CFPropertyList is installed ✓"
-else
-    echo "Need to install CFPropertyList ..."
-    gem install CFPropertyList
-    echo "CFPropertyList installation complete ✓"
-fi
