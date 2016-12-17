@@ -11,6 +11,7 @@ import Vapor
 import HTTP
 import S3
 import MimeLib
+import Routing
 
 
 final class CompaniesController: RootController, ControllerProtocol {
@@ -19,16 +20,27 @@ final class CompaniesController: RootController, ControllerProtocol {
     // MARK: Routing
     
     func configureRoutes() {
-        self.baseRoute.get("companies", handler: self.index)
-        self.baseRoute.post("companies", handler: self.create)
-        self.baseRoute.get("companies", IdType.self) { request, objectId in
+        let group: Routing.RouteGroup = self.baseRoute.grouped("companies")
+        
+        // Companies
+        group.get(handler: self.index)
+        group.post(handler: self.create)
+        group.get(IdType.self) { request, objectId in
             return try self.get(request: request, objectId: objectId)
         }
-        self.baseRoute.put("companies", IdType.self) { request, objectId in
+        group.put(IdType.self) { request, objectId in
             return try self.update(request: request, objectId: objectId)
         }
-        self.baseRoute.delete("companies", IdType.self) { request, objectId in
+        group.delete(IdType.self) { request, objectId in
             return try self.delete(request: request, objectId: objectId)
+        }
+        
+        // Logo
+        group.post(IdType.self, "logo") { request, objectId in
+            return try self.logoUpload(request: request, objectId: objectId)
+        }
+        group.delete(IdType.self, "logo") { request, objectId in
+            return try self.logoDelete(request: request, objectId: objectId)
         }
     }
     
@@ -111,6 +123,72 @@ final class CompaniesController: RootController, ControllerProtocol {
         return ResponseBuilder.okNoContent
     }
     
+    func logoUpload(request: Request, objectId: IdType) throws -> ResponseRepresentable {
+        if let response = super.basicAuth(request) {
+            return response
+        }
+        
+        guard var object = try Company.find(objectId) else {
+            return ResponseBuilder.notFound
+        }
+        
+        do {
+            guard let bytes: Bytes = request.body.bytes, bytes.count > 0 else {
+                return ResponseBuilder.incompleteData
+            }
+            guard var mime: String = request.headers["Content-Type"] else {
+                return ResponseBuilder.customErrorResponse(statusCode: .preconditionNotMet, message: Lang.get("Missing Content-Type header"))
+            }
+            mime = mime.lowercased()
+            guard mime == "image/png" || mime == "image/jpeg" else {
+                return ResponseBuilder.customErrorResponse(statusCode: .preconditionNotMet, message: Lang.get("File not supported"))
+            }
+            let fileName: String = "logo." + (Mime.fileExtension(forMime: mime) ?? "img")
+            let companyPath: String = "companies/" + object.id!.string! + "/"
+            let logoPath: String = companyPath + fileName
+            
+            let s3: S3 = try S3(droplet: drop)
+            if object.logoName != nil {
+                try s3.delete(fileAtPath: companyPath + object.logoName!)
+            }
+            try s3.put(bytes: bytes, filePath: logoPath)
+            
+            object.logoName = fileName
+            try object.save()
+            
+            return ResponseBuilder.build(node: try ["uploaded": logoPath].makeNode(), statusCode: .success)
+        }
+        catch {
+            return ResponseBuilder.internalServerError
+        }
+    }
+    
+    func logoDelete(request: Request, objectId: IdType) throws -> ResponseRepresentable {
+        if let response = super.basicAuth(request) {
+            return response
+        }
+        
+        guard var object = try Company.find(objectId) else {
+            return ResponseBuilder.notFound
+        }
+        
+        do {
+            if object.logoName != nil {
+                let s3: S3 = try S3(droplet: drop)
+                let logoPath: String = "companies/" + object.id!.string! + "/" + object.logoName!
+                try s3.delete(fileAtPath: logoPath)
+                
+                object.logoName = nil
+                
+                try object.save()
+            }
+            return ResponseBuilder.customErrorResponse(statusCode: .successNoData, message: Lang.get("Deleted"))
+        }
+        catch {
+            return ResponseBuilder.internalServerError
+        }
+    }
+    
 }
 
 // MARK: - Helper methods
@@ -136,23 +214,6 @@ extension CompaniesController {
                 return ResponseBuilder.internalServerError
             }
             
-            do {
-                let s3: S3 = try S3(droplet: drop)
-                if let removeLogo: Bool = request.data["remove-logo"]?.bool {
-                    if removeLogo == true && object.logoName != nil {
-                        let logoPath: String = "companies/" + object.id!.string! + "/" + object.logoName!
-                        try s3.delete(fileAtPath: logoPath)
-                    }
-                }
-                if let file: Multipart.File = request.multipart?["logo"]?.file {
-                    let logoPath: String = "companies/" + object.id!.string! + "/logo." + Mime.fileExtension(forMime: file.type!)!
-                    try s3.put(bytes: file.data, filePath: logoPath)
-                    
-                }
-            }
-            catch {
-                
-            }
             return ResponseBuilder.build(model: object, statusCode: code)
         }
         else {

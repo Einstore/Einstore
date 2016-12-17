@@ -32,6 +32,9 @@ final class App: Model {
     var token: String?
     var platform: Platform?
     var created: Date?
+    var modified: Date?
+    var latest: Date?
+    var availableToAll: Bool = false
     var users: [IdType]?
     
     
@@ -48,6 +51,9 @@ final class App: Model {
         self.token = try node.extract("token")
         self.platform = Platform(rawValue: try node.extract("platform"))
         self.created = Date.init(timeIntervalSince1970: try node.extract("created"))
+        self.modified = Date.init(timeIntervalSince1970: try node.extract("modified"))
+        self.latest = Date.init(timeIntervalSince1970: try node.extract("latest"))
+        self.availableToAll = try node.extract("all") ?? false
         self.users = try node.extract("users")
     }
     
@@ -59,6 +65,9 @@ final class App: Model {
             "token": self.token,
             "platform": self.platform?.rawValue,
             "created": self.created?.timeIntervalSince1970.makeNode(),
+            "modified": self.modified?.timeIntervalSince1970.makeNode(),
+            "latest": self.latest?.timeIntervalSince1970.makeNode(),
+            "all": self.availableToAll,
             "users": self.users?.makeNode()
             ])
         return nodes
@@ -97,14 +106,31 @@ extension App {
         return try query.sort("created", .ascending)
     }
     
+    static func exists(id: Node) throws -> Bool {
+        let count = try self.find(id)
+        return count != nil
+    }
+    
+    static func exists(idString: String) throws -> Bool {
+        return try self.exists(id: idString.makeNode())
+    }
+    
     // MARK: Save / update
     
     func update(fromRequest request: Request) throws {
         if let name = request.data["name"]?.string {
             self.name = name
         }
+        if let all = request.data["all"]?.bool {
+            self.availableToAll = all
+        }
         if let users = request.data["users"]?.array {
-            self.users = users as? [IdType]
+            self.users = []
+            for objectId: JSON in users as! [JSON] {
+                if try User.exists(id: objectId.node) {
+                    self.users?.append(objectId.string!)
+                }
+            }
         }
     }
     

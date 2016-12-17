@@ -47,6 +47,15 @@ final class UploadToken: Model {
         return nodes
     }
     
+    func makeJSON() throws -> JSON {
+        return try JSON([
+            "_id": self.id!,
+            "name": self.name!.makeNode(),
+            "created": self.created!.timeIntervalSince1970.makeNode(),
+            "apps": (self.limitedToApps ?? []).makeNode()
+        ].makeNode())
+    }
+    
 }
 
 extension UploadToken: Preparation {
@@ -80,8 +89,14 @@ extension UploadToken {
         if let name = request.data["name"]?.string {
             self.name = name
         }
+        
         if let apps = request.data["apps"]?.array {
-            self.limitedToApps = apps as? [IdType]
+            self.limitedToApps = []
+            for appId: Node in apps as! [Node] {
+                if try App.exists(id: appId) {
+                    self.limitedToApps?.append(appId.string!)
+                }
+            }
         }
     }
     

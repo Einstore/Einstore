@@ -18,14 +18,12 @@ enum HistoryEvent: String {
 
 final class HistoryController: RootController, ControllerProtocol {
     
+    
     // MARK: Routing
     
     func configureRoutes() {
         let basic = self.baseRoute.grouped("history")
         basic.get(handler: self.index)
-        basic.get(IdType.self) { request, appId in
-            return try self.view(request: request, appId: appId)
-        }
     }
     
     // MARK: Data pages

@@ -21,11 +21,21 @@ final class Company: Model {
     var id: Node?
     var name: String?
     var address: String?
-    var logoName: String?
     var url: String?
     var phone: String?
     var created: Date?
     var users: [IdType]?
+    
+    var logoName: String?
+    
+    var mainColor: String?
+    var mainFontColor: String?
+    
+    var secondaryColor: String?
+    var secondaryFontColor: String?
+    
+    var backgroundColor: String?
+    var contentFontColor: String?
     
     
     // MARK: Initialization
@@ -41,6 +51,14 @@ final class Company: Model {
         self.logoName = try node.extract("logo")
         self.url = try node.extract("url")
         self.phone = try node.extract("phone")
+        
+        self.mainColor = try node.extract("maincolor")
+        self.mainFontColor = try node.extract("mainfontcolor")
+        self.secondaryColor = try node.extract("secondarycolor")
+        self.secondaryFontColor = try node.extract("secondaryfontcolor")
+        self.backgroundColor = try node.extract("backgroundcolor")
+        self.contentFontColor = try node.extract("contentfontcolor")
+        
         self.created = Date.init(timeIntervalSince1970: try node.extract("created"))
         self.users = try node.extract("users")
     }
@@ -53,6 +71,14 @@ final class Company: Model {
             "logo": self.logoName,
             "url": self.url,
             "phone": self.phone,
+            
+            "maincolor": self.mainColor,
+            "mainfontcolor": self.mainFontColor,
+            "secondarycolor": self.secondaryColor,
+            "secondaryfontcolor": self.secondaryFontColor,
+            "backgroundcolor": self.backgroundColor,
+            "contentfontcolor": self.contentFontColor,
+            
             "created": self.created?.timeIntervalSince1970.makeNode(),
             "users": self.users?.makeNode()
             ])
@@ -86,22 +112,42 @@ extension Company {
     // MARK: Save / update
     
     func update(fromRequest request: Request) throws {
-        if let name = request.data["name"]?.string {
-            self.name = name
+        if let value = request.data["name"]?.string {
+            self.name = value
         }
-        if let address = request.data["address"]?.string {
-            self.address = address
+        if let value = request.data["address"]?.string {
+            self.address = value
         }
-        if let url = request.data["url"]?.string {
-            self.url = url
+        if let value = request.data["url"]?.string {
+            self.url = value
         }
-        if let phone = request.data["phone"]?.string {
-            self.phone = phone
+        if let value = request.data["phone"]?.string {
+            self.phone = value
+        }
+        if let value = request.data["maincolor"]?.string {
+            self.mainColor = value
+        }
+        if let value = request.data["mainfontcolor"]?.string {
+            self.mainFontColor = value
+        }
+        if let value = request.data["secondarycolor"]?.string {
+            self.secondaryColor = value
+        }
+        if let value = request.data["secondaryfontcolor"]?.string {
+            self.secondaryFontColor = value
+        }
+        if let value = request.data["backgroundcolor"]?.string {
+            self.backgroundColor = value
+        }
+        if let value = request.data["contentfontcolor"]?.string {
+            self.contentFontColor = value
         }
         if let users = request.data["users"]?.array {
             self.users = []
-            for user in users {
-                self.users?.append(user.string!)
+            for objectId: JSON in users as! [JSON] {
+                if try User.exists(id: objectId.node) {
+                    self.users?.append(objectId.string!)
+                }
             }
         }
     }

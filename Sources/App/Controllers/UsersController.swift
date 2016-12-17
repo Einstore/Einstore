@@ -174,6 +174,7 @@ final class UsersController: RootController, ControllerProtocol {
         }
         
         do {
+            try Auth.delete(userId: user.id!)
             try user.delete()
         }
         catch {

@@ -155,10 +155,12 @@ final class AppsController: RootController, ControllerProtocol {
             return response
         }
         
+        // BOOST: Upload as a binry file!!!!
         guard let multipart: Multipart = request.multipart?["app"] else {
             return ResponseBuilder.incompleteData
         }
         
+        // BOOST: Unzip first and than decide which decoder to use based on content
         guard let decoder: DecoderProtocol = Decoder.decoderForFile(multipart: multipart) else {
             throw BoostError(.fileNotCompatible)
         }

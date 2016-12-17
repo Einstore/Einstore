@@ -108,6 +108,15 @@ extension User {
         return try User.query().filter("email", email).first()
     }
     
+    static func exists(id: Node) throws -> Bool {
+        let count = try self.find(id)
+        return count != nil
+    }
+    
+    static func exists(idString: String) throws -> Bool {
+        return try self.exists(id: idString.makeNode())
+    }
+    
     // MARK: Save / update
     
     func update(fromRequest request: Request, forgetPassword: Bool = false) throws {

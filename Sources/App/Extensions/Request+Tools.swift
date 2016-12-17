@@ -19,7 +19,7 @@ extension Request {
             if let token = self.headers["X-AuthToken"] {
                 return token
             }
-            else if let token = self.query?["token"] {
+            else if let token = self.query?["auth"] {
                 return token.string
             }
             return nil
