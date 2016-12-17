@@ -12,9 +12,29 @@ import HTTP
 
 extension Request {
     
-    // MARK: Get token
+    // MARK: Upload token
     
-    var tokenString: String? {
+    var uploadTokenString: String? {
+        get {
+            if let token = self.headers["X-UploadToken"] {
+                return token
+            }
+            else if let token = self.query?["token"] {
+                return token.string
+            }
+            return nil
+        }
+    }
+    
+    var uploadToken: Node? {
+        get {
+            return self.uploadTokenString?.makeNode()
+        }
+    }
+    
+    // MARK: Auth tokens
+    
+    var authTokenString: String? {
         get {
             if let token = self.headers["X-AuthToken"] {
                 return token
@@ -26,9 +46,9 @@ extension Request {
         }
     }
     
-    var token: Node? {
+    var authToken: Node? {
         get {
-            return self.tokenString?.makeNode()
+            return self.authTokenString?.makeNode()
         }
     }
     

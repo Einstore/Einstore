@@ -38,8 +38,8 @@ final class Auth: Model {
         self.token = try node.extract("token")
         self.created = try Date(rfc1123: node.extract("created"))
         
-        self.userId = try node.extract("user_id")
-        let user = try User.query().filter("user_id", self.userId!).first()
+        self.userId = try node.extract("user")
+        let user = try User.query().filter("user", self.userId!).first()
         self.user = user
     }
     
@@ -50,7 +50,7 @@ final class Auth: Model {
             "_id": self.id,
             "token": tokenHash,
             "created": self.created?.rfc1123,
-            "user_id": self.userId
+            "user": self.userId
             ])
     }
     

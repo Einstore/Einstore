@@ -107,8 +107,8 @@ extension App {
     }
     
     static func exists(id: Node) throws -> Bool {
-        let count = try self.find(id)
-        return count != nil
+        let object = try self.find(id)
+        return object != nil
     }
     
     static func exists(idString: String) throws -> Bool {

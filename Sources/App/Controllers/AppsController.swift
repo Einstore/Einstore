@@ -72,11 +72,6 @@ final class AppsController: RootController, ControllerProtocol {
         
         let data = try App.query()
         return JSON(try data.all().makeNode())
-        
-//        let build: Build = try Build.query().first()!
-//        let owner: App = try build.owner().get()! as App
-//        print(owner)
-//        return JSON(try owner.makeNode())
     }
     
     func get(request: Request, objectId: IdType) throws -> ResponseRepresentable {
@@ -147,12 +142,36 @@ final class AppsController: RootController, ControllerProtocol {
             return ResponseBuilder.notFound
         }
         
-        return try self.updateResponse(request: request, object: &object)
+        let validated: [ValidationError] = request.isCool(forValues: App.validationFields)
+        if validated.count == 0 {
+            try object.update(fromRequest: request)
+            
+            object.modified = Date()
+            
+            do {
+                try object.save()
+            }
+            catch {
+                return ResponseBuilder.internalServerError
+            }
+            
+            return ResponseBuilder.build(model: object, statusCode: StatusCodes.created)
+        }
+        else {
+            return ResponseBuilder.validationErrorResponse(errors: validated)
+        }
     }
     
     func upload(request: Request) throws -> ResponseRepresentable {
-        if let response = super.basicAuth(request, minAccess: .developer) {
-            return response
+        if let token: String = request.uploadTokenString {
+            guard try UploadToken.exists(token: token) else {
+                return ResponseBuilder.notAuthorised
+            }
+        }
+        else {
+            if let response = super.basicAuth(request, minAccess: .developer) {
+                return response
+            }
         }
         
         // BOOST: Upload as a binry file!!!!
@@ -179,6 +198,9 @@ final class AppsController: RootController, ControllerProtocol {
             app?.token = UUID().uuidString
             app?.created = Date()
         }
+        app?.modified = Date()
+        app?.latest = Date()
+        
         app?.name = decoder.appName
         try app?.save()
         
@@ -244,33 +266,5 @@ final class AppsController: RootController, ControllerProtocol {
 // MARK: - Helper methods
 
 extension AppsController {
-    
-    func updateResponse(request: Request, object: inout App) throws -> ResponseRepresentable {
-        guard Me.shared.type(min: .admin) else {
-            return ResponseBuilder.notAuthorised
-        }
-        
-        let validated: [ValidationError] = request.isCool(forValues: App.validationFields)
-        if validated.count == 0 {
-            try object.update(fromRequest: request)
-            
-            do {
-                try object.save()
-            }
-            catch {
-                return ResponseBuilder.internalServerError
-            }
-            
-            return ResponseBuilder.build(model: object, statusCode: StatusCodes.created)
-        }
-        else {
-            return ResponseBuilder.validationErrorResponse(errors: validated)
-        }
-    }
-    
-    func createResponse(request: Request, object: inout App) throws -> ResponseRepresentable {
-        object.created = Date()
-        return try self.updateResponse(request: request, object: &object)
-    }
     
 }

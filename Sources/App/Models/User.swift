@@ -53,7 +53,7 @@ final class User: Model {
         self.password = try node.extract("password")
         self.firstname = try node.extract("firstname")
         self.lastname = try node.extract("lastname")
-        self.company = try node.extract("company_id")
+        self.company = try node.extract("company")
         self.phone = try node.extract("phone")
         self.ims = try node.extract("ims")
         self.timezone = try node.extract("timezone")
@@ -70,7 +70,7 @@ final class User: Model {
             "password": self.password,
             "firstname": self.firstname,
             "lastname": self.lastname,
-            "company_id": self.company,
+            "company": self.company,
             "phone": self.phone,
             "ims": self.ims?.makeNode(),
             "timezone": self.timezone?.makeNode(),
@@ -109,8 +109,8 @@ extension User {
     }
     
     static func exists(id: Node) throws -> Bool {
-        let count = try self.find(id)
-        return count != nil
+        let object = try self.find(id)
+        return object != nil
     }
     
     static func exists(idString: String) throws -> Bool {
@@ -136,6 +136,19 @@ extension User {
         }
         if let phone = request.data["phone"]?.string {
             self.phone = phone
+        }
+        if let company = request.data["company"]?.string {
+            if try Company.exists(idString: company) {
+                self.company = company
+            }
+        }
+        if let ims = request.data["ims"]?.object {
+            self.ims = [:]
+            for key: String in ims.keys {
+                if let value: String = ims[key]?.string {
+                    self.ims![key] = value
+                }
+            }
         }
         if var timezone = request.data["timezone"]?.int {
             if timezone < -12 {

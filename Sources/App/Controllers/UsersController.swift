@@ -81,7 +81,7 @@ final class UsersController: RootController, ControllerProtocol {
     }
     
     func logout(request: Request) throws -> ResponseRepresentable {
-        let hashedToken = try drop.hash.make(request.tokenString ?? "")
+        let hashedToken = try drop.hash.make(request.authTokenString ?? "")
         try Auth.delete(token: hashedToken)
         return ResponseBuilder.okNoContent
     }

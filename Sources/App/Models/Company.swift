@@ -109,6 +109,15 @@ extension Company {
         return try Team.query().filter("name", name).first()
     }
     
+    static func exists(id: Node) throws -> Bool {
+        let object = try self.find(id)
+        return object != nil
+    }
+    
+    static func exists(idString: String) throws -> Bool {
+        return try self.exists(id: idString.makeNode())
+    }
+    
     // MARK: Save / update
     
     func update(fromRequest request: Request) throws {

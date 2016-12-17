@@ -33,9 +33,10 @@ class RootController {
     }
     
     func kickOut(_ request: Request) -> ResponseRepresentable? {
-        if let token = request.tokenString {
+        if let token = request.authTokenString {
             do {
-                // TODO: Can we merge the following into one query?
+                // BOOST: It would be good to cache variable amount of auth codes and users to avoid querying database too often!
+                // BOOST: Can we merge the following into one query?
                 Me.shared.auth = try Auth.find(tokenString: token)
                 if Me.shared.auth != nil {
                     Me.shared.user = try User.find(Me.shared.auth!.userId!)
