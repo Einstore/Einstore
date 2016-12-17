@@ -10,7 +10,7 @@
 		{
 			"name": "Auth",
 			"request": {
-				"url": "http://localhost:8080/v1/auth",
+				"url": "{{SERVER}}v1/auth",
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -37,7 +37,7 @@
 		{
 			"name": "Auth (invalid)",
 			"request": {
-				"url": "http://localhost:8080/v1/auth",
+				"url": "{{SERVER}}v1/auth",
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -64,7 +64,7 @@
 		{
 			"name": "Auth (Tester)",
 			"request": {
-				"url": "http://localhost:8080/v1/auth",
+				"url": "{{SERVER}}v1/auth",
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -91,7 +91,7 @@
 		{
 			"name": "Install (no auth)",
 			"request": {
-				"url": "http://localhost:8080/v1/install",
+				"url": "{{SERVER}}v1/install",
 				"method": "GET",
 				"header": [],
 				"body": {
@@ -105,7 +105,7 @@
 		{
 			"name": "Users",
 			"request": {
-				"url": "http://localhost:8080/v1/users",
+				"url": "{{SERVER}}v1/users",
 				"method": "GET",
 				"header": [
 					{
@@ -125,7 +125,7 @@
 		{
 			"name": "Users (url token)",
 			"request": {
-				"url": "http://localhost:8080/v1/users?token={{AUTH}}",
+				"url": "{{SERVER}}v1/users?token={{AUTH}}",
 				"method": "GET",
 				"header": [],
 				"body": {
@@ -139,7 +139,7 @@
 		{
 			"name": "Users (create)",
 			"request": {
-				"url": "http://localhost:8080/v1/users/",
+				"url": "{{SERVER}}v1/users/",
 				"method": "POST",
 				"header": [
 					{
@@ -164,7 +164,7 @@
 		{
 			"name": "Users/:id",
 			"request": {
-				"url": "http://localhost:8080/v1/users/62254058296038d51f88e0ce",
+				"url": "{{SERVER}}v1/users/62254058296038d51f88e0ce",
 				"method": "GET",
 				"header": [
 					{
@@ -184,7 +184,7 @@
 		{
 			"name": "Users/:id",
 			"request": {
-				"url": "http://localhost:8080/v1/users/92424058b818a953c5568d17",
+				"url": "{{SERVER}}v1/users/92424058b818a953c5568d17",
 				"method": "PUT",
 				"header": [
 					{
@@ -209,7 +209,7 @@
 		{
 			"name": "Users/:id",
 			"request": {
-				"url": "http://localhost:8080/v1/users/4f5f3f580efcc9573e8ff9ea",
+				"url": "{{SERVER}}v1/users/4f5f3f580efcc9573e8ff9ea",
 				"method": "DELETE",
 				"header": [
 					{
@@ -234,7 +234,7 @@
 		{
 			"name": "Users/register (no auth)",
 			"request": {
-				"url": "http://localhost:8080/v1/users/register",
+				"url": "{{SERVER}}v1/users/register",
 				"method": "POST",
 				"header": [
 					{
@@ -254,7 +254,7 @@
 		{
 			"name": "Users/invite",
 			"request": {
-				"url": "http://localhost:8080/v1/users/invite",
+				"url": "{{SERVER}}v1/users/invite",
 				"method": "POST",
 				"header": [
 					{
@@ -279,7 +279,7 @@
 		{
 			"name": "Users/types",
 			"request": {
-				"url": "http://localhost:8080/v1/users/types",
+				"url": "{{SERVER}}v1/users/types",
 				"method": "GET",
 				"header": [],
 				"body": {
@@ -293,7 +293,7 @@
 		{
 			"name": "Users/types/full",
 			"request": {
-				"url": "http://localhost:8080/v1/users/types/full",
+				"url": "{{SERVER}}v1/users/types/full",
 				"method": "GET",
 				"header": [],
 				"body": {
@@ -307,7 +307,7 @@
 		{
 			"name": "Users/logout",
 			"request": {
-				"url": "http://localhost:8080/v1/users/logout?token={{AUTH}}",
+				"url": "{{SERVER}}v1/users/logout?token={{AUTH}}",
 				"method": "GET",
 				"header": [],
 				"body": {
@@ -321,7 +321,7 @@
 		{
 			"name": "Tea",
 			"request": {
-				"url": "http://localhost:8080/v1/tea",
+				"url": "{{SERVER}}v1/tea",
 				"method": "GET",
 				"header": [],
 				"body": {
@@ -335,7 +335,7 @@
 		{
 			"name": "Teams",
 			"request": {
-				"url": "http://localhost:8080/v1/teams",
+				"url": "{{SERVER}}v1/teams",
 				"method": "GET",
 				"header": [
 					{
@@ -355,7 +355,7 @@
 		{
 			"name": "Teams (create)",
 			"request": {
-				"url": "http://localhost:8080/v1/teams",
+				"url": "{{SERVER}}v1/teams",
 				"method": "POST",
 				"header": [
 					{
@@ -380,7 +380,7 @@
 		{
 			"name": "Teams/:id",
 			"request": {
-				"url": "http://localhost:8080/v1/teams/62254058296038d52088e0ce",
+				"url": "{{SERVER}}v1/teams/62254058296038d52088e0ce",
 				"method": "GET",
 				"header": [
 					{
@@ -400,7 +400,7 @@
 		{
 			"name": "Teams/:id",
 			"request": {
-				"url": "http://localhost:8080/v1/teams/62254058296038d52088e0ce",
+				"url": "{{SERVER}}v1/teams/62254058296038d52088e0ce",
 				"method": "PUT",
 				"header": [
 					{
@@ -425,7 +425,7 @@
 		{
 			"name": "Teams/:id",
 			"request": {
-				"url": "http://localhost:8080/v1/teams/a26b4058fea6f62a67c14491",
+				"url": "{{SERVER}}v1/teams/a26b4058fea6f62a67c14491",
 				"method": "DELETE",
 				"header": [
 					{
@@ -445,7 +445,7 @@
 		{
 			"name": "Companies",
 			"request": {
-				"url": "http://localhost:8080/v1/companies",
+				"url": "{{SERVER}}v1/companies",
 				"method": "GET",
 				"header": [
 					{
@@ -465,7 +465,7 @@
 		{
 			"name": "Companies (create)",
 			"request": {
-				"url": "http://localhost:8080/v1/companies",
+				"url": "{{SERVER}}v1/companies",
 				"method": "POST",
 				"header": [
 					{
@@ -490,7 +490,7 @@
 		{
 			"name": "Companies/:id",
 			"request": {
-				"url": "http://localhost:8080/v1/companies/766c4058fea6f62a68c14491",
+				"url": "{{SERVER}}v1/companies/c36a5158ebd131d055caa0e0",
 				"method": "GET",
 				"header": [
 					{
@@ -510,7 +510,7 @@
 		{
 			"name": "Companies/:id",
 			"request": {
-				"url": "http://localhost:8080/v1/companies/a26b4058fea6f62a67c14491",
+				"url": "{{SERVER}}v1/companies/ea8451581fcf26b5229f9574",
 				"method": "PUT",
 				"header": [
 					{
@@ -535,7 +535,7 @@
 		{
 			"name": "Companies/:id",
 			"request": {
-				"url": "http://localhost:8080/v1/companies/c1744058fea6f62a70c14491",
+				"url": "{{SERVER}}v1/companies/c36a5158ebd131d055caa0e0",
 				"method": "DELETE",
 				"header": [
 					{
@@ -555,7 +555,7 @@
 		{
 			"name": "Apps",
 			"request": {
-				"url": "http://localhost:8080/v1/apps",
+				"url": "{{SERVER}}v1/apps",
 				"method": "GET",
 				"header": [
 					{
@@ -575,7 +575,7 @@
 		{
 			"name": "Apps (upload)",
 			"request": {
-				"url": "http://localhost:8080/v1/apps",
+				"url": "{{SERVER}}v1/apps",
 				"method": "POST",
 				"header": [
 					{
@@ -600,7 +600,7 @@
 		{
 			"name": "Apps/:id",
 			"request": {
-				"url": "http://localhost:8080/v1/apps/0c7a5058473be9333af98c3a",
+				"url": "{{SERVER}}v1/apps/0c7a5058473be9333af98c3a",
 				"method": "GET",
 				"header": [
 					{
@@ -620,7 +620,7 @@
 		{
 			"name": "Apps/:id",
 			"request": {
-				"url": "http://localhost:8080/v1/apps/aaaaaaa",
+				"url": "{{SERVER}}v1/apps/0c7a5058473be9333af98c3a",
 				"method": "DELETE",
 				"header": [
 					{
@@ -640,7 +640,7 @@
 		{
 			"name": "Apps/:id/builds",
 			"request": {
-				"url": "http://localhost:8080/v1/apps/0c7a5058473be9333af98c3a/builds?limit=1&offset=1",
+				"url": "{{SERVER}}v1/apps/3f825058f2803827dee55bb0/builds?limit=1&offset=1",
 				"method": "GET",
 				"header": [
 					{
@@ -660,7 +660,7 @@
 		{
 			"name": "Apps/:id/builds/:id",
 			"request": {
-				"url": "http://localhost:8080/v1/apps/0c7a5058473be9333af98c3a/builds/c3815058ee95b99225970f8c",
+				"url": "{{SERVER}}v1/apps/0c7a5058473be9333af98c3a/builds/c3815058ee95b99225970f8c",
 				"method": "GET",
 				"header": [
 					{
@@ -680,7 +680,7 @@
 		{
 			"name": "Apps/:id/builds/:id",
 			"request": {
-				"url": "http://localhost:8080/v1/apps/0c7a5058473be9333af98c3a/builds/c3815058ee95b99225970f8c",
+				"url": "{{SERVER}}v1/apps/0c7a5058473be9333af98c3a/builds/c3815058ee95b99225970f8c",
 				"method": "DELETE",
 				"header": [
 					{
@@ -700,7 +700,7 @@
 		{
 			"name": "Builds/:id",
 			"request": {
-				"url": "http://localhost:8080/v1/builds/c3815058ee95b99225970f8c",
+				"url": "{{SERVER}}v1/builds/3f825058f2803827dee55bb0",
 				"method": "GET",
 				"header": [
 					{
@@ -720,7 +720,7 @@
 		{
 			"name": "Builds/:id",
 			"request": {
-				"url": "http://localhost:8080/v1/builds/c3815058ee95b99225970f8c",
+				"url": "{{SERVER}}v1/builds/3f825058f2803827dee55bb0",
 				"method": "DELETE",
 				"header": [
 					{

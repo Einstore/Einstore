@@ -21,6 +21,7 @@ final class Company: Model {
     var id: Node?
     var name: String?
     var address: String?
+    var logoName: String?
     var url: String?
     var phone: String?
     var created: Date?
@@ -37,6 +38,7 @@ final class Company: Model {
         self.id = try node.extract("_id")
         self.name = try node.extract("name")
         self.address = try node.extract("address")
+        self.logoName = try node.extract("logo")
         self.url = try node.extract("url")
         self.phone = try node.extract("phone")
         self.created = Date.init(timeIntervalSince1970: try node.extract("created"))
@@ -48,6 +50,7 @@ final class Company: Model {
             "_id": self.id,
             "name": self.name,
             "address": self.address,
+            "logo": self.logoName,
             "url": self.url,
             "phone": self.phone,
             "created": self.created?.timeIntervalSince1970.makeNode(),
@@ -96,7 +99,10 @@ extension Company {
             self.phone = phone
         }
         if let users = request.data["users"]?.array {
-            self.users = users as? [IdType]
+            self.users = []
+            for user in users {
+                self.users?.append(user.string!)
+            }
         }
     }
     

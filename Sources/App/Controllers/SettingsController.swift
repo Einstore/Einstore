@@ -22,6 +22,10 @@ final class SettingsController: RootController, ControllerProtocol {
     // MARK: Data pages
     
     func index(request: Request) throws -> ResponseRepresentable {
+        if let response = super.basicAuth(request) {
+            return response
+        }
+        
         return ":)"
     }
     

@@ -156,12 +156,8 @@ final class UsersController: RootController, ControllerProtocol {
     }
     
     func delete(request: Request, userId: IdType) throws -> ResponseRepresentable {
-        if let response = super.kickOut(request) {
+        if let response = super.basicAuth(request) {
             return response
-        }
-        
-        guard Me.shared.type(min: .admin) else {
-            return ResponseBuilder.notAuthorised
         }
         
         let userIdNode = userId.makeNode()
@@ -188,12 +184,8 @@ final class UsersController: RootController, ControllerProtocol {
     }
     
     func create(request: Request) throws -> ResponseRepresentable {
-        if let response = super.kickOut(request) {
+        if let response = super.basicAuth(request) {
             return response
-        }
-        
-        guard Me.shared.type(min: .admin) else {
-            return ResponseBuilder.notAuthorised
         }
         
         var user = User()
@@ -202,12 +194,8 @@ final class UsersController: RootController, ControllerProtocol {
     }
     
     func invite(request: Request) throws -> ResponseRepresentable {
-        if let response = super.kickOut(request) {
+        if let response = super.basicAuth(request) {
             return response
-        }
-        
-        guard Me.shared.type(min: .admin) else {
-            return ResponseBuilder.notAuthorised
         }
         
         var user = User()

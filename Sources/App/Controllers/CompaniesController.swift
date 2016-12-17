@@ -9,6 +9,8 @@
 import Foundation
 import Vapor
 import HTTP
+import S3
+import MimeLib
 
 
 final class CompaniesController: RootController, ControllerProtocol {
@@ -37,6 +39,12 @@ final class CompaniesController: RootController, ControllerProtocol {
             return response
         }
         
+        // BOOST: Show only user companies if he's not an admin
+        guard Me.shared.type(min: .admin) else {
+            let data = try Company.query()
+            return JSON(try data.all().makeNode())
+        }
+        
         let data = try Company.query()
         return JSON(try data.all().makeNode())
     }
@@ -44,6 +52,14 @@ final class CompaniesController: RootController, ControllerProtocol {
     func get(request: Request, objectId: IdType) throws -> ResponseRepresentable {
         if let response = super.kickOut(request) {
             return response
+        }
+        
+        // BOOST: Show only user company if he's not an admin
+        if !Me.shared.type(min: .admin) {
+            guard let object = try Company.find(objectId) else {
+                return ResponseBuilder.notFound
+            }
+            return ResponseBuilder.build(model: object)
         }
         
         guard let object = try Company.find(objectId) else {
@@ -54,7 +70,7 @@ final class CompaniesController: RootController, ControllerProtocol {
     }
     
     func update(request: Request, objectId: IdType) throws -> ResponseRepresentable {
-        if let response = super.kickOut(request) {
+        if let response = super.basicAuth(request) {
             return response
         }
         
@@ -62,21 +78,22 @@ final class CompaniesController: RootController, ControllerProtocol {
             return ResponseBuilder.notFound
         }
         
-        return try self.updateResponse(request: request, object: &object)
+        return self.checkAndSave(object: &object, withResponse: request, andStatusCode: .success)
     }
     
     func create(request: Request) throws -> ResponseRepresentable {
-        if let response = super.kickOut(request) {
+        if let response = super.basicAuth(request) {
             return response
         }
         
         var object = Company()
         object.created = Date()
-        return try self.createResponse(request: request, object: &object)
+        
+        return self.checkAndSave(object: &object, withResponse: request, andStatusCode: .created)
     }
     
     func delete(request: Request, objectId: IdType) throws -> ResponseRepresentable {
-        if let response = super.kickOut(request) {
+        if let response = super.basicAuth(request) {
             return response
         }
         
@@ -100,16 +117,18 @@ final class CompaniesController: RootController, ControllerProtocol {
 
 extension CompaniesController {
     
-    func updateResponse(request: Request, object: inout Company) throws -> ResponseRepresentable {
-        guard Me.shared.type(min: .admin) else {
-            return ResponseBuilder.notAuthorised
-        }
-        
+    
+    // MARK: Saving with response
+    
+    func checkAndSave(object: inout Company, withResponse request: Request, andStatusCode code: StatusCodes) -> ResponseRepresentable {
         let validated: [ValidationError] = request.isCool(forValues: Company.validationFields)
         if validated.count == 0 {
-            
-            try object.update(fromRequest: request)
-            
+            do {
+                try object.update(fromRequest: request)
+            }
+            catch {
+                return ResponseBuilder.incompleteData
+            }
             do {
                 try object.save()
             }
@@ -117,16 +136,28 @@ extension CompaniesController {
                 return ResponseBuilder.internalServerError
             }
             
-            return ResponseBuilder.build(model: object, statusCode: StatusCodes.created)
+            do {
+                let s3: S3 = try S3(droplet: drop)
+                if let removeLogo: Bool = request.data["remove-logo"]?.bool {
+                    if removeLogo == true && object.logoName != nil {
+                        let logoPath: String = "companies/" + object.id!.string! + "/" + object.logoName!
+                        try s3.delete(fileAtPath: logoPath)
+                    }
+                }
+                if let file: Multipart.File = request.multipart?["logo"]?.file {
+                    let logoPath: String = "companies/" + object.id!.string! + "/logo." + Mime.fileExtension(forMime: file.type!)!
+                    try s3.put(bytes: file.data, filePath: logoPath)
+                    
+                }
+            }
+            catch {
+                
+            }
+            return ResponseBuilder.build(model: object, statusCode: code)
         }
         else {
             return ResponseBuilder.validationErrorResponse(errors: validated)
         }
-    }
-    
-    func createResponse(request: Request, object: inout Company) throws -> ResponseRepresentable {
-        object.created = Date()
-        return try self.updateResponse(request: request, object: &object)
     }
     
 }

@@ -58,7 +58,6 @@ final class AppsController: RootController, ControllerProtocol {
     
     private func s3() throws -> S3 {
         let s3: S3 = try S3(droplet: drop)
-        s3.bucketName = "booststore"
         return s3
     }
     
@@ -68,6 +67,8 @@ final class AppsController: RootController, ControllerProtocol {
         if let response = super.kickOut(request) {
             return response
         }
+        
+        // BOOST: Only return builds user can see if they are < developer
         
         let data = try App.query()
         return JSON(try data.all().makeNode())
@@ -83,6 +84,8 @@ final class AppsController: RootController, ControllerProtocol {
             return response
         }
         
+        // BOOST: Only return builds user can see if they are < developer
+        
         guard let object = try App.find(objectId) else {
             return ResponseBuilder.notFound
         }
@@ -95,6 +98,8 @@ final class AppsController: RootController, ControllerProtocol {
             return response
         }
         
+        // BOOST: Only return builds user can see if they are < developer
+        
         guard let object = try Build.find(objectId) else {
             return ResponseBuilder.notFound
         }
@@ -103,7 +108,7 @@ final class AppsController: RootController, ControllerProtocol {
     }
     
     func deleteBuild(request: Request, objectId: IdType) throws -> ResponseRepresentable {
-        if let response = super.kickOut(request) {
+        if let response = super.basicAuth(request, minAccess: .developer) {
             return response
         }
         
@@ -119,6 +124,8 @@ final class AppsController: RootController, ControllerProtocol {
             return response
         }
         
+        // BOOST: Only return builds user can see if they are < developer
+        
         guard let object = try App.find(objectId) else {
             return ResponseBuilder.notFound
         }
@@ -132,7 +139,7 @@ final class AppsController: RootController, ControllerProtocol {
     }
     
     func update(request: Request, objectId: IdType) throws -> ResponseRepresentable {
-        if let response = super.kickOut(request) {
+        if let response = super.basicAuth(request, minAccess: .developer) {
             return response
         }
         
@@ -144,7 +151,7 @@ final class AppsController: RootController, ControllerProtocol {
     }
     
     func upload(request: Request) throws -> ResponseRepresentable {
-        if let response = super.kickOut(request) {
+        if let response = super.basicAuth(request, minAccess: .developer) {
             return response
         }
         
@@ -205,7 +212,7 @@ final class AppsController: RootController, ControllerProtocol {
     }
     
     func delete(request: Request, objectId: IdType) throws -> ResponseRepresentable {
-        if let response = super.kickOut(request) {
+        if let response = super.basicAuth(request, minAccess: .developer) {
             return response
         }
         

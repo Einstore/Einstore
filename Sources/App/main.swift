@@ -21,6 +21,7 @@ drop.register(controller: CompaniesController())
 drop.register(controller: HistoryController())
 drop.register(controller: SettingsController())
 drop.register(controller: InstallController())
+drop.register(controller: UploadTokensController())
 
 
 drop.run()

@@ -33,7 +33,7 @@ final class TeamsController: RootController, ControllerProtocol {
     // MARK: Teams
     
     func index(request: Request) throws -> ResponseRepresentable {
-        if let response = super.kickOut(request) {
+        if let response = super.basicAuth(request) {
             return response
         }
         
@@ -42,7 +42,7 @@ final class TeamsController: RootController, ControllerProtocol {
     }
     
     func get(request: Request, objectId: IdType) throws -> ResponseRepresentable {
-        if let response = super.kickOut(request) {
+        if let response = super.basicAuth(request) {
             return response
         }
         
@@ -54,7 +54,7 @@ final class TeamsController: RootController, ControllerProtocol {
     }
     
     func update(request: Request, objectId: IdType) throws -> ResponseRepresentable {
-        if let response = super.kickOut(request) {
+        if let response = super.basicAuth(request) {
             return response
         }
         
@@ -66,18 +66,19 @@ final class TeamsController: RootController, ControllerProtocol {
     }
     
     func create(request: Request) throws -> ResponseRepresentable {
-        if let response = super.kickOut(request) {
+        if let response = super.basicAuth(request) {
             return response
         }
         
         var team = Team()
         team.created = Date()
         team.adminTeam = false
+        
         return try self.createResponse(request: request, object: &team)
     }
     
     func delete(request: Request, objectId: IdType) throws -> ResponseRepresentable {
-        if let response = super.kickOut(request) {
+        if let response = super.basicAuth(request) {
             return response
         }
         

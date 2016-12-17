@@ -20,6 +20,18 @@ class RootController {
     
     // MARK: Authentication
     
+    func basicAuth(_ request: Request, minAccess userType: UserType = .admin) -> ResponseRepresentable? {
+        if let response = self.kickOut(request) {
+            return response
+        }
+        
+        guard Me.shared.type(min: userType) else {
+            return ResponseBuilder.notAuthorised
+        }
+        
+        return nil
+    }
+    
     func kickOut(_ request: Request) -> ResponseRepresentable? {
         if let token = request.tokenString {
             do {

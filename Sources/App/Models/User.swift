@@ -141,7 +141,7 @@ extension User {
             guard let type = UserType(rawValue: rawType) else {
                 return
             }
-            if Me.shared.type(min: type) && Me.shared.user?.id != self.id {
+            if Me.shared.type(min: .admin) && Me.shared.user?.id != self.id {
                 self.type = type
             }
         }
