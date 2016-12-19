@@ -22,9 +22,6 @@ final class InstallController: RootController, ControllerProtocol {
     // MARK: Data pages
     
     func index(request: Request) throws -> ResponseRepresentable {
-        // TODO: Install basic user and any other database stuff
-        // TODO: Install should be only available if there is no SU available
-        
         let superUsers = try User.query().filter("type", "su")
         
         if try superUsers.all().count == 0 {

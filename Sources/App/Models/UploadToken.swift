@@ -77,7 +77,8 @@ extension UploadToken {
     // MARK: Get
     
     static func exists(token: String) throws -> Bool {
-        if let _ = try UploadToken.query().filter("token", token.lowercased()).first() {
+        let hashedToken: String = try drop.hash.make(token.uppercased())
+        if let _ = try UploadToken.query().filter("token", hashedToken).first() {
             return true
         }
         return false
@@ -92,8 +93,8 @@ extension UploadToken {
         
         if let apps = request.data["apps"]?.array {
             self.limitedToApps = []
-            for appId: Node in apps as! [Node] {
-                if try App.exists(id: appId) {
+            for appId: JSON in apps as! [JSON] {
+                if try App.exists(id: appId.makeNode()) {
                     self.limitedToApps?.append(appId.string!)
                 }
             }

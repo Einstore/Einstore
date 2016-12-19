@@ -195,7 +195,6 @@ final class AppsController: RootController, ControllerProtocol {
             app = App()
             app?.identifier = decoder.appIdentifier
             app?.platform = platform
-            app?.token = UUID().uuidString
             app?.created = Date()
         }
         app?.modified = Date()
