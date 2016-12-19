@@ -111,6 +111,11 @@ final class AppsController: RootController, ControllerProtocol {
             return ResponseBuilder.notFound
         }
         
+        // BOOST: Delete build from S3
+        
+        // History
+        try History.make(.deleteBuild, objectId: object.app?.makeNode())
+        
         return ResponseBuilder.build(model: object)
     }
     
@@ -150,6 +155,9 @@ final class AppsController: RootController, ControllerProtocol {
             
             do {
                 try object.save()
+                
+                // History
+                try History.make(.updateApp, objectId: object.id)
             }
             catch {
                 return ResponseBuilder.internalServerError
@@ -231,6 +239,10 @@ final class AppsController: RootController, ControllerProtocol {
         try decoder.cleanUp()
         
         let ret: [String: Node] = try ["app": app!.makeNode(), "build": build.makeNode()]
+        
+        // History
+        try History.make(.uploadApp, objectId: app?.id)
+        
         return try ResponseBuilder.build(node: ret.makeNode(), statusCode: .created)
     }
     
@@ -250,6 +262,9 @@ final class AppsController: RootController, ControllerProtocol {
             let s3: S3 = try self.s3()
             let path: String = "data/" + object.platform!.rawValue + "/" + object.id!.string!
             try s3.delete(fileAtPath: path)
+            
+            // History
+            try History.make(.deleteApp, message: "\(object.name) (\(object.identifier))")
             
             try object.delete()
         }

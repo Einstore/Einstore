@@ -50,6 +50,8 @@ final class InstallController: RootController, ControllerProtocol {
                 //try user.save()
                 try team.save()
                 
+                try History.make(.install)
+                
                 return ResponseBuilder.build(json: JSON(["admin": try user.makeNode(), "team": try team.makeNode()]), statusCode: StatusCodes.created)
             }
             catch {

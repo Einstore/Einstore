@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Vapor
 
 
 final class Me {
@@ -15,6 +16,10 @@ final class Me {
     
     var auth: Auth?
     var user: User?
+    
+    func id() -> Node? {
+        return self.user?.id
+    }
     
     func type(min: UserType) -> Bool {
         let type = self.user?.type ?? .tester

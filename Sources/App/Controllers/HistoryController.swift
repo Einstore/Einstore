@@ -10,12 +10,6 @@ import Vapor
 import HTTP
 
 
-enum HistoryEvent: String {
-    case uploadedApp = "APU"
-    case deletedApp = "APD"
-}
-
-
 final class HistoryController: RootController, ControllerProtocol {
     
     
