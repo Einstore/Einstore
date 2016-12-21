@@ -94,13 +94,12 @@ extension App {
         return try App.query().filter("identifier", identifier).filter("platform", platform.rawValue).first()
     }
     
-    func builds(_ limit: Int = 20, offset: Int = 0) throws -> Fluent.Query<Build> {
+    func builds() throws -> Fluent.Query<Build> {
         guard let id: String = self.id?.string else {
             throw BoostError(.missingId)
         }
         let query: Fluent.Query = try Build.query().filter("app", id)
-        query.limit = Limit(count: limit, offset: offset)
-        return try query.sort("created", .descending)
+        return query
     }
     
     static func exists(id: Node) throws -> Bool {

@@ -71,7 +71,7 @@ final class AppsController: RootController, ControllerProtocol {
         // BOOST: Only return builds user can see if they are < developer
         
         let data = try App.query()
-        return JSON(try data.all().makeNode())
+        return JSON(try data.requestSorted(request).makeNode())
     }
     
     func get(request: Request, objectId: IdType) throws -> ResponseRepresentable {
@@ -110,8 +110,15 @@ final class AppsController: RootController, ControllerProtocol {
         guard let object = try Build.find(objectId) else {
             return ResponseBuilder.notFound
         }
+        guard let app = try App.find(object.app!.makeNode()) else {
+            return ResponseBuilder.appNotFound
+        }
         
-        // BOOST: Delete build from S3
+        // BOOST: Check build is being deleted!
+        let s3: S3 = try self.s3()
+        // Format: data/:appPlatform/:appId/:buildId
+        let path: String = "data/\(app.platform!.rawValue)/\(app.id!.string!)/\(object.id!.string)"
+        try s3.delete(fileAtPath: path)
         
         // History
         try History.make(.deleteBuild, objectId: object.app?.makeNode())
@@ -130,12 +137,8 @@ final class AppsController: RootController, ControllerProtocol {
             return ResponseBuilder.notFound
         }
         
-        let limit: Int = request.query?["limit"]?.int ?? 20
-        let offset: Int = request.query?["offset"]?.int ?? 0
-        
-        let builds = try object.builds(limit, offset: offset)
-        
-        return ResponseBuilder.build(node: try builds.all().makeNode())
+        let builds: [Build] = try Build.query().filter("app", object.id!).requestSorted(request, sortBy: "created", direction: .descending)
+        return ResponseBuilder.build(node: try builds.makeNode())
     }
     
     func update(request: Request, objectId: IdType) throws -> ResponseRepresentable {
@@ -256,7 +259,7 @@ final class AppsController: RootController, ControllerProtocol {
         }
         
         do {
-            // TODO: Make sure that the following actually does delete builds! Super important!
+            // BOOST: Make sure that the following actually does delete builds! Super important!
             try object.builds().delete()
             
             let s3: S3 = try self.s3()

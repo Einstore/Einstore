@@ -54,7 +54,7 @@ final class CompaniesController: RootController, ControllerProtocol {
         // BOOST: Show only user companies if he's not an admin
         guard Me.shared.type(min: .admin) else {
             let data = try Company.query()
-            return JSON(try data.all().makeNode())
+            return JSON(try data.requestSorted(request, sortBy: "name", direction: .ascending).makeNode())
         }
         
         let data = try Company.query()

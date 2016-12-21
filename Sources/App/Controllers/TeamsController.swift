@@ -38,7 +38,7 @@ final class TeamsController: RootController, ControllerProtocol {
         }
         
         let data = try Team.query()
-        return JSON(try data.all().makeNode())
+        return JSON(try data.requestSorted(request, sortBy: "name", direction: .ascending).makeNode())
     }
     
     func get(request: Request, objectId: IdType) throws -> ResponseRepresentable {

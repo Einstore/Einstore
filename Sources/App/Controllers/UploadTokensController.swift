@@ -38,7 +38,7 @@ final class UploadTokensController: RootController, ControllerProtocol {
         }
         
         let query = try UploadToken.query()
-        let data = try query.sort("name", .ascending).all()
+        let data = try query.requestSorted(request, sortBy: "name", direction: .ascending)
         var output: [JSON] = []
         for item in data {
             try output.append(item.makeJSON())

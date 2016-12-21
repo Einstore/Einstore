@@ -89,6 +89,12 @@ struct ResponseBuilder {
         }
     }
     
+    static var appNotFound: ResponseRepresentable {
+        get {
+            return self.customErrorResponse(statusCode: .notFound, message: Lang.get("Application not found"))
+        }
+    }
+    
     static var emailExists: ResponseRepresentable {
         get {
             return self.customErrorResponse(statusCode: .notAuthorised, message: Lang.get("Email already registered"))

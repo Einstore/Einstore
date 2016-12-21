@@ -27,15 +27,8 @@ final class HistoryController: RootController, ControllerProtocol {
             return response
         }
         
-        return ":)"
-    }
-    
-    func view(request: Request, appId: IdType) throws -> ResponseRepresentable {
-        if let response = super.basicAuth(request) {
-            return response
-        }
-        
-        return "You requested User #\(appId)"
+        let data: [History] = try History.query().requestSorted(request, sortBy: "created", direction: .descending)
+        return JSON(try data.makeNode())
     }
     
 }
