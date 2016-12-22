@@ -17,6 +17,7 @@ final class TeamsController: RootController, ControllerProtocol {
     // MARK: Routing
     
     func configureRoutes() {
+        // Teams
         self.baseRoute.get("teams", handler: self.index)
         self.baseRoute.post("teams", handler: self.create)
         self.baseRoute.get("teams", IdType.self) { request, objectId in
@@ -27,6 +28,11 @@ final class TeamsController: RootController, ControllerProtocol {
         }
         self.baseRoute.delete("teams", IdType.self) { request, objectId in
             return try self.delete(request: request, objectId: objectId)
+        }
+        
+        // Users
+        self.baseRoute.get("teams", IdType.self, "users") { request, teamId in
+            return try self.users(request: request, objectId: teamId)
         }
     }
     
@@ -97,6 +103,24 @@ final class TeamsController: RootController, ControllerProtocol {
         }
         
         return ResponseBuilder.okNoContent
+    }
+    
+    // MARK: Users
+    
+    func users(request: Request, objectId: IdType) throws -> ResponseRepresentable {
+        if let response = super.basicAuth(request) {
+            return response
+        }
+        
+        guard let team = try Team.find(objectId) else {
+            return ResponseBuilder.notFound
+        }
+        
+        guard let data = try team.members() else {
+            return ResponseBuilder.build(json: JSON([]))
+        }
+        
+        return JSON(try data.requestSorted(request, sortBy: "name", direction: .ascending).makeNode())
     }
     
 }

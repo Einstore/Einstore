@@ -98,6 +98,7 @@ extension User: Preparation {
 
 extension User {
     
+    
     // MARK: Get
     
     static func find(email: String, password: String) throws -> User? {
@@ -115,6 +116,10 @@ extension User {
     
     static func exists(idString: String) throws -> Bool {
         return try self.exists(id: idString.makeNode())
+    }
+    
+    func teams() throws -> Fluent.Query<Team> {
+        return try Team.query(forUser: self)
     }
     
     // MARK: Save / update

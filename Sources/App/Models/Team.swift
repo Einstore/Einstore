@@ -80,6 +80,22 @@ extension Team {
         return try self.exists(id: idString.makeNode())
     }
     
+    static func query(forUserId userId: Node) throws -> Fluent.Query<Team> {
+        return try self.query().filter("users", Fluent.Filter.Comparison.contains, userId)
+    }
+    
+    static func query(forUser user: User) throws -> Fluent.Query<Team> {
+        return try self.query(forUserId: user.id!)
+    }
+    
+    func members() throws -> Fluent.Query<User>? {
+        guard let users = self.users else {
+            throw BoostError(.noData)
+        }
+        // BOOST: Fix this query!!!!
+        return try User.query().filter("_id", .in, users)
+    }
+    
     // MARK: Save / update
     
     func update(fromRequest request: Request) throws {

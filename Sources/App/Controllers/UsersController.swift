@@ -19,6 +19,8 @@ final class UsersController: RootController, ControllerProtocol {
         self.baseRoute.post("auth", handler: self.auth)
         
         let basic = self.baseRoute.grouped("users")
+        
+        // Users
         basic.get("logout", handler: self.logout)
         basic.post("register", handler: self.register)
         basic.get(handler: self.index)
@@ -35,6 +37,11 @@ final class UsersController: RootController, ControllerProtocol {
         }
         basic.get("types", handler: self.userTypes)
         basic.get("types", "full", handler: self.userTypesFull)
+        
+        // Parent & children
+        basic.get(IdType.self, "teams") { request, userId in
+            return try self.teams(request: request, userId: userId)
+        }
     }
     
     // MARK: Authentication
@@ -216,6 +223,24 @@ final class UsersController: RootController, ControllerProtocol {
         return ResponseBuilder.build(node: try types.makeNode())
     }
     
+    func teams(request: Request, userId: IdType) throws -> ResponseRepresentable {
+        if let response = super.kickOut(request) {
+            return response
+        }
+        
+        if userId != Me.shared.id()?.string {
+            guard Me.shared.type(min: .developer) else {
+                return ResponseBuilder.notAuthorised
+            }
+        }
+        
+        guard let user = try User.find(userId) else {
+            return ResponseBuilder.notFound
+        }
+        
+        let teams = try user.teams().requestSorted(request, sortBy: "name", direction: .ascending)
+        return JSON(try teams.makeNode())
+    }
     
 }
 
