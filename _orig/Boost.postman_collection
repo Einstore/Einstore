@@ -2,7 +2,7 @@
 	"variables": [],
 	"info": {
 		"name": "Boost",
-		"_postman_id": "79592d1f-49da-ce1d-7c16-b45b4321ec6d",
+		"_postman_id": "b909a216-c45c-ccc8-9f82-d9e5f9e3d4d9",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
@@ -94,10 +94,7 @@
 				"url": "{{SERVER}}v1/install",
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": []
-				},
+				"body": {},
 				"description": ""
 			},
 			"response": []
@@ -114,10 +111,7 @@
 						"description": ""
 					}
 				],
-				"body": {
-					"mode": "formdata",
-					"formdata": []
-				},
+				"body": {},
 				"description": ""
 			},
 			"response": []
@@ -125,13 +119,10 @@
 		{
 			"name": "Users (url token)",
 			"request": {
-				"url": "{{SERVER}}v1/users?token={{AUTH}}",
+				"url": "{{SERVER}}v1/users?auth={{AUTH}}",
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": []
-				},
+				"body": {},
 				"description": ""
 			},
 			"response": []
@@ -155,7 +146,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"firstname\": \"Billy\",\n\t\"lastname\": \"Bob\",\n\t\"email\": \"billy@bobek.com\",\n\t\"password\": \"superP4ssword\",\n\t\"mobile\": \"07972574949\",\n\t\"type\": \"a\",\n\t\"timezone\": 1\n}"
+					"raw": "{\n  \"firstname\": \"Billy\",\n  \"lastname\": \"Bob\",\n  \"email\": \"billy@bobek.com\",\n  \"password\": \"superP4ssword\",\n  \"mobile\": \"07972574949\",\n  \"type\": \"a\",\n  \"timezone\": 1\n}"
 				},
 				"description": ""
 			},
@@ -173,10 +164,7 @@
 						"description": ""
 					}
 				],
-				"body": {
-					"mode": "formdata",
-					"formdata": []
-				},
+				"body": {},
 				"description": ""
 			},
 			"response": []
@@ -184,7 +172,7 @@
 		{
 			"name": "Users/:id",
 			"request": {
-				"url": "{{SERVER}}v1/users/92424058b818a953c5568d17",
+				"url": "{{SERVER}}v1/users/d8bc555895d65daabdde4284",
 				"method": "PUT",
 				"header": [
 					{
@@ -200,7 +188,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"firstname\": \"Finally 2\",\n\t\"lastname\": \"success?\",\n\t\"type\": \"su\",\n\t\"email\": \"admin@boost\",\n\t\"phone\": \"07972574949\"\n}"
+					"raw": "{\n  \"firstname\": \"Ondrej\",\n  \"lastname\": \"Rafaj\",\n  \"type\": \"c\",\n  \"email\": \"ondrej.rafaj@gmail.com\",\n  \"phone\": \"07972574949\",\n  \"ims\": {\n    \"skype\": \"rafiki270\",\n    \"whatsapp\": \"07972574949\"\n  },\n  \"company\": \"67bb5558c628d39748ecf241\"\n}"
 				},
 				"description": ""
 			},
@@ -225,7 +213,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"firstname\": \"Finally 2\",\n\t\"lastname\": \"success?\",\n\t\"type\": \"su\",\n\t\"email\": \"admin@boost\",\n\t\"phone\": \"07972574949\"\n}"
+					"raw": "{\n  \"firstname\": \"Finally 2\",\n  \"lastname\": \"success?\",\n  \"type\": \"su\",\n  \"email\": \"admin@boost\",\n  \"phone\": \"07972574949\"\n}"
 				},
 				"description": ""
 			},
@@ -245,7 +233,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"firstname\": \"Billy\",\n\t\"lastname\": \"Bob\",\n\t\"email\": \"billy2@bobek.com\",\n\t\"password\": \"superP4ssword\",\n\t\"mobile\": \"07972574949\",\n\t\"type\": \"a\",\n\t\"timezone\": 1\n}"
+					"raw": "{\n  \"firstname\": \"Billy\",\n  \"lastname\": \"Bob\",\n  \"email\": \"billy2@bobek.com\",\n  \"password\": \"superP4ssword\",\n  \"mobile\": \"07972574949\",\n  \"type\": \"a\",\n  \"timezone\": 1\n}"
 				},
 				"description": ""
 			},
@@ -270,7 +258,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"firstname\": \"Billy\",\n\t\"lastname\": \"Bob\",\n\t\"email\": \"billy@bobek.com\",\n\t\"password\": \"superP4ssword\",\n\t\"mobile\": \"07972574949\",\n\t\"type\": \"a\"\n}"
+					"raw": "{\n  \"firstname\": \"Billy\",\n  \"lastname\": \"Bob\",\n  \"email\": \"billy@bobek.com\",\n  \"password\": \"superP4ssword\",\n  \"mobile\": \"07972574949\",\n  \"type\": \"a\"\n}"
 				},
 				"description": ""
 			},
@@ -282,10 +270,7 @@
 				"url": "{{SERVER}}v1/users/types",
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": []
-				},
+				"body": {},
 				"description": ""
 			},
 			"response": []
@@ -296,10 +281,7 @@
 				"url": "{{SERVER}}v1/users/types/full",
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": []
-				},
+				"body": {},
 				"description": ""
 			},
 			"response": []
@@ -310,10 +292,24 @@
 				"url": "{{SERVER}}v1/users/logout?token={{AUTH}}",
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": []
-				},
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Users/:id/teams",
+			"request": {
+				"url": "{{SERVER}}v1/users/bebc555895d65daabade4284/teams",
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					}
+				],
+				"body": {},
 				"description": ""
 			},
 			"response": []
@@ -324,10 +320,7 @@
 				"url": "{{SERVER}}v1/tea",
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": []
-				},
+				"body": {},
 				"description": ""
 			},
 			"response": []
@@ -344,10 +337,7 @@
 						"description": ""
 					}
 				],
-				"body": {
-					"mode": "formdata",
-					"formdata": []
-				},
+				"body": {},
 				"description": ""
 			},
 			"response": []
@@ -371,7 +361,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Another team\"\n}"
+					"raw": "{\n  \"name\": \"Another team\"\n}"
 				},
 				"description": ""
 			},
@@ -380,7 +370,7 @@
 		{
 			"name": "Teams/:id",
 			"request": {
-				"url": "{{SERVER}}v1/teams/62254058296038d52088e0ce",
+				"url": "{{SERVER}}v1/teams/bebc555895d65daabbde4284",
 				"method": "GET",
 				"header": [
 					{
@@ -389,10 +379,7 @@
 						"description": ""
 					}
 				],
-				"body": {
-					"mode": "formdata",
-					"formdata": []
-				},
+				"body": {},
 				"description": ""
 			},
 			"response": []
@@ -400,7 +387,7 @@
 		{
 			"name": "Teams/:id",
 			"request": {
-				"url": "{{SERVER}}v1/teams/62254058296038d52088e0ce",
+				"url": "{{SERVER}}v1/teams/2ff35a58971b68fc800367f6",
 				"method": "PUT",
 				"header": [
 					{
@@ -416,7 +403,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Super team!\"\n}"
+					"raw": "{\n  \"name\": \"AAA Super team!\"\n}"
 				},
 				"description": ""
 			},
@@ -425,7 +412,7 @@
 		{
 			"name": "Teams/:id",
 			"request": {
-				"url": "{{SERVER}}v1/teams/a26b4058fea6f62a67c14491",
+				"url": "{{SERVER}}v1/teams/db405558d34c50fea5b7a588",
 				"method": "DELETE",
 				"header": [
 					{
@@ -434,10 +421,24 @@
 						"description": ""
 					}
 				],
-				"body": {
-					"mode": "formdata",
-					"formdata": []
-				},
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Teams/:id/users",
+			"request": {
+				"url": "{{SERVER}}v1/teams/bebc555895d65daabbde4284/users",
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					}
+				],
+				"body": {},
 				"description": ""
 			},
 			"response": []
@@ -454,10 +455,7 @@
 						"description": ""
 					}
 				],
-				"body": {
-					"mode": "formdata",
-					"formdata": []
-				},
+				"body": {},
 				"description": ""
 			},
 			"response": []
@@ -481,7 +479,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"manGoweb UK Ltd\",\n\t\"address\": \"71 Avondale Avenue\\nEN4 8NB\\nLondon, UK\",\n\t\"url\": \"http://www.mangoweb.cz/en\",\n\t\"phone\": \"07972574949\"\n}"
+					"raw": "{\n  \"name\": \"manGoweb UK Ltd\",\n  \"address\": \"71 Avondale Avenue\\nEN4 8NB\\nLondon, UK\",\n  \"url\": \"http://www.mangoweb.cz/en\",\n  \"phone\": \"07972574949\",\n  \"maincolor\": \"#FF0000\",\n  \"mainfontcolor\": \"#FFFFFF\",\n  \"secondarycolor\": \"#CCCCCC\",\n  \"secondaryfontcolor\": \"#FFFFFF\",\n  \"backgroundcolor\": \"#FFFFFF\",\n  \"contentfontcolor\": \"#000000\",\n  \"users\": [\n      \"62254058296038d51f88e0ce\"\n    ]\n}"
 				},
 				"description": ""
 			},
@@ -490,7 +488,7 @@
 		{
 			"name": "Companies/:id",
 			"request": {
-				"url": "{{SERVER}}v1/companies/c36a5158ebd131d055caa0e0",
+				"url": "{{SERVER}}v1/companies/2a445558d488496df50456d0",
 				"method": "GET",
 				"header": [
 					{
@@ -499,10 +497,7 @@
 						"description": ""
 					}
 				],
-				"body": {
-					"mode": "formdata",
-					"formdata": []
-				},
+				"body": {},
 				"description": ""
 			},
 			"response": []
@@ -510,7 +505,7 @@
 		{
 			"name": "Companies/:id",
 			"request": {
-				"url": "{{SERVER}}v1/companies/ea8451581fcf26b5229f9574",
+				"url": "{{SERVER}}v1/companies/efbc555895d65daabfde4284",
 				"method": "PUT",
 				"header": [
 					{
@@ -526,7 +521,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"manGoweb sro\",\n\t\"address\": \"Jungmanovo namesti, Praha 1\",\n\t\"url\": \"http://www.mangoweb.cz\",\n\t\"phone\": \"004202341253453\",\n\t\"users\": [\n      \"62254058296038d51f88e0ce\",\n      \"db5940585ab3dcd192245b83\"\n    ]\n}"
+					"raw": "{\n  \"name\": \"manGoweb sro\",\n  \"address\": \"Jungmanovo namesti, Praha 1\",\n  \"url\": \"http://www.mangoweb.cz\",\n  \"phone\": \"004202341253453\",\n  \"maincolor\": \"#FF0000\",\n  \"mainfontcolor\": \"#FFFFFF\",\n  \"secondarycolor\": \"#CCCCCC\",\n  \"secondaryfontcolor\": \"#FFFFFF\",\n  \"backgroundcolor\": \"#FFFFFF\",\n  \"contentfontcolor\": \"#000000\",\n  \"users\": [\n      \"db405558d34c50fea4b7a588\",\n      \"db405558d34c50fea4b7a589\"\n    ]\n}"
 				},
 				"description": ""
 			},
@@ -544,10 +539,49 @@
 						"description": ""
 					}
 				],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Companies/:id/logo",
+			"request": {
+				"url": "{{SERVER}}v1/companies/efbc555895d65daabfde4284/logo",
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "image/png",
+						"description": ""
+					}
+				],
 				"body": {
-					"mode": "formdata",
-					"formdata": []
+					"mode": "raw",
+					"raw": ""
 				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Companies/:id/logo",
+			"request": {
+				"url": "{{SERVER}}v1/companies/2a445558d488496df50456d0/logo",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					}
+				],
+				"body": {},
 				"description": ""
 			},
 			"response": []
@@ -564,10 +598,7 @@
 						"description": ""
 					}
 				],
-				"body": {
-					"mode": "formdata",
-					"formdata": []
-				},
+				"body": {},
 				"description": ""
 			},
 			"response": []
@@ -582,10 +613,102 @@
 						"key": "X-AuthToken",
 						"value": "{{AUTH}}",
 						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "app",
+							"type": "file",
+							"enabled": true,
+							"src": "bytecheck-debug.apk"
+						}
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Apps (upload - token)",
+			"request": {
+				"url": "{{SERVER}}v1/apps?token=72613B1B-66D2-410B-9AD3-9051FF12833E",
+				"method": "POST",
+				"header": [
+					{
+						"key": "//X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": "",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "app",
+							"type": "file",
+							"enabled": true,
+							"src": "app.ipa"
+						}
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Apps/:id",
+			"request": {
+				"url": "{{SERVER}}v1/apps/04ab55588f1dd0a42caf01f2",
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Apps/:id",
+			"request": {
+				"url": "{{SERVER}}v1/apps/74bd555895d65daac0de4284",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
 					},
 					{
 						"key": "Content-Type",
-						"value": "application/x-www-form-urlencoded",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"My new app name\",\n  \"all\": true,\n  \"users\": [\n    \"d8bc555895d65daabdde4284\"\n  ]\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Apps/:id",
+			"request": {
+				"url": "{{SERVER}}v1/apps/0c7a5058473be9333af98c3a",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
 						"description": ""
 					}
 				],
@@ -598,49 +721,9 @@
 			"response": []
 		},
 		{
-			"name": "Apps/:id",
-			"request": {
-				"url": "{{SERVER}}v1/apps/0c7a5058473be9333af98c3a",
-				"method": "GET",
-				"header": [
-					{
-						"key": "X-AuthToken",
-						"value": "{{AUTH}}",
-						"description": ""
-					}
-				],
-				"body": {
-					"mode": "formdata",
-					"formdata": []
-				},
-				"description": ""
-			},
-			"response": []
-		},
-		{
-			"name": "Apps/:id",
-			"request": {
-				"url": "{{SERVER}}v1/apps/0c7a5058473be9333af98c3a",
-				"method": "DELETE",
-				"header": [
-					{
-						"key": "X-AuthToken",
-						"value": "{{AUTH}}",
-						"description": ""
-					}
-				],
-				"body": {
-					"mode": "formdata",
-					"formdata": []
-				},
-				"description": ""
-			},
-			"response": []
-		},
-		{
 			"name": "Apps/:id/builds",
 			"request": {
-				"url": "{{SERVER}}v1/apps/3f825058f2803827dee55bb0/builds?limit=1&offset=1",
+				"url": "{{SERVER}}v1/apps/436256587e9a1c5c620a2608/builds?limit=10&offset=0",
 				"method": "GET",
 				"header": [
 					{
@@ -649,10 +732,7 @@
 						"description": ""
 					}
 				],
-				"body": {
-					"mode": "formdata",
-					"formdata": []
-				},
+				"body": {},
 				"description": ""
 			},
 			"response": []
@@ -669,10 +749,7 @@
 						"description": ""
 					}
 				],
-				"body": {
-					"mode": "formdata",
-					"formdata": []
-				},
+				"body": {},
 				"description": ""
 			},
 			"response": []
@@ -689,10 +766,7 @@
 						"description": ""
 					}
 				],
-				"body": {
-					"mode": "formdata",
-					"formdata": []
-				},
+				"body": {},
 				"description": ""
 			},
 			"response": []
@@ -709,10 +783,7 @@
 						"description": ""
 					}
 				],
-				"body": {
-					"mode": "formdata",
-					"formdata": []
-				},
+				"body": {},
 				"description": ""
 			},
 			"response": []
@@ -729,9 +800,223 @@
 						"description": ""
 					}
 				],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Tokens",
+			"request": {
+				"url": "{{SERVER}}v1/tokens",
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Tokens (create)",
+			"request": {
+				"url": "{{SERVER}}v1/tokens",
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
 				"body": {
-					"mode": "formdata",
-					"formdata": []
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Token\",\n  \"apps\": [\n    \"d85d5558aed73c50cbf39491\"\n  ]\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Tokens (create, no name)",
+			"request": {
+				"url": "{{SERVER}}v1/tokens",
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"apps\": [\n    \"d85d5558aed73c50cbf39491\"\n  ]\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Tokens/:id",
+			"request": {
+				"url": "{{SERVER}}v1/tokens/546e55588ade6c74d04b88e2",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Another Token\",\n  \"apps\": [\n    \"d85d5558aed73c50cbf39491\"\n  ]\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Tokens/:id (no name)",
+			"request": {
+				"url": "{{SERVER}}v1/tokens/546e55588ade6c74d04b88e2",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"apps\": [\n    \"d85d5558aed73c50cbf39491\"\n  ]\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Tokens/:id",
+			"request": {
+				"url": "{{SERVER}}v1/tokens/4d8c5558b958e6348600d321sss",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Token 3\",\n  \"apps\": [\n    \"d85d5558aed73c50cbf39491\"\n  ]\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Settings",
+			"request": {
+				"url": "{{SERVER}}v1/settings",
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Token 3\",\n  \"apps\": [\n    \"d85d5558aed73c50cbf39491\"\n  ]\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Settings",
+			"request": {
+				"url": "{{SERVER}}v1/settings",
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"store-name\": \"Boost Appstore\",\n  \"store-subtitle\": \"Swift enterprise mobility deployment system\",\n  \"per-page\": \"20\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Settings",
+			"request": {
+				"url": "{{SERVER}}v1/settings",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"per-page\": \"30\"\n}"
 				},
 				"description": ""
 			},
