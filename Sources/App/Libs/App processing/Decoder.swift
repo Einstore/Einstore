@@ -22,7 +22,7 @@ class Decoder {
     
     var archiveFolderUrl: URL {
         get {
-            var archiveUrl: URL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+            var archiveUrl: URL = URL.init(fileURLWithPath: "/tmp")
             archiveUrl.appendPathComponent("BoostAppStore")
             archiveUrl.appendPathComponent(self.sessionUUID)
             return archiveUrl

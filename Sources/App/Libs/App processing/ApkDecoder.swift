@@ -77,15 +77,12 @@ final class ApkDecoder: Decoder, DecoderProtocol {
         // Extract archive
         let result: TerminalResult = Terminal.execute("java", "-jar", self.apktoolUrl.path, "d", self.archiveFileUrl.path, "-o", self.extractedApkFolder.path, "-f")
         
-        //let _ = Terminal.execute("open", self.archiveFolderUrl.path)
-        
         if result.exitCode != 0 {
             throw BoostError(.unarchivingFailed)
         }
     }
     
     private func getApplicationName() throws {
-        
         var pathUrl: URL = self.extractedApkFolder
         pathUrl.appendPathComponent("res")
         pathUrl.appendPathComponent("values")
