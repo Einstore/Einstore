@@ -15,7 +15,7 @@ class XML:XMLNode {
         self.parser = XMLParser(data: data)
         super.init()
         parser.delegate = self
-        parser.parse()
+        let _ = parser.parse()
     }
     init?(contentsOf url: URL) {
         guard let parser = XMLParser(contentsOf: url) else { return nil}
@@ -117,5 +117,13 @@ extension XMLNode:XMLParserDelegate {
         if let parent = parent {
             parser.delegate = parent
         }
+    }
+    
+    func parserDidStartDocument(_ parser: XMLParser) {
+        
+    }
+    
+    func parserDidEndDocument(_ parser: XMLParser) {
+        
     }
 }
