@@ -9,6 +9,11 @@
 import Foundation
 
 
+#if os(Linux)
+    typealias Process = Task
+#endif
+
+
 struct TerminalResult {
     let exitCode: Int32
     let output: String?
