@@ -8,6 +8,7 @@
 
 import Foundation
 import Vapor
+import SwiftyXML
 
 
 final class ApkDecoder: Decoder, DecoderProtocol {
@@ -69,23 +70,19 @@ final class ApkDecoder: Decoder, DecoderProtocol {
         }
     }
     
-    private func getApplicationName() {
+    private func getApplicationName() throws {
         var pathUrl: URL = self.extractedApkFolder
         pathUrl.appendPathComponent("res")
         pathUrl.appendPathComponent("values")
         pathUrl.appendPathComponent("strings.xml")
         if FileManager.default.fileExists(atPath:pathUrl.path) {
-            let strings: XMLNode? = XML(contentsOf: pathUrl)?.children[0]
-            for string: XMLNode in strings!.children {
-                if let attributeName: String = string.attributes["name"] {
-                    if attributeName == self.appNameId {
-                        self.appName = string.text
-                        continue
-                    }
-                    else if attributeName == "app_name" {
-                        self.appName = string.text
-                        continue
-                    }
+            let data = try! Data.init(contentsOf: pathUrl)
+            guard let strings = XML(data: data) else {
+                throw BoostError(.invalidAppContent)
+            }
+            for string: XML in strings.children {
+                if string["@name"].string == "app_name" {
+                    self.appName = string.string
                 }
             }
         }
@@ -140,6 +137,7 @@ final class ApkDecoder: Decoder, DecoderProtocol {
     private var appIconId: String?
     private var appNameId: String?
     
+    /*
     private func parseApplicationNode(_ node: XMLNode) {
         if let name = node.attributes["android:label"] {
             self.appNameId = name.replacingOccurrences(of: "@string/", with: "")
@@ -160,12 +158,12 @@ final class ApkDecoder: Decoder, DecoderProtocol {
             self.appFeatures.append(value)
         }
     }
-    
+    */
     func parse() throws {
         guard FileManager.default.fileExists(atPath: self.manifestFileUrl.path) else {
             throw BoostError(.missingManifestFile)
         }
-        
+        /*
         let manifestXml = XML(contentsOf: self.manifestFileUrl)
         guard let manifestContent = manifestXml?["manifest"] else {
             throw BoostError(.corruptedManifestFile)
@@ -196,7 +194,8 @@ final class ApkDecoder: Decoder, DecoderProtocol {
             }
         }
         
-        self.getApplicationName()
+        */
+        try self.getApplicationName()
         try self.getApplicationIcon()
     }
     
