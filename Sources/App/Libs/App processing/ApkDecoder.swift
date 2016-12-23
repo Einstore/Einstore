@@ -71,6 +71,7 @@ final class ApkDecoder: Decoder, DecoderProtocol {
     }
     
     private func getApplicationName() throws {
+        /*
         var pathUrl: URL = self.extractedApkFolder
         pathUrl.appendPathComponent("res")
         pathUrl.appendPathComponent("values")
@@ -86,7 +87,7 @@ final class ApkDecoder: Decoder, DecoderProtocol {
                 }
             }
         }
-        
+        */
         if self.appName == nil {
             let file: Multipart.File = self.multiPartFile.file!
             self.appName = file.name?.replacingOccurrences(of: ".apk", with: "")
@@ -196,7 +197,7 @@ final class ApkDecoder: Decoder, DecoderProtocol {
         
         */
         try self.getApplicationName()
-        try self.getApplicationIcon()
+        //try self.getApplicationIcon()
     }
     
     // MARK: Data conversion
