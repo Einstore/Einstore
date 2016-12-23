@@ -96,6 +96,7 @@ final class ApkDecoder: Decoder, DecoderProtocol {
             var jsonUrl = pathUrl
             jsonUrl.appendPathComponent("strings.json")
             
+            // Convert XML to JSON
             let _ = Terminal.execute(self.xml2jsonUrl.path, "-t", "xml2json", "-o", jsonUrl.path, xmlUrl.path)
             
             

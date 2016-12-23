@@ -15,7 +15,7 @@ extension Dictionary {
     static func get(fromPlistAtUrl url: URL) throws -> [String: AnyObject]? {
         var format = PropertyListSerialization.PropertyListFormat.xml
         let plistData: Data = try Data.init(contentsOf: url)
-        let plist: [String: AnyObject]? = try PropertyListSerialization.propertyList(from: plistData, options: .mutableContainersAndLeaves, format: &format) as? [String:AnyObject]
+        let plist: [String: AnyObject]? = try PropertyListSerialization.propertyList(from: plistData, options: [], format: &format) as? [String:AnyObject]
         return plist
     }
 
