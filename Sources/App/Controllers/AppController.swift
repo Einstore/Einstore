@@ -37,8 +37,13 @@ final class AppController: RootController, ControllerProtocol {
         
         self.setupGenericRouteForAllNonRoutedPaths()
         
+        
         self.baseRoute.get(handler: self.root)
+        
+        // Ping
         self.baseRoute.get(handler: self.ping)
+        
+        // Tea
         self.baseRoute.get("tea") { request in
             return ResponseBuilder.teapot
         }

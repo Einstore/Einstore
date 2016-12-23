@@ -185,6 +185,7 @@ extension User {
         get {
             var fields: [Field] = self.inviteValidationFields
             
+            // BOOST: Check for other values too!!!
             fields.append(Field(name: "password", validationType: .password, errorMessage: Lang.get("Password needs to be at least six characters long")))
             
             return fields

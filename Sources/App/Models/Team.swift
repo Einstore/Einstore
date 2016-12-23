@@ -103,7 +103,15 @@ extension Team {
             self.name = name
         }
         if let users = request.data["users"]?.array {
-            self.users = users as? [IdType]
+            self.users = []
+            for user: Polymorphic in users {
+                if let userId: String = user.string {
+                    guard try User.exists(idString: userId) else {
+                        continue
+                    }
+                    self.users?.append(userId)
+                }
+            }
         }
     }
     
