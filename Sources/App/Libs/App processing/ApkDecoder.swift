@@ -8,7 +8,6 @@
 
 import Foundation
 import Vapor
-import SwiftyXML
 
 
 final class ApkDecoder: Decoder, DecoderProtocol {
@@ -44,11 +43,26 @@ final class ApkDecoder: Decoder, DecoderProtocol {
         }
     }
     
-    var apktoolUrl: URL {
+    var binUrl: URL {
         get {
             var url: URL = URL(fileURLWithPath: drop.resourcesDir)
             url.appendPathComponent("bin")
+            return url
+        }
+    }
+    
+    var apktoolUrl: URL {
+        get {
+            var url: URL = self.binUrl
             url.appendPathComponent("apktool_2.2.1.jar")
+            return url
+        }
+    }
+    
+    var xml2jsonUrl: URL {
+        get {
+            var url: URL = self.binUrl
+            url.appendPathComponent("xml2json.py")
             return url
         }
     }
@@ -71,23 +85,32 @@ final class ApkDecoder: Decoder, DecoderProtocol {
     }
     
     private func getApplicationName() throws {
-        /*
+        
         var pathUrl: URL = self.extractedApkFolder
         pathUrl.appendPathComponent("res")
         pathUrl.appendPathComponent("values")
-        pathUrl.appendPathComponent("strings.xml")
-        if FileManager.default.fileExists(atPath:pathUrl.path) {
-            let data = try! Data.init(contentsOf: pathUrl)
-            guard let strings = XML(data: data) else {
-                throw BoostError(.invalidAppContent)
-            }
-            for string: XML in strings.children {
-                if string["@name"].string == "app_name" {
-                    self.appName = string.string
-                }
-            }
+        
+        var xmlUrl = pathUrl
+        xmlUrl.appendPathComponent("strings.xml")
+        if FileManager.default.fileExists(atPath:xmlUrl.path) {
+            var jsonUrl = pathUrl
+            jsonUrl.appendPathComponent("strings.json")
+            
+            let _ = Terminal.execute(self.xml2jsonUrl.path, "-t", "xml2json", "-o", jsonUrl.path, xmlUrl.path)
+            
+            
+            
+//            let data = try! Data.init(contentsOf: xmlUrl)
+//            guard let strings = XML(data: data) else {
+//                throw BoostError(.invalidAppContent)
+//            }
+//            for string: XML in strings.children {
+//                if string["@name"].string == "app_name" {
+//                    self.appName = string.string
+//                }
+//            }
         }
-        */
+        //*/
         if self.appName == nil {
             let file: Multipart.File = self.multiPartFile.file!
             self.appName = file.name?.replacingOccurrences(of: ".apk", with: "")
