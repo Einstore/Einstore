@@ -78,7 +78,7 @@ final class IpaDecoder: Decoder, DecoderProtocol {
         }
     }
     
-    private func parseInfoPlistFile(_ plist: NSDictionary) throws {
+    private func parseInfoPlistFile(_ plist: [String: AnyObject]) throws {
         // Bundle ID
         guard let bundleId = plist["CFBundleIdentifier"] as? String else {
             throw BoostError(.invalidAppContent)
@@ -117,8 +117,8 @@ final class IpaDecoder: Decoder, DecoderProtocol {
         }
     }
     
-    private func checkIcons(_ iconInfo: NSDictionary, files: [String]) throws {
-        guard let primaryIcon: NSDictionary = iconInfo["CFBundlePrimaryIcon"] as? NSDictionary else {
+    private func checkIcons(_ iconInfo: [String: AnyObject], files: [String]) throws {
+        guard let primaryIcon: [String: AnyObject] = iconInfo["CFBundlePrimaryIcon"] as? [String: AnyObject] else {
             return
         }
         guard let icons: [String] = primaryIcon["CFBundleIconFiles"] as? [String] else {
@@ -139,12 +139,12 @@ final class IpaDecoder: Decoder, DecoderProtocol {
         }
     }
     
-    private func parseIcon(_ plist: NSDictionary) throws {
+    private func parseIcon(_ plist: [String: AnyObject]) throws {
         let files: [String] = try FileManager.default.contentsOfDirectory(atPath: self.extractedIpaFolder.path)
-        if let iconInfo: NSDictionary = plist["CFBundleIcons"] as? NSDictionary {
+        if let iconInfo: [String: AnyObject] = plist["CFBundleIcons"] as? [String: AnyObject] {
             try self.checkIcons(iconInfo, files: files)
         }
-        if let iconsInfoTablet: NSDictionary = plist["CFBundleIcons~ipad"] as? NSDictionary {
+        if let iconsInfoTablet: [String: AnyObject] = plist["CFBundleIcons~ipad"] as? [String: AnyObject] {
             try self.checkIcons(iconsInfoTablet, files: files)
         }
     }
@@ -156,7 +156,7 @@ final class IpaDecoder: Decoder, DecoderProtocol {
         var embeddedFile: URL = self.extractedIpaFolder
         embeddedFile.appendPathComponent("Info.plist")
         
-        guard let plist: NSDictionary = NSDictionary(contentsOfFile: embeddedFile.path) else {
+        guard let plist: [String: AnyObject] = try [String: AnyObject].get(fromPlistAtUrl: embeddedFile) else {
             throw BoostError(.invalidAppContent)
         }
         

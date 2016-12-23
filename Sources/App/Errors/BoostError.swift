@@ -20,6 +20,7 @@ enum ErrorReason {
     case invalidAppContent
     case missingPlatform
     case missingId
+    case missingIdentifier
     case fileNotCompatible
     
     case databaseError

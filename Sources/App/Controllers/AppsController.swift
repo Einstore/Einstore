@@ -24,15 +24,15 @@ final class AppsController: RootController, ControllerProtocol {
         let appGroup: Routing.RouteGroup = self.baseRoute.grouped("apps")
         
         // Apps
-        self.baseRoute.get("apps", handler: self.index)
-        self.baseRoute.post("apps", handler: self.upload)
-        self.baseRoute.get("apps", IdType.self) { request, objectId in
+        appGroup.get(handler: self.index)
+        appGroup.post(handler: self.upload)
+        appGroup.get(IdType.self) { request, objectId in
             return try self.get(request: request, objectId: objectId)
         }
-        self.baseRoute.put("apps", IdType.self) { request, objectId in
+        appGroup.put(IdType.self) { request, objectId in
             return try self.update(request: request, objectId: objectId)
         }
-        self.baseRoute.delete("apps", IdType.self) { request, objectId in
+        appGroup.delete(IdType.self) { request, objectId in
             return try self.delete(request: request, objectId: objectId)
         }
         
@@ -43,6 +43,8 @@ final class AppsController: RootController, ControllerProtocol {
         self.baseRoute.delete("builds", IdType.self) { request, objectId in
             return try self.deleteBuild(request: request, objectId: objectId)
         }
+        
+        // Builds in apps
         appGroup.get(IdType.self, "builds") { request, objectId in
             return try self.builds(request: request, objectId: objectId)
         }
@@ -197,11 +199,15 @@ final class AppsController: RootController, ControllerProtocol {
         try decoder.prepare()
         try decoder.parse()
         
+        // BOOST: Return JSON errors
         guard let platform: Platform = decoder.platform else {
             throw BoostError(.missingPlatform)
         }
+        guard let identifier: String = decoder.appIdentifier else {
+            throw BoostError(.missingIdentifier)
+        }
         
-        var app: App? = try App.find(identifier: decoder.appIdentifier!, platform: platform)
+        var app: App? = try App.find(identifier: identifier, platform: platform)
         if app == nil {
             app = App()
             app?.identifier = decoder.appIdentifier

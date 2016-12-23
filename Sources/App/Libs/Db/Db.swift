@@ -26,7 +26,8 @@ struct Db {
             Team.self,
             App.self,
             Build.self,
-            UploadToken.self
+            UploadToken.self,
+            History.self
         ]
         
         do {
