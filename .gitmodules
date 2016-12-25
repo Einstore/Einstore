@@ -1,0 +1,3 @@
+[submodule "Sources/App/Smoke"]
+	path = Sources/App/Smoke
+	url = git@github.com:manGoweb/Smoke.git
