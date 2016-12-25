@@ -9,9 +9,12 @@
 import Foundation
 
 
-enum BoostErrorReason: ErrorReason {
+enum BoostErrorReason {
     
+    case noFile
+    case noData
     case unarchivingFailed
+    case cacheNotAccessible
     case missingManifestFile
     case corruptedManifestFile
     case invalidAppContent
@@ -20,8 +23,30 @@ enum BoostErrorReason: ErrorReason {
     case missingIdentifier
     case fileNotCompatible
     
+    case databaseError
+    
+    case generic(String)
+    
 }
 
-class BoostError: SmokeError {
+class BoostError: Error {
+    
+    
+    let type: BoostErrorReason
+    let number: Int32
+    
+    
+    // MARK: Initialization
+    
+    init(_ type: BoostErrorReason) {
+        self.type = type
+        self.number = errno
+    }
+    
+    init(message: String) {
+        self.type = .generic(message)
+        self.number = -1
+    }
+
     
 }
