@@ -12,6 +12,26 @@
 			"request": {
 				"url": "{{SERVER}}v1/auth",
 				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"admin@boost\",\n  \"password\": \"password\"\n}"
+				},
+				"description": "POST"
+			},
+			"response": []
+		},
+		{
+			"name": "Auth (FORM POST)",
+			"request": {
+				"url": "{{SERVER}}v1/auth",
+				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "formdata",
@@ -155,7 +175,7 @@
 		{
 			"name": "Users/:id",
 			"request": {
-				"url": "{{SERVER}}v1/users/62254058296038d51f88e0ce",
+				"url": "{{SERVER}}v1/users/bebc555895d65daabade4284",
 				"method": "GET",
 				"header": [
 					{
@@ -370,7 +390,7 @@
 		{
 			"name": "Teams/:id",
 			"request": {
-				"url": "{{SERVER}}v1/teams/bebc555895d65daabbde4284",
+				"url": "{{SERVER}}v1/teams/2ff35a58971b68fc800367f6",
 				"method": "GET",
 				"header": [
 					{
@@ -403,7 +423,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"name\": \"AAA Super team!\"\n}"
+					"raw": "{\n  \"name\": \"AAA Super team!\",\n  \"users\": [\n  \t\"bebc555895d65daabade4284\",\n  \t\"d8bc555895d65daabdde4284\"\n  ]\n}"
 				},
 				"description": ""
 			},
@@ -429,7 +449,7 @@
 		{
 			"name": "Teams/:id/users",
 			"request": {
-				"url": "{{SERVER}}v1/teams/bebc555895d65daabbde4284/users",
+				"url": "{{SERVER}}v1/teams/2ff35a58971b68fc800367f6/users",
 				"method": "GET",
 				"header": [
 					{
@@ -562,8 +582,10 @@
 					}
 				],
 				"body": {
-					"mode": "raw",
-					"raw": ""
+					"mode": "file",
+					"file": {
+						"src": ""
+					}
 				},
 				"description": ""
 			},
@@ -622,7 +644,7 @@
 							"key": "app",
 							"type": "file",
 							"enabled": true,
-							"src": "bytecheck-debug.apk"
+							"src": "app.ipa"
 						}
 					]
 				},
@@ -633,7 +655,7 @@
 		{
 			"name": "Apps (upload - token)",
 			"request": {
-				"url": "{{SERVER}}v1/apps?token=72613B1B-66D2-410B-9AD3-9051FF12833E",
+				"url": "{{SERVER}}v1/apps?token=25F98CC0-235F-4410-963C-56148824F9C4",
 				"method": "POST",
 				"header": [
 					{
@@ -650,7 +672,7 @@
 							"key": "app",
 							"type": "file",
 							"enabled": true,
-							"src": "app.ipa"
+							"src": "app-mallorca_fashion_club-release.apk"
 						}
 					]
 				},
@@ -1017,6 +1039,31 @@
 				"body": {
 					"mode": "raw",
 					"raw": "{\n  \"per-page\": \"30\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "History",
+			"request": {
+				"url": "{{SERVER}}v1/history?limit=10",
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-AuthToken",
+						"value": "{{AUTH}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Token 3\",\n  \"apps\": [\n    \"d85d5558aed73c50cbf39491\"\n  ]\n}"
 				},
 				"description": ""
 			},
