@@ -8,6 +8,26 @@
 	},
 	"item": [
 		{
+			"name": "CORS",
+			"request": {
+				"url": "{{SERVER}}v1/something",
+				"method": "OPTIONS",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
 			"name": "Auth",
 			"request": {
 				"url": "{{SERVER}}v1/auth",
@@ -21,9 +41,9 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"admin@boost\",\n  \"password\": \"password\"\n}"
+					"raw": "{\n  \"username\": \"admin@boost\",\n  \"password\": \"password\"\n}"
 				},
-				"description": "POST"
+				"description": ""
 			},
 			"response": []
 		},
@@ -37,7 +57,7 @@
 					"mode": "formdata",
 					"formdata": [
 						{
-							"key": "email",
+							"key": "username",
 							"value": "admin@boost",
 							"type": "text",
 							"enabled": true
