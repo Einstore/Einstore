@@ -3,7 +3,7 @@
 if [[ $(id -u) -ne 0 ]] ; then echo "Please run as root ( sudo install-ubuntu.sh )" ; exit 1 ; fi
 
 # Update all
-apt-get update
+apt-get -y update
 
 # Curl
 if hash curl 2>/dev/null; then
