@@ -2,5 +2,5 @@ Packages
 .build
 xcuserdata
 *.xcodeproj
-Config/secrets
+#Config/secrets
 .DS_Store
