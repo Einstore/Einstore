@@ -1,5 +1,5 @@
 # Boost
-FROM mangoweb/swift:mongodb
+FROM mangoweb/swift:latest
 
 MAINTAINER Ondrej Rafaj "ondrej.rafaj@liveui.io"
 
@@ -10,14 +10,11 @@ RUN apt-get -y update
 CMD mkdir -R /Projects/Web/Boost
 COPY ./ /Projects/Web/Boost
 
-CMD mongod
+
 
 # Build and run Boost
-RUN cd /Projects/Web/Boost && swift build
+#RUN cd /Projects/Web/Boost && swift build
 
-
-ENTRYPOINT mongod && /bin/bash
-ENTRYPOINT ls && pwd && echo ":)"
-ENTRYPOINT cd /Projects/Web/Boost && vapor run serve && /bin/bash
+ENTRYPOINT cd /Projects/Web/Boost && ./run.sh
 
 EXPOSE 80 443 8080

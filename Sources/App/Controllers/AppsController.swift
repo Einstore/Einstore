@@ -16,8 +16,6 @@ import Routing
 final class AppsController: RootController, ControllerProtocol {
     
     
-    
-    
     // MARK: Routing
     
     func configureRoutes() {
@@ -118,8 +116,21 @@ final class AppsController: RootController, ControllerProtocol {
         
         // BOOST: Check build is being deleted!
         let s3: S3 = try self.s3()
-        // Format: data/:appPlatform/:appId/:buildId
-        let path: String = "data/\(app.platform!.rawValue)/\(app.id!.string!)/\(object.id!.string)"
+        
+        // Path format: data/:appPlatform/:appId/:buildId
+        guard let appId: String = app.id?.string else {
+            // TODO: Improve error
+            return ResponseBuilder.internalServerError
+        }
+        guard let objectId: String = object.id?.string else {
+            // TODO: Improve error
+            return ResponseBuilder.internalServerError
+        }
+        guard let platform: String = app.platform?.rawValue else {
+            // TODO: Improve error
+            return ResponseBuilder.internalServerError
+        }
+        let path: String = "data/\(platform)/\(appId)/\(objectId)"
         try s3.delete(fileAtPath: path)
         
         // History
@@ -187,7 +198,7 @@ final class AppsController: RootController, ControllerProtocol {
             }
         }
         
-        // BOOST: Upload as a binry file!!!!
+        // BOOST: Upload as a binary file!!!!
         guard let multipart: Multipart = request.multipart?["app"] else {
             return ResponseBuilder.incompleteData
         }
@@ -273,7 +284,7 @@ final class AppsController: RootController, ControllerProtocol {
             try s3.delete(fileAtPath: path)
             
             // History
-            try History.make(.deleteApp, message: "\(object.name) (\(object.identifier))")
+            try History.make(.deleteApp, message: "\((object.name ?? "Unknown name")) (\((object.identifier ?? "Unknown identifier")))")
             
             try object.delete()
         }
