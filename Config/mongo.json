@@ -1,7 +1,7 @@
 {
-    "user": "admin",
-    "password": "aaaaaa",
+    "user": "boost",
+    "password": "boost",
     "database": "boost",
     "port": "27017",
-    "host": "127.0.0.1"
+    "host": "boost-mongo"
 }
