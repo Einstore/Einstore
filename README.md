@@ -4,6 +4,14 @@
 
 # Installation
 
+Install [Docker](https://www.docker.com) 
+Run `./docker_build.sh`
+Run `docker-compose up`
+
+
+
+### Following guide is obsolete as we'll be using Docker instead!!!!!!!!!!!!!!!!!!!
+
 * Install Swift 3 on your machine ([macOS or Ubuntu](https://swift.org/download/#releases))
 * Instal Vapor
     * [macOS](https://vapor.github.io/documentation/getting-started/install-swift-3-macos.html)
