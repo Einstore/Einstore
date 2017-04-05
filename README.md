@@ -4,9 +4,9 @@
 
 # Installation
 
-Install [Docker](https://www.docker.com) 
-Run `./docker_build.sh`
-Run `docker-compose up`
+* Install [Docker](https://www.docker.com) 
+* Run `./docker_build.sh`
+* Run `docker-compose up`
 
 
 
