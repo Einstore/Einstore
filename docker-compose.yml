@@ -7,31 +7,9 @@ services:
      - "8080:8080"
     depends_on:
      - db
-    environment:
-     - DB_HOST=db
-     - DB_USER=ecoov
-     - DB_NAME=ecoov
-     - DB_PASS=ecoov
-     - DB_PORT=5432
-     - SMTP_HOST=smtp.mailgun.org
-     - SMTP_USER=postmaster@xxxxxxxxx.mailgun.org
-     - SMTP_FROM=postmaster@xxxxxxxxx.mailgun.org
-     - SMTP_PASS=xxxxxxxxx
-     - PUBLICURL=http://localhost:8080
-     - PORT=8080
-     - AWS_ACCESS_KEY_ID=xxxxxxxx
-     - AWS_SECRET_ACCESS_KEY=xxxxxxxx
-     - AWS_REGION=eu-central-1
-     - BUCKET_NAME=boost
+    links:
+     - db
   nginx:
     image: nginx
-    container_name: boost-nginx
   db:
     image: mongo
-    container_name: boost-mongo
-    ports:
-      - "27017:27017"
-    environment:
-     - DB_PASSWORD=boost
-     - DB_USER=boost
-     - DB_DB=boost
