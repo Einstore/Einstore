@@ -11,5 +11,14 @@ services:
      - db
   nginx:
     image: nginx
+    ports:
+     - "90:8080"
+    environment:
+     - NGINX_HOST=appstorehq.net
+     - NGINX_PORT=90
+    depends_on:
+     - web
   db:
     image: mongo
+    command: mongod
+    command: 'mongo boost --eval "db.createUser( { user: \"boost\", pwd: \"boost\", roles: [ { role: \"readWrite\", db: \"boost\" } ] } )"'
