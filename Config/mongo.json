@@ -1,6 +1,4 @@
 {
-    "user": "boost",
-    "password": "boost",
     "database": "boost",
     "port": "27017",
     "host": "db"
