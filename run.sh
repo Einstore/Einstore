@@ -1,3 +1,3 @@
-rm -rf ./.build
-swift build
+#rm -rf ./.build
+#swift build
 ./.build/debug/App
