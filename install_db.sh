@@ -1,1 +1,0 @@
-mongo boost --eval "db.createUser( { user: \"boost\", pwd: \"boost\", roles: [ { role: \"readWrite\", db: \"boost\" } ] } )"
