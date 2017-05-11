@@ -168,34 +168,9 @@
 			"response": []
 		},
 		{
-			"name": "Users (create)",
-			"request": {
-				"url": "{{SERVER}}v1/users/",
-				"method": "POST",
-				"header": [
-					{
-						"key": "X-AuthToken",
-						"value": "{{AUTH}}",
-						"description": ""
-					},
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"description": ""
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"firstname\": \"Billy\",\n  \"lastname\": \"Bob\",\n  \"email\": \"billy@bobek.com\",\n  \"password\": \"superP4ssword\",\n  \"mobile\": \"07972574949\",\n  \"type\": \"a\",\n  \"timezone\": 1\n}"
-				},
-				"description": ""
-			},
-			"response": []
-		},
-		{
 			"name": "Users/:id",
 			"request": {
-				"url": "{{SERVER}}v1/users/bebc555895d65daabade4284",
+				"url": "{{SERVER}}v1/users/15d014594a0478136deb9359",
 				"method": "GET",
 				"header": [
 					{
@@ -237,7 +212,7 @@
 		{
 			"name": "Users/:id",
 			"request": {
-				"url": "{{SERVER}}v1/users/4f5f3f580efcc9573e8ff9ea",
+				"url": "{{SERVER}}v1/users/bebc555895d65daabade4284",
 				"method": "DELETE",
 				"header": [
 					{
@@ -410,7 +385,7 @@
 		{
 			"name": "Teams/:id",
 			"request": {
-				"url": "{{SERVER}}v1/teams/2ff35a58971b68fc800367f6",
+				"url": "{{SERVER}}v1/teams/bebc555895d65daabbde4284",
 				"method": "GET",
 				"header": [
 					{
@@ -765,7 +740,7 @@
 		{
 			"name": "Apps/:id/builds",
 			"request": {
-				"url": "{{SERVER}}v1/apps/436256587e9a1c5c620a2608/builds?limit=10&offset=0",
+				"url": "{{SERVER}}v1/apps/436256587e9a1c5c620a2608/builds?limit=3&offset=0",
 				"method": "GET",
 				"header": [
 					{
@@ -917,7 +892,7 @@
 		{
 			"name": "Tokens/:id",
 			"request": {
-				"url": "{{SERVER}}v1/tokens/546e55588ade6c74d04b88e2",
+				"url": "{{SERVER}}v1/tokens/dad014594a0478136eeb9359",
 				"method": "PUT",
 				"header": [
 					{
@@ -933,7 +908,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"name\": \"Another Token\",\n  \"apps\": [\n    \"d85d5558aed73c50cbf39491\"\n  ]\n}"
+					"raw": "{\n  \"name\": \"Another Token Yo!\",\n  \"apps\": [\n    \"436256587e9a1c5c620a2608\"\n  ]\n}"
 				},
 				"description": ""
 			},
@@ -942,7 +917,7 @@
 		{
 			"name": "Tokens/:id (no name)",
 			"request": {
-				"url": "{{SERVER}}v1/tokens/546e55588ade6c74d04b88e2",
+				"url": "{{SERVER}}v1/tokens/dad014594a0478136eeb9359",
 				"method": "PUT",
 				"header": [
 					{
@@ -958,7 +933,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"apps\": [\n    \"d85d5558aed73c50cbf39491\"\n  ]\n}"
+					"raw": "{\n  \"apps\": [\n    \"436256587e9a1c5c620a2608\"\n  ]\n}"
 				},
 				"description": ""
 			},
@@ -1033,7 +1008,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"store-name\": \"Boost Appstore\",\n  \"store-subtitle\": \"Swift enterprise mobility deployment system\",\n  \"per-page\": \"20\"\n}"
+					"raw": "{\n  \"store-name\": \"Boost Appstore\",\n  \"store-subtitle\": \"Swift enterprise mobility deployment system\",\n  \"per-page\": \"20\",\n  \"yooohoooo\": \"s\"\n}"
 				},
 				"description": ""
 			},
