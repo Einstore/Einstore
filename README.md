@@ -12,7 +12,8 @@
 
 
 ####Not yet ready:
-bash <(curl -sSL 'goo.gl/tx0uZG')
+
+`bash <(curl -sSL 'goo.gl/tx0uZG')`
 
 
 * Install [Docker](https://www.docker.com) 
