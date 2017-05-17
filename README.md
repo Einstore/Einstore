@@ -6,6 +6,7 @@
 
 * Install [Vapor](https://vapor.github.io/documentation/getting-started/install-swift-3-ubuntu.html)  
 * clone this project
+* clone submodules
 * run mongo database, no password
 * vapor build
 * vapor run serve
