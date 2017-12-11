@@ -12,7 +12,9 @@ import Vapor
 public class MyBase {
     
     static var controllers: [Controller.Type] = [
-        InstallController.self
+        InstallController.self,
+        UsersController.self,
+        TeamsController.self
     ]
     
     public static func boot(router: Router) throws {

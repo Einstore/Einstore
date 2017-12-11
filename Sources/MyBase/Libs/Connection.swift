@@ -10,6 +10,10 @@ import Vapor
 import MySQL
 
 
+public func sanitize(_ string: String) -> String {
+    return string
+}
+
 public struct Connection {
     
     static var host: String = "localhost"

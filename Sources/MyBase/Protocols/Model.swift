@@ -9,13 +9,10 @@ import Foundation
 
 
 public protocol Model {
-    
     static var tableName: String { get }
     static var create: String { get }
-    
 }
 
-
-extension Model {
-    
+public protocol HasForeignId {
+    static var foreignIdName: String { get }
 }

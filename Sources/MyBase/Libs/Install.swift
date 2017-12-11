@@ -12,8 +12,12 @@ import MySQL
 
 public class Install {
     
+    var worker: EventLoop
+    
     public var models: [Model.Type] = [
-        Migration.self
+        Migration.self,
+        User.self,
+        Team.self
     ]
     
     // TODO: Make return strings when available
@@ -27,28 +31,30 @@ public class Install {
     
     func installModels() {
         let tables = self.tables
-        _ = try! worker.pool.retain({ (connection) -> Future<Void> in
-            var results = [Future<Void>]()
-            
-            for model in self.models {
-                if !tables.contains(table: model.tableName) {
-                    results.append(connection.administrativeQuery(model.create))
-                }
+        for model in self.models {
+            if !tables.contains(table: model.tableName) {
+                Connection.administrativeConnection.administrativeQuery(model.create)
             }
-            
-            let allDone: Future<Void> = results.flatten()
-            return allDone
-        }).systemBlockingAwait()
+        }
+//        _ = try! worker.pool.retain({ (connection) -> Future<Void> in
+//            var results = [Future<Void>]()
+//
+//            for model in self.models {
+//                if !tables.contains(table: model.tableName) {
+//                    results.append(connection.administrativeQuery(model.create))
+//                }
+//            }
+//
+//            let allDone: Future<Void> = results.flatten()
+//            return allDone
+//        }).systemBlockingAwait()
     }
     
     public func proceed(_ worker: EventLoop) {
-        let install = Install(worker)
-        install.installModels()
+        installModels()
     }
     
     // MARK: Initialization
-    
-    var worker: EventLoop
     
     public init(_ worker: EventLoop) {
         self.worker = worker

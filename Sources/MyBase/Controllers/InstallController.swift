@@ -14,8 +14,7 @@ public class InstallController: Controller {
     public static func boot(router: Router) throws {
         router.get("migrations") { req -> Future<[Migration]> in
             return Migration.all(req)
-        }
-        
+        }   
     }
     
 }

@@ -15,5 +15,7 @@ public func boot(_ app: Application) throws {
         
     let install = Install(app)
     install.models.append(Tag.self)
+    install.models.append(App.self)
+
     install.proceed(app)
 }
