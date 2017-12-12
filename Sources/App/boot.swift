@@ -1,7 +1,7 @@
 import Routing
 import Vapor
 import MySQL
-import MyBase
+import Boost
 
 /// Called after your application has initialized.
 ///
@@ -13,9 +13,5 @@ public func boot(_ app: Application) throws {
     let routes = Routes(app: app)
     try router.register(collection: routes)
         
-    let install = Install(app)
-    install.models.append(Tag.self)
-    install.models.append(App.self)
-
-    install.proceed(app)
+    try Boost.boot(app)
 }

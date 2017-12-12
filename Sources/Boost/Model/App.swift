@@ -18,8 +18,11 @@ struct App: Codable {
     }
     
     let id: Int?
+    let teamId: Int?
     let name: String
     let identifier: String
+    let version: String
+    let build: String
     let platform: Platform
     let created: Date?
     let modified: Date?
@@ -27,8 +30,11 @@ struct App: Codable {
     
     enum CodingKeys: String, CodingKey {
         case id
+        case teamId = "team_id"
         case name
         case identifier
+        case version
+        case build
         case platform
         case created
         case modified

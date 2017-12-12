@@ -1,6 +1,6 @@
 import Routing
 import Vapor
-import MyBase
+import Boost
 
 /// Register your application's routes here.
 ///
@@ -12,10 +12,6 @@ final class Routes: RouteCollection {
     /// need for your routes.
     let app: Application
     
-    var controllers: [Controller.Type] = [
-        TagsController.self
-    ]
-
     // MARK: Initialization
     
     init(app: Application) {
@@ -25,10 +21,6 @@ final class Routes: RouteCollection {
     // MARK: Boot
     
     func boot(router: Router) throws {
-        try MyBase.boot(router: router)
-        
-        for c in controllers {
-            try c.boot(router: router)
-        }
+        try Boost.boot(router: router)
     }
 }

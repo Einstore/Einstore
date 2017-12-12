@@ -11,7 +11,6 @@ import Foundation
 public struct User: Codable {
     
     var id: Int?
-    var username: String
     var firstname: String
     var lastname: String
     var email: String

@@ -1,6 +1,6 @@
 import Vapor
 import FluentMySQL
-import MyBase
+import Boost
 
 /// Called before your application initializes.
 ///
@@ -14,4 +14,6 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
 //    services.register(databaseConfig)
 //
 //    try services.register(FluentProvider())
+    
+    try Boost.configure(&config, &env, &services)
 }

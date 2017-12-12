@@ -13,19 +13,39 @@ let package = Package(
                 "Routing",
                 "Service",
                 "Vapor",
+                "Boost"
+            ]
+        ),
+        .target(
+            name: "MyErrors",
+            dependencies: [
+                "Routing",
+                "Service",
+                "Vapor"
+            ]
+        ),
+        .target(
+            name: "Boost",
+            dependencies: [
+                "Routing",
+                "Service",
+                "Vapor",
                 "MySQL",
                 "Redis",
                 "JWT",
                 "Crypto",
                 "Validation",
-                "MyBase"
+                "MyBase",
+                "MyErrors"
             ]
         ),
         .target(
             name: "MyBase",
             dependencies: [
+                "Routing",
                 "Vapor",
-                "MySQL"
+                "MySQL",
+                "MyErrors"
             ]
         ),
         .target(name: "Run", dependencies: [
