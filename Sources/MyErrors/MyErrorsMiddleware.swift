@@ -62,7 +62,7 @@ public final class MyErrorMiddleware: Middleware {
             }
             
             let res = req.makeResponse()
-            res.http.body = HTTPBody(string: "Oops: \(reason)")
+            res.http.body = HTTPBody(string: "Boost: \(reason)")
             res.http.status = status
             promise.complete(res)
         }

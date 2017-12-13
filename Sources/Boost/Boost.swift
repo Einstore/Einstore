@@ -8,7 +8,7 @@
 import Foundation
 import Vapor
 import MyBase
-
+import MyErrors
 
 public class Boost {
     
@@ -33,7 +33,17 @@ public class Boost {
     }
     
     public static func configure(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
+        var mc = MiddlewareConfig()
+        mc.use(JWTTokenMiddleware.self)
+        mc.use(MyErrorMiddleware.self)
+        mc.use(MyDebugMiddleware.self)
+        services.register(mc)
+        
+        let logger = PrintLogger()
+        
         services.register(JWTTokenMiddleware())
+        services.register(MyErrorMiddleware.init(environment: env, log: logger))
+        services.register(MyDebugMiddleware())
     }
     
 }
