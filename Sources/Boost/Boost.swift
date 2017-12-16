@@ -21,7 +21,8 @@ public class Boost {
     }
     
     static var controllers: [Controller.Type] = [
-        TagsController.self
+        TagsController.self,
+        AppsController.self
     ]
     
     public static func boot(router: Router) throws {

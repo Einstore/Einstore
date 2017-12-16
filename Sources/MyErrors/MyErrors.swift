@@ -12,13 +12,9 @@ import Vapor
 public protocol WebError { }
 
 
-public enum HTTPError: Error, WebError {
+public enum MyHTTPError: Error, WebError {
     case notAuthorized
+    case missingRequestData
+    case missingAuthorizationData
 }
 
-
-public class MyErrors {
-    
-    
-    
-}

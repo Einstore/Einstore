@@ -10,8 +10,8 @@ import Foundation
 
 public struct Migration: Codable {
     
-    let id: Int?
-    let query: String
+    public let id: Int?
+    public let query: String
     
 }
 

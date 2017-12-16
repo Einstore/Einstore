@@ -10,11 +10,15 @@ import Foundation
 
 public struct User: Codable {
     
-    var id: Int?
-    var firstname: String
-    var lastname: String
-    var email: String
-    var password: String?
-    var registered: Date?
+    public var id: Int?
+    public var firstname: String
+    public var lastname: String
+    public var email: String
+    public var password: String?
+    public var token: String?
+    public var expires: Date?
+    public var registered: Date
+    public var disabled: Bool
+    public var su: Bool
     
 }

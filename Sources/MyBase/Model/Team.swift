@@ -10,7 +10,7 @@ import Foundation
 
 public struct Team: Codable {
     
-    var id: Int?
-    var name: String
+    public var id: Int?
+    public var name: String
     
 }

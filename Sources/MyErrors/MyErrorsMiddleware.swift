@@ -62,7 +62,8 @@ public final class MyErrorMiddleware: Middleware {
             }
             
             let res = req.makeResponse()
-            res.http.body = HTTPBody(string: "Boost: \(reason)")
+            res.http.body = HTTPBody(string: "{ \"error\": \"\(reason)\" }")
+            res.headers["Content-Type"] = "application/json; charset=utf-8"
             res.http.status = status
             promise.complete(res)
         }

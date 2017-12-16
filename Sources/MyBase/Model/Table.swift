@@ -8,14 +8,14 @@
 import Foundation
 
 
-protocol TableProtocol {
+public protocol TableProtocol {
     var name: String { get }
 }
 
 
 public struct Table: TableProtocol, Codable {
     
-    let name: String
+    public let name: String
     
     enum CodingKeys: String, CodingKey {
         case name = "Tables_in_boost"
@@ -26,7 +26,7 @@ public struct Table: TableProtocol, Codable {
 
 extension Array where Element: TableProtocol {
     
-    func contains(table name: String) -> Bool {
+    public func contains(table name: String) -> Bool {
         for t in self {
             if t.name == name {
                 return true
