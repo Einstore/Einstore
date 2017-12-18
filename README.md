@@ -5,7 +5,7 @@
 [![Swift 4](https://img.shields.io/badge/swift-4.0-orange.svg?style=flat)](http://swift.org)
 [![Vapor 3](https://img.shields.io/badge/vapor-3.0-blue.svg?style=flat)](https://vapor.codes)
 [![iOS app](https://img.shields.io/badge/app-iOS-blue.svg?style=flat)](https://github.com/manGoweb/Boost-iOS/)
-[![Android app](https://img.shields.io/badge/app-Android-blue.svg?style=flat)](https://github.com/manGoweb/Boost-Android/)
+[![Android app](https://img.shields.io/badge/app-Android-green.svg?style=flat)](https://github.com/manGoweb/Boost-Android/)
 
 ## 
 
