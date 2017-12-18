@@ -1,4 +1,4 @@
-Boost
+Boost - unfinished, contact us on Slack for ETA
 ======
 
 [![Slack](https://img.shields.io/badge/join-slack-745EAF.svg?style=flat)](http://bit.ly/2B0dEyt)
