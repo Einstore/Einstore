@@ -1,5 +1,4 @@
-Boost - unfinished, contact us on Slack for ETA
-======
+# Boost - unfinished, contact us on Slack for ETA
 
 [![Slack](https://img.shields.io/badge/join-slack-745EAF.svg?style=flat)](http://bit.ly/2B0dEyt)
 [![Platforms](https://img.shields.io/badge/platforms-macOS%2010.13%20|%20Ubuntu%2016.04%20LTS-ff0000.svg?style=flat)](http://cocoapods.org/pods/FASwift)
