@@ -12,7 +12,7 @@ Enterprise appstore for easy project deployment
 
 ## Slack
 
-Get help using and installing this product on our [Slack](http://bit.ly/2B0dEyt), channel #boost
+Get help using and installing this product on our [Slack](http://bit.ly/2B0dEyt), channel <b>#help-boost</b>
 
 ## Frontend apps
 
