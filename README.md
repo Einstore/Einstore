@@ -1,17 +1,19 @@
 Boost
 ======
 
-[![Slack](https://img.shields.io/badge/vapor-3.0-blue.svg?style=flat)](https://vapor.codes)
+[![Slack](https://img.shields.io/badge/vapor-3.0-blue.svg?style=flat)](http://bit.ly/2B0dEyt)
 [![Platforms](https://img.shields.io/badge/platforms-macOS%2010.13%20|%20Ubuntu%2016.04%20LTS-ff0000.svg?style=flat)](http://cocoapods.org/pods/FASwift)
 [![Swift 4](https://img.shields.io/badge/swift-4.0-orange.svg?style=flat)](http://swift.org)
 [![Vapor 3](https://img.shields.io/badge/vapor-3.0-blue.svg?style=flat)](https://vapor.codes)
 [![Vapor 3](https://img.shields.io/badge/vapor-3.0-blue.svg?style=flat)](https://vapor.codes)
 
-======
+## 
 
 Enterprise appstore for easy project deployment
 
-## 
+## Slack
+
+Get help using and installing this product on our [Slack](http://bit.ly/2B0dEyt)
 
 ## Installation
 
