@@ -5,13 +5,14 @@ let package = Package(
     name: "Boost",
     dependencies: [
         .package(url: "https://github.com/vapor/vapor.git", .branch("beta")),
+        .package(url: "https://github.com/vapor/mysql.git", .branch("beta")),
+        .package(url: "https://github.com/vapor/redis.git", .branch("beta")),
+        .package(url: "https://github.com/vapor/jwt.git", .branch("beta"))
         ],
     targets: [
         .target(
             name: "App",
             dependencies: [
-                "Routing",
-                "Service",
                 "Vapor",
                 "Boost"
             ]
@@ -19,22 +20,17 @@ let package = Package(
         .target(
             name: "MyErrors",
             dependencies: [
-                "Routing",
-                "Service",
                 "Vapor"
             ]
         ),
         .target(
             name: "Boost",
             dependencies: [
-                "Routing",
-                "Service",
                 "Vapor",
                 "MySQL",
                 "Redis",
                 "JWT",
                 "Crypto",
-                "Validation",
                 "MyBase",
                 "MyErrors"
             ]
@@ -42,7 +38,6 @@ let package = Package(
         .target(
             name: "MyBase",
             dependencies: [
-                "Routing",
                 "Vapor",
                 "MySQL",
                 "MyErrors"
