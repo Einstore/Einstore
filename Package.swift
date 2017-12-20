@@ -4,7 +4,8 @@ import PackageDescription
 let package = Package(
     name: "Boost",
     dependencies: [
-        .package(url: "https://github.com/vapor/vapor.git", .branch("beta")),
+        .package(url: "https://github.com/vapor/vapor.git", .exact("3.0.0-alpha.12")),
+        .package(url: "https://github.com/manGoweb/MimeLib.git", .exact("1.0.0")),
         ],
     targets: [
         .target(
@@ -25,6 +26,11 @@ let package = Package(
             ]
         ),
         .target(
+            name: "SQLEncoder",
+            dependencies: [
+            ]
+        ),
+        .target(
             name: "Boost",
             dependencies: [
                 "Routing",
@@ -36,7 +42,8 @@ let package = Package(
                 "Crypto",
                 "Validation",
                 "MyBase",
-                "MyErrors"
+                "MyErrors",
+                "SQLEncoder"
             ]
         ),
         .target(
@@ -45,7 +52,8 @@ let package = Package(
                 "Routing",
                 "Vapor",
                 "MySQL",
-                "MyErrors"
+                "MyErrors",
+                "SQLEncoder"
             ]
         ),
         .target(name: "Run", dependencies: [

@@ -11,12 +11,21 @@
         }
       },
       {
+        "package": "MimeLib",
+        "repositoryURL": "https://github.com/manGoweb/MimeLib.git",
+        "state": {
+          "branch": null,
+          "revision": "e795b624b3e9e2d57a9ba0e11543a6ee7c32067e",
+          "version": "1.0.0"
+        }
+      },
+      {
         "package": "Vapor",
         "repositoryURL": "https://github.com/vapor/vapor.git",
         "state": {
-          "branch": "beta",
-          "revision": "1a319f892c9bac4228b6ccbcba7bc5de0103ae66",
-          "version": null
+          "branch": null,
+          "revision": "b6a253ccb5a454a2640db593cd7ecbcc591d8bbc",
+          "version": "3.0.0-alpha.12"
         }
       }
     ]
