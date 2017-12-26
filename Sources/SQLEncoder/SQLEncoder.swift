@@ -8,8 +8,8 @@
 import Foundation
 
 
-public protocol SQLEncodable: Encodable {
-    var tableName: String { get }
+public protocol SQLEncodable: Encodable, Decodable {
+    static var tableName: String { get }
 }
 
 
@@ -28,7 +28,7 @@ open class SQLEncoder {
         
         let columns = self.columns(encoder.result.data).joined(separator: ", ")
         let values = try self.values(encoder.result.data).joined(separator: ", ")
-        let query: String = "INSERT INTO `\(value.tableName)` (\(columns)) VALUES (\(values);"
+        let query: String = "INSERT INTO `\(T.tableName)` (\(columns)) VALUES (\(values));"
         return query
     }
     
@@ -36,7 +36,7 @@ open class SQLEncoder {
         let encoder = _SQLEncoder(userInfo: userInfo)
         try value.encode(to: encoder)
         
-        var query: String = "UPDATE `\(value.tableName)` SET "
+        var query: String = "UPDATE `\(T.tableName)` SET "
         
         var sets: [String] = []
         for pair in encoder.result.data {

@@ -7,11 +7,12 @@
 
 import Foundation
 import Vapor
+import SQLEncoder
 
 /**
  Protocol allowing access to queries on models
  */
-public protocol Queryable: Model {
+public protocol Queryable: Model, SQLEncodable {
     
     associatedtype PropertyParentType
     var query: Queries<PropertyParentType> { get }

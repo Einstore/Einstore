@@ -33,27 +33,6 @@ public class Boost {
         for c in controllers {
             try c.boot(router: router)
         }
-        
-        
-        // ------------------------- TO BE REMOVED -----------------
-        struct TestObject: SQLEncodable {
-            let tableName: String = "test_object"
-            
-            let id: Int
-            let name: String
-            
-            enum CodingKeys: String, CodingKey {
-                case id = "test_id"
-                case name
-            }
-        }
-        
-        let object = TestObject(id: 12, name: "Yo\"oho'ooooo :)")
-        
-        let encoder = SQLEncoder()
-        print(try encoder.update(object, where: "`id` = 12"))
-        print(try encoder.insert(object))
-        // ------------------------- TO BE REMOVED -----------------
     }
     
     public static func configure(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {

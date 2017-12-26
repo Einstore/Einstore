@@ -81,7 +81,7 @@ extension SQLSerialization {
     private static func serializeString(_ value: String) throws -> String {
         switch value.rangeOfCharacter(from: SQLSerialization.notIdentifier) {
         case .none:
-            return value
+            return "'\(value)'"
         case .some:
             return "'" + value.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "'", with: "\\'") + "'"
         }
