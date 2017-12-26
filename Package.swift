@@ -7,7 +7,8 @@ let package = Package(
         .package(url: "https://github.com/vapor/vapor.git", .branch("beta")),
         .package(url: "https://github.com/vapor/mysql.git", .branch("beta")),
         .package(url: "https://github.com/vapor/redis.git", .branch("beta")),
-        .package(url: "https://github.com/vapor/jwt.git", .branch("beta"))
+        .package(url: "https://github.com/vapor/jwt.git", .branch("beta")),
+        .package(url: "https://github.com/manGoweb/MimeLib.git", .exact("1.0.0"))
         ],
     targets: [
         .target(
@@ -24,6 +25,11 @@ let package = Package(
             ]
         ),
         .target(
+            name: "SQLEncoder",
+            dependencies: [
+            ]
+        ),
+        .target(
             name: "Boost",
             dependencies: [
                 "Vapor",
@@ -31,7 +37,8 @@ let package = Package(
                 "Redis",
                 "JWT",
                 "MyBase",
-                "MyErrors"
+                "MyErrors",
+                "SQLEncoder"
             ]
         ),
         .target(
@@ -39,7 +46,8 @@ let package = Package(
             dependencies: [
                 "Vapor",
                 "MySQL",
-                "MyErrors"
+                "MyErrors",
+                "SQLEncoder"
             ]
         ),
         .target(name: "Run", dependencies: [

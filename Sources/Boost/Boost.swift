@@ -9,6 +9,8 @@ import Foundation
 import Vapor
 import MyBase
 import MyErrors
+import SQLEncoder
+
 
 public class Boost {
     

@@ -65,6 +65,15 @@
         }
       },
       {
+        "package": "MimeLib",
+        "repositoryURL": "https://github.com/manGoweb/MimeLib.git",
+        "state": {
+          "branch": null,
+          "revision": "e795b624b3e9e2d57a9ba0e11543a6ee7c32067e",
+          "version": "1.0.0"
+        }
+      },
+      {
         "package": "MySQL",
         "repositoryURL": "https://github.com/vapor/mysql.git",
         "state": {

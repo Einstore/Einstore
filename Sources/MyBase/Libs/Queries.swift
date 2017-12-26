@@ -7,6 +7,7 @@
 
 import Foundation
 import Vapor
+import SQLEncoder
 
 
 public struct Queries<T> {
@@ -20,10 +21,25 @@ public struct Queries<T> {
 }
 
 
-extension Queries where T: Queryable {
+extension Queries where T: SQLEncodable {
     
-     public func insert(_ request: Request) throws {
-        
+    // TODO: Make this non-blocking (Future returning withou blockingAwaits)
+    public func insert(_ request: Request) throws -> Int {
+        let encoder = SQLEncoder()
+        let query = try encoder.insert(model)
+        let future = request.pool.retain { (connection) -> Future<UInt64> in
+            let future = connection.administrativeQuery(query)
+            let id: UInt64
+            do {
+                try future.systemBlockingAwait()
+                id = connection.lastInsertID ?? 0
+            } catch {
+                id = 0
+            }
+            return Future<UInt64>(id)
+        }
+        let result = try future.systemBlockingAwait()
+        return Int(result)
     }
     
     public func update(_ request: Request) throws {
