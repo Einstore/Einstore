@@ -6,7 +6,7 @@
         "repositoryURL": "https://github.com/vapor/async.git",
         "state": {
           "branch": "beta",
-          "revision": "321effb198aedbeb987524dfd17c6e53f0c8926e",
+          "revision": "e2dec3c2013d5c71e3ebace661344de7d1259b79",
           "version": null
         }
       },
@@ -34,15 +34,6 @@
         "state": {
           "branch": "beta",
           "revision": "b31cdb4ecc32b8f529a6027c1945f404c4a41c1e",
-          "version": null
-        }
-      },
-      {
-        "package": "Debugging",
-        "repositoryURL": "https://github.com/vapor/debugging.git",
-        "state": {
-          "branch": "beta",
-          "revision": "5485029920a2d906af301e29626c0471de4ae643",
           "version": null
         }
       },
@@ -78,7 +69,7 @@
         "repositoryURL": "https://github.com/vapor/mysql.git",
         "state": {
           "branch": "beta",
-          "revision": "d413d96a1afccc1456404544c5f24e0cf03ce95b",
+          "revision": "003cf3d601d1651a3fb259b68bf90a511c8d1316",
           "version": null
         }
       },
@@ -88,15 +79,6 @@
         "state": {
           "branch": "beta",
           "revision": "2d150f6ec90b1071a0633272180c4dafc1043f92",
-          "version": null
-        }
-      },
-      {
-        "package": "Routing",
-        "repositoryURL": "https://github.com/vapor/routing.git",
-        "state": {
-          "branch": "beta",
-          "revision": "c1640238cb6136d8548dc5dc87a526a59af03c8f",
           "version": null
         }
       },

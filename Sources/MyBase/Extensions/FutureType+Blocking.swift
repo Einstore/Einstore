@@ -8,10 +8,10 @@
 import Foundation
 import Vapor
 
-extension FutureType {
+extension Future {
     
-    public func systemBlockingAwait() throws -> Self.Expectation {
-        return try blockingAwait(timeout: .seconds(5))
+    public func systemBlockingAwait() throws -> Expectation {
+        return try blockingAwait(timeout: .seconds(2))
     }
     
 }

@@ -15,7 +15,19 @@ import Service
 import Vapor
 
 
-public final class MyDebugMiddleware: Middleware {
+public final class MyDebugMiddleware: Middleware, ServiceFactory {
+    
+    public var serviceType: Any.Type = MyDebugMiddleware.self
+    
+    public var serviceSupports: [Any.Type] = []
+    
+    public var serviceTag: String?
+    
+    public var serviceIsSingleton: Bool = false
+    
+    public func makeService(for worker: Container) throws -> Any {
+        return self
+    }
     
     public func respond(to req: Request, chainingTo next: Responder) throws -> Future<Response> {
         if req.environment != .production {

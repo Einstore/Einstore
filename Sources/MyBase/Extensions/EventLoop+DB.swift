@@ -10,10 +10,10 @@ import Vapor
 import MySQL
 
 
-extension EventLoop {
+extension Worker {
     
     public var pool: MySQLConnectionPool {
-        return Connection.pool(for: self)
+        return Connection.pool(for: self.eventLoop)
     }
     
 }

@@ -12,7 +12,7 @@ import MySQL
 
 public class Install {
     
-    var worker: EventLoop
+    var worker: Worker
     
     public var models: [Model.Type] = [
         Migration.self,
@@ -29,11 +29,13 @@ public class Install {
         return tables
     }
     
-    func installModels() {
+    func installModels(_ worker: Worker) {
         let tables = self.tables
         for model in self.models {
             if !tables.contains(table: model.tableName) {
-                Connection.administrativeConnection.administrativeQuery(model.create)
+                try! worker.pool.retain({ (connection) -> Future<Void> in
+                    connection.administrativeQuery(model.create)
+                }).systemBlockingAwait()
             }
         }
 //        _ = try! worker.pool.retain({ (connection) -> Future<Void> in
@@ -50,13 +52,13 @@ public class Install {
 //        }).systemBlockingAwait()
     }
     
-    public func proceed(_ worker: EventLoop) {
-        installModels()
+    public func proceed(_ worker: Worker) {
+        installModels(worker)
     }
     
     // MARK: Initialization
     
-    public init(_ worker: EventLoop) {
+    public init(_ worker: Worker) {
         self.worker = worker
     }
     

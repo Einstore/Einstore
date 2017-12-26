@@ -24,14 +24,14 @@ public struct Connection {
     
     static let poolQueue: DispatchQueue = DispatchQueue(label: "multi")
     
-    public static let administrativeConnection = try! MySQLConnection.makeConnection(
-        hostname: host,
-        port: port,
-        user: user,
-        password: pass,
-        database: db,
-        on: Connection.poolQueue
-    ).blockingAwait(timeout: .seconds(10))
+//    public static let administrativeConnection = try! MySQLConnection.makeConnection(
+//        hostname: host,
+//        port: port,
+//        user: user,
+//        password: pass,
+//        database: db,
+//        on: Connection.poolQueue
+//    ).blockingAwait(timeout: .seconds(10))
     
     public static func pool(for worker: EventLoop) -> MySQLConnectionPool {
         let connectionPool = MySQLConnectionPool(hostname: host, port: port, user: user, password: pass, database: db, on: worker)

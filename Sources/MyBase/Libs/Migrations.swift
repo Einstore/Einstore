@@ -13,7 +13,7 @@ public class Migrations {
     
     public func add(query: String) {
         // TODO: Test when neccessary
-        Connection.administrativeConnection.administrativeQuery(query)
+        //Connection.administrativeConnection.administrativeQuery(query)
     }
     
 }

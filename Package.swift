@@ -30,7 +30,6 @@ let package = Package(
                 "MySQL",
                 "Redis",
                 "JWT",
-                "Crypto",
                 "MyBase",
                 "MyErrors"
             ]
