@@ -36,15 +36,15 @@ public class Boost {
     }
     
     public static func configure(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
-        var mc = MiddlewareConfig()
+        var middlewareConfig = MiddlewareConfig()
 //        mc.use(FileMiddleware.self)
 //        mc.use(DateMiddleware.self)
-        mc.use(JWTTokenMiddleware.self)
-        mc.use(MyErrorMiddleware.self)
-        mc.use(MyDebugMiddleware.self)
+        middlewareConfig.use(JWTTokenMiddleware.self)
+        middlewareConfig.use(MyErrorMiddleware.self)
+        middlewareConfig.use(MyDebugMiddleware.self)
         
         services.register { container -> MiddlewareConfig in
-            mc
+            middlewareConfig
         }
         
         services.register(JWTTokenMiddleware())

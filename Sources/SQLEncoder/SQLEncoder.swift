@@ -76,6 +76,8 @@ fileprivate class _SQLEncoder : Encoder {
     
     var result: _SQLPartiallyEncodedData
     
+//    var dateEncodingStrategy: SQLEncoder.DateEncodingStrategy = .mySQLDate
+    
     init(userInfo: [CodingUserInfoKey: Any], codingPath: [CodingKey] = [], referencing: _SQLPartiallyEncodedData = .init(data: SQLEncoder.KeyValuePairs())) {
         self.userInfo = userInfo
         self.codingPath = codingPath
@@ -99,7 +101,6 @@ fileprivate class _SQLEncoder : Encoder {
     }
     
     public func unkeyedContainer() -> UnkeyedEncodingContainer {
-        // can't throw from Encoder.unkeyedContainer() - why?
         fatalError("SQL encoder doesn't support arrays")
     }
     
@@ -107,6 +108,7 @@ fileprivate class _SQLEncoder : Encoder {
         return _SQLSingleValueEncodingContainer(referencing: self, codingPath: self.codingPath, wrapping: result)
     }
 }
+
 
 fileprivate final class _SQLPartiallyEncodedData {
     
@@ -116,35 +118,17 @@ fileprivate final class _SQLPartiallyEncodedData {
         self.data = data
     }
     
-    private func findKey(_ key: CodingKey) -> (idx: SQLEncoder.KeyValuePairs.Index, key: String, value: SQLEncoder.KeyValuePairs)? {
-        guard let idx = data.index(where: { $0.key == key.stringValue && $0.value is SQLEncoder.KeyValuePairs }) else {
-            return nil
-        }
-        
-        return (idx, data[idx].key, data[idx].value as! SQLEncoder.KeyValuePairs)
-    }
-    
     fileprivate func set(_ value: Any, atPath path: [CodingKey]) throws {
         switch path.count {
             case 1:
                 self.data.append((key: path[0].stringValue, value))
-            case 2:
-                if let info = findKey(path[0]) {
-                    var obj = info.value
-                    obj.append((path[1].stringValue, value))
-                    data[info.idx] = (info.key, obj)
-                } else {
-                    data.append((path[0].stringValue, SQLEncoder.KeyValuePairs([SQLEncoder.KeyValuePair(path[1].stringValue, value)])))
-                }
             default:
-                throw EncodingError.invalidValue(value, EncodingError.Context(codingPath: path, debugDescription: "Can't nest \(path.count) levels deep in INI encoder"))
+                throw EncodingError.invalidValue(value, EncodingError.Context(codingPath: path, debugDescription: "Can't nest \(path.count) levels deep in SQL encoder"))
         }
     }
 }
 
 fileprivate class _SQLKeyedEncodingContainer<K: CodingKey>: KeyedEncodingContainerProtocol {
-    
-    typealias Key = K
     
     private let encoder: _SQLEncoder
     private let container: _SQLPartiallyEncodedData
@@ -160,47 +144,119 @@ fileprivate class _SQLKeyedEncodingContainer<K: CodingKey>: KeyedEncodingContain
     public var codingPath: [CodingKey]
     
     public func encodeNil(forKey key: K) throws {
-    	try self.encoder.with(pushedKey: key) { try container.set("", atPath: self.encoder.codingPath) }
+    	try self.encoder.with(pushedKey: key) {
+            try container.set("", atPath: self.encoder.codingPath)
+        }
     }
     
-    public func encode(_ value: Bool, forKey key: K) throws { try encoder.with(pushedKey: key) { try container.set(value, atPath: encoder.codingPath) } }
+    public func encode(_ value: Bool, forKey key: K) throws {
+        try encoder.with(pushedKey: key) {
+            try container.set(value, atPath: encoder.codingPath)
+        }
+    }
+    
     public func encode(_ value: Int, forKey key: K) throws {
         try encoder.with(pushedKey: key) {
             try container.set(value, atPath: encoder.codingPath)
         }
     }
-    public func encode(_ value: Int8, forKey key: K) throws { try encoder.with(pushedKey: key) { try container.set(value, atPath: encoder.codingPath) } }
-    public func encode(_ value: Int16, forKey key: K) throws { try encoder.with(pushedKey: key) { try container.set(value, atPath: encoder.codingPath) } }
-    public func encode(_ value: Int32, forKey key: K) throws { try encoder.with(pushedKey: key) { try container.set(value, atPath: encoder.codingPath) } }
-    public func encode(_ value: Int64, forKey key: K) throws { try encoder.with(pushedKey: key) { try container.set(value, atPath: encoder.codingPath) } }
-    public func encode(_ value: UInt, forKey key: K) throws { try encoder.with(pushedKey: key) { try container.set(value, atPath: encoder.codingPath) } }
-    public func encode(_ value: UInt8, forKey key: K) throws { try encoder.with(pushedKey: key) { try container.set(value, atPath: encoder.codingPath) } }
-    public func encode(_ value: UInt16, forKey key: K) throws { try encoder.with(pushedKey: key) { try container.set(value, atPath: encoder.codingPath) } }
-    public func encode(_ value: UInt32, forKey key: K) throws { try encoder.with(pushedKey: key) { try container.set(value, atPath: encoder.codingPath) } }
-    public func encode(_ value: UInt64, forKey key: K) throws { try encoder.with(pushedKey: key) { try container.set(value, atPath: encoder.codingPath) } }
-    public func encode(_ value: Float, forKey key: K) throws { try encoder.with(pushedKey: key) { try container.set(value, atPath: encoder.codingPath) } }
-    public func encode(_ value: Double, forKey key: K) throws { try encoder.with(pushedKey: key) { try container.set(value, atPath: encoder.codingPath) } }
+    
+    public func encode(_ value: Int8, forKey key: K) throws {
+        try encoder.with(pushedKey: key) {
+            try container.set(value, atPath: encoder.codingPath)
+        }
+    }
+    
+    public func encode(_ value: Int16, forKey key: K) throws {
+        try encoder.with(pushedKey: key) {
+            try container.set(value, atPath: encoder.codingPath)
+        }
+    }
+    
+    public func encode(_ value: Int32, forKey key: K) throws {
+        try encoder.with(pushedKey: key) {
+            try container.set(value, atPath: encoder.codingPath)
+        }
+    }
+    
+    public func encode(_ value: Int64, forKey key: K) throws {
+        try encoder.with(pushedKey: key) {
+            try container.set(value, atPath: encoder.codingPath)
+        }
+    }
+    
+    public func encode(_ value: UInt, forKey key: K) throws {
+        try encoder.with(pushedKey: key) {
+            try container.set(value, atPath: encoder.codingPath)
+        }
+    }
+    
+    public func encode(_ value: UInt8, forKey key: K) throws {
+        try encoder.with(pushedKey: key) {
+            try container.set(value, atPath: encoder.codingPath)
+        }
+    }
+    
+    public func encode(_ value: UInt16, forKey key: K) throws {
+        try encoder.with(pushedKey: key) {
+            try container.set(value, atPath: encoder.codingPath)
+        }
+    }
+    
+    public func encode(_ value: UInt32, forKey key: K) throws {
+        try encoder.with(pushedKey: key) {
+            try container.set(value, atPath: encoder.codingPath)
+        }
+    }
+    
+    public func encode(_ value: UInt64, forKey key: K) throws {
+        try encoder.with(pushedKey: key) {
+            try container.set(value, atPath: encoder.codingPath)
+        }
+    }
+    
+    public func encode(_ value: Float, forKey key: K) throws {
+        try encoder.with(pushedKey: key) {
+            try container.set(value, atPath: encoder.codingPath)
+        }
+    }
+    
+    public func encode(_ value: Double, forKey key: K) throws {
+        try encoder.with(pushedKey: key) {
+            try container.set(value, atPath: encoder.codingPath)
+        }
+    }
+    
+    public func encode(date value: Date, forKey key: K) throws {
+        try encoder.with(pushedKey: key) {
+            try container.set(value, atPath: encoder.codingPath)
+        }
+    }
+    
     public func encode(_ value: String, forKey key: K) throws {
         try encoder.with(pushedKey: key) {
             try container.set(value, atPath: encoder.codingPath)
         }
     }
+    
     public func encode<T>(_ value: T, forKey key: K) throws where T : Encodable {
-        try encoder.with(pushedKey: key) {
-            let innerEncoder = _SQLEncoder(userInfo: encoder.userInfo, codingPath: encoder.codingPath, referencing: encoder.result)
-            
-            try value.encode(to: innerEncoder)
+        if T.self == Date.self || T.self == NSDate.self {
+            try encode(date: value as! Date, forKey: key)
         }
-    }
-    public func nestedContainer<NestedKey: CodingKey>(keyedBy keyType: NestedKey.Type, forKey key: K) -> KeyedEncodingContainer<NestedKey> {
-        return encoder.with(pushedKey: key) {
-            .init(_SQLKeyedEncodingContainer<NestedKey>(referencing: encoder, codingPath: encoder.codingPath, wrapping: container))
+        else {
+            try encoder.with(pushedKey: key) {
+                let innerEncoder = _SQLEncoder(userInfo: encoder.userInfo, codingPath: encoder.codingPath, referencing: encoder.result)
+                try value.encode(to: innerEncoder)
+            }
         }
     }
     
+    public func nestedContainer<NestedKey: CodingKey>(keyedBy keyType: NestedKey.Type, forKey key: K) -> KeyedEncodingContainer<NestedKey> {
+        fatalError("SQL encoder doesn't support nested containers")
+    }
+    
     public func nestedUnkeyedContainer(forKey key: K) -> UnkeyedEncodingContainer {
-        // can't throw from KeyedEncodingContainerProtocol.nestedUnkeyedContainer() - why?
-        fatalError("INI encoder doesn't support arrays")
+        fatalError("SQL encoder doesn't support arrays")
     }
     
     public func superEncoder() -> Encoder {
@@ -229,9 +285,7 @@ fileprivate class _SQLSingleValueEncodingContainer: SingleValueEncodingContainer
     
     public func encodeNil() throws { try container.set("", atPath: self.codingPath) }
     public func encode(_ value: Bool) throws { try container.set(value, atPath: self.codingPath) }
-    public func encode(_ value: Int) throws {
-        try container.set(value, atPath: self.codingPath)
-    }
+    public func encode(_ value: Int) throws { try container.set(value, atPath: self.codingPath) }
     public func encode(_ value: Int8) throws { try container.set(value, atPath: self.codingPath)}
     public func encode(_ value: Int16) throws { try container.set(value, atPath: self.codingPath) }
     public func encode(_ value: Int32) throws { try container.set(value, atPath: self.codingPath) }
@@ -243,12 +297,9 @@ fileprivate class _SQLSingleValueEncodingContainer: SingleValueEncodingContainer
     public func encode(_ value: UInt64) throws { try container.set(value, atPath: self.codingPath) }
     public func encode(_ value: Float) throws { try container.set(value, atPath: self.codingPath) }
     public func encode(_ value: Double) throws { try container.set(value, atPath: self.codingPath) }
-    public func encode(_ value: String) throws {
-        try container.set(value, atPath: self.codingPath)
-    }
+    public func encode(_ value: String) throws { try container.set(value, atPath: self.codingPath) }
     public func encode<T>(_ value: T) throws where T : Encodable {
         let innerEncoder = _SQLEncoder(userInfo: encoder.userInfo, codingPath: self.codingPath, referencing: self.container)
-        
         try value.encode(to: innerEncoder)
     }
 }

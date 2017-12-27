@@ -23,7 +23,7 @@ public struct Queries<T> {
 
 extension Queries where T: SQLEncodable {
     
-    // TODO: Make this non-blocking (Future returning withou blockingAwaits)
+    // TODO: Make this non-blocking (Future returning without blockingAwaits)
     public func insert(_ request: Request) throws -> Int {
         let encoder = SQLEncoder()
         let query = try encoder.insert(model)

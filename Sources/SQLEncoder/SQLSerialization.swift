@@ -28,20 +28,51 @@ extension SQLSerialization {
     static func serializeValue(_ value: Any) throws -> String {
         let valueResult: String
         
-        if let uintValue = value as? UInt { valueResult = try serializeUInt(uintValue) }
-        else if let uintValue = value as? UInt8 { valueResult = try serializeUInt(uintValue) }
-        else if let uintValue = value as? UInt16 { valueResult = try serializeUInt(uintValue) }
-        else if let uintValue = value as? UInt32 { valueResult = try serializeUInt(uintValue) }
-        else if let uintValue = value as? UInt64 { valueResult = try serializeUInt(uintValue) }
-        else if let intValue = value as? Int { valueResult = try serializeInt(intValue) }
-        else if let intValue = value as? Int8 { valueResult = try serializeInt(intValue) }
-        else if let intValue = value as? Int16 { valueResult = try serializeInt(intValue) }
-        else if let intValue = value as? Int32 { valueResult = try serializeInt(intValue) }
-        else if let intValue = value as? Int64 { valueResult = try serializeInt(intValue) }
-        else if let floatValue = value as? Float { valueResult = try serializeFloat(floatValue) }
-        else if let floatValue = value as? Double { valueResult = try serializeFloat(floatValue) }
-        else if let stringValue = value as? String { valueResult = try serializeString(stringValue) }
-        else if let boolValue = value as? Bool { valueResult = try serializeBool(boolValue) }
+        if let dateValue = value as? Date {
+            valueResult = try serializeDate(dateValue)
+        }
+        else if let uintValue = value as? UInt {
+            valueResult = try serializeUInt(uintValue)
+        }
+        else if let uintValue = value as? UInt8 {
+            valueResult = try serializeUInt(uintValue)
+        }
+        else if let uintValue = value as? UInt16 {
+            valueResult = try serializeUInt(uintValue)
+        }
+        else if let uintValue = value as? UInt32 {
+            valueResult = try serializeUInt(uintValue)
+        }
+        else if let uintValue = value as? UInt64 {
+            valueResult = try serializeUInt(uintValue)
+        }
+        else if let intValue = value as? Int {
+            valueResult = try serializeInt(intValue)
+        }
+        else if let intValue = value as? Int8 {
+            valueResult = try serializeInt(intValue)
+        }
+        else if let intValue = value as? Int16 {
+            valueResult = try serializeInt(intValue)
+        }
+        else if let intValue = value as? Int32 {
+            valueResult = try serializeInt(intValue)
+        }
+        else if let intValue = value as? Int64 {
+            valueResult = try serializeInt(intValue)
+        }
+        else if let floatValue = value as? Float {
+            valueResult = try serializeFloat(floatValue)
+        }
+        else if let floatValue = value as? Double {
+            valueResult = try serializeFloat(floatValue)
+        }
+        else if let stringValue = value as? String {
+            valueResult = try serializeString(stringValue)
+        }
+        else if let boolValue = value as? Bool {
+            valueResult = try serializeBool(boolValue)
+        }
         else {
             fatalError("Unsupported type")
         }
@@ -83,8 +114,15 @@ extension SQLSerialization {
         case .none:
             return "'\(value)'"
         case .some:
-            return "'" + value.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "'", with: "\\'") + "'"
+            return "'" + (value.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "'", with: "\\'")) + "'"
         }
+    }
+    
+    private static func serializeDate(_ value: Date) throws -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        formatter.timeZone = TimeZone(abbreviation: "GMT")
+        return "'\(formatter.string(from: value))'"
     }
     
     private static func serializeBool(_ value: Bool) throws -> String {
