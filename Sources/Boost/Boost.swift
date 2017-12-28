@@ -10,16 +10,14 @@ import Vapor
 import MyBase
 import MyErrors
 import SQLEncoder
+import Fluent
+import FluentMySQL
 
 
 public class Boost {
     
     public static func boot(_ app: Application) throws {
-        let install = Install(app)
-        install.models.append(Tag.self)
-        install.models.append(App.self)
         
-        install.proceed(app)
     }
     
     static var controllers: [Controller.Type] = [
@@ -39,7 +37,7 @@ public class Boost {
         var middlewareConfig = MiddlewareConfig()
 //        middlewareConfig.use(FileMiddleware.self)
         middlewareConfig.use(DateMiddleware.self)
-        middlewareConfig.use(JWTTokenMiddleware.self)
+//        middlewareConfig.use(JWTTokenMiddleware.self)
         middlewareConfig.use(MyErrorMiddleware.self)
         middlewareConfig.use(MyDebugMiddleware.self)
         
@@ -47,10 +45,18 @@ public class Boost {
             middlewareConfig
         }
         
-        services.register(JWTTokenMiddleware())
+//        services.register(JWTTokenMiddleware())
         let logger = PrintLogger()
+        services.instance(FluentProvider())
         services.register(MyErrorMiddleware(environment: env, log: logger))
         services.register(MyDebugMiddleware())
+        
+        var databaseConfig = DatabaseConfig()
+        let mysql = MySQLDatabase(hostname: "127.0.0.1", port: 3306, user: "root", password: nil, database: "boost")
+        databaseConfig.add(database: mysql, as: .boost)
+        services.instance(databaseConfig)
+        
+        MyBase.databaseIdentifier = .boost
     }
     
 }

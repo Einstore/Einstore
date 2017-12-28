@@ -12,5 +12,6 @@ public struct Team: Codable {
     
     public var id: Int?
     public var name: String
+    public var identifier: String
     
 }

@@ -13,16 +13,9 @@ import MyBase
 class AppsController: Controller {
     
     static func boot(router: Router) throws {
-        router.get("apps") { req -> Future<[App]> in
-            // TODO: Check if user is logged in
-            return App.all(req)
-        }
-        
-        router.post("apps") { req -> Future<[App]> in
-            // TODO: Check if user is logged in
-            return App.all(req)
-        }
-        
+//        router.get("hu") { (request) -> Future<App> in
+//            
+//        }
     }
     
 }

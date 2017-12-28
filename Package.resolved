@@ -47,6 +47,24 @@
         }
       },
       {
+        "package": "Fluent",
+        "repositoryURL": "https://github.com/vapor/fluent.git",
+        "state": {
+          "branch": "beta",
+          "revision": "6efe49ef8c362c105d950a24b94a0ce96600b8c8",
+          "version": null
+        }
+      },
+      {
+        "package": "FluentMySQL",
+        "repositoryURL": "https://github.com/vapor/mysql-driver.git",
+        "state": {
+          "branch": "beta",
+          "revision": "9d41314c92157661c9a5fad0315fe8a11dc2f274",
+          "version": null
+        }
+      },
+      {
         "package": "JWT",
         "repositoryURL": "https://github.com/vapor/jwt.git",
         "state": {

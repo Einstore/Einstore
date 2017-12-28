@@ -7,14 +7,17 @@
 
 import Foundation
 import Vapor
+import FluentMySQL
 
 
 public class MyBase {
     
+    public static var databaseIdentifier: DatabaseIdentifier<MySQLDatabase>!
+    
     static var controllers: [Controller.Type] = [
-        InstallController.self,
+//        InstallController.self,
         UsersController.self,
-        TeamsController.self
+//        TeamsController.self
     ]
     
     public static func boot(router: Router) throws {

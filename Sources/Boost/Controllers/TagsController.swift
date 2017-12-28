@@ -13,9 +13,6 @@ import MyBase
 class TagsController: Controller {
     
     static func boot(router: Router) throws {
-        router.get("tags") { req -> Future<[Tag]> in
-            return Tag.all(req)
-        }
         
     }
     
