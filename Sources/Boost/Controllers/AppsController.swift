@@ -13,9 +13,11 @@ import MyBase
 class AppsController: Controller {
     
     static func boot(router: Router) throws {
-//        router.get("hu") { (request) -> Future<App> in
-//            
-//        }
+        router.get("apps") { (req) -> Future<App> in
+            return req.withConnection(to: .boost) { db -> Future<[App]> in
+                return db.query(App.self).all()
+            }
+        }
     }
     
 }
