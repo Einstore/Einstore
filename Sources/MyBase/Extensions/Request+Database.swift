@@ -18,3 +18,6 @@ extension Request {
 //    }
     
 }
+
+
+extension Request: DatabaseConnectable {}

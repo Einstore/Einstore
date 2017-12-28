@@ -52,7 +52,7 @@ public class Boost {
         services.register(MyDebugMiddleware())
         
         var databaseConfig = DatabaseConfig()
-        let mysql = MySQLDatabase(hostname: "127.0.0.1", port: 3306, user: "root", password: nil, database: "boost")
+        let mysql = MySQLDatabase(hostname: "localhost", port: 3306, user: "root", password: nil, database: "boost")
         databaseConfig.add(database: mysql, as: .boost)
         services.instance(databaseConfig)
         
