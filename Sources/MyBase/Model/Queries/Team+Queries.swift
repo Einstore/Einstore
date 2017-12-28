@@ -8,12 +8,12 @@
 import Foundation
 
 
-extension Team: Queryable, HasForeignId {
+extension Team: Selectable, HasForeignId {
     
     public static var tableName: String = "teams"
     public static var foreignIdName: String = "team_id"
     
-    public static var userJoinTableName: String = "\(User.tableName)_\(Team.tableName)"
+    public static var userJoinTableName: String = "\(User.Display.tableName)_\(Team.tableName)"
     
     public static var columns: [String] {
         return [
@@ -29,14 +29,14 @@ extension Team: Queryable, HasForeignId {
     }
     
     public static func teams(for userId: Int, count: Bool = false) -> String {
-        return "\(userJoin(count)) WHERE `\(userJoinTableName)`.'\(User.foreignIdName)' = \(userId)"
+        return "\(userJoin(count)) WHERE `\(userJoinTableName)`.'\(User.Display.foreignIdName)' = \(userId)"
     }
     
     public static var create: String = """
     CREATE TABLE `\(tableName)` (
-    `id` int(11) UNSIGNED NOT NULL,
-    `name` varchar(40) NOT NULL,
-    `identifier` varchar(40) NOT NULL
+        `id` int(11) UNSIGNED NOT NULL,
+        `name` varchar(40) NOT NULL,
+        `identifier` varchar(40) NOT NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
     
     ALTER TABLE `teams`
@@ -49,17 +49,17 @@ extension Team: Queryable, HasForeignId {
     INSERT INTO `teams` (`name`, `identifier`) VALUES ('Admin team', 'admin-team');
     
     CREATE TABLE `\(userJoinTableName)` (
-    `\(User.foreignIdName)` int(11) UNSIGNED NOT NULL,
+    `\(User.Display.foreignIdName)` int(11) UNSIGNED NOT NULL,
     `\(Team.foreignIdName)` int(11) UNSIGNED NOT NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
     
     ALTER TABLE `\(userJoinTableName)`
-        ADD KEY `indexes` (`\(Team.foreignIdName)`, `\(User.foreignIdName)`);
+        ADD KEY `indexes` (`\(Team.foreignIdName)`, `\(User.Display.foreignIdName)`);
     
     ALTER TABLE `\(userJoinTableName)`
-        ADD CONSTRAINT `fk-\(userJoinTableName)-\(User.foreignIdName)`
-            FOREIGN KEY (`\(User.foreignIdName)`)
-            REFERENCES `\(User.tableName)` (`id`)
+        ADD CONSTRAINT `fk-\(userJoinTableName)-\(User.Display.foreignIdName)`
+            FOREIGN KEY (`\(User.Display.foreignIdName)`)
+            REFERENCES `\(User.Display.tableName)` (`id`)
             ON DELETE CASCADE
             ON UPDATE NO ACTION,
         ADD CONSTRAINT `fk-\(userJoinTableName)-\(Team.foreignIdName)`

@@ -10,7 +10,7 @@ import MyBase
 import Vapor
 
 
-extension Tag: Queryable, HasForeignId {
+extension Tag: Selectable, HasForeignId {
     
     static var tableName: String = "tags"
     static var foreignIdName: String = "tag_id"

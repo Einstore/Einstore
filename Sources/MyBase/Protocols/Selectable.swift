@@ -1,5 +1,5 @@
 //
-//  Queryable.swift
+//  Selectable.swift
 //  Queries
 //
 //  Created by Ondrej Rafaj on 09/12/2017.
@@ -12,23 +12,23 @@ import SQLEncoder
 /**
  Protocol allowing access to queries on models
  */
-public protocol Queryable: Model, SQLEncodable {
+public protocol Selectable: Model, SQLEncodable {
     
-    associatedtype PropertyParentType
-    var query: Queries<PropertyParentType> { get }
+//    associatedtype PropertyParentType
+//    var query: Manipulation<PropertyParentType> { get }
     
 }
 
-extension Queryable {
+extension Selectable {
     
     // MARK: Queries
     
     /// Queries for model
-    public var query: Queries<Self> {
-        get {
-            return Queries(self)
-        }
-    }
+//    public var query: Manipulation<Self> {
+//        get {
+//            return Manipulation(self)
+//        }
+//    }
     
     public static var select: String {
         return "SELECT * FROM `\(self.tableName)`"

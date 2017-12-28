@@ -37,8 +37,8 @@ public class Boost {
     
     public static func configure(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
         var middlewareConfig = MiddlewareConfig()
-//        mc.use(FileMiddleware.self)
-//        mc.use(DateMiddleware.self)
+//        middlewareConfig.use(FileMiddleware.self)
+        middlewareConfig.use(DateMiddleware.self)
         middlewareConfig.use(JWTTokenMiddleware.self)
         middlewareConfig.use(MyErrorMiddleware.self)
         middlewareConfig.use(MyDebugMiddleware.self)

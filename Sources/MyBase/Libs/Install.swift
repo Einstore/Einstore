@@ -16,7 +16,7 @@ public class Install {
     
     public var models: [Model.Type] = [
         Migration.self,
-        User.self,
+        User.Display.self,
         Team.self
     ]
     

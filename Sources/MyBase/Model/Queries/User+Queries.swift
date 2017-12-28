@@ -10,7 +10,7 @@ import Vapor
 import Crypto
 
 
-extension User: Queryable, HasForeignId {
+extension User.Display: Selectable, HasForeignId {
     
     public static var tableName: String = "users"
     public static var foreignIdName: String = "user_id"

@@ -8,7 +8,7 @@
 import Foundation
 
 
-extension Migration: Queryable {
+extension Migration: Selectable {
     
     public static var tableName: String = "migrations"
     

@@ -22,33 +22,61 @@ open class SQLEncoder {
     
     public init() { }
     
-    open func insert<T: SQLEncodable>(_ value: T) throws -> String {
+//    open func insert<T: SQLEncodable>(_ value: T) throws -> String {
+//        let encoder = _SQLEncoder(userInfo: userInfo)
+//        try value.encode(to: encoder)
+//        
+//        let columns = self.columns(encoder.result.data).joined(separator: ", ")
+//        let values = try self.values(encoder.result.data).joined(separator: ", ")
+//        let query: String = "INSERT INTO `\(T.tableName)` (\(columns)) VALUES (\(values));"
+//        return query
+//    }
+//    
+//    open func update<T: SQLEncodable>(_ value: T, where whereQuery: String? = nil) throws -> String {
+//        let encoder = _SQLEncoder(userInfo: userInfo)
+//        try value.encode(to: encoder)
+//        
+//        var query: String = "UPDATE `\(T.tableName)` SET "
+//        
+//        var sets: [String] = []
+//        for pair in encoder.result.data {
+//            try sets.append("`\(pair.key)` = \(SQLSerialization.serializeValue(pair.value))")
+//        }
+//        query.append(sets.joined(separator: ", "))
+//        
+//        if whereQuery != nil {
+//            query.append(" WHERE \(whereQuery!)")
+//        }
+//        return query.appending(";")
+//    }
+    
+    open func insert<T: SQLEncodable>(_ value: T) throws -> (query: String, values: Any) {
         let encoder = _SQLEncoder(userInfo: userInfo)
         try value.encode(to: encoder)
         
         let columns = self.columns(encoder.result.data).joined(separator: ", ")
         let values = try self.values(encoder.result.data).joined(separator: ", ")
         let query: String = "INSERT INTO `\(T.tableName)` (\(columns)) VALUES (\(values));"
-        return query
+        return (query: query, values: values)
     }
     
-    open func update<T: SQLEncodable>(_ value: T, where whereQuery: String? = nil) throws -> String {
-        let encoder = _SQLEncoder(userInfo: userInfo)
-        try value.encode(to: encoder)
-        
-        var query: String = "UPDATE `\(T.tableName)` SET "
-        
-        var sets: [String] = []
-        for pair in encoder.result.data {
-            try sets.append("`\(pair.key)` = \(SQLSerialization.serializeValue(pair.value))")
-        }
-        query.append(sets.joined(separator: ", "))
-        
-        if whereQuery != nil {
-            query.append(" WHERE \(whereQuery!)")
-        }
-        return query.appending(";")
-    }
+//    open func update<T: SQLEncodable>(_ value: T, where whereQuery: String? = nil) throws -> (query: String, values: Any) {
+//        let encoder = _SQLEncoder(userInfo: userInfo)
+//        try value.encode(to: encoder)
+//
+//        var query: String = "UPDATE `\(T.tableName)` SET "
+//
+//        var sets: [String] = []
+//        for pair in encoder.result.data {
+//            try sets.append("`\(pair.key)` = \(SQLSerialization.serializeValue(pair.value))")
+//        }
+//        query.append(sets.joined(separator: ", "))
+//
+//        if whereQuery != nil {
+//            query.append(" WHERE \(whereQuery!)")
+//        }
+//        return (query: query.appending(";"), values: values)
+//    }
 
 }
 
@@ -75,8 +103,6 @@ extension SQLEncoder {
 fileprivate class _SQLEncoder : Encoder {
     
     var result: _SQLPartiallyEncodedData
-    
-//    var dateEncodingStrategy: SQLEncoder.DateEncodingStrategy = .mySQLDate
     
     init(userInfo: [CodingUserInfoKey: Any], codingPath: [CodingKey] = [], referencing: _SQLPartiallyEncodedData = .init(data: SQLEncoder.KeyValuePairs())) {
         self.userInfo = userInfo
