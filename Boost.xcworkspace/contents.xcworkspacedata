@@ -8,6 +8,9 @@
       location = "container:"
       name = "Configuration">
       <FileRef
+         location = "group:app.json">
+      </FileRef>
+      <FileRef
          location = "group:Procfile">
       </FileRef>
       <FileRef

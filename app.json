@@ -1,0 +1,18 @@
+{
+	"name": "Boost Enterprise AppStore",
+	"description": "Enterprise appstore for easy project deployment",
+	"repository": "https://github.com/LiveUI/Boost",
+	"website": "https://github.com/LiveUI/Boost",
+	"keywords": [
+		"boost",
+		"hockeyapp",
+		"fabric",
+		"ios",
+		"android",
+		"enterprise",
+		"appstore"
+	],
+	"buildpacks": [{
+		"url": "https://github.com/kylef/heroku-buildpack-swift"
+	}]
+}
