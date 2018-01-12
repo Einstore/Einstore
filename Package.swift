@@ -7,21 +7,21 @@ let package = Package(
         .package(url: "https://github.com/vapor/vapor.git", .branch("beta")),
         .package(url: "https://github.com/vapor/mysql.git", .branch("beta")),
         .package(url: "https://github.com/vapor/mysql-driver.git", .branch("beta")),
+        .package(url: "https://github.com/vapor/fluent.git", .branch("beta")),
         .package(url: "https://github.com/vapor/redis.git", .branch("beta")),
         .package(url: "https://github.com/vapor/jwt.git", .branch("beta")),
-        .package(url: "https://github.com/vapor/fluent.git", .branch("beta")),
         .package(url: "https://github.com/manGoweb/MimeLib.git", .exact("1.0.0"))
-        ],
+    ],
     targets: [
         .target(
             name: "App",
             dependencies: [
                 "Vapor",
-                "Boost"
+                "BoostCore"
             ]
         ),
         .target(
-            name: "MyErrors",
+            name: "ApiErrors",
             dependencies: [
                 "Vapor"
             ]
@@ -32,7 +32,21 @@ let package = Package(
             ]
         ),
         .target(
-            name: "Boost",
+            name: "MySQLPool",
+            dependencies: [
+            ]
+        ),
+        .target(
+            name: "DbCore",
+            dependencies: [
+                "MySQL",
+                "Vapor",
+                "Fluent",
+                "FluentMySQL"
+            ]
+        ),
+        .target(
+            name: "BoostCore",
             dependencies: [
                 "Vapor",
                 "MySQL",
@@ -40,20 +54,22 @@ let package = Package(
                 "FluentMySQL",
                 "Redis",
                 "JWT",
-                "MyBase",
-                "MyErrors",
-                "SQLEncoder"
+                "ApiCore",
+                "ApiErrors",
+                "SQLEncoder",
+                "DbCore"
             ]
         ),
         .target(
-            name: "MyBase",
+            name: "ApiCore",
             dependencies: [
                 "Vapor",
                 "MySQL",
                 "Fluent",
                 "FluentMySQL",
-                "MyErrors",
-                "SQLEncoder"
+                "ApiErrors",
+                "SQLEncoder",
+                "DbCore"
             ]
         ),
         .target(name: "Run", dependencies: [

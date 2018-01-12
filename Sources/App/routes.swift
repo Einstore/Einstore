@@ -1,6 +1,6 @@
 import Routing
 import Vapor
-import Boost
+import BoostCore
 
 /// Register your application's routes here.
 ///

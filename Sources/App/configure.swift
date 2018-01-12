@@ -1,5 +1,5 @@
 import Vapor
-import Boost
+import BoostCore
 
 /// Called before your application initializes.
 ///

@@ -1,7 +1,7 @@
 import Routing
 import Vapor
 import MySQL
-import Boost
+import BoostCore
 
 /// Called after your application has initialized.
 ///

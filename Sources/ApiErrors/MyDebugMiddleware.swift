@@ -15,9 +15,9 @@ import Service
 import Vapor
 
 
-public final class MyDebugMiddleware: Middleware, ServiceFactory {
+public final class UrlDebugMiddleware: Middleware, ServiceFactory {
     
-    public var serviceType: Any.Type = MyDebugMiddleware.self
+    public var serviceType: Any.Type = UrlDebugMiddleware.self
     
     public var serviceSupports: [Any.Type] = []
     

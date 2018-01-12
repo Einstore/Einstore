@@ -8,6 +8,7 @@
 import Foundation
 import Vapor
 import FluentMySQL
+import DbCore
 
 
 //final class App: Content {
@@ -50,8 +51,8 @@ import FluentMySQL
 ////    static var idKey: ReferenceWritableKeyPath<App, Int?> {
 ////        return /.id
 ////    }
-//    static var database = DatabaseIdentifier<MySQLDatabase>.boost
-//    typealias Database = MySQLDatabase
+//    static var database = DatabaseIdentifier<DbCoreDatabase>.db
+//    typealias Database = DbCoreDatabase
 //    typealias ID = Int
 //
 //    static var idKey: IDKey {
@@ -59,16 +60,22 @@ import FluentMySQL
 //    }
 //}
 
-final class App: Content {
-    var id: Int?
+final class App: Model, Content {
+    
+    typealias Database = DbCoreDatabase
+    typealias ID = Int
+    
+    static var idKey = \App.id
+    
+    var id: ID?
     var name: String
     
-    enum Platform: Int, Codable {
-        case file = 0
-        case ios = 1
-        case tvos = 2
-        case android = 3
-    }
+//    enum Platform: Int, Codable {
+//        case file = 0
+//        case ios = 1
+//        case tvos = 2
+//        case android = 3
+//    }
 
     init(id: Int?, name: String) {
         self.id = id
@@ -76,13 +83,5 @@ final class App: Content {
     }
 }
 
-extension App: Model, Migration {
-    static var database = DatabaseIdentifier<MySQLDatabase>.boost
-    typealias Database = MySQLDatabase
-    typealias ID = Int
-    
-    static var idKey: IDKey {
-        return \.id
-    }
-}
+extension App: Migration { }
 

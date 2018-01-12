@@ -7,7 +7,7 @@
 
 import Foundation
 import Vapor
-import MyBase
+import ApiCore
 
 
 class TagsController: Controller {

@@ -12,8 +12,8 @@ import FluentMySQL
 
 extension DatabaseIdentifier {
     
-    public static var boost: DatabaseIdentifier<MySQLDatabase> {
-        return .init("boost")
+    public static var db: DatabaseIdentifier<DbCoreDatabase> {
+        return .init("db")
     }
     
 }

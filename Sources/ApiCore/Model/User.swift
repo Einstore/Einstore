@@ -1,6 +1,6 @@
 //
 //  User.swift
-//  MyBase
+//  ApiCore
 //
 //  Created by Ondrej Rafaj on 11/12/2017.
 //
