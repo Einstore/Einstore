@@ -34,6 +34,8 @@ let package = Package(
         .target(
             name: "MySQLPool",
             dependencies: [
+                "Vapor",
+                "MySQL"
             ]
         ),
         .target(
