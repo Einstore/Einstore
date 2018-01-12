@@ -8,6 +8,9 @@
       location = "container:"
       name = "Configuration">
       <FileRef
+         location = "group:Jenkinsfile">
+      </FileRef>
+      <FileRef
          location = "group:circle.yml">
       </FileRef>
       <FileRef
