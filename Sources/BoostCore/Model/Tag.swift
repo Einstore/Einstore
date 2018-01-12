@@ -6,11 +6,24 @@
 //
 
 import Foundation
+import DbCore
 
 
-struct Tag: Codable {
+final class Tag: DbCoreModel {
     
-    let id: UInt16?
-    let value: String
+    typealias Database = DbCoreDatabase
+    typealias ID = DbCoreIdentifier
+    
+    static var idKey = \Tag.id
+    
+    var id: ID?
+    var name: String
+    var identifier: String
+    
+    init(id: Int?, name: String, identifier: String) {
+        self.id = id
+        self.name = name
+        self.identifier = identifier
+    }
     
 }

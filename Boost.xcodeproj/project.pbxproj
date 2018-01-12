@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		15BC427320097A40006735E9 /* CoreDbModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15BC427120097A07006735E9 /* CoreDbModel.swift */; };
 		OBJ_1037 /* boot.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_43 /* boot.swift */; };
 		OBJ_1038 /* configure.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_44 /* configure.swift */; };
 		OBJ_1039 /* routes.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_45 /* routes.swift */; };
@@ -3775,6 +3776,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		15BC427120097A07006735E9 /* CoreDbModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDbModel.swift; sourceTree = "<group>"; };
 		"Async::Async::Product" /* Async.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Async.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCore::Product" /* ApiCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiErrors::Product" /* ApiErrors.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiErrors.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -5159,6 +5161,7 @@
 			children = (
 				OBJ_16 /* DatabaseIdentifier.swift */,
 				OBJ_17 /* DbCore.swift */,
+				15BC427120097A07006735E9 /* CoreDbModel.swift */,
 			);
 			name = DbCore;
 			path = Sources/DbCore;
@@ -6181,7 +6184,7 @@
 			path = Serialization;
 			sourceTree = "<group>";
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -6192,7 +6195,6 @@
 				OBJ_55 /* Dependencies */,
 				OBJ_696 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_50 /* Tests */ = {
@@ -8174,7 +8176,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_696 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -8315,6 +8317,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
+				15BC427320097A40006735E9 /* CoreDbModel.swift in Sources */,
 				OBJ_1326 /* DatabaseIdentifier.swift in Sources */,
 				OBJ_1327 /* DbCore.swift in Sources */,
 			);

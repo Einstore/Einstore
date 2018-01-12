@@ -11,6 +11,7 @@ import FluentMySQL
 
 
 public typealias DbCoreDatabase = MySQLDatabase
+public typealias DbCoreIdentifier = Int
 
 
 public class DbCore {

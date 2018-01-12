@@ -60,22 +60,24 @@ import DbCore
 //    }
 //}
 
-final class App: Model, Content {
+
+//
+//extension DbCoreModel {
+//
+//    typealias Database = DbCoreDatabase
+//    typealias ID = DbCoreIdentifier
+//
+//}
+
+final class App: DbCoreModel {
     
     typealias Database = DbCoreDatabase
-    typealias ID = Int
+    typealias ID = DbCoreIdentifier
     
     static var idKey = \App.id
     
     var id: ID?
     var name: String
-    
-//    enum Platform: Int, Codable {
-//        case file = 0
-//        case ios = 1
-//        case tvos = 2
-//        case android = 3
-//    }
 
     init(id: Int?, name: String) {
         self.id = id
@@ -83,5 +85,4 @@ final class App: Model, Content {
     }
 }
 
-extension App: Migration { }
 
