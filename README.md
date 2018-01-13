@@ -1,4 +1,4 @@
-# Boost - unfinished, contact us on Slack for ETA
+![Boost: Enterprise AppStore in Swift](https://github.com/LiveUI/Boost/raw/master/Other/Images/header.jpg)
 
 [![Slack](https://img.shields.io/badge/join-slack-745EAF.svg?style=flat)](http://bit.ly/2B0dEyt)
 [![Platforms](https://img.shields.io/badge/platforms-macOS%2010.13%20|%20Ubuntu%2016.04%20LTS-ff0000.svg?style=flat)](http://cocoapods.org/pods/FASwift)
@@ -7,9 +7,23 @@
 [![iOS app](https://img.shields.io/badge/app-iOS-blue.svg?style=flat)](https://github.com/manGoweb/Boost-iOS/)
 [![Android app](https://img.shields.io/badge/app-Android-green.svg?style=flat)](https://github.com/manGoweb/Boost-Android/)
 
-## 
+##
 
 Enterprise appstore for easy project deployment
+
+# Warning! - Project is not finished, contact us on Slack for ETA
+
+## Table of contents
+
+* [Slack](#slack)
+* [Frontend apps](#frontend-apps)
+* [Installation](#installation)
+    * [Docker](#docker)
+    * [macOS](#macos)
+    * [Ubuntu](#ubuntu)
+    * [Heroku](#heroku)
+* [Continuous Integration](#continuous-integration)
+
 
 ## Slack
 
@@ -66,3 +80,4 @@ Ondrej Rafaj , development@mangoweb.cz
 ## License
 
 Boost is available under the Apache2 license. See the LICENSE file for more info.
+
