@@ -12,6 +12,28 @@
 		"enterprise",
 		"appstore"
 	],
+    "env": {
+        "DB_HOST": {
+            "description": "MySQL database host.",
+            "value": "localhost"
+        },
+        "DB_PORT": {
+            "description": "MySQL database host.",
+            "value": 3306
+        },
+        "DB_USER": {
+            "description": "MySQL database host.",
+            "value": "root"
+        },
+        "DB_PASSWORD": {
+            "description": "MySQL database password.",
+            "value": ""
+        },
+        "DB_NAME": {
+            "description": "MySQL database name.",
+            "value": "localhost"
+        }
+    },
 	"buildpacks": [{
 		"url": "https://github.com/kylef/heroku-buildpack-swift"
 	}]
