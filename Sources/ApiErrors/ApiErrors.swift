@@ -1,6 +1,6 @@
 //
-//  MyErrors.swift
-//  MyErrors
+//  ApiErrors.swift
+//  ApiErrors
 //
 //  Created by Ondrej Rafaj on 09/12/2017.
 //
@@ -12,7 +12,7 @@ import Vapor
 public protocol WebError { }
 
 
-public enum MyHTTPError: Error, WebError {
+public enum HTTPError: Error, WebError {
     case notAuthorized
     case missingRequestData
     case missingAuthorizationData

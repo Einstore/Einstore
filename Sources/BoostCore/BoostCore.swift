@@ -40,23 +40,21 @@ public class Boost {
         try ApiCore.configure(&config, &env, &services)
         try DbCore.configure(&config, &env, &services)
         
-//        var middlewareConfig = MiddlewareConfig()
-////        middlewareConfig.use(FileMiddleware.self)
-//        middlewareConfig.use(DateMiddleware.self)
-////        middlewareConfig.use(JWTTokenMiddleware.self)
-//        middlewareConfig.use(MyErrorMiddleware.self)
-//        middlewareConfig.use(UrlDebugMiddleware.self)
-//
-//        services.register { container -> MiddlewareConfig in
-//            middlewareConfig
-//        }
-        
-        ApiCore.databaseIdentifier = .db
+        var middlewareConfig = MiddlewareConfig()
+//        middlewareConfig.use(FileMiddleware.self)
+        middlewareConfig.use(DateMiddleware.self)
+//        middlewareConfig.use(JWTTokenMiddleware.self)
+        middlewareConfig.use(ApiErrorsMiddleware.self)
+        middlewareConfig.use(UrlDebugMiddleware.self)
+
+        services.register { container -> MiddlewareConfig in
+            middlewareConfig
+        }
         
 //        services.register(JWTTokenMiddleware())
         
         let logger = PrintLogger()
-        services.register(MyErrorMiddleware(environment: env, log: logger))
+        services.register(ApiErrorsMiddleware(environment: env, log: logger))
         services.register(UrlDebugMiddleware())
     }
     

@@ -359,9 +359,9 @@
 		OBJ_1598 /* Debugging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Core::Debugging::Product" /* Debugging.framework */; };
 		OBJ_1612 /* SQLEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_13 /* SQLEncoder.swift */; };
 		OBJ_1613 /* SQLSerialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_14 /* SQLSerialization.swift */; };
-		OBJ_1619 /* MyDebugMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* MyDebugMiddleware.swift */; };
-		OBJ_1620 /* MyErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_10 /* MyErrors.swift */; };
-		OBJ_1621 /* MyErrorsMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* MyErrorsMiddleware.swift */; };
+		OBJ_1619 /* UrlDebugMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* UrlDebugMiddleware.swift */; };
+		OBJ_1620 /* ApiErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_10 /* ApiErrors.swift */; };
+		OBJ_1621 /* ApiErrorsMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* ApiErrorsMiddleware.swift */; };
 		OBJ_1623 /* Vapor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Vapor::Vapor::Product" /* Vapor.framework */; };
 		OBJ_1624 /* ServerSecurity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Engine::ServerSecurity::Product" /* ServerSecurity.framework */; };
 		OBJ_1625 /* TemplateKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "TemplateKit::TemplateKit::Product" /* TemplateKit.framework */; };
@@ -3812,7 +3812,7 @@
 		"FluentMySQL::FluentMySQL::Product" /* FluentMySQL.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FluentMySQL.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"JWT::JWT::Product" /* JWT.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = JWT.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"MySQL::MySQL::Product" /* MySQL.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = MySQL.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		OBJ_10 /* MyErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyErrors.swift; sourceTree = "<group>"; };
+		OBJ_10 /* ApiErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiErrors.swift; sourceTree = "<group>"; };
 		OBJ_100 /* Exports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exports.swift; sourceTree = "<group>"; };
 		OBJ_101 /* FluentError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluentError.swift; sourceTree = "<group>"; };
 		OBJ_103 /* Migration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Migration.swift; sourceTree = "<group>"; };
@@ -3821,7 +3821,7 @@
 		OBJ_106 /* MigrationLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationLog.swift; sourceTree = "<group>"; };
 		OBJ_107 /* QueryMigrationConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryMigrationConfig.swift; sourceTree = "<group>"; };
 		OBJ_108 /* SchemaMigrationConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemaMigrationConfig.swift; sourceTree = "<group>"; };
-		OBJ_11 /* MyErrorsMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyErrorsMiddleware.swift; sourceTree = "<group>"; };
+		OBJ_11 /* ApiErrorsMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiErrorsMiddleware.swift; sourceTree = "<group>"; };
 		OBJ_110 /* Identifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifier.swift; sourceTree = "<group>"; };
 		OBJ_111 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		OBJ_112 /* SoftDeletable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoftDeletable.swift; sourceTree = "<group>"; };
@@ -4343,7 +4343,7 @@
 		OBJ_87 /* MySQLConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MySQLConnection.swift; sourceTree = "<group>"; };
 		OBJ_88 /* MySQLConnectionConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MySQLConnectionConfig.swift; sourceTree = "<group>"; };
 		OBJ_89 /* MySQLDatabase+Query.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MySQLDatabase+Query.swift"; sourceTree = "<group>"; };
-		OBJ_9 /* MyDebugMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyDebugMiddleware.swift; sourceTree = "<group>"; };
+		OBJ_9 /* UrlDebugMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrlDebugMiddleware.swift; sourceTree = "<group>"; };
 		OBJ_90 /* MySQLDatabase+Schema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MySQLDatabase+Schema.swift"; sourceTree = "<group>"; };
 		OBJ_91 /* MySQLDatabase+Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MySQLDatabase+Transaction.swift"; sourceTree = "<group>"; };
 		OBJ_92 /* MySQLDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MySQLDatabase.swift; sourceTree = "<group>"; };
@@ -6815,9 +6815,9 @@
 		OBJ_8 /* ApiErrors */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_9 /* MyDebugMiddleware.swift */,
-				OBJ_10 /* MyErrors.swift */,
-				OBJ_11 /* MyErrorsMiddleware.swift */,
+				OBJ_9 /* UrlDebugMiddleware.swift */,
+				OBJ_10 /* ApiErrors.swift */,
+				OBJ_11 /* ApiErrorsMiddleware.swift */,
 			);
 			name = ApiErrors;
 			path = Sources/ApiErrors;
@@ -8483,9 +8483,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_1619 /* MyDebugMiddleware.swift in Sources */,
-				OBJ_1620 /* MyErrors.swift in Sources */,
-				OBJ_1621 /* MyErrorsMiddleware.swift in Sources */,
+				OBJ_1619 /* UrlDebugMiddleware.swift in Sources */,
+				OBJ_1620 /* ApiErrors.swift in Sources */,
+				OBJ_1621 /* ApiErrorsMiddleware.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -13,8 +13,6 @@ import DbCore
 
 public class ApiCore {
     
-    public static var databaseIdentifier: DatabaseIdentifier<DbCoreDatabase>!
-    
     static var controllers: [Controller.Type] = [
 //        InstallController.self,
         UsersController.self,

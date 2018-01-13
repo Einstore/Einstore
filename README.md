@@ -23,7 +23,8 @@ Enterprise appstore for easy project deployment
     * [Ubuntu](#ubuntu)
     * [Heroku](#heroku)
 * [Continuous Integration](#continuous-integration)
-
+* [Author](#author)
+* [License](#license)
 
 ## Slack
 
