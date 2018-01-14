@@ -20,7 +20,7 @@ final class Tag: DbCoreModel {
     var name: String
     var identifier: String
     
-    init(id: Int?, name: String, identifier: String) {
+    init(id: ID?, name: String, identifier: String) {
         self.id = id
         self.name = name
         self.identifier = identifier

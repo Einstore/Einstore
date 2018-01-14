@@ -3,7 +3,7 @@ import Dispatch
 import XCTest
 
 
-final class AppTests : XCTestCase {
+final class DbCoreTests : XCTestCase {
     
     func testNothing() throws {
         XCTAssert(true)

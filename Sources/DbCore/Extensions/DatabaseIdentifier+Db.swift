@@ -1,5 +1,5 @@
 //
-//  DatabaseIdentifier.swift
+//  DatabaseIdentifier+Db.swift
 //  Boost
 //
 //  Created by Ondrej Rafaj on 28/12/2017.

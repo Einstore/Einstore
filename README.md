@@ -9,13 +9,12 @@
 
 ##
 
-Enterprise appstore for easy project deployment
-
-# Warning! - Project is not finished, contact us on Slack for ETA
+Distribute apps to employees and authorized members of your extended enterprise like contractors, ecosystem partners and distributors, through a fully private and custom-branded app store.
 
 ## Table of contents
 
 * [Slack](#slack)
+* [Features](#features)
 * [Frontend apps](#frontend-apps)
 * [Installation](#installation)
     * [Docker](#docker)
@@ -29,6 +28,42 @@ Enterprise appstore for easy project deployment
 ## Slack
 
 Get help using and installing this product on our [Slack](http://bit.ly/2B0dEyt), channel <b>#help-boost</b>
+
+## Features
+
+**Warning! - *Project is not finished, contact us on Slack for ETA or follow the status below***
+
+#### MVP (current)
+- [x] Build basic framework
+- [ ] Authenticate with username and password
+- [ ] Authenticate in enterprise environment (`ActiveDirectory`, etc ...)
+- [ ] Upload, process and install iOS app
+- [ ] Upload, process and install Android app
+- [ ] Search apps by it's tags, name, platform and bundle Id
+- [ ] Integrated web client (web interface)
+- [ ] Create client accounts
+- [ ] Basic emails (forgotten password, registration, invitation)
+
+
+#### Phase 2
+- [ ] Create client accounts
+- [ ] Upload, process and install tvOS app
+- [ ] Comment on builds
+- [ ] Native iOS client
+- [ ] Native Android client
+- [ ] Email notifications (new builds, clents, etc)
+
+
+#### Phase 3
+- [ ] Create virtual apps for web-apps (urls)
+- [ ] Authenticate in enterprise environment (custom plugins and integrations for common systems)
+
+
+#### Phase 4
+- [ ] Upload, process and download standalone files
+- [ ] Upload, process and install macOS app
+- [ ] Upload, process and install Windows app
+- [ ] Upload, process and display web app (.zip)
 
 ## Frontend apps
 

@@ -43,7 +43,13 @@ public final class ApiErrorsMiddleware: Middleware, ServiceFactory {
     public func respond(to req: Request, chainingTo next: Responder) throws -> Future<Response> {
         let promise = Promise(Response.self)
         
-        func handleError(_ error: Swift.Error) {
+        func handleError(_ error: Swift.Error) throws {
+            if let frontendError = error as? FrontendError {
+                let res = try req.response.errorRequest(status: frontendError.status, error: frontendError.code, description: frontendError.description)
+                promise.complete(res)
+                return
+            }
+            
             let reason: String
             let status: HTTPStatus
             
@@ -74,10 +80,8 @@ public final class ApiErrorsMiddleware: Middleware, ServiceFactory {
                 }
             }
             
-            let res = req.makeResponse()
-            res.http.body = HTTPBody(string: "{ \"error\": \"\(reason)\" }")
-            res.headers["Content-Type"] = "application/json; charset=utf-8"
-            res.http.status = status
+            let res = try req.response.internalServerError(message: reason)
+            res.status = status
             promise.complete(res)
         }
         
@@ -85,10 +89,11 @@ public final class ApiErrorsMiddleware: Middleware, ServiceFactory {
             try next.respond(to: req).do { res in
                 promise.complete(res)
                 }.catch { error in
-                    handleError(error)
+                    // TODO: This doesn't return anything?!
+                    try? handleError(error)
             }
         } catch {
-            handleError(error)
+            try handleError(error)
         }
         
         return promise.future

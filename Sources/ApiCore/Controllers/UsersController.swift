@@ -13,11 +13,11 @@ import FluentMySQL
 public class UsersController: Controller {
     
     public static func boot(router: Router) throws {
-//        router.get("users") { req in
-//            return req.withConnection(to: DatabaseIdentifier.init("boost")) { db -> Future<[User]> in
-//                return db.query(User.self)
-//            }
-//        }
+        router.get("users") { req in
+            req.withPooledConnection(to: .db, closure: { (db) -> Future<[User.Display]> in
+                return User.Display.query(on: db).all()
+            })
+        }
     }
     
 }

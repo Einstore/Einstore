@@ -79,7 +79,7 @@ final class App: DbCoreModel {
     var id: ID?
     var name: String
 
-    init(id: Int?, name: String) {
+    init(id: ID?, name: String) {
         self.id = id
         self.name = name
     }

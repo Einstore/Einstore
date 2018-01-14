@@ -78,6 +78,10 @@ let package = Package(
             "App"
             ]),
         .testTarget(name: "AppTests", dependencies: ["App"]),
+        .testTarget(name: "ApiCoreTests", dependencies: ["ApiCore"]),
+        .testTarget(name: "BoostCoreTests", dependencies: ["BoostCore"]),
+        .testTarget(name: "DbCoreTests", dependencies: ["DbCore"]),
+        .testTarget(name: "ApiErrorsTests", dependencies: ["ApiErrors"]),
         ]
 )
 

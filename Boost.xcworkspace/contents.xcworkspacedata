@@ -32,4 +32,11 @@
          location = "group:README.md">
       </FileRef>
    </Group>
+   <Group
+      location = "container:scripts"
+      name = "Scripts">
+      <FileRef
+         location = "group:update.sh">
+      </FileRef>
+   </Group>
 </Workspace>
