@@ -109,6 +109,12 @@ You can upload a new build simply by sending the following `curl`
 curl -X POST -H "Authorization: Token XXXXXX-XXXXXX-XXXXXX-XXXX" -d @myfilename https://api.appstorehq.net?tags=some_tag_no1,some_tag_2
 ```
 
+## API documentation
+
+A complete API documentation is on [Apiary.io](https://boost.docs.apiary.io/). In the repo we also maintain a [Postman](https://www.getpostman.com) collection of all available requests [here](https://github.com/LiveUI/Boost/tree/master/Other/Postman).
+
+[![Apiary.io API documentation for Boost](https://github.com/LiveUI/Boost/raw/master/Other/Images/apiary.png)](https://boost.docs.apiary.io/)
+
 ## Author
 
 Ondrej Rafaj , development@mangoweb.cz
