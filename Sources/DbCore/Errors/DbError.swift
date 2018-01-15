@@ -6,14 +6,20 @@
 //
 
 import Foundation
+import Vapor
 import ApiErrors
 
 
 public enum DbError: FrontendError {
+    
     case missingLastInsertedId
 
     public var code: String {
         return "db_error"
+    }
+    
+    public var status: HTTPStatus {
+        return .internalServerError
     }
     
     public var description: String {

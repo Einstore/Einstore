@@ -20,22 +20,26 @@ public final class User: DbCoreModel {
     }
     
     public struct Auth: Content {
-        public let token: String
+        
+        public struct Login: Content {
+            public let email: String
+            public let password: String
+            
+            public init?(email: String, password: String) {
+                guard email.count > 0, password.count > 0 else {
+                    return nil
+                }
+                self.email = email
+                self.password = password
+            }
+        }
+        
+        public struct Token: Content {
+            public let token: String
+        }
+        
         public let twt: String
         public let user: User.Display
-    }
-        
-    public struct Login: Content {
-        public let email: String
-        public let password: String
-        
-        public init?(email: String, password: String) {
-            guard email.count > 0, password.count > 0 else {
-                return nil
-            }
-            self.email = email
-            self.password = password
-        }
     }
     
     public final class Display: DbCoreModel {

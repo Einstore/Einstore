@@ -10,7 +10,8 @@ let package = Package(
         .package(url: "https://github.com/vapor/fluent.git", .branch("beta")),
         .package(url: "https://github.com/vapor/redis.git", .branch("beta")),
         .package(url: "https://github.com/vapor/jwt.git", .branch("beta")),
-        .package(url: "https://github.com/manGoweb/MimeLib.git", .exact("1.0.0"))
+        .package(url: "https://github.com/manGoweb/MimeLib.git", .exact("1.0.0")),
+        .package(url: "https://github.com/kareman/SwiftShell.git", .exact("4.0.0"))
     ],
     targets: [
         .target(
@@ -59,7 +60,8 @@ let package = Package(
                 "ApiCore",
                 "ApiErrors",
                 "SQLEncoder",
-                "DbCore"
+                "DbCore",
+                "SwiftShell"
             ]
         ),
         .target(

@@ -71,6 +71,16 @@ import DbCore
 
 final class App: DbCoreModel {
     
+    enum Platform: String {
+        case iOS = "iOS"
+        case tvOS = "tvOS"
+        case url = "url"
+        case simulator = "Simulator"
+        case android = "Android"
+        case macOS = "macOS"
+        case windows = "Windows"
+    }
+    
     typealias Database = DbCoreDatabase
     typealias ID = DbCoreIdentifier
     

@@ -9,8 +9,11 @@ import Foundation
 import Vapor
 
 
-public protocol FrontendError: Swift.Error {
-    var code: String { get }
-    var description: String { get }
-    var status: HTTPStatus { get }
-}
+public typealias FrontendError = Error
+
+//public protocol FrontendError: Swift.Error {
+//    var code: String { get }
+//    var description: String { get }
+//    var status: HTTPStatus { get }
+//}
+

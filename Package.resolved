@@ -119,6 +119,15 @@
         }
       },
       {
+        "package": "SwiftShell",
+        "repositoryURL": "https://github.com/kareman/SwiftShell.git",
+        "state": {
+          "branch": null,
+          "revision": "ecf0544d740c8d729275ac3d52543511153909d6",
+          "version": "4.0.0"
+        }
+      },
+      {
         "package": "TemplateKit",
         "repositoryURL": "https://github.com/vapor/template-kit.git",
         "state": {

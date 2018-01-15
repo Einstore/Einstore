@@ -44,11 +44,12 @@ public final class ApiErrorsMiddleware: Middleware, ServiceFactory {
         let promise = Promise(Response.self)
         
         func handleError(_ error: Swift.Error) throws {
-            if let frontendError = error as? FrontendError {
-                let res = try req.response.errorRequest(status: frontendError.status, error: frontendError.code, description: frontendError.description)
-                promise.complete(res)
-                return
-            }
+            // TODO: Make this work on linux
+//            if let frontendError = error as? FrontendError {
+//                let res = try req.response.errorRequest(status: frontendError.status, error: frontendError.code, description: frontendError.description)
+//                promise.complete(res)
+//                return
+//            }
             
             let reason: String
             let status: HTTPStatus
