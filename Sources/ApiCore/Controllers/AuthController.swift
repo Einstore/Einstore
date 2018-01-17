@@ -47,24 +47,13 @@ public class AuthController: Controller {
         }
         
         router.post("auth") { (req)->Future<Token> in
-            // Temporary
-            let loginData: User.Auth.Login
             do {
-                loginData = try req.content.decode(User.Auth.Login.self)
+                return try req.content.decode(User.Auth.Login.self).flatMap(to: Token.self, { (loginData) -> Future<Token> in
+                    return try login(request: req, login: loginData)
+                })
             } catch {
                 throw AuthError.authenticationFailed
             }
-            
-            return try login(request: req, login: loginData)
-            
-            // After update it will be:
-//            do {
-//                return try req.content.decode(User.Auth.Login.self).flatMap(to: Token.self, { (loginData) -> Future<Token> in
-//                    return try login(request: req, login: loginData)
-//                })
-//            } catch {
-//                throw AuthError.authenticationFailed
-//            }
         }
 
 //        router.get("token") { req in

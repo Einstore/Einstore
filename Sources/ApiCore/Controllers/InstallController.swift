@@ -19,9 +19,11 @@ public class InstallController: Controller {
                 return install(connection: db, request: req)
             }
         }
+        
         router.get("demo") { req in
             return try req.response.maintenanceFinished(message: "Demo install finished")
         }
+        
         router.get("uninstall") { req in
             return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
                 return req.dbHelpers.showTables().flatMap(to: Response.self, { (tables) -> Future<Response> in
@@ -35,6 +37,7 @@ public class InstallController: Controller {
                 })
             }
         }
+        
         router.get("reinstall") { (req)->Future<Response> in
             return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
                 let objects = [

@@ -43,3 +43,13 @@ protocol Extractor {
     func process() throws -> Future<App?>
     
 }
+
+extension Extractor {
+    
+//    func app() throws -> App {
+//        let app = App(id: nil, name: appName ?? "")
+//
+//        return app
+//    }
+    
+}

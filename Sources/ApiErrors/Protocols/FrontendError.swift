@@ -16,4 +16,3 @@ public typealias FrontendError = Error
 //    var description: String { get }
 //    var status: HTTPStatus { get }
 //}
-

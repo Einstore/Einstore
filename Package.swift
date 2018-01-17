@@ -42,10 +42,11 @@ let package = Package(
         .target(
             name: "DbCore",
             dependencies: [
-                "MySQL",
                 "Vapor",
+                "MySQL",
                 "Fluent",
-                "FluentMySQL"
+                "FluentMySQL",
+                "ApiErrors"
             ]
         ),
         .target(

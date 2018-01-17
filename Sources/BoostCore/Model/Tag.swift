@@ -7,6 +7,9 @@
 
 import Foundation
 import DbCore
+import Vapor
+import Fluent
+import FluentMySQL
 
 
 final class Tag: DbCoreModel {
@@ -20,6 +23,12 @@ final class Tag: DbCoreModel {
     var name: String
     var identifier: String
     
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case identifier
+    }
+    
     init(id: ID?, name: String, identifier: String) {
         self.id = id
         self.name = name
@@ -27,3 +36,19 @@ final class Tag: DbCoreModel {
     }
     
 }
+
+
+extension Tag: Migration {
+    
+    public static func prepare(on connection: Database.Connection) -> Future<Void> {
+        return Database.create(self, on: connection) { (schema: SchemaBuilder<Tag>) in
+            schema.addField(type: ColumnType.uint64(length: 20), name: CodingKeys.id.stringValue, isIdentifier: true)
+            schema.addField(type: ColumnType.varChar(length: 60), name: CodingKeys.name.stringValue)
+            schema.addField(type: ColumnType.varChar(length: 60), name: CodingKeys.identifier.stringValue)
+        }
+    }
+    
+}
+
+
+

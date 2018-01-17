@@ -7,6 +7,8 @@
 
 import Foundation
 import Vapor
+import Fluent
+import FluentMySQL
 import DbCore
 
 
@@ -96,37 +98,12 @@ extension User {
     
     public static var idKey = \User.id
     
-    static var superUser: String {
-        let password: String = "admin".passwordHash
-        let query = "INSERT INTO `\(entity)` (`firstname`, `lastname`, `email`, `password`, `registered`, `disabled`, `su`) VALUES ('Super', 'Admin', 'admin@liveui.io', '\(password)', NOW(), 0, 1);"
-        return query
-    }
-    
 //    public static func prepare(on connection: Database.Connection) -> Future<Void> {
-//        let query = """
-//        CREATE TABLE `\(entity)` (
-//            `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-//            `firstname` varchar(80) NOT NULL,
-//            `lastname` varchar(80) NOT NULL,
-//            `email` varchar(140) NOT NULL,
-//            `password` varchar(64) NOT NULL,
-//            `token` varchar(64) NULL,
-//            `expires` datetime NULL,
-//            `registered` datetime NOT NULL,
-//            `disabled` tinyint(1) NOT NULL DEFAULT '1',
-//            `su` tinyint(1) NOT NULL DEFAULT '0'
-//        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-//
-//        ALTER TABLE `\(entity)`
-//            ADD PRIMARY KEY (`id`),
-//            ADD KEY `strings` (`email`,`password`);
-//
-//        -- Create super user
-//        \(superUser)
-//
-//        COMMIT;
-//        """
-//        return connection.administrativeQuery(query)
+//        return Database.create(self, on: connection) { (schema: SchemaBuilder<User>) in
+//            schema.addField(type: ColumnType.uint32(length: 11), name: CodingKeys.id.stringValue, isIdentifier: true)
+//            schema.addField(type: ColumnType.varChar(length: 40), name: CodingKeys.name.stringValue)
+//            schema.addField(type: ColumnType.varChar(length: 40), name: CodingKeys.identifier.stringValue)
+//        }
 //    }
     
 }

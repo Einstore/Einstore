@@ -1,4 +1,4 @@
 rm -rf .build
 vapor clean -y --verbose
-#rm Package.resolved
+rm Package.resolved
 vapor xcode --verbose

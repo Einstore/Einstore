@@ -25,6 +25,8 @@ class Ipa: BaseDecoder, Extractor {
     // MARK: Processing
     
     func process() throws -> Future<App?> {
+        platform = .iOS
+        
         let promise = Promise<App?>()
         
         // TODO: Make async
@@ -55,7 +57,7 @@ extension Ipa {
     private func parseProvisioning() throws {
         var embeddedFile: URL = payload
         embeddedFile.appendPathComponent("embedded.mobileprovision")
-        let provisioning: String = try String.init(contentsOfFile: embeddedFile.path, encoding: String.Encoding.utf8)
+        let provisioning: String = try String(contentsOfFile: embeddedFile.path, encoding: String.Encoding.utf8)
         if provisioning.contains("ProvisionsAllDevices") {
             data["provisioning"] = "enterprise"
         }
@@ -119,7 +121,7 @@ extension Ipa {
                 if file.contains(icon) {
                     var fileUrl: URL = payload
                     fileUrl.appendPathComponent(file)
-                    let iconData: Data = try Data.init(contentsOf: fileUrl)
+                    let iconData: Data = try Data(contentsOf: fileUrl)
                     if iconData.count > (self.iconData?.count ?? 0) {
                         self.iconData = iconData
                     }

@@ -25,6 +25,7 @@ public class ApiCore {
     
     public static func configure(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
         DbCore.migrationConfig.add(model: Token.self, database: .db)
+        DbCore.migrationConfig.add(model: Team.self, database: .db)
         DbCore.migrationConfig.add(model: User.self, database: .db)
         
         ApiCore.middlewareConfig.use(ApiAuthMiddleware.self)

@@ -7,6 +7,8 @@
 
 import Foundation
 import Vapor
+import Fluent
+import FluentMySQL
 import DbCore
 
 
@@ -58,22 +60,14 @@ extension Token {
     
     public static var idKey = \Token.id
     
-//    public static func prepare(on connection: Database.Connection) -> Future<Void> {
-//        let query = """
-//        CREATE TABLE `\(entity)` (
-//          `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-//          `user_id` int(11) UNSIGNED NOT NULL,
-//          `token` varchar(64) NOT NULL,
-//          `expires` datetime NOT NULL
-//        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-//
-//        ALTER TABLE `\(entity)`
-//            ADD CONSTRAINT `user_id` FOREIGN KEY (`id`) REFERENCES `\(User.entity)` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
-//
-//        COMMIT;
-//        """
-//        return connection.administrativeQuery(query)
-//    }
+    public static func prepare(on connection: Database.Connection) -> Future<Void> {
+        return Database.create(self, on: connection) { (schema: SchemaBuilder<Token>) in
+            schema.addField(type: ColumnType.uint32(length: 11), name: CodingKeys.id.stringValue, isIdentifier: true)
+            schema.addField(type: ColumnType.uint32(length: 11), name: "user_id")
+            schema.addField(type: ColumnType.varChar(length: 64), name: CodingKeys.token.stringValue)
+            schema.addField(type: ColumnType.datetime(), name: CodingKeys.expires.stringValue)
+        }
+    }
     
 }
 

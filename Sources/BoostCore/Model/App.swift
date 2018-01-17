@@ -7,78 +7,25 @@
 
 import Foundation
 import Vapor
+import Fluent
 import FluentMySQL
 import DbCore
 
 
-//final class App: Content {
-//
-//    enum Platform: Int, Codable {
-//        case file = 0
-//        case ios = 1
-//        case tvos = 2
-//        case android = 3
-//    }
-//
-//    let id: Int?
-//    let teamId: Int?
-//    let name: String
-//    let identifier: String
-//    let version: String
-//    let build: String
-//    let platform: Platform
-//    let created: Date?
-//    let modified: Date?
-//    let availableToAll: Bool = false
-//
-//    enum CodingKeys: String, CodingKey {
-//        case id
-//        case teamId = "team_id"
-//        case name
-//        case identifier
-//        case version
-//        case build
-//        case platform
-//        case created
-//        case modified
-//        case availableToAll = "basic"
-//    }
-//
-//}
-//
-//extension App: Model, Migration {
-//
-////    static var idKey: ReferenceWritableKeyPath<App, Int?> {
-////        return /.id
-////    }
-//    static var database = DatabaseIdentifier<DbCoreDatabase>.db
-//    typealias Database = DbCoreDatabase
-//    typealias ID = Int
-//
-//    static var idKey: IDKey {
-//        return \.id
-//    }
-//}
-
-
-//
-//extension DbCoreModel {
-//
-//    typealias Database = DbCoreDatabase
-//    typealias ID = DbCoreIdentifier
-//
-//}
-
 final class App: DbCoreModel {
     
-    enum Platform: String {
-        case iOS = "iOS"
-        case tvOS = "tvOS"
+    enum Platform: String, Codable, KeyStringDecodable {
+        case unknown
+        case iOS = "ios"
+        case tvOS = "tvos"
         case url = "url"
-        case simulator = "Simulator"
-        case android = "Android"
-        case macOS = "macOS"
-        case windows = "Windows"
+        case simulator = "simulator"
+        case android = "android"
+        case macOS = "macos"
+        case windows = "windows"
+        
+        static var keyStringTrue: App.Platform = .unknown
+        static var keyStringFalse: App.Platform = .unknown
     }
     
     typealias Database = DbCoreDatabase
@@ -87,12 +34,63 @@ final class App: DbCoreModel {
     static var idKey = \App.id
     
     var id: ID?
+    var teamId: ID?
     var name: String
-
-    init(id: ID?, name: String) {
-        self.id = id
-        self.name = name
+    var identifier: String
+    var version: String
+    var build: String
+    //var platform: Platform
+    var platform: String
+    var created: Date?
+    var modified: Date?
+    var availableToAll: Bool
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case teamId = "team_id"
+        case name
+        case identifier
+        case version
+        case build
+        case platform
+        case created
+        case modified
+        case availableToAll = "basic"
     }
+
+
+    init(id: ID? = nil, teamId: ID?, name: String, identifier: String, version: String, build: String, platform: Platform, availableToAll: Bool = false) {
+        self.id = id
+        self.teamId = teamId
+        self.name = name
+        self.identifier = identifier
+        self.version = version
+        self.build = build
+        self.platform = platform.rawValue
+        self.created = Date()
+        self.modified = Date()
+        self.availableToAll = availableToAll
+    }
+    
+}
+
+extension App: Migration {
+    
+    public static func prepare(on connection: Database.Connection) -> Future<Void> {
+        return Database.create(self, on: connection) { (schema: SchemaBuilder<App>) in
+            schema.addField(type: ColumnType.uint32(length: 11), name: CodingKeys.id.stringValue, isIdentifier: true)
+            schema.addField(type: ColumnType.uint32(length: 11), name: CodingKeys.teamId.stringValue)
+            schema.addField(type: ColumnType.varChar(length: 140), name: CodingKeys.name.stringValue)
+            schema.addField(type: ColumnType.varChar(length: 140), name: CodingKeys.identifier.stringValue)
+            schema.addField(type: ColumnType.varChar(length: 20), name: CodingKeys.version.stringValue)
+            schema.addField(type: ColumnType.varChar(length: 20), name: CodingKeys.build.stringValue)
+            schema.addField(type: ColumnType.varChar(length: 10), name: CodingKeys.platform.stringValue)
+            schema.addField(type: ColumnType.datetime(), name: CodingKeys.created.stringValue)
+            schema.addField(type: ColumnType.datetime(), name: CodingKeys.modified.stringValue)
+            schema.addField(type: ColumnType.uint8(length: 1), name: CodingKeys.availableToAll.stringValue)
+        }
+    }
+    
 }
 
 
