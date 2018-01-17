@@ -68,12 +68,16 @@ public final class ApiAuthMiddleware: Middleware, ServiceFactory {
         guard allowedUri.contains(req.uri.path) else {
             printUrl(req: req, type: .secured)
             
+//            let authCache = AuthenticationCache(userId: 1, teamIds: [1])
+//            req.privateContainer
             
             return try next.respond(to: req)
         }
         
         // Unsecured URI
         printUrl(req: req, type: .unsecured)
+        
+        // Respond to request
         return try next.respond(to: req)
     }
     

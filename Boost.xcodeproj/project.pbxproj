@@ -25,6 +25,12 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		1535AE22200FB013008F515A /* UploadKeyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1535AE21200FB013008F515A /* UploadKeyController.swift */; };
+		1535AE24200FC510008F515A /* Request+Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1535AE23200FC510008F515A /* Request+Auth.swift */; };
+		1535AE27201001C0008F515A /* TeamsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1535AE26201001C0008F515A /* TeamsController.swift */; };
+		1535AE2A201006BC008F515A /* AuthError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1535AE29201006BC008F515A /* AuthError.swift */; };
+		1535AE2C2010071E008F515A /* ContentError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1535AE2B2010071E008F515A /* ContentError.swift */; };
+		1535AE2E2010B72D008F515A /* AuthenticationCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1535AE2D2010B72D008F515A /* AuthenticationCache.swift */; };
 		OBJ_1017 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_77 /* main.swift */; };
 		OBJ_1019 /* App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Boost::App::Product" /* App.framework */; };
 		OBJ_1020 /* BoostCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Boost::BoostCore::Product" /* BoostCore.framework */; };
@@ -5117,6 +5123,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1535AE21200FB013008F515A /* UploadKeyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadKeyController.swift; sourceTree = "<group>"; };
+		1535AE23200FC510008F515A /* Request+Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Request+Auth.swift"; sourceTree = "<group>"; };
+		1535AE26201001C0008F515A /* TeamsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamsController.swift; sourceTree = "<group>"; };
+		1535AE29201006BC008F515A /* AuthError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthError.swift; sourceTree = "<group>"; };
+		1535AE2B2010071E008F515A /* ContentError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentError.swift; sourceTree = "<group>"; };
+		1535AE2D2010B72D008F515A /* AuthenticationCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationCache.swift; sourceTree = "<group>"; };
 		"Async::Async::Product" /* Async.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Async.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCore::Product" /* ApiCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCoreTests::Product" /* ApiCoreTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = ApiCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -6614,6 +6626,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1535AE28201006A5008F515A /* Libs */ = {
+			isa = PBXGroup;
+			children = (
+				1535AE29201006BC008F515A /* AuthError.swift */,
+				1535AE2B2010071E008F515A /* ContentError.swift */,
+				1535AE2D2010B72D008F515A /* AuthenticationCache.swift */,
+			);
+			path = Libs;
+			sourceTree = "<group>";
+		};
 		OBJ_10 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -7224,6 +7246,7 @@
 		OBJ_31 /* ApiCore */ = {
 			isa = PBXGroup;
 			children = (
+				1535AE28201006A5008F515A /* Libs */,
 				OBJ_32 /* ApiCore.swift */,
 				OBJ_33 /* Controllers */,
 				OBJ_38 /* Extensions */,
@@ -7313,6 +7336,7 @@
 				OBJ_35 /* GenericController.swift */,
 				OBJ_36 /* InstallController.swift */,
 				OBJ_37 /* UsersController.swift */,
+				1535AE26201001C0008F515A /* TeamsController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -7433,6 +7457,7 @@
 				OBJ_39 /* Date+Tools.swift */,
 				OBJ_40 /* HTTPHeaders+Tools.swift */,
 				OBJ_41 /* String+Crypto.swift */,
+				1535AE23200FC510008F515A /* Request+Auth.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -7787,7 +7812,7 @@
 			path = ".build/checkouts/engine.git-3311994267206676365/Sources/Routing";
 			sourceTree = SOURCE_ROOT;
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -7801,7 +7826,6 @@
 				OBJ_95 /* Dependencies */,
 				OBJ_749 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_50 /* MySQLPool */ = {
@@ -7930,6 +7954,7 @@
 			children = (
 				OBJ_55 /* AppsController.swift */,
 				OBJ_56 /* TagsController.swift */,
+				1535AE21200FB013008F515A /* UploadKeyController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -10206,7 +10231,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_749 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -10318,6 +10343,7 @@
 				OBJ_1269 /* Ipa.swift in Sources */,
 				OBJ_1270 /* Extractor.swift in Sources */,
 				OBJ_1271 /* App.swift in Sources */,
+				1535AE22200FB013008F515A /* UploadKeyController.swift in Sources */,
 				OBJ_1272 /* Tag.swift in Sources */,
 				OBJ_1273 /* UploadKey.swift in Sources */,
 			);
@@ -10405,13 +10431,18 @@
 				OBJ_1617 /* AuthController.swift in Sources */,
 				OBJ_1618 /* GenericController.swift in Sources */,
 				OBJ_1619 /* InstallController.swift in Sources */,
+				1535AE2C2010071E008F515A /* ContentError.swift in Sources */,
 				OBJ_1620 /* UsersController.swift in Sources */,
+				1535AE2E2010B72D008F515A /* AuthenticationCache.swift in Sources */,
 				OBJ_1621 /* Date+Tools.swift in Sources */,
+				1535AE2A201006BC008F515A /* AuthError.swift in Sources */,
 				OBJ_1622 /* HTTPHeaders+Tools.swift in Sources */,
 				OBJ_1623 /* String+Crypto.swift in Sources */,
+				1535AE27201001C0008F515A /* TeamsController.swift in Sources */,
 				OBJ_1624 /* ApiAuthMiddleware.swift in Sources */,
 				OBJ_1625 /* Team.swift in Sources */,
 				OBJ_1626 /* Token.swift in Sources */,
+				1535AE24200FC510008F515A /* Request+Auth.swift in Sources */,
 				OBJ_1627 /* User.swift in Sources */,
 				OBJ_1628 /* Controller.swift in Sources */,
 			);

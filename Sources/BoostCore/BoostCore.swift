@@ -23,7 +23,8 @@ public class Boost {
     
     static var controllers: [Controller.Type] = [
         TagsController.self,
-        AppsController.self
+        AppsController.self,
+        UploadKeyController.self
     ]
     
     public static func boot(router: Router) throws {
@@ -37,6 +38,7 @@ public class Boost {
     public static func configure(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
         DbCore.migrationConfig.add(model: App.self, database: .db)
         DbCore.migrationConfig.add(model: Tag.self, database: .db)
+        DbCore.migrationConfig.add(model: UploadKey.self, database: .db)
         
         try ApiCore.configure(&config, &env, &services)
         try DbCore.configure(&config, &env, &services)

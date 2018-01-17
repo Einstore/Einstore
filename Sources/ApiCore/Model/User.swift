@@ -21,7 +21,7 @@ public final class User: DbCoreModel {
         public var password: String
     }
     
-    public struct Auth: Content {
+    public struct Auth {
         
         public struct Login: Content {
             public let email: String

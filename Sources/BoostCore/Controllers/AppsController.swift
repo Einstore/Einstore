@@ -15,7 +15,7 @@ import DbCore
 class AppsController: Controller {
     
     static func boot(router: Router) throws {
-        router.post("upload") { (req) -> Future<App> in
+        router.post("apps", "upload") { (req) -> Future<App> in
             return App.query(on: req).first().flatMap(to: App.self, { (app) -> Future<App> in
                 let extractor: Extractor = try Ipa(file: URL(fileURLWithPath: "/Users/pro/Desktop/Desktop - Dictator/Builds/app.ipa"))
                 return try extractor.process().map(to: App.self, { app in

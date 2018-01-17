@@ -6,12 +6,57 @@
 //
 
 import Foundation
+import Vapor
+import Fluent
+import FluentMySQL
+import DbCore
+import ApiCore
 
 
-struct UploadKey: Codable {
+final class UploadKey: DbCoreModel {
     
-    let id: UInt16?
-    let name: String
-    let key: String?
+    typealias Database = DbCoreDatabase
+    typealias ID = DbCoreIdentifier
+    
+    static var idKey = \UploadKey.id
+    
+    var id: ID?
+    var teamId: ID
+    var team: Team? = nil
+    var name: String
+    var expires: Date?
+    var token: String
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case teamId = "team_id"
+        case team
+        case name
+        case expires
+        case token
+    }
+    
+    init(id: ID?, teamId: ID, name: String, expires: Date?, token: String) {
+        self.id = id
+        self.teamId = teamId
+        self.name = name
+        self.expires = expires
+        self.token = token
+    }
+    
+}
+
+
+extension UploadKey: Migration {
+    
+    public static func prepare(on connection: Database.Connection) -> Future<Void> {
+        return Database.create(self, on: connection) { (schema: SchemaBuilder<UploadKey>) in
+            schema.addField(type: ColumnType.uint32(length: 11), name: CodingKeys.id.stringValue, isIdentifier: true)
+            schema.addField(type: ColumnType.uint32(length: 11), name: CodingKeys.teamId.stringValue)
+            schema.addField(type: ColumnType.varChar(length: 60), name: CodingKeys.name.stringValue)
+            schema.addField(type: ColumnType.datetime(), name: CodingKeys.expires.stringValue, isOptional: true)
+            schema.addField(type: ColumnType.varChar(length: 64), name: CodingKeys.token.stringValue)
+        }
+    }
     
 }

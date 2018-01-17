@@ -18,10 +18,19 @@ public final class Team: DbCoreModel {
     public var name: String
     public var identifier: String
     
+    public init(name: String, identifier: String) {
+        self.name = name
+        self.identifier = identifier
+    }
+    
 }
 
 
 extension Team {
+    
+    public struct New: Content {
+        public let token: String
+    }
     
     public typealias Database = DbCoreDatabase
     public typealias ID = DbCoreIdentifier

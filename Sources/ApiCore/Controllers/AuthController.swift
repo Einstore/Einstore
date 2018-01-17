@@ -15,25 +15,6 @@ import ApiErrors
 
 public class AuthController: Controller {
     
-    enum AuthError: FrontendError {
-        case authenticationFailed
-        
-        public var code: String {
-            return "auth_error"
-        }
-        
-        public var status: HTTPStatus {
-            return .unauthorized
-        }
-        
-        public var description: String {
-            switch self {
-            case .authenticationFailed:
-                return "Authentication has failed"
-            }
-        }
-    }
-    
     public static func boot(router: Router) throws {
         router.get("auth") { (req)->Future<Token> in
             guard let token = req.headers.authorizationToken, let decoded = token.base64Decoded else {

@@ -20,7 +20,8 @@ public class ApiCore {
         GenericController.self,
         InstallController.self,
         AuthController.self,
-        UsersController.self
+        UsersController.self,
+        TeamsController.self
     ]
     
     public static func configure(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
@@ -39,6 +40,11 @@ public class ApiCore {
         let logger = PrintLogger()
         services.register(ApiErrorsMiddleware(environment: env, log: logger))
         services.register(ApiAuthMiddleware())
+        
+        // Authentication
+//        services.register(isSingleton: true) { container in
+//            return AuthenticationCache()
+//        }
     }
     
     public static func boot(router: Router) throws {
