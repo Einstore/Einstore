@@ -31,6 +31,8 @@
 		1535AE2A201006BC008F515A /* AuthError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1535AE29201006BC008F515A /* AuthError.swift */; };
 		1535AE2C2010071E008F515A /* ContentError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1535AE2B2010071E008F515A /* ContentError.swift */; };
 		1535AE2E2010B72D008F515A /* AuthenticationCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1535AE2D2010B72D008F515A /* AuthenticationCache.swift */; };
+		1535AE342010E3DC008F515A /* Insertable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1535AE332010E3DC008F515A /* Insertable.swift */; };
+		1535AE362011318E008F515A /* String+Manipulation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1535AE352011318E008F515A /* String+Manipulation.swift */; };
 		OBJ_1017 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_77 /* main.swift */; };
 		OBJ_1019 /* App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Boost::App::Product" /* App.framework */; };
 		OBJ_1020 /* BoostCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Boost::BoostCore::Product" /* BoostCore.framework */; };
@@ -5129,6 +5131,8 @@
 		1535AE29201006BC008F515A /* AuthError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthError.swift; sourceTree = "<group>"; };
 		1535AE2B2010071E008F515A /* ContentError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentError.swift; sourceTree = "<group>"; };
 		1535AE2D2010B72D008F515A /* AuthenticationCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationCache.swift; sourceTree = "<group>"; };
+		1535AE332010E3DC008F515A /* Insertable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Insertable.swift; sourceTree = "<group>"; };
+		1535AE352011318E008F515A /* String+Manipulation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Manipulation.swift"; sourceTree = "<group>"; };
 		"Async::Async::Product" /* Async.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Async.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCore::Product" /* ApiCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCoreTests::Product" /* ApiCoreTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = ApiCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -7202,6 +7206,7 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_30 /* CoreDbModel.swift */,
+				1535AE332010E3DC008F515A /* Insertable.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -7458,6 +7463,7 @@
 				OBJ_40 /* HTTPHeaders+Tools.swift */,
 				OBJ_41 /* String+Crypto.swift */,
 				1535AE23200FC510008F515A /* Request+Auth.swift */,
+				1535AE352011318E008F515A /* String+Manipulation.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -10444,6 +10450,7 @@
 				OBJ_1626 /* Token.swift in Sources */,
 				1535AE24200FC510008F515A /* Request+Auth.swift in Sources */,
 				OBJ_1627 /* User.swift in Sources */,
+				1535AE362011318E008F515A /* String+Manipulation.swift in Sources */,
 				OBJ_1628 /* Controller.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -10455,6 +10462,7 @@
 				OBJ_1698 /* DbCore.swift in Sources */,
 				OBJ_1699 /* DbError.swift in Sources */,
 				OBJ_1700 /* DatabaseIdentifier+Db.swift in Sources */,
+				1535AE342010E3DC008F515A /* Insertable.swift in Sources */,
 				OBJ_1701 /* Request+Tables.swift in Sources */,
 				OBJ_1702 /* Helpers.swift in Sources */,
 				OBJ_1703 /* CoreDbModel.swift in Sources */,

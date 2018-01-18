@@ -12,7 +12,9 @@ import ApiErrors
 
 public enum DbError: FrontendError {
     
-    case missingLastInsertedId
+    case insertFailed
+    case updateFailed
+    case deleteFailed
 
     public var code: String {
         return "db_error"
@@ -24,8 +26,12 @@ public enum DbError: FrontendError {
     
     public var description: String {
         switch self {
-        case .missingLastInsertedId:
-            return "Last inserted ID is missing"
+        case .insertFailed:
+            return "Insert failed"
+        case .updateFailed:
+            return "Update failed"
+        case .deleteFailed:
+            return "Delete failed"
         }
     }
     
