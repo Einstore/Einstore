@@ -17,6 +17,7 @@ public final class Team: DbCoreModel {
     
     public enum TeamError: FrontendError {
         case identifierAlreadyExists
+        case teamDoesntExist
         
         public var code: String {
             return "app_error"
@@ -30,6 +31,8 @@ public final class Team: DbCoreModel {
             switch self {
             case .identifierAlreadyExists:
                 return "Identifier already exists"
+            case .teamDoesntExist:
+                return "Team doesn't exist"
             }
         }
         
@@ -93,14 +96,14 @@ extension Team {
         })
     }
     
-    public static func verifiedTeamQuery(request req: Request, id: DbCoreIdentifier) throws -> QueryBuilder<Team> {
+    public static func verifiedTeamQuery(connection db: Database.Connection, id: DbCoreIdentifier) throws -> QueryBuilder<Team> {
 //        let teams = try req.authInfo.teamIds()
 //        return Team.query(on: req).filter(\Team.id == id).filter(\Team.id, in: teams)
-        return Team.query(on: req).filter(\Team.id == id)
+        return Team.query(on: db).filter(\Team.id == id)
     }
     
-    public static func verifiedTeam(request req: Request, id: DbCoreIdentifier) throws -> Future<Team> {
-        return try verifiedTeamQuery(request: req, id: id).first().map(to: Team.self, { (team) -> Team in
+    public static func verifiedTeam(connection db: Database.Connection, id: DbCoreIdentifier) throws -> Future<Team> {
+        return try verifiedTeamQuery(connection: db, id: id).first().map(to: Team.self, { (team) -> Team in
             guard let team = team else {
                 throw ContentError.unavailable
             }

@@ -16,15 +16,19 @@ public class GenericController: Controller {
         router.get(PathComponent.anything) { req in
             return try req.response.badUrl()
         }
+        
         router.post(PathComponent.anything) { req in
             return try req.response.badUrl()
         }
+        
         router.put(PathComponent.anything) { req in
             return try req.response.badUrl()
         }
+        
         router.patch(PathComponent.anything) { req in
             return try req.response.badUrl()
         }
+        
         router.delete(PathComponent.anything) { req in
             return try req.response.badUrl()
         }

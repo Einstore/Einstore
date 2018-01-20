@@ -33,6 +33,8 @@ class Ipa: BaseDecoder, Extractor {
 //        Thread.async {
             try runAndPrint("unzip", "-o", file.path, "-d", archive.path)
             try parse()
+            
+            // TODO: Do cleanup even if something above fails
             try cleanUp()
             
             // TODO: Make app and return it

@@ -48,10 +48,10 @@ public class InstallController: Controller {
                 })
             }
         }
+        
         router.get("tables") { req in
             return req.dbHelpers.showTables()
         }
-        
     }
     
 }

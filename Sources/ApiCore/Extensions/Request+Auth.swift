@@ -43,10 +43,16 @@ public struct AuthInfo {
     // MARK: Public interface
     
     public func userId() throws -> DbCoreIdentifier {
+        if !ApiCore.configuration.enableUsers || ApiCore.configuration.singleSignOn != nil {
+            return 1
+        }
         return 1
     }
     
     public func teamIds() throws -> [DbCoreIdentifier] {
+        if !ApiCore.configuration.enableTeams || ApiCore.configuration.singleSignOn != nil {
+            return [1]
+        }
         return [1]
     }
     

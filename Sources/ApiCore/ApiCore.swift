@@ -14,6 +14,14 @@ import ApiErrors
 
 public class ApiCore {
     
+    public static var configuration: Configuration = Configuration.basic()
+    
+    public typealias DeleteTeamWarning = (_ team: Team) -> Future<Error?>
+    public typealias DeleteUserWarning = (_ user: User) -> Future<Error?>
+    
+    public static var deleteTeamWarning: DeleteTeamWarning?
+    public static var deleteUserWarning: DeleteUserWarning?
+    
     public static var middlewareConfig = MiddlewareConfig()
     
     static var controllers: [Controller.Type] = [

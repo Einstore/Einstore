@@ -45,7 +45,7 @@ public final class ApiErrorsMiddleware: Middleware, ServiceFactory {
         
         func handleError(_ error: Swift.Error) throws {
             if let frontendError = error as? FrontendError {
-                let res = try req.response.errorRequest(status: frontendError.status, error: frontendError.code, description: frontendError.description)
+                let res = try req.response.error(status: frontendError.status, error: frontendError.code, description: frontendError.description)
                 promise.complete(res)
                 return
             }

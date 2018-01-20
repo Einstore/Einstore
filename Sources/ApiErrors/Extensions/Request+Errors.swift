@@ -7,6 +7,7 @@
 
 import Foundation
 import Vapor
+import Fluent
 
 
 public struct ErrorResponse: Content {
@@ -30,7 +31,7 @@ public struct RequestResponse {
     
     // MARK: Generators
     
-    public func basicRequest(status: HTTPStatus = .ok) throws -> Response {
+    public func basic(status: HTTPStatus = .ok) throws -> Response {
         let response = Response(using: request)
         response.status = status
         
@@ -40,8 +41,8 @@ public struct RequestResponse {
         return response
     }
     
-    public func errorRequest(status: HTTPStatus, error: String, description: String) throws -> Response {
-        let response = try basicRequest(status: status)
+    public func error(status: HTTPStatus, error: String, description: String) throws -> Response {
+        let response = try basic(status: status)
         
         let responseObject = ErrorResponse(error: error, description: description)
         let encoder = JSONEncoder()
@@ -50,8 +51,8 @@ public struct RequestResponse {
         return response
     }
     
-    public func successRequest(status: HTTPStatus = .ok, code: String, description: String) throws -> Response {
-        let response = try basicRequest(status: status)
+    public func success(status: HTTPStatus = .ok, code: String, description: String) throws -> Response {
+        let response = try basic(status: status)
         
         let responseObject = SuccessResponse(code: code, description: description)
         let encoder = JSONEncoder()
@@ -62,27 +63,27 @@ public struct RequestResponse {
     
     public func notFound() throws -> Response {
         // TODO: make "not_found" come from HTTPStatus
-        let response = try errorRequest(status: .notFound, error: "not_found", description: "Not found")
+        let response = try error(status: .notFound, error: "not_found", description: "Not found")
         return response
     }
     
     public func badUrl() throws -> Response {
-        let response = try errorRequest(status: .notFound, error: "not_found", description: "Endpoint doesn't exist; See http://boost.docs.apiary.io for API documentation")
+        let response = try error(status: .notFound, error: "not_found", description: "Endpoint doesn't exist; See http://boost.docs.apiary.io for API documentation")
         return response
     }
     
     public func onlyInDebug() throws -> Response {
-        let response = try errorRequest(status: .preconditionFailed, error: "not_available", description: "Endpoint is not available in production mode")
+        let response = try error(status: .preconditionFailed, error: "not_available", description: "Endpoint is not available in production mode")
         return response
     }
     
     public func maintenanceFinished(message: String) throws -> Response {
-        let response = try successRequest(code: "maintenance_ok", description: message)
+        let response = try success(code: "maintenance_ok", description: message)
         return response
     }
     
     public func internalServerError(message: String) throws -> Response {
-        let response = try errorRequest(status: .internalServerError, error: "server_err", description: message)
+        let response = try error(status: .internalServerError, error: "server_err", description: message)
         return response
     }
     

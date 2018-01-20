@@ -6,8 +6,15 @@
 //
 
 import Foundation
+import Vapor
 
 
-class Apk: BaseDecoder {
+class Apk: BaseDecoder, Extractor {
+    
+    func process() throws -> Future<App?> {
+        let promise = Promise<App?>()
+        
+        return promise.future
+    }
     
 }
