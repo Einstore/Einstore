@@ -12,6 +12,9 @@ import FluentMySQL
 import DbCore
 
 
+public typealias Users = [User]
+
+
 public final class User: DbCoreModel {
     
     public struct Registration: Content {

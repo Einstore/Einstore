@@ -13,6 +13,9 @@ import DbCore
 import ApiErrors
 
 
+public typealias Teams = [Team]
+
+
 public final class Team: DbCoreModel {
     
     public enum TeamError: FrontendError {

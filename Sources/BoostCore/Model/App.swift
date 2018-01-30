@@ -10,11 +10,15 @@ import Vapor
 import Fluent
 import FluentMySQL
 import DbCore
+import ApiCore
 
 
-final class App: DbCoreModel {
+public typealias Apps = [App]
+
+
+final public class App: DbCoreModel {
     
-    enum Platform: String, Codable, KeyStringDecodable {
+    public enum Platform: String, Codable, KeyStringDecodable {
         case unknown
         case iOS = "ios"
         case tvOS = "tvos"
@@ -24,26 +28,26 @@ final class App: DbCoreModel {
         case macOS = "macos"
         case windows = "windows"
         
-        static var keyStringTrue: App.Platform = .unknown
-        static var keyStringFalse: App.Platform = .unknown
+        public static var keyStringTrue: App.Platform = .unknown
+        public static var keyStringFalse: App.Platform = .unknown
     }
     
-    typealias Database = DbCoreDatabase
-    typealias ID = DbCoreIdentifier
+    public typealias Database = DbCoreDatabase
+    public typealias ID = DbCoreIdentifier
     
-    static var idKey = \App.id
+    public static var idKey = \App.id
     
-    var id: ID?
-    var teamId: ID?
-    var name: String
-    var identifier: String
-    var version: String
-    var build: String
-    //var platform: Platform
-    var platform: String
-    var created: Date?
-    var modified: Date?
-    var availableToAll: Bool
+    public var id: ID?
+    public var teamId: ID?
+    public var name: String
+    public var identifier: String
+    public var version: String
+    public var build: String
+    //public var platform: Platform
+    public var platform: String
+    public var created: Date?
+    public var modified: Date?
+    public var availableToAll: Bool
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -59,7 +63,7 @@ final class App: DbCoreModel {
     }
 
 
-    init(id: ID? = nil, teamId: ID?, name: String, identifier: String, version: String, build: String, platform: Platform, availableToAll: Bool = false) {
+    public init(id: ID? = nil, teamId: ID?, name: String, identifier: String, version: String, build: String, platform: Platform, availableToAll: Bool = false) {
         self.id = id
         self.teamId = teamId
         self.name = name
@@ -89,6 +93,15 @@ extension App: Migration {
             schema.addField(type: ColumnType.datetime(), name: CodingKeys.modified.stringValue)
             schema.addField(type: ColumnType.uint8(length: 1), name: CodingKeys.availableToAll.stringValue)
         }
+    }
+    
+}
+
+
+extension App {
+    
+    var team: Parent<App, Team> {
+        return parent(\.teamId)
     }
     
 }

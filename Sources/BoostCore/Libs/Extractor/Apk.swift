@@ -7,14 +7,15 @@
 
 import Foundation
 import Vapor
+import ApiCore
 
 
 class Apk: BaseDecoder, Extractor {
     
-    func process() throws -> Future<App?> {
-        let promise = Promise<App?>()
+    func process() throws -> Promise<App> {
+        let promise = Promise<App>()
         
-        return promise.future
+        return promise
     }
     
 }

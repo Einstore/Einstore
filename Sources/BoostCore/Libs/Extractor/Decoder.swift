@@ -37,4 +37,17 @@ class BaseDecoder {
         try FileManager.default.createDirectory(at: archive, withIntermediateDirectories: true)
     }
     
+    static func decoder(file: String) throws -> Extractor? {
+        let url = URL(fileURLWithPath: file)
+        let fileExtension: String = url.pathExtension
+        switch fileExtension {
+        case "ipa":
+            return try Ipa(file: url)
+        case "apk":
+            return try Apk(file: url)
+        default:
+            return nil
+        }
+    }
+    
 }

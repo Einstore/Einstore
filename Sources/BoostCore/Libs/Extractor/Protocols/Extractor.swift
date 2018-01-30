@@ -8,6 +8,7 @@
 import Foundation
 import Vapor
 import ApiErrors
+import ApiCore
 
 
 enum ExtractorError: FrontendError {
@@ -40,7 +41,7 @@ protocol Extractor {
     var versionLong: String? { get }
     
     init(file: URL) throws
-    func process() throws -> Future<App?>
+    func process() throws -> Promise<App>
     
 }
 

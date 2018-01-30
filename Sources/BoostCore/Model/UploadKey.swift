@@ -13,19 +13,22 @@ import DbCore
 import ApiCore
 
 
-final class UploadKey: DbCoreModel {
+public typealias UploadKeys = [UploadKey]
+
+
+final public class UploadKey: DbCoreModel {
     
-    typealias Database = DbCoreDatabase
-    typealias ID = DbCoreIdentifier
+    public typealias Database = DbCoreDatabase
+    public typealias ID = DbCoreIdentifier
     
-    static var idKey = \UploadKey.id
+    public static var idKey = \UploadKey.id
     
-    var id: ID?
-    var teamId: ID
-    var team: Team? = nil
-    var name: String
-    var expires: Date?
-    var token: String
+    public var id: ID?
+    public var teamId: ID
+    public var team: Team? = nil
+    public var name: String
+    public var expires: Date?
+    public var token: String
     
     enum CodingKeys: String, CodingKey {
         case id

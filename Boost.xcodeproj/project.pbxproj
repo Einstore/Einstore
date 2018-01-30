@@ -28,6 +28,7 @@
 		1535B513201558F4008F515A /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1535B512201558F4008F515A /* Configuration.swift */; };
 		1535B51520162CF9008F515A /* Filesize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1535B51420162CF9008F515A /* Filesize.swift */; };
 		1535B51720167E4C008F515A /* Request+Files.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1535B51620167E4C008F515A /* Request+Files.swift */; };
+		1535B56B20189ECF008F515A /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1535B56A20189ECF008F515A /* Result.swift */; };
 		OBJ_1035 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_86 /* main.swift */; };
 		OBJ_1037 /* App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Boost::App::Product" /* App.framework */; };
 		OBJ_1038 /* BoostCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Boost::BoostCore::Product" /* BoostCore.framework */; };
@@ -5139,6 +5140,7 @@
 		1535B512201558F4008F515A /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Configuration.swift; path = Config/Configuration.swift; sourceTree = "<group>"; };
 		1535B51420162CF9008F515A /* Filesize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Filesize.swift; sourceTree = "<group>"; };
 		1535B51620167E4C008F515A /* Request+Files.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Request+Files.swift"; sourceTree = "<group>"; };
+		1535B56A20189ECF008F515A /* Result.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		"Async::Async::Product" /* Async.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Async.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCore::Product" /* ApiCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCoreTests::Product" /* ApiCoreTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = ApiCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -7743,6 +7745,7 @@
 				OBJ_48 /* AuthenticationCache.swift */,
 				OBJ_49 /* ContentError.swift */,
 				1535B51420162CF9008F515A /* Filesize.swift */,
+				1535B56A20189ECF008F515A /* Result.swift */,
 			);
 			path = Libs;
 			sourceTree = "<group>";
@@ -7848,7 +7851,7 @@
 			path = ".build/checkouts/engine.git-3311994267206676365/Sources/WebSocket";
 			sourceTree = SOURCE_ROOT;
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -7862,7 +7865,6 @@
 				OBJ_104 /* Dependencies */,
 				OBJ_767 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_50 /* Middleware */ = {
@@ -10279,7 +10281,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_767 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -10488,6 +10490,7 @@
 				OBJ_1645 /* String+Manipulation.swift in Sources */,
 				OBJ_1646 /* AuthError.swift in Sources */,
 				OBJ_1647 /* AuthenticationCache.swift in Sources */,
+				1535B56B20189ECF008F515A /* Result.swift in Sources */,
 				OBJ_1648 /* ContentError.swift in Sources */,
 				OBJ_1649 /* ApiAuthMiddleware.swift in Sources */,
 				OBJ_1650 /* Team.swift in Sources */,

@@ -8,6 +8,7 @@
 import Foundation
 import Vapor
 import SwiftShell
+import ApiCore
 
 
 class Ipa: BaseDecoder, Extractor {
@@ -24,24 +25,25 @@ class Ipa: BaseDecoder, Extractor {
     
     // MARK: Processing
     
-    func process() throws -> Future<App?> {
-        platform = .iOS
-        
-        let promise = Promise<App?>()
+    func process() throws -> Promise<App> {
+        let promise = Promise<App>()
         
         // TODO: Make async
-//        Thread.async {
-            try runAndPrint("unzip", "-o", file.path, "-d", archive.path)
-            try parse()
-            
-            // TODO: Do cleanup even if something above fails
-            try cleanUp()
-            
-            // TODO: Make app and return it
-            promise.complete(nil)
+//        runloop.zeromilisecondsTimer {
+            do {
+                try runAndPrint("unzip", "-o", self.file.path, "-d", self.archive.path)
+                try self.parse()
+                try self.cleanUp()
+                
+                // TODO: Return an app
+//                let app = App(...)
+//                promise.complete(Result.success(app))
+            } catch {
+                promise.fail(error)
+            }
 //        }
         
-        return promise.future
+        return promise
     }
     
     // MARK: Cleaning

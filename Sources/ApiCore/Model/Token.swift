@@ -12,6 +12,9 @@ import FluentMySQL
 import DbCore
 
 
+public typealias Tokens = [Token]
+
+
 public final class Token: DbCoreModel {
     
     public enum TokenError: Error {

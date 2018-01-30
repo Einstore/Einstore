@@ -12,16 +12,19 @@ import Fluent
 import FluentMySQL
 
 
-final class Tag: DbCoreModel {
+public typealias Tags = [Tag]
+
+
+final public class Tag: DbCoreModel {
     
-    typealias Database = DbCoreDatabase
-    typealias ID = DbCoreIdentifier
+    public typealias Database = DbCoreDatabase
+    public typealias ID = DbCoreIdentifier
     
-    static var idKey = \Tag.id
+    public static var idKey = \Tag.id
     
-    var id: ID?
-    var name: String
-    var identifier: String
+    public var id: ID?
+    public var name: String
+    public var identifier: String
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -29,7 +32,7 @@ final class Tag: DbCoreModel {
         case identifier
     }
     
-    init(id: ID?, name: String, identifier: String) {
+    public init(id: ID?, name: String, identifier: String) {
         self.id = id
         self.name = name
         self.identifier = identifier
