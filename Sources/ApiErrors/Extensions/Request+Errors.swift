@@ -33,10 +33,10 @@ public struct RequestResponse {
     
     public func basic(status: HTTPStatus = .ok) throws -> Response {
         let response = Response(using: request)
-        response.status = status
+        response.http.status = status
         
         let headers = HTTPHeaders(dictionaryLiteral: (.contentType, "application/json; charset=utf-8"))
-        response.headers = headers
+        response.http.headers = headers
         
         return response
     }
@@ -46,7 +46,7 @@ public struct RequestResponse {
         
         let responseObject = ErrorResponse(error: error, description: description)
         let encoder = JSONEncoder()
-        response.body = try HTTPBody(encoder.encode(responseObject))
+        response.http.body = try HTTPBody(encoder.encode(responseObject))
         
         return response
     }
@@ -56,7 +56,7 @@ public struct RequestResponse {
         
         let responseObject = SuccessResponse(code: code, description: description)
         let encoder = JSONEncoder()
-        response.body = try HTTPBody(encoder.encode(responseObject))
+        response.http.body = try HTTPBody(encoder.encode(responseObject))
         
         return response
     }

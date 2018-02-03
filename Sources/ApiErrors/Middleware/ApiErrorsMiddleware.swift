@@ -81,7 +81,7 @@ public final class ApiErrorsMiddleware: Middleware, ServiceFactory {
             }
             
             let res = try req.response.internalServerError(message: reason)
-            res.status = status
+            res.http.status = status
             promise.complete(res)
         }
         

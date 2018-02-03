@@ -252,7 +252,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Engine::ServerSecurity"
+               BlueprintIdentifier = "TLS::ServerSecurity"
                BuildableName = "ServerSecurity.framework"
                BlueprintName = "ServerSecurity"
                ReferencedContainer = "container:Boost.xcodeproj">
@@ -322,7 +322,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Engine::AppleTLS"
+               BlueprintIdentifier = "TLS::AppleTLS"
                BuildableName = "AppleTLS.framework"
                BlueprintName = "AppleTLS"
                ReferencedContainer = "container:Boost.xcodeproj">
@@ -336,7 +336,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Engine::TLS"
+               BlueprintIdentifier = "TLS::TLS"
                BuildableName = "TLS.framework"
                BlueprintName = "TLS"
                ReferencedContainer = "container:Boost.xcodeproj">
@@ -406,7 +406,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Engine::TCP"
+               BlueprintIdentifier = "Sockets::TCP"
                BuildableName = "TCP.framework"
                BlueprintName = "TCP"
                ReferencedContainer = "container:Boost.xcodeproj">

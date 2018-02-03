@@ -51,7 +51,7 @@ public final class ApiAuthMiddleware: Middleware, ServiceFactory {
     
     public func respond(to req: Request, chainingTo next: Responder) throws -> Future<Response> {
         // Maintenance URI
-        if debugUri.contains(req.uri.path) {
+        if debugUri.contains(req.http.uri.path) {
             printUrl(req: req, type: .maintenance)
             
             if req.environment != .production {
@@ -65,7 +65,7 @@ public final class ApiAuthMiddleware: Middleware, ServiceFactory {
         }
         
         // Secured URI
-        guard allowedUri.contains(req.uri.path) else {
+        guard allowedUri.contains(req.http.uri.path) else {
             printUrl(req: req, type: .secured)
             
 //            let authCache = AuthenticationCache(userId: 1, teamIds: [1])
@@ -83,7 +83,7 @@ public final class ApiAuthMiddleware: Middleware, ServiceFactory {
     
     private func printUrl(req: Request, type: Security) {
         if req.environment != .production {
-            print("\(type.rawValue): [\(req.method.string)] \(req.uri.path)")
+            print("\(type.rawValue): [\(req.http.method.string)] \(req.http.uri.path)")
         }
     }
     

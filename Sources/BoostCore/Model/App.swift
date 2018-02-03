@@ -100,9 +100,9 @@ extension App: Migration {
 
 extension App {
     
-    var team: Parent<App, Team> {
-        return parent(\.teamId)
-    }
+//    var team: Parent<App, Team> {
+//        return parent(\.teamId)
+//    }
     
 }
 

@@ -17,7 +17,7 @@ public class AuthController: Controller {
     
     public static func boot(router: Router) throws {
         router.get("auth") { (req)->Future<Token> in
-            guard let token = req.headers.authorizationToken, let decoded = token.base64Decoded else {
+            guard let token = req.http.headers.authorizationToken, let decoded = token.base64Decoded else {
                 throw AuthError.authenticationFailed
             }
             let parts = decoded.split(separator: ":")
