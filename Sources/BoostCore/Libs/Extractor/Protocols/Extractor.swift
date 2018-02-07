@@ -9,6 +9,7 @@ import Foundation
 import Vapor
 import ApiErrors
 import ApiCore
+import DbCore
 
 
 enum ExtractorError: FrontendError {
@@ -36,12 +37,12 @@ protocol Extractor {
     var iconData: Data? { get }
     var appName: String? { get }
     var appIdentifier: String? { get }
-    var platform: App.Platform? { get }
     var versionShort: String? { get }
     var versionLong: String? { get }
     
     init(file: URL) throws
-    func process() throws -> Promise<App>
+    func process(teamId: DbCoreIdentifier) throws -> Promise<App>
+    func cleanUp() throws
     
 }
 

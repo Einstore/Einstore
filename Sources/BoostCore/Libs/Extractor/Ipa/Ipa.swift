@@ -9,9 +9,10 @@ import Foundation
 import Vapor
 import SwiftShell
 import ApiCore
+import DbCore
 
 
-class Ipa: BaseDecoder, Extractor {
+class Ipa: BaseExtractor, Extractor {
     
     var payload: URL {
         var url = self.archive
@@ -25,7 +26,7 @@ class Ipa: BaseDecoder, Extractor {
     
     // MARK: Processing
     
-    func process() throws -> Promise<App> {
+    func process(teamId: DbCoreIdentifier) throws -> Promise<App> {
         let promise = Promise<App>()
         
         // TODO: Make async
@@ -35,9 +36,9 @@ class Ipa: BaseDecoder, Extractor {
                 try self.parse()
                 try self.cleanUp()
                 
-                // TODO: Return an app
-//                let app = App(...)
-//                promise.complete(Result.success(app))
+                // TODO: Don't force unwrap!!!
+                let app = App(teamId: teamId, name: appName!, identifier: appIdentifier!, version: versionLong!, build: versionShort!, platform: .iOS)
+                promise.complete(app)
             } catch {
                 promise.fail(error)
             }
@@ -61,7 +62,15 @@ extension Ipa {
     private func parseProvisioning() throws {
         var embeddedFile: URL = payload
         embeddedFile.appendPathComponent("embedded.mobileprovision")
-        let provisioning: String = try String(contentsOfFile: embeddedFile.path, encoding: String.Encoding.utf8)
+        // TODO: Fix by decoding the provisioning file!!!!
+        guard let fileData = try? Data(contentsOf: embeddedFile) else {
+            return
+        }
+        let str = NSString(data: fileData, encoding: String.Encoding.utf8.rawValue)
+        print("\(str)")
+        guard let provisioning: String = try? String(contentsOfFile: embeddedFile.path, encoding: String.Encoding.utf8) else {
+            return
+        }
         if provisioning.contains("ProvisionsAllDevices") {
             data["provisioning"] = "enterprise"
         }
@@ -132,6 +141,16 @@ extension Ipa {
                 }
             }
         }
+        
+        guard let iconData = iconData else {
+            return
+        }
+        let iconUrl = archive.appendingPathComponent("icon.png")
+        try iconData.write(to: iconUrl)
+        
+        // TODO: Normalize binary image
+//        let normalize = binUrl.appendingPathComponent("normalize.py")
+//        try runAndPrint(normalize.path, "-t", "xml2json", "-o", jsonUrl.path, xmlUrl.path)
     }
     
     private func parseIcon(_ plist: [String: AnyObject]) throws {
@@ -145,8 +164,7 @@ extension Ipa {
     }
     
     func parse() throws {
-        // TODO: Fix!!!!
-        //try parseProvisioning()
+        try parseProvisioning()
         
         var embeddedFile: URL = payload
         embeddedFile.appendPathComponent("Info.plist")

@@ -8,12 +8,15 @@
 import Foundation
 
 
-class BaseDecoder {
+class BaseExtractor {
+    
+    enum BaseExtractorError: Error {
+        case unsupportedFile
+    }
     
     var iconData: Data?
     var appName: String?
     var appIdentifier: String?
-    var platform: App.Platform?
     var versionShort: String?
     var versionLong: String?
     
@@ -23,6 +26,15 @@ class BaseDecoder {
     var archive: URL
     
     let sessionUUID: String = UUID().uuidString
+    
+    var binUrl: URL {
+        get {
+            // TODO: Make path to resources dynamic!!!!!
+            var url: URL = URL(fileURLWithPath: "/Projects/Web/Boost/Resources/")
+            url.appendPathComponent("bin")
+            return url
+        }
+    }
     
     // MARK: Initialization
     
@@ -37,7 +49,7 @@ class BaseDecoder {
         try FileManager.default.createDirectory(at: archive, withIntermediateDirectories: true)
     }
     
-    static func decoder(file: String) throws -> Extractor? {
+    static func decoder(file: String) throws -> Extractor {
         let url = URL(fileURLWithPath: file)
         let fileExtension: String = url.pathExtension
         switch fileExtension {
@@ -46,7 +58,7 @@ class BaseDecoder {
         case "apk":
             return try Apk(file: url)
         default:
-            return nil
+            throw BaseExtractorError.unsupportedFile
         }
     }
     

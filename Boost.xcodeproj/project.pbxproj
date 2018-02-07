@@ -25,6 +25,9 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		150F1B67202BA529005A9CF0 /* ApkManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 150F1B66202BA529005A9CF0 /* ApkManifest.swift */; };
+		154DF24F202B92A5003D119F /* ApkStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154DF24E202B92A5003D119F /* ApkStrings.swift */; };
+		154DF2B5202B957C003D119F /* Decodable+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154DF2B4202B957C003D119F /* Decodable+Helpers.swift */; };
 		OBJ_1000 /* Debugging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Core::Debugging::Product" /* Debugging.framework */; };
 		OBJ_1082 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_91 /* main.swift */; };
 		OBJ_1084 /* App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Boost::App::Product" /* App.framework */; };
@@ -149,7 +152,7 @@
 		OBJ_1330 /* UploadKeyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_70 /* UploadKeyController.swift */; };
 		OBJ_1331 /* Dictionary+Plist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_72 /* Dictionary+Plist.swift */; };
 		OBJ_1332 /* Apk.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_75 /* Apk.swift */; };
-		OBJ_1333 /* Decoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_76 /* Decoder.swift */; };
+		OBJ_1333 /* BaseExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_76 /* BaseExtractor.swift */; };
 		OBJ_1334 /* Extractor+Tools.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_78 /* Extractor+Tools.swift */; };
 		OBJ_1335 /* Ipa.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_79 /* Ipa.swift */; };
 		OBJ_1336 /* Extractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_81 /* Extractor.swift */; };
@@ -5094,6 +5097,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		150F1B66202BA529005A9CF0 /* ApkManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApkManifest.swift; sourceTree = "<group>"; };
+		154DF24E202B92A5003D119F /* ApkStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApkStrings.swift; sourceTree = "<group>"; };
+		154DF2B4202B957C003D119F /* Decodable+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Decodable+Helpers.swift"; sourceTree = "<group>"; };
 		"Async::Async::Product" /* Async.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Async.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCore::Product" /* ApiCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCoreTests::Product" /* ApiCoreTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = ApiCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -5686,7 +5692,7 @@
 		OBJ_756 /* EventLoop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventLoop.swift; sourceTree = "<group>"; };
 		OBJ_757 /* EventSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventSource.swift; sourceTree = "<group>"; };
 		OBJ_759 /* KqueueEventLoop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KqueueEventLoop.swift; sourceTree = "<group>"; };
-		OBJ_76 /* Decoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Decoder.swift; sourceTree = "<group>"; };
+		OBJ_76 /* BaseExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseExtractor.swift; sourceTree = "<group>"; };
 		OBJ_760 /* KqueueEventSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KqueueEventSource.swift; sourceTree = "<group>"; };
 		OBJ_761 /* Worker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Worker.swift; sourceTree = "<group>"; };
 		OBJ_763 /* DirectoryConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectoryConfig.swift; sourceTree = "<group>"; };
@@ -6624,6 +6630,40 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		154DF24B202B9263003D119F /* Ipa */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_79 /* Ipa.swift */,
+			);
+			path = Ipa;
+			sourceTree = "<group>";
+		};
+		154DF24C202B9269003D119F /* Apk */ = {
+			isa = PBXGroup;
+			children = (
+				154DF24D202B9273003D119F /* Model */,
+				OBJ_75 /* Apk.swift */,
+			);
+			path = Apk;
+			sourceTree = "<group>";
+		};
+		154DF24D202B9273003D119F /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				154DF24E202B92A5003D119F /* ApkStrings.swift */,
+				150F1B66202BA529005A9CF0 /* ApkManifest.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		154DF2B6202B964E003D119F /* Coding */ = {
+			isa = PBXGroup;
+			children = (
+				154DF2B4202B957C003D119F /* Decodable+Helpers.swift */,
+			);
+			path = Coding;
+			sourceTree = "<group>";
+		};
 		OBJ_10 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -7795,6 +7835,7 @@
 		OBJ_49 /* Libs */ = {
 			isa = PBXGroup;
 			children = (
+				154DF2B6202B964E003D119F /* Coding */,
 				OBJ_50 /* AuthError.swift */,
 				OBJ_51 /* AuthenticationCache.swift */,
 				OBJ_52 /* ContentError.swift */,
@@ -7804,7 +7845,7 @@
 			path = Libs;
 			sourceTree = "<group>";
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -7818,7 +7859,6 @@
 				OBJ_109 /* Dependencies */,
 				OBJ_802 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_500 /* Multipart */ = {
@@ -8534,10 +8574,10 @@
 		OBJ_74 /* Extractor */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_75 /* Apk.swift */,
-				OBJ_76 /* Decoder.swift */,
+				154DF24C202B9269003D119F /* Apk */,
+				154DF24B202B9263003D119F /* Ipa */,
+				OBJ_76 /* BaseExtractor.swift */,
 				OBJ_77 /* Extensions */,
-				OBJ_79 /* Ipa.swift */,
 				OBJ_80 /* Protocols */,
 			);
 			path = Extractor;
@@ -10374,7 +10414,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_802 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -10483,12 +10523,14 @@
 				OBJ_1329 /* TagsController.swift in Sources */,
 				OBJ_1330 /* UploadKeyController.swift in Sources */,
 				OBJ_1331 /* Dictionary+Plist.swift in Sources */,
+				154DF24F202B92A5003D119F /* ApkStrings.swift in Sources */,
 				OBJ_1332 /* Apk.swift in Sources */,
-				OBJ_1333 /* Decoder.swift in Sources */,
+				OBJ_1333 /* BaseExtractor.swift in Sources */,
 				OBJ_1334 /* Extractor+Tools.swift in Sources */,
 				OBJ_1335 /* Ipa.swift in Sources */,
 				OBJ_1336 /* Extractor.swift in Sources */,
 				OBJ_1337 /* App.swift in Sources */,
+				150F1B67202BA529005A9CF0 /* ApkManifest.swift in Sources */,
 				OBJ_1338 /* Tag.swift in Sources */,
 				OBJ_1339 /* UploadKey.swift in Sources */,
 			);
@@ -10593,6 +10635,7 @@
 				OBJ_1702 /* Filesize.swift in Sources */,
 				OBJ_1703 /* Result.swift in Sources */,
 				OBJ_1704 /* ApiAuthMiddleware.swift in Sources */,
+				154DF2B5202B957C003D119F /* Decodable+Helpers.swift in Sources */,
 				OBJ_1705 /* Team.swift in Sources */,
 				OBJ_1706 /* Token.swift in Sources */,
 				OBJ_1707 /* User.swift in Sources */,

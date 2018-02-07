@@ -29,7 +29,7 @@ public final class UrlDebugMiddleware: Middleware, ServiceFactory {
     
     public func respond(to req: Request, chainingTo next: Responder) throws -> Future<Response> {
         if req.environment != .production {
-            print("[\(req.method.string)] \(req.uri.path)")
+            print("[\(req.http.method.string)] \(req.http.uri.path)")
         }
         return try next.respond(to: req)
     }
