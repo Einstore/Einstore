@@ -1,0 +1,521 @@
+{
+	"info": {
+		"name": "Boost 2",
+		"_postman_id": "8fa44547-1ad4-e1fb-53c1-9f93fe4a89b2",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Install",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"admin@liveui.io\",\n\t\"password\": \"password123\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}install",
+					"host": [
+						"{{SERVER}}install"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Demo",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"admin@liveui.io\",\n\t\"password\": \"password123\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}demo",
+					"host": [
+						"{{SERVER}}demo"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Re-Install",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"admin@liveui.io\",\n\t\"password\": \"password123\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}reinstall",
+					"host": [
+						"{{SERVER}}reinstall"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Un-Install",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"admin@liveui.io\",\n\t\"password\": \"password123\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}uninstall",
+					"host": [
+						"{{SERVER}}uninstall"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Auth (BASIC)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW5AbGl2ZXVpLmlvOmFkbWlu"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"admin@liveui.io\",\n\t\"password\": \"password123\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}auth",
+					"host": [
+						"{{SERVER}}auth"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Auth",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"admin@liveui.io\",\n\t\"password\": \"admin\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}auth",
+					"host": [
+						"{{SERVER}}auth"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Upload",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token XXXXXX-XXXXXX-XXXXX-XXXX-XXXXXX"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}apps/upload?tags=[tag1,tag2,tag3,tag4]",
+					"host": [
+						"{{SERVER}}apps"
+					],
+					"path": [
+						"upload"
+					],
+					"query": [
+						{
+							"key": "tags",
+							"value": "[tag1,tag2,tag3,tag4]",
+							"equals": true
+						}
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Teams (teams)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}teams",
+					"host": [
+						"{{SERVER}}teams"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Teams (teams)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7f0250dc-4854-4613-8165-9bbf5a712a4e",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 201\"] = responseCode.code === 201;",
+							"",
+							"// Token check",
+							"tests[\"Team has an id\"] = (jsonData[\"id\"] > 0)",
+							"tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
+							"tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
+							"",
+							"postman.setEnvironmentVariable(\"TEST_TEAM_ID\", jsonData[\"id\"]);",
+							"",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin8\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}teams",
+					"host": [
+						"{{SERVER}}teams"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Teams (teams/check)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"identifier\": \"admin\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/check",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"check"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Teams (teams/:id)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Teams (teams/:id)",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Teams (teams/:id)",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Teams (teams/:id)",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Apps list",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{SERVER}}apps",
+					"host": [
+						"{{SERVER}}apps"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Apps",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"App\",\n  \"identifier\": \"identifier\",\n  \"platform\": 1,\n  \"size\": 12312,\n  \"detail\": \"detail\",\n  \"info\": \"info\",\n  \"commit\": \"commit\",\n  \"message\": \"message\",\n  \"devices\": \"devices\",\n  \"version\": \"version\",\n  \"build\": \"build\",\n  \"categoryId\": 1\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}apps",
+					"host": [
+						"{{SERVER}}apps"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Users",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{SERVER}}users",
+					"host": [
+						"{{SERVER}}users"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Register",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"firstname\": \"Ondrej\",\n\t\"lastname\": \"Rafaj\",\n\t\"email\": \"ondrej.rafaj@gmail.com\",\n\t\"password\": \"exploited3330\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}register",
+					"host": [
+						"{{SERVER}}register"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Teams",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{SERVER}}teams",
+					"host": [
+						"{{SERVER}}teams"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Unknown URL",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{SERVER}}unknown",
+					"host": [
+						"{{SERVER}}unknown"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Show tables",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{SERVER}}tables",
+					"host": [
+						"{{SERVER}}tables"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		}
+	]
+}

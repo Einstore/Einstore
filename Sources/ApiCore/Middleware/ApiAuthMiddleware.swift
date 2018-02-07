@@ -34,14 +34,14 @@ public final class ApiAuthMiddleware: Middleware, ServiceFactory {
         return self
     }
     
-    lazy var allowedUri: [String] = [
+    public static var allowedUri: [String] = [
         "/auth",
         "/token",
         "/ping",
         "/teapot"
     ]
     
-    lazy var debugUri: [String] = [
+    public static var debugUri: [String] = [
         "/install",
         "/demo",
         "/tables",
@@ -51,7 +51,7 @@ public final class ApiAuthMiddleware: Middleware, ServiceFactory {
     
     public func respond(to req: Request, chainingTo next: Responder) throws -> Future<Response> {
         // Maintenance URI
-        if debugUri.contains(req.http.uri.path) {
+        if ApiAuthMiddleware.debugUri.contains(req.http.uri.path) {
             printUrl(req: req, type: .maintenance)
             
             if req.environment != .production {
@@ -65,7 +65,7 @@ public final class ApiAuthMiddleware: Middleware, ServiceFactory {
         }
         
         // Secured URI
-        guard allowedUri.contains(req.http.uri.path) else {
+        guard ApiAuthMiddleware.allowedUri.contains(req.http.uri.path) else {
             printUrl(req: req, type: .secured)
             
 //            let authCache = AuthenticationCache(userId: 1, teamIds: [1])

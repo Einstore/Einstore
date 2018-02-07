@@ -36,9 +36,8 @@ class Ipa: BaseExtractor, Extractor {
                 try self.parse()
                 try self.cleanUp()
                 
-                // TODO: Don't force unwrap!!!
-                let app = App(teamId: teamId, name: appName!, identifier: appIdentifier!, version: versionLong!, build: versionShort!, platform: .iOS)
-                promise.complete(app)
+                let a = try app(platform: .iOS, teamId: teamId)
+                promise.complete(a)
             } catch {
                 promise.fail(error)
             }
@@ -63,22 +62,17 @@ extension Ipa {
         var embeddedFile: URL = payload
         embeddedFile.appendPathComponent("embedded.mobileprovision")
         // TODO: Fix by decoding the provisioning file!!!!
-        guard let fileData = try? Data(contentsOf: embeddedFile) else {
-            return
-        }
-        let str = NSString(data: fileData, encoding: String.Encoding.utf8.rawValue)
-        print("\(str)")
         guard let provisioning: String = try? String(contentsOfFile: embeddedFile.path, encoding: String.Encoding.utf8) else {
             return
         }
         if provisioning.contains("ProvisionsAllDevices") {
-            data["provisioning"] = "enterprise"
+            infoData["provisioning"] = "enterprise"
         }
         else if provisioning.contains("ProvisionedDevices") {
-            data["provisioning"] = "adhoc"
+            infoData["provisioning"] = "adhoc"
         }
         else {
-            data["provisioning"] = "appstore"
+            infoData["provisioning"] = "appstore"
         }
     }
     
@@ -105,19 +99,19 @@ extension Ipa {
         
         // Other plist data
         if let minOS: String = plist["MinimumOSVersion"] as? String {
-            data["minOS"] = minOS
+            infoData["minOS"] = minOS
         }
         if let orientationPhone: [String] = plist["UISupportedInterfaceOrientations"] as? [String] {
-            data["orientationPhone"] = orientationPhone
+            infoData["orientationPhone"] = orientationPhone
         }
         if let orientationTablet: [String] = plist["UISupportedInterfaceOrientations~ipad"] as? [String] {
-            data["orientationTablet"] = orientationTablet
+            infoData["orientationTablet"] = orientationTablet
         }
         if let deviceCapabilities: [String] = plist["UIRequiredDeviceCapabilities"] as? [String] {
-            data["deviceCapabilities"] = deviceCapabilities
+            infoData["deviceCapabilities"] = deviceCapabilities
         }
         if let deviceFamily: [String] = plist["UIDeviceFamily"] as? [String] {
-            data["deviceFamily"] = deviceFamily
+            infoData["deviceFamily"] = deviceFamily
         }
     }
     

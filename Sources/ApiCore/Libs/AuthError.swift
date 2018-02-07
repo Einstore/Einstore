@@ -10,7 +10,7 @@ import ApiErrors
 import Vapor
 
 
-enum AuthError: FrontendError {
+public enum AuthError: FrontendError {
     case authenticationFailed
     
     public var code: String {

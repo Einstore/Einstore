@@ -17,6 +17,8 @@ import DbCore
 
 public class Boost {
     
+    public static var uploadsRequireKey: Bool = false
+    
     public static func boot(_ app: Application) throws {
         
     }
@@ -35,13 +37,17 @@ public class Boost {
         }
     }
     
-    public static func configure(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
+    public static func configure(boostConfig: inout BoostConfig, _ config: inout Config, _ env: inout Vapor.Environment, _ services: inout Services) throws {
+        guard let database = boostConfig.database else {
+            fatalError("Missing database configuration in BoostConfig")
+        }
+        
         DbCore.migrationConfig.add(model: App.self, database: .db)
         DbCore.migrationConfig.add(model: Tag.self, database: .db)
         DbCore.migrationConfig.add(model: UploadKey.self, database: .db)
         
         try ApiCore.configure(&config, &env, &services)
-        try DbCore.configure(&config, &env, &services)
+        try DbCore.configure(databaseConfig: database, &config, &env, &services)
     }
     
 }

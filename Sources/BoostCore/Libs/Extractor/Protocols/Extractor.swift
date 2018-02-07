@@ -13,6 +13,7 @@ import DbCore
 
 
 enum ExtractorError: FrontendError {
+    case unsupportedFile
     case invalidAppContent
     
     public var code: String {
@@ -20,11 +21,16 @@ enum ExtractorError: FrontendError {
     }
     
     public var status: HTTPStatus {
-        return .unsupportedMediaType
+        switch self {
+        default:
+            return .preconditionFailed
+        }
     }
     
     public var description: String {
         switch self {
+        case .unsupportedFile:
+            return "Invalid file type"
         case .invalidAppContent:
             return "Invalid or unsupported app content"
         }
@@ -48,10 +54,29 @@ protocol Extractor {
 
 extension Extractor {
     
-//    func app() throws -> App {
-//        let app = App(id: nil, name: appName ?? "")
-//
-//        return app
-//    }
+    var binUrl: URL {
+        get {
+            // TODO: Make path to resources dynamic!!!!!
+            let config = DirectoryConfig.default()
+            print(config.workDir)
+            
+            var url: URL = URL(fileURLWithPath: "/Projects/Web/Boost/Resources/")
+            url.appendPathComponent("bin")
+            return url
+        }
+    }
+    
+    func app(platform: App.Platform, teamId: DbCoreIdentifier) throws -> App {
+        guard let appName = appName, let appIdentifier = appIdentifier, let versionLong = versionLong, let versionShort = versionShort else {
+            throw ExtractorError.invalidAppContent
+        }
+        let app = App(teamId: teamId, name: appName, identifier: appIdentifier, version: versionLong, build: versionShort, platform: platform)
+        return app
+    }
+    
+    func save() throws {
+        // Save file
+        // Save icon
+    }
     
 }

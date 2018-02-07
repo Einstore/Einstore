@@ -11,7 +11,7 @@ import Vapor
 
 extension HTTPHeaders {
     
-    var authorizationToken: String? {
+    public var authorizationToken: String? {
         guard let token = self[HTTPHeaderName.authorization] else {
             return nil
         }

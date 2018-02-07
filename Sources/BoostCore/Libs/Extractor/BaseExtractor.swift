@@ -10,31 +10,18 @@ import Foundation
 
 class BaseExtractor {
     
-    enum BaseExtractorError: Error {
-        case unsupportedFile
-    }
-    
     var iconData: Data?
     var appName: String?
     var appIdentifier: String?
     var versionShort: String?
     var versionLong: String?
     
-    var data: [String: Any] = [:]
+    var infoData: [String: Codable] = [:]
     
     var file: URL
     var archive: URL
     
     let sessionUUID: String = UUID().uuidString
-    
-    var binUrl: URL {
-        get {
-            // TODO: Make path to resources dynamic!!!!!
-            var url: URL = URL(fileURLWithPath: "/Projects/Web/Boost/Resources/")
-            url.appendPathComponent("bin")
-            return url
-        }
-    }
     
     // MARK: Initialization
     
@@ -58,7 +45,7 @@ class BaseExtractor {
         case "apk":
             return try Apk(file: url)
         default:
-            throw BaseExtractorError.unsupportedFile
+            throw ExtractorError.unsupportedFile
         }
     }
     

@@ -157,9 +157,8 @@ class Apk: BaseExtractor, Extractor {
             try getOtherApplicationInfo()
             try getApplicationIcon()
             
-            // TODO: Don't force unwrap!!!
-            let app = App(teamId: teamId, name: appName!, identifier: appIdentifier!, version: versionLong!, build: versionShort!, platform: .android)
-            promise.complete(app)
+            let a = try app(platform: .iOS, teamId: teamId)
+            promise.complete(a)
         } catch {
             promise.fail(error)
         }
