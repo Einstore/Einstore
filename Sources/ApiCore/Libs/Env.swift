@@ -8,15 +8,15 @@
 import Foundation
 
 
-public class Environment {
+public class Env {
     
-    static var env: [String: String] {
+    static var data: [String: String] {
         return ProcessInfo.processInfo.environment as [String: String]
     }
     
     public static func print() {
         Swift.print("Environment variables:")
-        env.sorted(by: { (item1, item2) -> Bool in
+        data.sorted(by: { (item1, item2) -> Bool in
             item1.key < item2.key
         }).forEach { item in
             Swift.print("\t\(item.key)=\(item.value)")
