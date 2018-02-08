@@ -117,13 +117,13 @@ Coming with version 3, Vapor has become fully asynchronous and non-blocking whic
 
 #### Docker
 
-```ruby
-docker install boost
+```bash
+docker run -d -p 8080:8080 --name appstore liveui/boost
 ```
 
 #### macOS
 
-```ruby
+```bash
 #brew install mysql
 #brew install python
 #brew install java
@@ -132,7 +132,7 @@ brew install boost
 
 #### Ubuntu 16.04 LTS
 
-```ruby
+```bash
 #brew install mysql
 #brew install python
 #brew install java
