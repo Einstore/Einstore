@@ -8,7 +8,7 @@
 import Foundation
 import Vapor
 import Fluent
-import FluentMySQL
+import FluentPostgreSQL
 import DbCore
 import ApiCore
 
@@ -82,16 +82,16 @@ extension App: Migration {
     
     public static func prepare(on connection: Database.Connection) -> Future<Void> {
         return Database.create(self, on: connection) { (schema: SchemaBuilder<App>) in
-            schema.addField(type: ColumnType.uint32(length: 11), name: CodingKeys.id.stringValue, isIdentifier: true)
-            schema.addField(type: ColumnType.uint32(length: 11), name: CodingKeys.teamId.stringValue)
-            schema.addField(type: ColumnType.varChar(length: 140), name: CodingKeys.name.stringValue)
-            schema.addField(type: ColumnType.varChar(length: 140), name: CodingKeys.identifier.stringValue)
-            schema.addField(type: ColumnType.varChar(length: 20), name: CodingKeys.version.stringValue)
-            schema.addField(type: ColumnType.varChar(length: 20), name: CodingKeys.build.stringValue)
-            schema.addField(type: ColumnType.varChar(length: 10), name: CodingKeys.platform.stringValue)
-            schema.addField(type: ColumnType.datetime(), name: CodingKeys.created.stringValue)
-            schema.addField(type: ColumnType.datetime(), name: CodingKeys.modified.stringValue)
-            schema.addField(type: ColumnType.uint8(length: 1), name: CodingKeys.availableToAll.stringValue)
+            schema.addField(type: DbCoreColumnType.uint32(length: 11), name: CodingKeys.id.stringValue, isIdentifier: true)
+            schema.addField(type: DbCoreColumnType.uint32(length: 11), name: CodingKeys.teamId.stringValue)
+            schema.addField(type: DbCoreColumnType.varChar(length: 140), name: CodingKeys.name.stringValue)
+            schema.addField(type: DbCoreColumnType.varChar(length: 140), name: CodingKeys.identifier.stringValue)
+            schema.addField(type: DbCoreColumnType.varChar(length: 20), name: CodingKeys.version.stringValue)
+            schema.addField(type: DbCoreColumnType.varChar(length: 20), name: CodingKeys.build.stringValue)
+            schema.addField(type: DbCoreColumnType.varChar(length: 10), name: CodingKeys.platform.stringValue)
+            schema.addField(type: DbCoreColumnType.datetime(), name: CodingKeys.created.stringValue)
+            schema.addField(type: DbCoreColumnType.datetime(), name: CodingKeys.modified.stringValue)
+            schema.addField(type: DbCoreColumnType.uint8(length: 1), name: CodingKeys.availableToAll.stringValue)
         }
     }
     

@@ -8,7 +8,7 @@
 import Foundation
 import Vapor
 import ApiCore
-import FluentMySQL
+import FluentPostgreSQL
 import DbCore
 import ErrorsCore
 

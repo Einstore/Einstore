@@ -7,7 +7,9 @@
 
 import Foundation
 import Vapor
-
+import PostgreSQL
+import FluentPostgreSQL
+import Fluent
 
 public struct Helpers {
     
@@ -23,8 +25,12 @@ public struct Helpers {
 extension Helpers {
     
     public func showTables() -> Future<[String]> {
-        return request.withPooledConnection(to: .db) { (db) -> Future<[String]> in
-            return db.all(String.self, in: "SHOW TABLES")
+        return request.withPooledConnection(to: .db) { (db: PostgreSQLDatabase.Connection) -> Future<[String]> in
+//            return db.all(String.self, in: "SHOW TABLES")
+            
+            let promise = Promise<[String]>()
+            promise.complete(["n/a"])
+            return promise.future
         }
     }
     

@@ -7,7 +7,7 @@
 
 import Foundation
 import Vapor
-import FluentMySQL
+import FluentPostgreSQL
 
 
 public class UsersController: Controller {

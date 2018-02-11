@@ -24,19 +24,19 @@ public class InstallController: Controller {
             return try req.response.maintenanceFinished(message: "Demo install finished")
         }
         
-        router.get("uninstall") { req in
-            return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
-                return req.dbHelpers.showTables().flatMap(to: Response.self, { (tables) -> Future<Response> in
-                    var arr: [Future<Void>] = []
-                    for table in tables {
-                        arr.append(db.administrativeQuery("DROP TABLE `\(table)`;"))
-                    }
-                    return arr.map(to: Response.self, { () -> Response in
-                        return try req.response.maintenanceFinished(message: "Un-install finished")
-                    })
-                })
-            }
-        }
+//        router.get("uninstall") { req in
+//            return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
+//                return req.dbHelpers.showTables().flatMap(to: Response.self, { (tables) -> Future<Response> in
+//                    var arr: [Future<Void>] = []
+//                    for table in tables {
+//                        arr.append(db.administrativeQuery("DROP TABLE `\(table)`;"))
+//                    }
+//                    return arr.map(to: Response.self, { () -> Response in
+//                        return try req.response.maintenanceFinished(message: "Un-install finished")
+//                    })
+//                })
+//            }
+//        }
         
         router.get("reinstall") { (req)->Future<Response> in
             return req.withPooledConnection(to: .db) { (db) -> Future<Response> in

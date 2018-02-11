@@ -10,7 +10,7 @@ import Vapor
 import ApiCore
 import DbCore
 import Fluent
-import FluentMySQL
+import FluentPostgreSQL
 
 
 class TagsController: Controller {

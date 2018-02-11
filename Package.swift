@@ -4,12 +4,10 @@ import PackageDescription
 let package = Package(
     name: "Boost",
     dependencies: [
-        .package(url: "https://github.com/vapor/vapor.git", .branch("beta")),
-        .package(url: "https://github.com/vapor/mysql.git", .branch("beta")),
-        .package(url: "https://github.com/vapor/mysql-driver.git", .branch("beta")),
-        .package(url: "https://github.com/vapor/fluent.git", .branch("beta")),
-        .package(url: "https://github.com/vapor/redis.git", .branch("beta")),
-        .package(url: "https://github.com/vapor/jwt.git", .branch("beta")),
+        .package(url: "https://github.com/vapor/vapor.git", .exact("3.0.0-beta.1")),
+        .package(url: "https://github.com/twof/fluent-postgresql.git", .branch("beta")),
+        .package(url: "https://github.com/vapor/fluent.git", .exact("3.0.0-beta.1")),
+//        .package(url: "https://github.com/vapor/jwt.git", .branch("beta")),
         .package(url: "https://github.com/manGoweb/MimeLib.git", .exact("1.0.0")),
         .package(url: "https://github.com/kareman/SwiftShell.git", .exact("4.0.0"))
     ],
@@ -22,45 +20,28 @@ let package = Package(
             ]
         ),
         .target(
-            name: "ApiErrors",
+            name: "ErrorsCore",
             dependencies: [
                 "Vapor"
-            ]
-        ),
-        .target(
-            name: "SQLEncoder",
-            dependencies: [
-            ]
-        ),
-        .target(
-            name: "MySQLPool",
-            dependencies: [
-                "Vapor",
-                "MySQL"
             ]
         ),
         .target(
             name: "DbCore",
             dependencies: [
                 "Vapor",
-                "MySQL",
                 "Fluent",
-                "FluentMySQL",
-                "ApiErrors"
+                "FluentPostgreSQL",
+                "ErrorsCore"
             ]
         ),
         .target(
             name: "BoostCore",
             dependencies: [
                 "Vapor",
-                "MySQL",
                 "Fluent",
-                "FluentMySQL",
-                "Redis",
-                "JWT",
+                "FluentPostgreSQL",
                 "ApiCore",
-                "ApiErrors",
-                "SQLEncoder",
+                "ErrorsCore",
                 "DbCore",
                 "SwiftShell"
             ]
@@ -69,11 +50,9 @@ let package = Package(
             name: "ApiCore",
             dependencies: [
                 "Vapor",
-                "MySQL",
                 "Fluent",
-                "FluentMySQL",
-                "ApiErrors",
-                "SQLEncoder",
+                "FluentPostgreSQL",
+                "ErrorsCore",
                 "DbCore"
             ]
         ),
@@ -84,7 +63,7 @@ let package = Package(
         .testTarget(name: "ApiCoreTests", dependencies: ["ApiCore"]),
         .testTarget(name: "BoostCoreTests", dependencies: ["BoostCore"]),
         .testTarget(name: "DbCoreTests", dependencies: ["DbCore"]),
-        .testTarget(name: "ApiErrorsTests", dependencies: ["ApiErrors"]),
+        .testTarget(name: "ErrorsCoreTests", dependencies: ["ErrorsCore"]),
         ]
 )
 

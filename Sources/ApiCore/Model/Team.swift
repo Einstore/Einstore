@@ -8,7 +8,7 @@
 import Foundation
 import Vapor
 import Fluent
-import FluentMySQL
+import FluentPostgreSQL
 import DbCore
 import ErrorsCore
 
@@ -45,7 +45,7 @@ public final class Team: DbCoreModel {
     public var name: String
     public var identifier: String
     
-    public init(name: String, identifier: String) {
+    public init(id: ID? = nil, name: String, identifier: String) {
         self.name = name
         self.identifier = identifier
     }
@@ -69,13 +69,13 @@ extension Team {
     
     public static var idKey = \Team.id
     
-    public static func prepare(on connection: Database.Connection) -> Future<Void> {
-        return Database.create(self, on: connection) { (schema: SchemaBuilder<Team>) in
-            schema.addField(type: ColumnType.uint32(length: 11), name: CodingKeys.id.stringValue, isIdentifier: true)
-            schema.addField(type: ColumnType.varChar(length: 40), name: CodingKeys.name.stringValue)
-            schema.addField(type: ColumnType.varChar(length: 40), name: CodingKeys.identifier.stringValue)
-        }
-    }
+//    public static func prepare(on connection: Database.Connection) -> Future<Void> {
+//        return Database.create(self, on: connection) { (schema: SchemaBuilder<Team>) in
+//            schema.addField(type: DbCoreColumnType.uint32(length: 11), name: CodingKeys.id.stringValue, isIdentifier: true)
+//            schema.addField(type: DbCoreColumnType.varChar(length: 40), name: CodingKeys.name.stringValue)
+//            schema.addField(type: DbCoreColumnType.varChar(length: 40), name: CodingKeys.identifier.stringValue)
+//        }
+//    }
     
 }
 

@@ -8,7 +8,7 @@
 import Foundation
 import Vapor
 import Fluent
-import FluentMySQL
+import FluentPostgreSQL
 import DbCore
 import ApiCore
 
@@ -54,11 +54,11 @@ extension UploadKey: Migration {
     
     public static func prepare(on connection: Database.Connection) -> Future<Void> {
         return Database.create(self, on: connection) { (schema: SchemaBuilder<UploadKey>) in
-            schema.addField(type: ColumnType.uint32(length: 11), name: CodingKeys.id.stringValue, isIdentifier: true)
-            schema.addField(type: ColumnType.uint32(length: 11), name: CodingKeys.teamId.stringValue)
-            schema.addField(type: ColumnType.varChar(length: 60), name: CodingKeys.name.stringValue)
-            schema.addField(type: ColumnType.datetime(), name: CodingKeys.expires.stringValue, isOptional: true)
-            schema.addField(type: ColumnType.varChar(length: 64), name: CodingKeys.token.stringValue)
+            schema.addField(type: DbCoreColumnType.uint32(length: 11), name: CodingKeys.id.stringValue, isIdentifier: true)
+            schema.addField(type: DbCoreColumnType.uint32(length: 11), name: CodingKeys.teamId.stringValue)
+            schema.addField(type: DbCoreColumnType.varChar(length: 60), name: CodingKeys.name.stringValue)
+            schema.addField(type: DbCoreColumnType.datetime(), name: CodingKeys.expires.stringValue, isOptional: true)
+            schema.addField(type: DbCoreColumnType.varChar(length: 64), name: CodingKeys.token.stringValue)
         }
     }
     

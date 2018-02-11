@@ -8,7 +8,7 @@
 import Foundation
 import Vapor
 import Fluent
-import FluentMySQL
+import FluentPostgreSQL
 import DbCore
 
 
@@ -60,6 +60,16 @@ public final class User: DbCoreModel {
         public var registered: Date
         public var disabled: Bool
         public var su: Bool
+        
+        init(firstname: String, lastname: String, email: String, expires: Date? = nil, disabled: Bool = true, su: Bool = false) {
+            self.firstname = firstname
+            self.lastname = lastname
+            self.email = email
+            self.expires = expires
+            self.registered = Date()
+            self.disabled = disabled
+            self.su = su
+        }
     }
     
     public var id: ID?
@@ -105,20 +115,20 @@ extension User {
     
     public static var idKey = \User.id
     
-    public static func prepare(on connection: Database.Connection) -> Future<Void> {
-        return Database.create(self, on: connection) { (schema: SchemaBuilder<User>) in
-            schema.addField(type: ColumnType.uint32(length: 11), name: CodingKeys.id.stringValue, isIdentifier: true)
-            schema.addField(type: ColumnType.varChar(length: 80), name: CodingKeys.firstname.stringValue)
-            schema.addField(type: ColumnType.varChar(length: 80), name: CodingKeys.lastname.stringValue)
-            schema.addField(type: ColumnType.varChar(length: 140), name: CodingKeys.email.stringValue)
-            schema.addField(type: ColumnType.varChar(length: 64), name: CodingKeys.password.stringValue)
-            schema.addField(type: ColumnType.varChar(length: 64), name: CodingKeys.token.stringValue)
-            schema.addField(type: ColumnType.datetime(), name: CodingKeys.expires.stringValue)
-            schema.addField(type: ColumnType.datetime(), name: CodingKeys.registered.stringValue)
-            schema.addField(type: ColumnType.uint8(length: 1), name: CodingKeys.disabled.stringValue)
-            schema.addField(type: ColumnType.uint8(length: 1), name: CodingKeys.su.stringValue)
-        }
-    }
+//    public static func prepare(on connection: Database.Connection) -> Future<Void> {
+//        return Database.create(self, on: connection) { (schema: SchemaBuilder<User>) in
+//            schema.addField(type: DbCoreColumnType(type: PostgreSQLDataType.int8, size: 11), name: CodingKeys.id.stringValue, isIdentifier: true)
+//            schema.addField(type: DbCoreColumnType.varChar(length: 80), name: CodingKeys.firstname.stringValue)
+//            schema.addField(type: DbCoreColumnType.varChar(length: 80), name: CodingKeys.lastname.stringValue)
+//            schema.addField(type: DbCoreColumnType.varChar(length: 140), name: CodingKeys.email.stringValue)
+//            schema.addField(type: DbCoreColumnType.varChar(length: 64), name: CodingKeys.password.stringValue)
+//            schema.addField(type: DbCoreColumnType.varChar(length: 64), name: CodingKeys.token.stringValue)
+//            schema.addField(type: DbCoreColumnType.datetime(), name: CodingKeys.expires.stringValue)
+//            schema.addField(type: DbCoreColumnType.datetime(), name: CodingKeys.registered.stringValue)
+//            schema.addField(type: DbCoreColumnType.uint8(length: 1), name: CodingKeys.disabled.stringValue)
+//            schema.addField(type: DbCoreColumnType.uint8(length: 1), name: CodingKeys.su.stringValue)
+//        }
+//    }
     
 }
 

@@ -7,11 +7,12 @@
 
 import Foundation
 import Vapor
-import FluentMySQL
+import FluentPostgreSQL
 
 
-public typealias DbCoreDatabase = MySQLDatabase
+public typealias DbCoreDatabase = PostgreSQLDatabase
 public typealias DbCoreIdentifier = Int
+public typealias DbCoreColumnType = PostgreSQLColumn
 
 
 public class DbCore {
@@ -20,8 +21,9 @@ public class DbCore {
     
     public static func config(hostname: String, user: String, password: String?, database: String, port: UInt16 = 3306) -> DatabaseConfig {
         var databaseConfig = DatabaseConfig()
-        let mysql = DbCoreDatabase(hostname: hostname, port: port, user: user, password: password, database: database)
-        databaseConfig.add(database: mysql, as: .db)
+        let config = PostgreSQLDatabaseConfig(hostname: hostname, port: port, username: user, database: database, password: password)
+        let database = DbCoreDatabase(config: config)
+        databaseConfig.add(database: database, as: .db)
         return databaseConfig
     }
     
@@ -36,7 +38,7 @@ public class DbCore {
     }
     
     public static func configure(databaseConfig: DatabaseConfig,_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
-        try services.register(FluentMySQLProvider())
+        try services.register(FluentPostgreSQLProvider())
         
         services.register(databaseConfig)
         services.register(migrationConfig)

@@ -7,7 +7,7 @@
 
 import Foundation
 import Fluent
-import FluentMySQL
+import FluentPostgreSQL
 
 
 extension DatabaseIdentifier {

@@ -8,7 +8,7 @@
 import Foundation
 import Vapor
 import Fluent
-import FluentMySQL
+import FluentPostgreSQL
 import DbCore
 
 
@@ -63,14 +63,14 @@ extension Token {
     
     public static var idKey = \Token.id
     
-    public static func prepare(on connection: Database.Connection) -> Future<Void> {
-        return Database.create(self, on: connection) { (schema: SchemaBuilder<Token>) in
-            schema.addField(type: ColumnType.uint32(length: 11), name: CodingKeys.id.stringValue, isIdentifier: true)
-            schema.addField(type: ColumnType.uint32(length: 11), name: "user_id")
-            schema.addField(type: ColumnType.varChar(length: 64), name: CodingKeys.token.stringValue)
-            schema.addField(type: ColumnType.datetime(), name: CodingKeys.expires.stringValue)
-        }
-    }
+//    public static func prepare(on connection: Database.Connection) -> Future<Void> {
+//        return Database.create(self, on: connection) { (schema: SchemaBuilder<Token>) in
+//            schema.addField(type: DbCoreColumnType.uint32(length: 11), name: CodingKeys.id.stringValue, isIdentifier: true)
+//            schema.addField(type: DbCoreColumnType.uint32(length: 11), name: "user_id")
+//            schema.addField(type: DbCoreColumnType.varChar(length: 64), name: CodingKeys.token.stringValue)
+//            schema.addField(type: DbCoreColumnType.datetime(), name: CodingKeys.expires.stringValue)
+//        }
+//    }
     
 }
 

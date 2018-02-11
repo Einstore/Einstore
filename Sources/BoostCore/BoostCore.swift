@@ -11,7 +11,7 @@ import ApiCore
 import ErrorsCore
 import SQLEncoder
 import Fluent
-import FluentMySQL
+import FluentPostgreSQL
 import DbCore
 
 

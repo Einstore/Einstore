@@ -9,7 +9,7 @@ import Foundation
 import DbCore
 import Vapor
 import Fluent
-import FluentMySQL
+import FluentPostgreSQL
 
 
 public typealias Tags = [Tag]
@@ -45,9 +45,9 @@ extension Tag: Migration {
     
     public static func prepare(on connection: Database.Connection) -> Future<Void> {
         return Database.create(self, on: connection) { (schema: SchemaBuilder<Tag>) in
-            schema.addField(type: ColumnType.uint64(length: 20), name: CodingKeys.id.stringValue, isIdentifier: true)
-            schema.addField(type: ColumnType.varChar(length: 60), name: CodingKeys.name.stringValue)
-            schema.addField(type: ColumnType.varChar(length: 60), name: CodingKeys.identifier.stringValue)
+            schema.addField(type: DbCoreColumnType.uint64(length: 20), name: CodingKeys.id.stringValue, isIdentifier: true)
+            schema.addField(type: DbCoreColumnType.varChar(length: 60), name: CodingKeys.name.stringValue)
+            schema.addField(type: DbCoreColumnType.varChar(length: 60), name: CodingKeys.identifier.stringValue)
         }
     }
     
