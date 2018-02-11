@@ -9,7 +9,7 @@ import Foundation
 import Vapor
 import FluentMySQL
 import DbCore
-import ApiErrors
+import ErrorsCore
 
 
 public class ApiCore {
@@ -38,7 +38,7 @@ public class ApiCore {
         DbCore.migrationConfig.add(model: User.self, database: .db)
         
         ApiCore.middlewareConfig.use(ApiAuthMiddleware.self)
-        ApiCore.middlewareConfig.use(ApiErrorsMiddleware.self)
+        ApiCore.middlewareConfig.use(ErrorsCoreMiddleware.self)
         ApiCore.middlewareConfig.use(DateMiddleware.self)
         
         services.register { container -> MiddlewareConfig in
@@ -46,7 +46,7 @@ public class ApiCore {
         }
         
         let logger = PrintLogger()
-        services.register(ApiErrorsMiddleware(environment: env, log: logger))
+        services.register(ErrorsCoreMiddleware(environment: env, log: logger))
         services.register(ApiAuthMiddleware())
         
         // Authentication

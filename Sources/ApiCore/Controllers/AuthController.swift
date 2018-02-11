@@ -10,7 +10,7 @@ import Vapor
 import FluentMySQL
 import DbCore
 import Crypto
-import ApiErrors
+import ErrorsCore
 
 
 public class AuthController: Controller {

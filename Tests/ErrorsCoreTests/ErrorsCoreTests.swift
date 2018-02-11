@@ -3,7 +3,7 @@ import Dispatch
 import XCTest
 
 
-final class ApiErrorsTests : XCTestCase {
+final class ErrorsCoreTests : XCTestCase {
     
     func testNothing() throws {
         XCTAssert(true)

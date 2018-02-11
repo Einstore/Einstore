@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import ApiErrors
+import ErrorsCore
 import Vapor
 
 

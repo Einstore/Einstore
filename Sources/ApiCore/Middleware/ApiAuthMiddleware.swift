@@ -11,7 +11,7 @@ import Debugging
 import HTTP
 import Service
 import Vapor
-import ApiErrors
+import ErrorsCore
 
 
 public final class ApiAuthMiddleware: Middleware, ServiceFactory {

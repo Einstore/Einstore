@@ -10,7 +10,7 @@ import Vapor
 import Fluent
 import FluentMySQL
 import DbCore
-import ApiErrors
+import ErrorsCore
 
 
 public typealias Teams = [Team]

@@ -7,7 +7,7 @@
 
 import Foundation
 import Vapor
-import ApiErrors
+import ErrorsCore
 
 
 public enum DbError: FrontendError {

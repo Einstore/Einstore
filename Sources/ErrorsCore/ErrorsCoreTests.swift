@@ -1,6 +1,6 @@
 //
-//  ApiErrors.swift
-//  ApiErrors
+//  ErrorsCore.swift
+//  ErrorsCore
 //
 //  Created by Ondrej Rafaj on 09/12/2017.
 //

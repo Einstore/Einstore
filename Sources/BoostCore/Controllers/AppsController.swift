@@ -10,7 +10,7 @@ import Vapor
 import ApiCore
 import FluentMySQL
 import DbCore
-import ApiErrors
+import ErrorsCore
 
 
 class AppsController: Controller {
@@ -22,7 +22,7 @@ class AppsController: Controller {
             let token: String
             if Boost.uploadsRequireKey {
                 guard let t = req.http.headers.authorizationToken?.passwordHash else {
-                    throw ApiErrors.HTTPError.missingAuthorizationData
+                    throw ErrorsCore.HTTPError.missingAuthorizationData
                 }
                 token = t
             }

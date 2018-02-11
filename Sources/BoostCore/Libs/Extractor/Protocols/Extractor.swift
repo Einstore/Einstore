@@ -7,7 +7,7 @@
 
 import Foundation
 import Vapor
-import ApiErrors
+import ErrorsCore
 import ApiCore
 import DbCore
 

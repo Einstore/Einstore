@@ -580,7 +580,7 @@
 		OBJ_2057 /* Debugging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Core::Debugging::Product" /* Debugging.framework */; };
 		OBJ_2070 /* SQLEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_18 /* SQLEncoder.swift */; };
 		OBJ_2071 /* SQLSerialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_19 /* SQLSerialization.swift */; };
-		OBJ_2078 /* ApiErrorsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_94 /* ApiErrorsTests.swift */; };
+		OBJ_2078 /* ErrorsCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_94 /* ErrorsCoreTests.swift */; };
 		OBJ_2080 /* ApiErrors.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Boost::ApiErrors::Product" /* ApiErrors.framework */; };
 		OBJ_2081 /* Vapor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Vapor::Vapor::Product" /* Vapor.framework */; };
 		OBJ_2082 /* ServerSecurity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "TLS::ServerSecurity::Product" /* ServerSecurity.framework */; };
@@ -606,7 +606,7 @@
 		OBJ_2102 /* CodableKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Core::CodableKit::Product" /* CodableKit.framework */; };
 		OBJ_2103 /* Async.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Async::Async::Product" /* Async.framework */; };
 		OBJ_2104 /* Debugging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Core::Debugging::Product" /* Debugging.framework */; };
-		OBJ_2134 /* ApiErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* ApiErrors.swift */; };
+		OBJ_2134 /* ErrorsCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* ErrorsCoreTests.swift */; };
 		OBJ_2135 /* Request+Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* Request+Errors.swift */; };
 		OBJ_2136 /* ApiErrorsMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_13 /* ApiErrorsMiddleware.swift */; };
 		OBJ_2137 /* UrlDebugMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_14 /* UrlDebugMiddleware.swift */; };
@@ -5744,9 +5744,9 @@
 		OBJ_87 /* boot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = boot.swift; sourceTree = "<group>"; };
 		OBJ_88 /* configure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = configure.swift; sourceTree = "<group>"; };
 		OBJ_89 /* routes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = routes.swift; sourceTree = "<group>"; };
-		OBJ_9 /* ApiErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiErrors.swift; sourceTree = "<group>"; };
+		OBJ_9 /* ErrorsCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorsCoreTests.swift; sourceTree = "<group>"; };
 		OBJ_91 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		OBJ_94 /* ApiErrorsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiErrorsTests.swift; sourceTree = "<group>"; };
+		OBJ_94 /* ErrorsCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorsCoreTests.swift; sourceTree = "<group>"; };
 		OBJ_96 /* ApiCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiCoreTests.swift; sourceTree = "<group>"; };
 		OBJ_97 /* String+CryptoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+CryptoTests.swift"; sourceTree = "<group>"; };
 		OBJ_99 /* DbCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DbCoreTests.swift; sourceTree = "<group>"; };
@@ -8450,7 +8450,7 @@
 		OBJ_7 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_8 /* ApiErrors */,
+				OBJ_8 /* ErrorsCore */,
 				OBJ_17 /* SQLEncoder */,
 				OBJ_20 /* DbCore */,
 				OBJ_32 /* ApiCore */,
@@ -8735,16 +8735,16 @@
 			path = Streams;
 			sourceTree = "<group>";
 		};
-		OBJ_8 /* ApiErrors */ = {
+		OBJ_8 /* ErrorsCore */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_9 /* ApiErrors.swift */,
+				OBJ_9 /* ErrorsCoreTests.swift */,
 				OBJ_10 /* Extensions */,
 				OBJ_12 /* Middleware */,
 				OBJ_15 /* Protocols */,
 			);
-			name = ApiErrors;
-			path = Sources/ApiErrors;
+			name = ErrorsCore;
+			path = Sources/ErrorsCore;
 			sourceTree = SOURCE_ROOT;
 		};
 		OBJ_80 /* Protocols */ = {
@@ -8840,7 +8840,7 @@
 		OBJ_92 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_93 /* ApiErrorsTests */,
+				OBJ_93 /* ErrorsCoreTests */,
 				OBJ_95 /* ApiCoreTests */,
 				OBJ_98 /* DbCoreTests */,
 				OBJ_100 /* BoostCoreTests */,
@@ -8849,13 +8849,13 @@
 			name = Tests;
 			sourceTree = SOURCE_ROOT;
 		};
-		OBJ_93 /* ApiErrorsTests */ = {
+		OBJ_93 /* ErrorsCoreTests */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_94 /* ApiErrorsTests.swift */,
+				OBJ_94 /* ErrorsCoreTests.swift */,
 			);
-			name = ApiErrorsTests;
-			path = Tests/ApiErrorsTests;
+			name = ErrorsCoreTests;
+			path = Tests/ErrorsCoreTests;
 			sourceTree = SOURCE_ROOT;
 		};
 		OBJ_95 /* ApiCoreTests */ = {
@@ -10826,7 +10826,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_2078 /* ApiErrorsTests.swift in Sources */,
+				OBJ_2078 /* ErrorsCoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10834,7 +10834,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_2134 /* ApiErrors.swift in Sources */,
+				OBJ_2134 /* ErrorsCoreTests.swift in Sources */,
 				OBJ_2135 /* Request+Errors.swift in Sources */,
 				OBJ_2136 /* ApiErrorsMiddleware.swift in Sources */,
 				OBJ_2137 /* UrlDebugMiddleware.swift in Sources */,

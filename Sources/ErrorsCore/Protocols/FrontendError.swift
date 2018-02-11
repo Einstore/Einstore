@@ -1,6 +1,6 @@
 //
 //  FrontendError.swift
-//  ApiErrors
+//  ErrorsCore
 //
 //  Created by Ondrej Rafaj on 14/01/2018.
 //

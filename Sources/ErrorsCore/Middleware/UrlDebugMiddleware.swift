@@ -1,6 +1,6 @@
 //
 //  MyDebugMiddleware.swift
-//  ApiErrors
+//  ErrorsCore
 //
 //  Created by Ondrej Rafaj on 13/12/2017.
 //

@@ -1,6 +1,6 @@
 //
-//  ApiErrorsMiddleware.swift
-//  ApiErrors
+//  ErrorsCoreMiddleware.swift
+//  ErrorsCore
 //
 //  Created by Ondrej Rafaj on 12/12/2017.
 //
@@ -13,9 +13,9 @@ import Service
 import Vapor
 
 
-public final class ApiErrorsMiddleware: Middleware, ServiceFactory {
+public final class ErrorsCoreMiddleware: Middleware, ServiceFactory {
     
-    public var serviceType: Any.Type = ApiErrorsMiddleware.self
+    public var serviceType: Any.Type = ErrorsCoreMiddleware.self
     
     public var serviceSupports: [Any.Type] = []
     
