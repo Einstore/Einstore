@@ -12,7 +12,6 @@ import FluentPostgreSQL
 
 public typealias DbCoreDatabase = PostgreSQLDatabase
 public typealias DbCoreIdentifier = Int
-public typealias DbCoreColumnType = PostgreSQLColumn
 
 
 public class DbCore {

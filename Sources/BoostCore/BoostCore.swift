@@ -9,7 +9,6 @@ import Foundation
 import Vapor
 import ApiCore
 import ErrorsCore
-import SQLEncoder
 import Fluent
 import FluentPostgreSQL
 import DbCore

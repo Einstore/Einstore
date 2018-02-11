@@ -71,9 +71,9 @@ extension Team {
     
 //    public static func prepare(on connection: Database.Connection) -> Future<Void> {
 //        return Database.create(self, on: connection) { (schema: SchemaBuilder<Team>) in
-//            schema.addField(type: DbCoreColumnType.uint32(length: 11), name: CodingKeys.id.stringValue, isIdentifier: true)
-//            schema.addField(type: DbCoreColumnType.varChar(length: 40), name: CodingKeys.name.stringValue)
-//            schema.addField(type: DbCoreColumnType.varChar(length: 40), name: CodingKeys.identifier.stringValue)
+//            schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.id.stringValue, isIdentifier: true)
+//            schema.addField(type: DbCoreColumnType.varChar(40), name: CodingKeys.name.stringValue)
+//            schema.addField(type: DbCoreColumnType.varChar(40), name: CodingKeys.identifier.stringValue)
 //        }
 //    }
     
