@@ -57,7 +57,7 @@ extension Extractor {
     var binUrl: URL {
         get {
             // TODO: Make path to resources dynamic!!!!!
-            let config = DirectoryConfig.default()
+            let config = DirectoryConfig.detect()
             print(config.workDir)
             
             var url: URL = URL(fileURLWithPath: "/Projects/Web/Boost/Resources/")

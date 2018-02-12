@@ -44,16 +44,16 @@ public struct AuthInfo {
     
     public func userId() throws -> DbCoreIdentifier {
         if !ApiCore.configuration.enableUsers || ApiCore.configuration.singleSignOn != nil {
-            return 1
+            return DbCoreIdentifier()
         }
-        return 1
+        return DbCoreIdentifier()
     }
     
     public func teamIds() throws -> [DbCoreIdentifier] {
         if !ApiCore.configuration.enableTeams || ApiCore.configuration.singleSignOn != nil {
-            return [1]
+            return [DbCoreIdentifier()]
         }
-        return [1]
+        return [DbCoreIdentifier()]
     }
     
     // MARK: Private helpers

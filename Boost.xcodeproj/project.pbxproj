@@ -26,6 +26,7 @@
 
 /* Begin PBXBuildFile section */
 		1571B8CD2031097A00E45E3A /* Model+Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1571B8CC2031097A00E45E3A /* Model+Types.swift */; };
+		1571B8D12032218200E45E3A /* String+Tools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1571B8D02032218200E45E3A /* String+Tools.swift */; };
 		OBJ_1072 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_95 /* main.swift */; };
 		OBJ_1074 /* App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Boost::App::Product" /* App.framework */; };
 		OBJ_1075 /* BoostCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Boost::BoostCore::Product" /* BoostCore.framework */; };
@@ -4676,6 +4677,7 @@
 
 /* Begin PBXFileReference section */
 		1571B8CC2031097A00E45E3A /* Model+Types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Model+Types.swift"; sourceTree = "<group>"; };
+		1571B8D02032218200E45E3A /* String+Tools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Tools.swift"; sourceTree = "<group>"; };
 		"Async::Async::Product" /* Async.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Async.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCore::Product" /* ApiCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCoreTests::Product" /* ApiCoreTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = ApiCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -6496,6 +6498,7 @@
 				OBJ_22 /* DatabaseIdentifier+Db.swift */,
 				OBJ_23 /* Request+Tables.swift */,
 				1571B8CC2031097A00E45E3A /* Model+Types.swift */,
+				1571B8D02032218200E45E3A /* String+Tools.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -9904,6 +9907,7 @@
 				OBJ_1634 /* DbError.swift in Sources */,
 				OBJ_1635 /* DatabaseIdentifier+Db.swift in Sources */,
 				OBJ_1636 /* Request+Tables.swift in Sources */,
+				1571B8D12032218200E45E3A /* String+Tools.swift in Sources */,
 				OBJ_1637 /* Helpers.swift in Sources */,
 				1571B8CD2031097A00E45E3A /* Model+Types.swift in Sources */,
 				OBJ_1638 /* CoreDbModel.swift in Sources */,

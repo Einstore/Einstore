@@ -30,6 +30,10 @@ class AppsController: Controller {
                 token = "XXXX-XXXX-XXXX-XXXX"
             }
             
+            // TODO: Make this a proper teamId by checking the API key
+            let teamId = DbCoreIdentifier()
+            
+            
             return req.withPooledConnection(to: .db) { (db) -> Future<App> in
                 return UploadKey.query(on: db).filter(\.token == token).first().flatMap(to: App.self, { (matchingToken) -> Future<App> in
                     let uploadToken: UploadKey
@@ -40,7 +44,7 @@ class AppsController: Controller {
                         uploadToken = t
                     }
                     else {
-                        uploadToken = UploadKey(id: nil, teamId: 1, name: "test", expires: nil, token: token)
+                        uploadToken = UploadKey(id: nil, teamId: teamId, name: "test", expires: nil, token: token)
                     }
                     return App.query(on: req).first().flatMap(to: App.self, { (app) -> Future<App> in
                         //let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/bytecheck-debug.apk"

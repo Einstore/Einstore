@@ -63,14 +63,14 @@ extension Token {
     
     public static var idKey = \Token.id
     
-//    public static func prepare(on connection: Database.Connection) -> Future<Void> {
-//        return Database.create(self, on: connection) { (schema: SchemaBuilder<Token>) in
-//            schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.id.stringValue, isIdentifier: true)
-//            schema.addField(type: DbCoreColumnType.id(), name: "user_id")
-//            schema.addField(type: DbCoreColumnType.varChar(64), name: CodingKeys.token.stringValue)
-//            schema.addField(type: DbCoreColumnType.datetime(), name: CodingKeys.expires.stringValue)
-//        }
-//    }
+    public static func prepare(on connection: Database.Connection) -> Future<Void> {
+        return Database.create(self, on: connection) { (schema: SchemaBuilder<Token>) in
+            schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.id.stringValue, isIdentifier: true)
+            schema.addField(type: DbCoreColumnType.id(), name: "user_id")
+            schema.addField(type: DbCoreColumnType.varChar(64), name: CodingKeys.token.stringValue)
+            schema.addField(type: DbCoreColumnType.datetime(), name: CodingKeys.expires.stringValue)
+        }
+    }
     
 }
 

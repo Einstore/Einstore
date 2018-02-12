@@ -80,20 +80,20 @@ final public class App: DbCoreModel {
 
 extension App: Migration {
     
-//    public static func prepare(on connection: Database.Connection) -> Future<Void> {
-//        return Database.create(self, on: connection) { (schema: SchemaBuilder<App>) in
-//            schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.id.stringValue, isIdentifier: true)
-//            schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.teamId.stringValue)
-//            schema.addField(type: DbCoreColumnType.varChar(140), name: CodingKeys.name.stringValue)
-//            schema.addField(type: DbCoreColumnType.varChar(140), name: CodingKeys.identifier.stringValue)
-//            schema.addField(type: DbCoreColumnType.varChar(20), name: CodingKeys.version.stringValue)
-//            schema.addField(type: DbCoreColumnType.varChar(20), name: CodingKeys.build.stringValue)
-//            schema.addField(type: DbCoreColumnType.varChar(10), name: CodingKeys.platform.stringValue)
-//            schema.addField(type: DbCoreColumnType.datetime(), name: CodingKeys.created.stringValue)
-//            schema.addField(type: DbCoreColumnType.datetime(), name: CodingKeys.modified.stringValue)
-//            schema.addField(type: DbCoreColumnType.bool(), name: CodingKeys.availableToAll.stringValue)
-//        }
-//    }
+    public static func prepare(on connection: Database.Connection) -> Future<Void> {
+        return Database.create(self, on: connection) { (schema: SchemaBuilder<App>) in
+            schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.id.stringValue, isIdentifier: true)
+            schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.teamId.stringValue)
+            schema.addField(type: DbCoreColumnType.varChar(140), name: CodingKeys.name.stringValue)
+            schema.addField(type: DbCoreColumnType.varChar(140), name: CodingKeys.identifier.stringValue)
+            schema.addField(type: DbCoreColumnType.varChar(20), name: CodingKeys.version.stringValue)
+            schema.addField(type: DbCoreColumnType.varChar(20), name: CodingKeys.build.stringValue)
+            schema.addField(type: DbCoreColumnType.varChar(10), name: CodingKeys.platform.stringValue)
+            schema.addField(type: DbCoreColumnType.datetime(), name: CodingKeys.created.stringValue)
+            schema.addField(type: DbCoreColumnType.datetime(), name: CodingKeys.modified.stringValue)
+            schema.addField(type: DbCoreColumnType.bool(), name: CodingKeys.availableToAll.stringValue)
+        }
+    }
     
 }
 

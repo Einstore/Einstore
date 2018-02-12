@@ -26,7 +26,7 @@ class TeamsController: Controller {
         }
         
         router.get("teams", DbCoreIdentifier.parameter) { (req) -> Future<Team> in
-            let id = try req.parameter(Int.self)
+            let id = try req.parameter(DbCoreIdentifier.self)
             return req.withPooledConnection(to: .db) { (db) -> Future<Team> in
                 return try Team.verifiedTeam(connection: db, id: id)
             }
@@ -68,7 +68,7 @@ class TeamsController: Controller {
         }
         
         router.put("teams", DbCoreIdentifier.parameter) { (req) -> Future<Team> in
-            let id = try req.parameter(Int.self)
+            let id = try req.parameter(DbCoreIdentifier.self)
             return req.withPooledConnection(to: .db) { (db) -> Future<Team> in
                 return try Team.verifiedTeamQuery(connection: db, id: id).first().flatMap(to: Team.self, { (team) -> Future<Team> in
                     guard let team = team else {
@@ -103,7 +103,7 @@ class TeamsController: Controller {
         
         router.patch("teams", DbCoreIdentifier.parameter) { (req) -> Future<Team> in
             // TODO: Make a partial update when it becomes available
-            let id = try req.parameter(Int.self)
+            let id = try req.parameter(DbCoreIdentifier.self)
             return req.withPooledConnection(to: .db) { (db) -> Future<Team> in
                 return try Team.verifiedTeam(connection: db, id: id)
             }
@@ -112,7 +112,7 @@ class TeamsController: Controller {
         router.delete("teams", DbCoreIdentifier.parameter) { (req) -> Future<Response> in
             // TODO: Reload JWT token if successful with new info
             // QUESTION: Should we make sure user has at least one team?
-            let id = try req.parameter(Int.self)
+            let id = try req.parameter(DbCoreIdentifier.self)
             return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
                 return try Team.verifiedTeamQuery(connection: db, id: id).first().flatMap(to: Response.self, { (team) -> Future<Response> in
                     guard let team = team else {

@@ -43,12 +43,12 @@ final public class Tag: DbCoreModel {
 
 extension Tag: Migration {
     
-//    public static func prepare(on connection: Database.Connection) -> Future<Void> {
-//        return Database.create(self, on: connection) { (schema: SchemaBuilder<Tag>) in
-//            schema.addField(type: DbCoreColumnType.bigInt(), name: CodingKeys.id.stringValue, isIdentifier: true)
-//            schema.addField(type: DbCoreColumnType.varChar(60), name: CodingKeys.name.stringValue)
-//            schema.addField(type: DbCoreColumnType.varChar(60), name: CodingKeys.identifier.stringValue)
-//        }
-//    }
+    public static func prepare(on connection: Database.Connection) -> Future<Void> {
+        return Database.create(self, on: connection) { (schema: SchemaBuilder<Tag>) in
+            schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.id.stringValue, isIdentifier: true)
+            schema.addField(type: DbCoreColumnType.varChar(60), name: CodingKeys.name.stringValue)
+            schema.addField(type: DbCoreColumnType.varChar(60), name: CodingKeys.identifier.stringValue)
+        }
+    }
     
 }

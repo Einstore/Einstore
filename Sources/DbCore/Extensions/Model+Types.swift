@@ -13,11 +13,11 @@ import FluentPostgreSQL
 public struct DbCoreColumnType {
     
     public static func id() -> PostgreSQLColumn {
-        return PostgreSQLColumn(type: .int8, size: 11)
+        return PostgreSQLColumn(type: .uuid)
     }
     
     public static func bigInt() -> PostgreSQLColumn {
-        return PostgreSQLColumn(type: .int8, size: 20)
+        return PostgreSQLColumn(type: .int8)
     }
     
     public static func varChar(_ length: Int16) -> PostgreSQLColumn {
