@@ -49,7 +49,7 @@ class AppsController: Controller {
         }
         
         ApiAuthMiddleware.allowedUri.append("/apps/upload")
-        router.post("apps", "upload") { (req) -> Future<App> in
+        router.post("apps", "upload") { (req) -> Future<Response> in
             let token: String
             if Boost.uploadsRequireKey {
                 guard let t = req.http.headers.authorizationToken?.passwordHash else {
@@ -64,8 +64,8 @@ class AppsController: Controller {
             // TODO: Make this a proper teamId by checking the API key
             let teamId = DbCoreIdentifier()
             
-            return req.withPooledConnection(to: .db) { (db) -> Future<App> in
-                return UploadKey.query(on: db).filter(\.token == token).first().flatMap(to: App.self, { (matchingToken) -> Future<App> in
+            return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
+                return UploadKey.query(on: db).filter(\.token == token).first().flatMap(to: Response.self, { (matchingToken) -> Future<Response> in
                     let uploadToken: UploadKey
                     if Boost.uploadsRequireKey {
                         guard let t = matchingToken else {
@@ -76,7 +76,7 @@ class AppsController: Controller {
                     else {
                         uploadToken = UploadKey(id: nil, teamId: teamId, name: "test", expires: nil, token: token)
                     }
-                    return App.query(on: req).first().flatMap(to: App.self, { (app) -> Future<App> in
+                    return App.query(on: req).first().flatMap(to: Response.self, { (app) -> Future<Response> in
                         //let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/bytecheck-debug.apk"
                         //let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/AudiA6BiTurbo.ipa"
                         //let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/harods-rc2-b1-15-android.apk"
@@ -86,8 +86,8 @@ class AppsController: Controller {
                         let extractor: Extractor = try BaseExtractor.decoder(file: path)
                         do {
                             let promise: Promise<App> = try extractor.process(teamId: uploadToken.teamId)
-                            return promise.future.flatMap(to: App.self, { (app) -> Future<App> in
-                                return app.save(on: db).map(to: App.self) { (app) -> App in
+                            return promise.future.flatMap(to: Response.self, { (app) -> Future<Response> in
+                                return app.save(on: db).flatMap(to: Response.self) { (Response) -> Future<Response> in
                                     // Save files
                                     try extractor.save()
                                     
@@ -95,7 +95,8 @@ class AppsController: Controller {
                                     if let query = try? req.query.decode([String: String].self) {
                                         print(query)
                                     }
-                                    return app
+                                    
+                                    return try app.asResponse(.created, to: req)
                                 }
                             })
                         } catch {

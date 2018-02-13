@@ -44,10 +44,7 @@ class TeamsController: Controller {
                                 throw DbError.insertFailed
                             }
                             
-                            return try team.encode(for: req).map(to: Response.self, { (response) -> Response in
-                                response.http.status = .created
-                                return response
-                            })
+                            return try team.asResponse(.created, to: req)
                         })
                     })
                 }
