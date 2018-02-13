@@ -100,22 +100,19 @@ public final class User: DbCoreModel {
 
 extension User.Display {
     
-    public typealias Database = DbCoreDatabase
     public typealias ID = DbCoreIdentifier
-    
     public static var idKey = \User.Display.id
     
 }
 
+// MARK: - Migrations
 
-extension User {
+extension User: Migration {
     
-    public typealias Database = DbCoreDatabase
     public typealias ID = DbCoreIdentifier
-    
     public static var idKey = \User.id
     
-    public static func prepare(on connection: Database.Connection) -> Future<Void> {
+    public static func prepare(on connection: DbCoreConnection) -> Future<Void> {
         return Database.create(self, on: connection) { (schema: SchemaBuilder<User>) in
             schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.id.stringValue, isIdentifier: true)
             schema.addField(type: DbCoreColumnType.varChar(80), name: CodingKeys.firstname.stringValue)
@@ -128,6 +125,10 @@ extension User {
             schema.addField(type: DbCoreColumnType.bool(), name: CodingKeys.disabled.stringValue)
             schema.addField(type: DbCoreColumnType.bool(), name: CodingKeys.su.stringValue)
         }
+    }
+    
+    public static func revert(on connection: DbCoreConnection) -> Future<Void> {
+        return Database.delete(User.self, on: connection)
     }
     
 }

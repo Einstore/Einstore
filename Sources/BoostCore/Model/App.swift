@@ -32,7 +32,6 @@ final public class App: DbCoreModel {
         public static var keyStringFalse: App.Platform = .unknown
     }
     
-    public typealias Database = DbCoreDatabase
     public typealias ID = DbCoreIdentifier
     
     public static var idKey = \App.id
@@ -78,9 +77,21 @@ final public class App: DbCoreModel {
     
 }
 
+// MARK: - Relationships
+
+extension App {
+    
+    var tags: Siblings<App, Tag, AppTag> {
+        return siblings()
+    }
+    
+}
+
+// MARK: - Migrations
+
 extension App: Migration {
     
-    public static func prepare(on connection: Database.Connection) -> Future<Void> {
+    public static func prepare(on connection: DbCoreConnection) -> Future<Void> {
         return Database.create(self, on: connection) { (schema: SchemaBuilder<App>) in
             schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.id.stringValue, isIdentifier: true)
             schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.teamId.stringValue)
@@ -95,15 +106,8 @@ extension App: Migration {
         }
     }
     
-}
-
-
-extension App {
-    
-//    var team: Parent<App, Team> {
-//        return parent(\.teamId)
-//    }
+    public static func revert(on connection: DbCoreConnection) -> Future<Void> {
+        return Database.delete(App.self, on: connection)
+    }
     
 }
-
-

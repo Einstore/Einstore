@@ -18,7 +18,6 @@ public typealias UploadKeys = [UploadKey]
 
 final public class UploadKey: DbCoreModel {
     
-    public typealias Database = DbCoreDatabase
     public typealias ID = DbCoreIdentifier
     
     public static var idKey = \UploadKey.id
@@ -49,10 +48,11 @@ final public class UploadKey: DbCoreModel {
     
 }
 
+// MARK: - Migrations
 
 extension UploadKey: Migration {
     
-    public static func prepare(on connection: Database.Connection) -> Future<Void> {
+    public static func prepare(on connection: DbCoreConnection) -> Future<Void> {
         return Database.create(self, on: connection) { (schema: SchemaBuilder<UploadKey>) in
             schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.id.stringValue, isIdentifier: true)
             schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.teamId.stringValue)
@@ -60,6 +60,10 @@ extension UploadKey: Migration {
             schema.addField(type: DbCoreColumnType.datetime(), name: CodingKeys.expires.stringValue, isOptional: true)
             schema.addField(type: DbCoreColumnType.varChar(64), name: CodingKeys.token.stringValue)
         }
+    }
+    
+    public static func revert(on connection: DbCoreConnection) -> Future<Void> {
+        return Database.delete(UploadKey.self, on: connection)
     }
     
 }

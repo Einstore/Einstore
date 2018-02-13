@@ -8,6 +8,6 @@
 import Foundation
 import Vapor
 import Fluent
+import FluentPostgreSQL
 
-
-public protocol DbCoreModel: Model, Content, Migration { }
+public protocol DbCoreModel: PostgreSQLModel, Content { }

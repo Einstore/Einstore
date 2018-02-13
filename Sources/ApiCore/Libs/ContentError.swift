@@ -10,7 +10,7 @@ import ErrorsCore
 import Vapor
 
 
-enum ContentError: FrontendError {
+public enum ContentError: FrontendError {
     case unavailable
     
     public var code: String {

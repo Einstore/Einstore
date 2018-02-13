@@ -16,8 +16,39 @@ import ErrorsCore
 class AppsController: Controller {
     
     static func boot(router: Router) throws {
-        ApiAuthMiddleware.allowedUri.append("/apps/upload")
+        router.get("apps") { (req) -> Future<[App]> in
+            return req.withPooledConnection(to: .db) { (db) -> Future<[App]> in
+                return App.query(on: db).all()
+            }
+        }
         
+        router.get("apps", DbCoreIdentifier.parameter) { (req) -> Future<App> in
+            let id = try req.parameter(DbCoreIdentifier.self)
+            
+            return req.withPooledConnection(to: .db) { (db) -> Future<App> in
+                return appQuery(appId: id, db: db).first().map(to: App.self, { (app) -> App in
+                    guard let app = app else {
+                        throw ContentError.unavailable
+                    }
+                    return app
+                })
+            }
+        }
+        
+        router.get("apps", DbCoreIdentifier.parameter, "tags") { (req) -> Future<[Tag]> in
+            let id = try req.parameter(DbCoreIdentifier.self)
+            
+            return req.withPooledConnection(to: .db) { (db) -> Future<[Tag]> in
+                return appQuery(appId: id, db: db).first().flatMap(to: [Tag].self, { (app) -> Future<[Tag]> in
+                    guard let app: App = app else {
+                        throw ContentError.unavailable
+                    }
+                    return try app.tags.query(on: db).all()
+                })
+            }
+        }
+        
+        ApiAuthMiddleware.allowedUri.append("/apps/upload")
         router.post("apps", "upload") { (req) -> Future<App> in
             let token: String
             if Boost.uploadsRequireKey {
@@ -32,7 +63,6 @@ class AppsController: Controller {
             
             // TODO: Make this a proper teamId by checking the API key
             let teamId = DbCoreIdentifier()
-            
             
             return req.withPooledConnection(to: .db) { (db) -> Future<App> in
                 return UploadKey.query(on: db).filter(\.token == token).first().flatMap(to: App.self, { (matchingToken) -> Future<App> in
@@ -77,6 +107,15 @@ class AppsController: Controller {
                 })
             }
         }
+    }
+    
+}
+
+
+extension AppsController {
+    
+    static func appQuery(appId: DbCoreIdentifier, db: DbCoreConnection) -> QueryBuilder<App> {
+        return App.query(on: db).filter(\App.id == appId)
     }
     
 }

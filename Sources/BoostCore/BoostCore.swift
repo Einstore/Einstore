@@ -43,6 +43,7 @@ public class Boost {
         
         DbCore.migrationConfig.add(model: App.self, database: .db)
         DbCore.migrationConfig.add(model: Tag.self, database: .db)
+        DbCore.migrationConfig.add(model: AppTag.self, database: .db)
         DbCore.migrationConfig.add(model: UploadKey.self, database: .db)
         
         try ApiCore.configure(&config, &env, &services)

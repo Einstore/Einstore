@@ -11,6 +11,7 @@ import FluentPostgreSQL
 
 
 public typealias DbCoreDatabase = PostgreSQLDatabase
+public typealias DbCoreConnection = PostgreSQLConnection
 public typealias DbCoreIdentifier = UUID
 public let DbCoreDefaultPort: UInt16 = 3306
 

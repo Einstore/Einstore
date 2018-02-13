@@ -17,7 +17,6 @@ public typealias Tags = [Tag]
 
 final public class Tag: DbCoreModel {
     
-    public typealias Database = DbCoreDatabase
     public typealias ID = DbCoreIdentifier
     
     public static var idKey = \Tag.id
@@ -25,6 +24,7 @@ final public class Tag: DbCoreModel {
     public var id: ID?
     public var name: String
     public var identifier: String
+//    public var apps: [App]
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -40,15 +40,30 @@ final public class Tag: DbCoreModel {
     
 }
 
+// MARK: - Relationships
+
+extension Tag {
+    
+    var apps: Siblings<Tag, App, AppTag> {
+        return siblings()
+    }
+    
+}
+
+// MARK: - Migrations
 
 extension Tag: Migration {
     
-    public static func prepare(on connection: Database.Connection) -> Future<Void> {
+    public static func prepare(on connection: DbCoreConnection) -> Future<Void> {
         return Database.create(self, on: connection) { (schema: SchemaBuilder<Tag>) in
             schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.id.stringValue, isIdentifier: true)
             schema.addField(type: DbCoreColumnType.varChar(60), name: CodingKeys.name.stringValue)
             schema.addField(type: DbCoreColumnType.varChar(60), name: CodingKeys.identifier.stringValue)
         }
+    }
+    
+    public static func revert(on connection: DbCoreConnection) -> Future<Void> {
+        return Database.delete(Tag.self, on: connection)
     }
     
 }
