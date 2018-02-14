@@ -50,6 +50,14 @@ class AppsController: Controller {
         
         ApiAuthMiddleware.allowedUri.append("/apps/upload")
         router.post("apps", "upload") { (req) -> Future<Response> in
+//            return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
+//                let app = App(teamId: nil, name: "", identifier: "", version: "", build: "", platform: .iOS)
+//                return handleTags(db: db, request: req, app: app).flatMap(to: Response.self) { (_) -> Future<Response> in
+//                    return try app.asResponse(.created, to: req)
+//                }
+//            }
+            
+            //*
             let token: String
             if Boost.uploadsRequireKey {
                 guard let t = req.http.headers.authorizationToken?.passwordHash else {
@@ -87,16 +95,14 @@ class AppsController: Controller {
                         do {
                             let promise: Promise<App> = try extractor.process(teamId: uploadToken.teamId)
                             return promise.future.flatMap(to: Response.self, { (app) -> Future<Response> in
-                                return app.save(on: db).flatMap(to: Response.self) { (Response) -> Future<Response> in
+                                return app.save(on: db).flatMap(to: Response.self) { (app) -> Future<Response> in
                                     // Save files
                                     try extractor.save()
                                     
                                     // Save tokens
-                                    if let query = try? req.query.decode([String: String].self) {
-                                        print(query)
+                                    return handleTags(db: db, request: req, app: app).flatMap(to: Response.self) { (_) -> Future<Response> in
+                                        return try app.asResponse(.created, to: req)
                                     }
-                                    
-                                    return try app.asResponse(.created, to: req)
                                 }
                             })
                         } catch {
@@ -107,6 +113,7 @@ class AppsController: Controller {
                     })
                 })
             }
+            // */
         }
     }
     
@@ -117,6 +124,33 @@ extension AppsController {
     
     static func appQuery(appId: DbCoreIdentifier, db: DbCoreConnection) -> QueryBuilder<App> {
         return App.query(on: db).filter(\App.id == appId)
+    }
+    
+    static func handleTags(db: DbCoreConnection, request req: Request, app: App) -> Future<Void> {
+        let promise = Promise<Void>()
+//        if let query = try? req.query.decode([String: String].self) {
+//            if let tags = query["tags"]?.split(separator: "|") {
+//                var futures: [Future<AppTag>] = []
+//
+//                Tag.query(on: db).filter(\Tag.name, in: tags).all().map(to: Void.self) { (tags) -> T in
+//
+//                }
+//
+//                for tag in tags {
+//
+//                    let t = Tag(id: nil, name: String(tag), identifier: String(tag).safeText)
+//                    let future = app.tags.attach(t, on: db)
+//                    futures.append(future)
+//                }
+//                return futures.map(to: Void.self, { (_) -> Void in
+//                    return
+//                })
+//            }
+//        }
+//        else {
+            promise.complete()
+//        }
+        return promise.future
     }
     
 }

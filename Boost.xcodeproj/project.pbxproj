@@ -29,6 +29,7 @@
 		1571B8D12032218200E45E3A /* String+Tools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1571B8D02032218200E45E3A /* String+Tools.swift */; };
 		1571BB362033753400E45E3A /* AppTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1571BB352033753400E45E3A /* AppTag.swift */; };
 		1571BB382033A0A300E45E3A /* Future+Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1571BB372033A0A300E45E3A /* Future+Response.swift */; };
+		1571BB3A2033AA6F00E45E3A /* Content+Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1571BB392033AA6F00E45E3A /* Content+Response.swift */; };
 		OBJ_1072 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_95 /* main.swift */; };
 		OBJ_1074 /* App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Boost::App::Product" /* App.framework */; };
 		OBJ_1075 /* BoostCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Boost::BoostCore::Product" /* BoostCore.framework */; };
@@ -4682,6 +4683,7 @@
 		1571B8D02032218200E45E3A /* String+Tools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Tools.swift"; sourceTree = "<group>"; };
 		1571BB352033753400E45E3A /* AppTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTag.swift; sourceTree = "<group>"; };
 		1571BB372033A0A300E45E3A /* Future+Response.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Future+Response.swift"; sourceTree = "<group>"; };
+		1571BB392033AA6F00E45E3A /* Content+Response.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Content+Response.swift"; sourceTree = "<group>"; };
 		"Async::Async::Product" /* Async.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Async.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCore::Product" /* ApiCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCoreTests::Product" /* ApiCoreTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = ApiCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -7008,6 +7010,7 @@
 				OBJ_44 /* String+Crypto.swift */,
 				OBJ_45 /* String+Manipulation.swift */,
 				1571BB372033A0A300E45E3A /* Future+Response.swift */,
+				1571BB392033AA6F00E45E3A /* Content+Response.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -9893,6 +9896,7 @@
 				OBJ_1491 /* Result.swift in Sources */,
 				OBJ_1492 /* ApiAuthMiddleware.swift in Sources */,
 				OBJ_1493 /* Team.swift in Sources */,
+				1571BB3A2033AA6F00E45E3A /* Content+Response.swift in Sources */,
 				OBJ_1494 /* Token.swift in Sources */,
 				OBJ_1495 /* User.swift in Sources */,
 				OBJ_1496 /* Controller.swift in Sources */,
