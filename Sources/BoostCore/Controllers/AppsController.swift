@@ -8,6 +8,7 @@
 import Foundation
 import Vapor
 import ApiCore
+import Fluent
 import FluentPostgreSQL
 import DbCore
 import ErrorsCore
@@ -48,16 +49,23 @@ class AppsController: Controller {
             }
         }
         
+        router.delete("apps", DbCoreIdentifier.parameter) { (req) -> Future<Response> in
+            let id = try req.parameter(DbCoreIdentifier.self)
+            
+            return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
+                // TODO: Delete all tags (if they don't have any more parent apps)
+                // TODO: Delete files too!
+                return appQuery(appId: id, db: db).first().flatMap(to: Response.self) { (app) -> Future<Response> in
+                    guard let app: App = app else {
+                        throw ContentError.unavailable
+                    }
+                    return try app.delete(on: db).asResponse(to: req)
+                }
+            }
+        }
+        
         ApiAuthMiddleware.allowedUri.append("/apps/upload")
         router.post("apps", "upload") { (req) -> Future<Response> in
-//            return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
-//                let app = App(teamId: nil, name: "", identifier: "", version: "", build: "", platform: .iOS)
-//                return handleTags(db: db, request: req, app: app).flatMap(to: Response.self) { (_) -> Future<Response> in
-//                    return try app.asResponse(.created, to: req)
-//                }
-//            }
-            
-            //*
             let token: String
             if Boost.uploadsRequireKey {
                 guard let t = req.http.headers.authorizationToken?.passwordHash else {
@@ -113,7 +121,6 @@ class AppsController: Controller {
                     })
                 })
             }
-            // */
         }
     }
     
@@ -127,30 +134,42 @@ extension AppsController {
     }
     
     static func handleTags(db: DbCoreConnection, request req: Request, app: App) -> Future<Void> {
-        let promise = Promise<Void>()
-//        if let query = try? req.query.decode([String: String].self) {
-//            if let tags = query["tags"]?.split(separator: "|") {
-//                var futures: [Future<AppTag>] = []
-//
-//                Tag.query(on: db).filter(\Tag.name, in: tags).all().map(to: Void.self) { (tags) -> T in
-//
-//                }
-//
-//                for tag in tags {
-//
-//                    let t = Tag(id: nil, name: String(tag), identifier: String(tag).safeText)
-//                    let future = app.tags.attach(t, on: db)
-//                    futures.append(future)
-//                }
-//                return futures.map(to: Void.self, { (_) -> Void in
-//                    return
-//                })
-//            }
-//        }
-//        else {
-            promise.complete()
-//        }
-        return promise.future
+        if let query = try? req.query.decode([String: String].self) {
+            if let tags = query["tags"]?.split(separator: "|") {
+                var futures: [Future<Void>] = []
+                // TODO: Optimise to work without the for loop
+                for tagSubstring in tags {
+                    let tag = String(tagSubstring)
+                    let future = Tag.query(on: db).filter(\Tag.identifier == tag).first().flatMap(to: Void.self, { (tagObject) -> Future<Void> in
+                        guard let tagObject = tagObject else {
+                            let t = Tag(id: nil, name: tag, identifier: tag.safeText)
+                            return t.save(on: db).flatMap(to: Void.self, { (tag) -> Future<Void> in
+                                return app.tags.attach(tag, on: db).void()
+                            })
+                        }
+                        return app.tags.attach(tagObject, on: db).void()
+                    })
+                    futures.append(future)
+                }
+                return futures.join()
+            }
+        }
+        return Future<Void>.make()
     }
     
 }
+
+
+/*
+ 
+ for tag in tags {
+ 
+ let t = Tag(id: nil, name: String(tag), identifier: String(tag).safeText)
+ let future = app.tags.attach(t, on: db)
+ futures.append(future)
+ }
+ return futures.map(to: Void.self, { (_) -> Void in
+ return
+ })
+ 
+ */

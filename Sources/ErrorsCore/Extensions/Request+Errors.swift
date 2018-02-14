@@ -72,6 +72,11 @@ public struct RequestResponse {
         return response
     }
     
+    public func noContent() throws -> Response {
+        let response = try basic(status: .noContent)
+        return response
+    }
+    
     public func onlyInDebug() throws -> Response {
         let response = try error(status: .preconditionFailed, error: "not_available", description: "Endpoint is not available in production mode")
         return response

@@ -21,3 +21,13 @@ extension Future where T: ResponseEncodable {
     
 }
 
+extension Future where T == Void {
+    
+    public func asResponse(to req: Request) throws -> Future<Response> {
+        return self.map(to: Response.self) { _ in
+            return try req.response.noContent()
+        }
+    }
+    
+}
+
