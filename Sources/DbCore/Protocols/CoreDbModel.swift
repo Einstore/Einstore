@@ -10,4 +10,4 @@ import Vapor
 import Fluent
 import FluentPostgreSQL
 
-public protocol DbCoreModel: PostgreSQLModel, Content { }
+public protocol DbCoreModel: PostgreSQLUUIDModel, Content { }

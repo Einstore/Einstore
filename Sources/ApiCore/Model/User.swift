@@ -101,7 +101,7 @@ public final class User: DbCoreModel {
 extension User.Display {
     
     public typealias ID = DbCoreIdentifier
-    public static var idKey = \User.Display.id
+    public static var idKey: WritableKeyPath<User.Display, DbCoreIdentifier?> = \User.Display.id
     
 }
 
@@ -110,10 +110,11 @@ extension User.Display {
 extension User: Migration {
     
     public typealias ID = DbCoreIdentifier
-    public static var idKey = \User.id
+    public static var idKey: WritableKeyPath<User, DbCoreIdentifier?> = \User.id
+    
     
     public static func prepare(on connection: DbCoreConnection) -> Future<Void> {
-        return Database.create(self, on: connection) { (schema: SchemaBuilder<User>) in
+        return Database.create(self, on: connection) { (schema) in
             schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.id.stringValue, isIdentifier: true)
             schema.addField(type: DbCoreColumnType.varChar(80), name: CodingKeys.firstname.stringValue)
             schema.addField(type: DbCoreColumnType.varChar(80), name: CodingKeys.lastname.stringValue)

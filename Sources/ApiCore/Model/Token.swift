@@ -50,7 +50,7 @@ extension Token.Public {
     
     public typealias ID = DbCoreIdentifier
     
-    public static var idKey = \Token.Public.id
+    public static var idKey: WritableKeyPath<Token.Public, DbCoreIdentifier?> = \Token.Public.id
     
 }
 
@@ -60,10 +60,10 @@ extension Token: Migration {
     
     public typealias ID = DbCoreIdentifier
     
-    public static var idKey = \Token.id
+    public static var idKey: WritableKeyPath<Token, DbCoreIdentifier?> = \Token.id
     
     public static func prepare(on connection: DbCoreConnection) -> Future<Void> {
-        return Database.create(self, on: connection) { (schema: SchemaBuilder<Token>) in
+        return Database.create(self, on: connection) { (schema) in
             schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.id.stringValue, isIdentifier: true)
             schema.addField(type: DbCoreColumnType.id(), name: "user_id")
             schema.addField(type: DbCoreColumnType.varChar(64), name: CodingKeys.token.stringValue)

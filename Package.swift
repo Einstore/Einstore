@@ -4,9 +4,9 @@ import PackageDescription
 let package = Package(
     name: "Boost",
     dependencies: [
-        .package(url: "https://github.com/vapor/vapor.git", .exact("3.0.0-beta.1")),
-        .package(url: "https://github.com/twof/fluent-postgresql.git", .branch("beta")),
-        .package(url: "https://github.com/vapor/fluent.git", .exact("3.0.0-beta.1")),
+        .package(url: "https://github.com/vapor/vapor.git", .exact("3.0.0-beta.3.1.3")),
+        .package(url: "https://github.com/vapor/fluent-postgresql.git", .exact("1.0.0-beta.3")),
+        .package(url: "https://github.com/vapor/fluent.git", .exact("3.0.0-beta.3")),
 //        .package(url: "https://github.com/vapor/jwt.git", .branch("beta")),
         .package(url: "https://github.com/manGoweb/MimeLib.git", .exact("1.0.0")),
         .package(url: "https://github.com/kareman/SwiftShell.git", .exact("4.0.0"))
@@ -21,6 +21,12 @@ let package = Package(
         ),
         .target(
             name: "ErrorsCore",
+            dependencies: [
+                "Vapor"
+            ]
+        ),
+        .target(
+            name: "FileCore",
             dependencies: [
                 "Vapor"
             ]
@@ -43,7 +49,8 @@ let package = Package(
                 "ApiCore",
                 "ErrorsCore",
                 "DbCore",
-                "SwiftShell"
+                "SwiftShell",
+                "FileCore"
             ]
         ),
         .target(

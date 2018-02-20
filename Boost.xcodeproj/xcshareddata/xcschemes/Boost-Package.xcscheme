@@ -70,6 +70,20 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Boost::FileCore"
+               BuildableName = "FileCore.framework"
+               BlueprintName = "FileCore"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "Boost::ApiCore"
                BuildableName = "ApiCore.framework"
                BlueprintName = "ApiCore"
@@ -196,6 +210,20 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Validation::Validation"
+               BuildableName = "Validation.framework"
+               BlueprintName = "Validation"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "TLS::ServerSecurity"
                BuildableName = "ServerSecurity.framework"
                BlueprintName = "ServerSecurity"
@@ -241,20 +269,6 @@
                BlueprintIdentifier = "Engine::WebSocket"
                BuildableName = "WebSocket.framework"
                BlueprintName = "WebSocket"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Crypto::Crypto"
-               BuildableName = "Crypto.framework"
-               BlueprintName = "Crypto"
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -392,6 +406,20 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Crypto::Crypto"
+               BuildableName = "Crypto.framework"
+               BlueprintName = "Crypto"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "Console::Command"
                BuildableName = "Command.framework"
                BlueprintName = "Command"
@@ -462,37 +490,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Vapor::Validation"
-               BuildableName = "Validation.framework"
-               BlueprintName = "Validation"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "Core::CodableKit"
                BuildableName = "CodableKit.framework"
                BlueprintName = "CodableKit"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Async::Async"
-               BuildableName = "Async.framework"
-               BlueprintName = "Async"
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -510,6 +510,20 @@
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Async::Async"
+               BuildableName = "Async.framework"
+               BlueprintName = "Async"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -518,16 +532,6 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Boost::AppTests"
-               BuildableName = "AppTests.xctest"
-               BlueprintName = "AppTests"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
          <TestableReference
             skipped = "NO">
             <BuildableReference
@@ -565,6 +569,16 @@
                BlueprintIdentifier = "Boost::ErrorsCoreTests"
                BuildableName = "ErrorsCoreTests.xctest"
                BlueprintName = "ErrorsCoreTests"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Boost::AppTests"
+               BuildableName = "AppTests.xctest"
+               BlueprintName = "AppTests"
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </TestableReference>

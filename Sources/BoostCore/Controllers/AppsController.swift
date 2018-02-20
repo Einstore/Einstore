@@ -59,7 +59,7 @@ class AppsController: Controller {
                     guard let app: App = app else {
                         throw ContentError.unavailable
                     }
-                    return try app.delete(on: db).asResponse(to: req)
+                    return try app.delete(on: db).flatten().asResponse(to: req)
                 }
             }
         }
@@ -95,8 +95,8 @@ class AppsController: Controller {
                     return App.query(on: req).first().flatMap(to: Response.self, { (app) -> Future<Response> in
                         //let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/bytecheck-debug.apk"
                         //let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/AudiA6BiTurbo.ipa"
-                        //let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/harods-rc2-b1-15-android.apk"
-                        let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/HandyFleshlight WatchKit App 2017-01-05 10-10-35/HandyFleshlight WatchKit App.ipa"
+                        let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/harods-rc2-b1-15-android.apk"
+                        //let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/HandyFleshlight WatchKit App 2017-01-05 10-10-35/HandyFleshlight WatchKit App.ipa"
                         //let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/app.ipa"
                         
                         let extractor: Extractor = try BaseExtractor.decoder(file: path)
@@ -144,14 +144,14 @@ extension AppsController {
                         guard let tagObject = tagObject else {
                             let t = Tag(id: nil, name: tag, identifier: tag.safeText)
                             return t.save(on: db).flatMap(to: Void.self, { (tag) -> Future<Void> in
-                                return app.tags.attach(tag, on: db).void()
+                                return app.tags.attach(tag, on: db).flatten()
                             })
                         }
-                        return app.tags.attach(tagObject, on: db).void()
+                        return app.tags.attach(tagObject, on: db).flatten()
                     })
                     futures.append(future)
                 }
-                return futures.join()
+                return futures.flatten()
             }
         }
         return Future<Void>.make()

@@ -20,7 +20,7 @@ final public class UploadKey: DbCoreModel {
     
     public typealias ID = DbCoreIdentifier
     
-    public static var idKey = \UploadKey.id
+    public static var idKey: WritableKeyPath<UploadKey, DbCoreIdentifier?> = \UploadKey.id
     
     public var id: ID?
     public var teamId: ID
@@ -53,7 +53,7 @@ final public class UploadKey: DbCoreModel {
 extension UploadKey: Migration {
     
     public static func prepare(on connection: DbCoreConnection) -> Future<Void> {
-        return Database.create(self, on: connection) { (schema: SchemaBuilder<UploadKey>) in
+        return Database.create(self, on: connection) { (schema) in
             schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.id.stringValue, isIdentifier: true)
             schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.teamId.stringValue)
             schema.addField(type: DbCoreColumnType.varChar(60), name: CodingKeys.name.stringValue)

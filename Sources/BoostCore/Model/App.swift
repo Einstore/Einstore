@@ -34,7 +34,7 @@ final public class App: DbCoreModel {
     
     public typealias ID = DbCoreIdentifier
     
-    public static var idKey = \App.id
+    public static var idKey: WritableKeyPath<App, DbCoreIdentifier?> = \App.id
     
     public var id: ID?
     public var teamId: ID?
@@ -92,7 +92,7 @@ extension App {
 extension App: Migration {
     
     public static func prepare(on connection: DbCoreConnection) -> Future<Void> {
-        return Database.create(self, on: connection) { (schema: SchemaBuilder<App>) in
+        return Database.create(self, on: connection) { (schema) in
             schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.id.stringValue, isIdentifier: true)
             schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.teamId.stringValue)
             schema.addField(type: DbCoreColumnType.varChar(140), name: CodingKeys.name.stringValue)

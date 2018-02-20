@@ -18,21 +18,21 @@ public final class AppTag: ModifiablePivot, DbCoreModel {
     
     public typealias ID = DbCoreIdentifier
     
-    public static var leftIDKey: ReferenceWritableKeyPath<AppTag, DbCoreIdentifier> {
+    public static var leftIDKey: WritableKeyPath<AppTag, DbCoreIdentifier> {
         return \.appId
     }
     
-    public static var rightIDKey: ReferenceWritableKeyPath<AppTag, DbCoreIdentifier> {
+    public static var rightIDKey: WritableKeyPath<AppTag, DbCoreIdentifier> {
         return \.tagId
     }
     
-    public static var idKey: ReferenceWritableKeyPath<AppTag, DbCoreIdentifier?> {
+    public static var idKey: WritableKeyPath<AppTag, DbCoreIdentifier?> {
         return \.id
     }
     
-    var id: ID?
-    var appId: ID
-    var tagId: ID
+    public var id: ID?
+    public var appId: ID
+    public var tagId: ID
     
     // MARK: Initialization
     
@@ -49,10 +49,10 @@ public final class AppTag: ModifiablePivot, DbCoreModel {
 extension AppTag: Migration {
     
     public static func prepare(on connection: DbCoreConnection) -> Future<Void> {
-        return Database.create(AppTag.self, on: connection) { builder in
-            try builder.field(for: \AppTag.id)
-            try builder.field(for: \AppTag.appId)
-            try builder.field(for: \AppTag.tagId)
+        return Database.create(self, on: connection) { (schema) in
+            try schema.field(for: \AppTag.id)
+            try schema.field(for: \AppTag.appId)
+            try schema.field(for: \AppTag.tagId)
         }
     }
     

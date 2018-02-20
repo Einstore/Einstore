@@ -22,7 +22,7 @@ extension Future where T == Void {
 
 extension Future where T: Content {
     
-    public func void() -> Future<Void> {
+    public func flatten() -> Future<Void> {
         return map(to: Void.self, { (_) -> Void in
             return Void()
         })
@@ -31,12 +31,13 @@ extension Future where T: Content {
 }
 
 
-extension Array where Element == Future<Void> {
-    
-    public func join() -> Future<Void> {
-        return map(to: Void.self, { (_) -> Void in
-            return Void()
-        })
-    }
-    
-}
+//extension Array where Element == Future<Void> {
+//    
+//    public func join() -> Future<Void> {
+//        return map(to: Void.self, { (_) -> Void in
+//            return Void()
+//        })
+//    }
+//    
+//}
+

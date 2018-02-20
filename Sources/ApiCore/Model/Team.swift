@@ -67,10 +67,10 @@ extension Team: Migration {
     
     public typealias ID = DbCoreIdentifier
     
-    public static var idKey = \Team.id
+    public static var idKey: WritableKeyPath<Team, DbCoreIdentifier?> = \Team.id
     
     public static func prepare(on connection: DbCoreConnection) -> Future<Void> {
-        return Database.create(self, on: connection) { (schema: SchemaBuilder<Team>) in
+        return Database.create(self, on: connection) { (schema) in
             schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.id.stringValue, isIdentifier: true)
             schema.addField(type: DbCoreColumnType.varChar(40), name: CodingKeys.name.stringValue)
             schema.addField(type: DbCoreColumnType.varChar(40), name: CodingKeys.identifier.stringValue)

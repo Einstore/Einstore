@@ -19,7 +19,7 @@ final public class Tag: DbCoreModel {
     
     public typealias ID = DbCoreIdentifier
     
-    public static var idKey = \Tag.id
+    public static var idKey: WritableKeyPath<Tag, DbCoreIdentifier?> = \Tag.id
     
     public var id: ID?
     public var name: String
@@ -55,7 +55,7 @@ extension Tag {
 extension Tag: Migration {
     
     public static func prepare(on connection: DbCoreConnection) -> Future<Void> {
-        return Database.create(self, on: connection) { (schema: SchemaBuilder<Tag>) in
+        return Database.create(self, on: connection) { (schema) in
             schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.id.stringValue, isIdentifier: true)
             schema.addField(type: DbCoreColumnType.varChar(255), name: CodingKeys.name.stringValue)
             schema.addField(type: DbCoreColumnType.varChar(255), name: CodingKeys.identifier.stringValue)

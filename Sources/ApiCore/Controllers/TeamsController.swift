@@ -138,7 +138,7 @@ class TeamsController: Controller {
 extension TeamsController {
     
     static func delete(team: Team, request req: Request, on db: DatabaseConnectable) -> Future<Response> {
-        return team.delete(on: db).map(to: Response.self, { () -> Response in
+        return team.delete(on: db).map(to: Response.self, { (_) -> Response in
             return try req.response.success(code: "deleted", description: "Team has been deleted")
         })
     }
