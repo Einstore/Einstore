@@ -32,12 +32,10 @@ final public class App: DbCoreModel {
         public static var keyStringFalse: App.Platform = .unknown
     }
     
-    public typealias ID = DbCoreIdentifier
-    
     public static var idKey: WritableKeyPath<App, DbCoreIdentifier?> = \App.id
     
-    public var id: ID?
-    public var teamId: ID?
+    public var id: DbCoreIdentifier?
+    public var teamId: DbCoreIdentifier?
     public var name: String
     public var identifier: String
     public var version: String
@@ -62,7 +60,7 @@ final public class App: DbCoreModel {
     }
 
 
-    public init(id: ID? = nil, teamId: ID?, name: String, identifier: String, version: String, build: String, platform: Platform, availableToAll: Bool = false) {
+    public init(id: DbCoreIdentifier? = nil, teamId: DbCoreIdentifier?, name: String, identifier: String, version: String, build: String, platform: Platform, availableToAll: Bool = false) {
         self.id = id
         self.teamId = teamId
         self.name = name

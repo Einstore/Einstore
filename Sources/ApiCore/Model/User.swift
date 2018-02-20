@@ -52,7 +52,7 @@ public final class User: DbCoreModel {
         public static let entity: String = "users"
         public static let name: String = "users"
         
-        public var id: ID?
+        public var id: DbCoreIdentifier?
         public var firstname: String
         public var lastname: String
         public var email: String
@@ -72,7 +72,7 @@ public final class User: DbCoreModel {
         }
     }
     
-    public var id: ID?
+    public var id: DbCoreIdentifier?
     public var firstname: String
     public var lastname: String
     public var email: String
@@ -100,7 +100,6 @@ public final class User: DbCoreModel {
 
 extension User.Display {
     
-    public typealias ID = DbCoreIdentifier
     public static var idKey: WritableKeyPath<User.Display, DbCoreIdentifier?> = \User.Display.id
     
 }
@@ -109,9 +108,7 @@ extension User.Display {
 
 extension User: Migration {
     
-    public typealias ID = DbCoreIdentifier
     public static var idKey: WritableKeyPath<User, DbCoreIdentifier?> = \User.id
-    
     
     public static func prepare(on connection: DbCoreConnection) -> Future<Void> {
         return Database.create(self, on: connection) { (schema) in

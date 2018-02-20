@@ -18,12 +18,10 @@ public typealias UploadKeys = [UploadKey]
 
 final public class UploadKey: DbCoreModel {
     
-    public typealias ID = DbCoreIdentifier
-    
     public static var idKey: WritableKeyPath<UploadKey, DbCoreIdentifier?> = \UploadKey.id
     
-    public var id: ID?
-    public var teamId: ID
+    public var id: DbCoreIdentifier?
+    public var teamId: DbCoreIdentifier
     public var team: Team? = nil
     public var name: String
     public var expires: Date?
@@ -38,7 +36,7 @@ final public class UploadKey: DbCoreModel {
         case token
     }
     
-    init(id: ID?, teamId: ID, name: String, expires: Date?, token: String) {
+    init(id: DbCoreIdentifier?, teamId: DbCoreIdentifier, name: String, expires: Date?, token: String) {
         self.id = id
         self.teamId = teamId
         self.name = name

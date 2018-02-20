@@ -16,8 +16,6 @@ public final class AppTag: ModifiablePivot, DbCoreModel {
     public typealias Left = App
     public typealias Right = Tag
     
-    public typealias ID = DbCoreIdentifier
-    
     public static var leftIDKey: WritableKeyPath<AppTag, DbCoreIdentifier> {
         return \.appId
     }
@@ -30,9 +28,9 @@ public final class AppTag: ModifiablePivot, DbCoreModel {
         return \.id
     }
     
-    public var id: ID?
-    public var appId: ID
-    public var tagId: ID
+    public var id: DbCoreIdentifier?
+    public var appId: DbCoreIdentifier
+    public var tagId: DbCoreIdentifier
     
     // MARK: Initialization
     

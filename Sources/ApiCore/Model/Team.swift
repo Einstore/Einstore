@@ -41,11 +41,11 @@ public final class Team: DbCoreModel {
         
     }
     
-    public var id: ID?
+    public var id: DbCoreIdentifier?
     public var name: String
     public var identifier: String
     
-    public init(id: ID? = nil, name: String, identifier: String) {
+    public init(id: DbCoreIdentifier? = nil, name: String, identifier: String) {
         self.name = name
         self.identifier = identifier
     }
@@ -64,8 +64,6 @@ extension Team: Migration {
     public struct Identifier: Content {
         public var identifier: String
     }
-    
-    public typealias ID = DbCoreIdentifier
     
     public static var idKey: WritableKeyPath<Team, DbCoreIdentifier?> = \Team.id
     

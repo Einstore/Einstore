@@ -17,11 +17,9 @@ public typealias Tags = [Tag]
 
 final public class Tag: DbCoreModel {
     
-    public typealias ID = DbCoreIdentifier
-    
     public static var idKey: WritableKeyPath<Tag, DbCoreIdentifier?> = \Tag.id
     
-    public var id: ID?
+    public var id: DbCoreIdentifier?
     public var name: String
     public var identifier: String
 //    public var apps: [App]
@@ -32,7 +30,7 @@ final public class Tag: DbCoreModel {
         case identifier
     }
     
-    public init(id: ID?, name: String, identifier: String) {
+    public init(id: DbCoreIdentifier?, name: String, identifier: String) {
         self.id = id
         self.name = name
         self.identifier = identifier

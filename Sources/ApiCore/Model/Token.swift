@@ -22,13 +22,13 @@ public final class Token: DbCoreModel {
     }
     
     public final class Public: DbCoreModel {
-        public var id: ID?
+        public var id: DbCoreIdentifier?
         public var user: User
         public var expires: Date
     }
     
-    public var id: ID?
-    public var userId: ID
+    public var id: DbCoreIdentifier?
+    public var userId: DbCoreIdentifier
     public var user: User
     public var token: String
     public var expires: Date
@@ -48,8 +48,6 @@ public final class Token: DbCoreModel {
 
 extension Token.Public {
     
-    public typealias ID = DbCoreIdentifier
-    
     public static var idKey: WritableKeyPath<Token.Public, DbCoreIdentifier?> = \Token.Public.id
     
 }
@@ -57,8 +55,6 @@ extension Token.Public {
 // MARK: - Migrations
 
 extension Token: Migration {
-    
-    public typealias ID = DbCoreIdentifier
     
     public static var idKey: WritableKeyPath<Token, DbCoreIdentifier?> = \Token.id
     
