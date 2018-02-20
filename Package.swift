@@ -28,7 +28,8 @@ let package = Package(
         .target(
             name: "FileCore",
             dependencies: [
-                "Vapor"
+                "Vapor",
+                "ErrorCore"
             ]
         ),
         .target(

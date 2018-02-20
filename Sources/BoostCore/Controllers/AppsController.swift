@@ -12,6 +12,7 @@ import Fluent
 import FluentPostgreSQL
 import DbCore
 import ErrorsCore
+import FileCore
 
 
 class AppsController: Controller {
@@ -24,6 +25,34 @@ class AppsController: Controller {
         }
         
         router.get("apps", DbCoreIdentifier.parameter) { (req) -> Future<App> in
+            let id = try req.parameter(DbCoreIdentifier.self)
+            
+            return req.withPooledConnection(to: .db) { (db) -> Future<App> in
+                return appQuery(appId: id, db: db).first().map(to: App.self, { (app) -> App in
+                    guard let app = app else {
+                        throw ContentError.unavailable
+                    }
+                    return app
+                })
+            }
+        }
+        
+        // TODO: Return an actual plist!
+        router.get("apps", DbCoreIdentifier.parameter, "plist") { (req) -> Future<App> in
+            let id = try req.parameter(DbCoreIdentifier.self)
+            
+            return req.withPooledConnection(to: .db) { (db) -> Future<App> in
+                return appQuery(appId: id, db: db).first().map(to: App.self, { (app) -> App in
+                    guard let app = app else {
+                        throw ContentError.unavailable
+                    }
+                    return app
+                })
+            }
+        }
+        
+        // TODO: Return an actual file!
+        router.get("apps", DbCoreIdentifier.parameter, "file") { (req) -> Future<App> in
             let id = try req.parameter(DbCoreIdentifier.self)
             
             return req.withPooledConnection(to: .db) { (db) -> Future<App> in
@@ -59,12 +88,12 @@ class AppsController: Controller {
                     guard let app: App = app else {
                         throw ContentError.unavailable
                     }
+                    // TODO: Delete all the files too!
                     return try app.delete(on: db).flatten().asResponse(to: req)
                 }
             }
         }
         
-        ApiAuthMiddleware.allowedUri.append("/apps/upload")
         router.post("apps", "upload") { (req) -> Future<Response> in
             let token: String
             if Boost.uploadsRequireKey {
@@ -95,8 +124,8 @@ class AppsController: Controller {
                     return App.query(on: req).first().flatMap(to: Response.self, { (app) -> Future<Response> in
                         //let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/bytecheck-debug.apk"
                         //let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/AudiA6BiTurbo.ipa"
-                        let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/harods-rc2-b1-15-android.apk"
-                        //let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/HandyFleshlight WatchKit App 2017-01-05 10-10-35/HandyFleshlight WatchKit App.ipa"
+                        //let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/harods-rc2-b1-15-android.apk"
+                        let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/HandyFleshlight WatchKit App 2017-01-05 10-10-35/HandyFleshlight WatchKit App.ipa"
                         //let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/app.ipa"
                         
                         let extractor: Extractor = try BaseExtractor.decoder(file: path)
@@ -105,12 +134,13 @@ class AppsController: Controller {
                             return promise.future.flatMap(to: Response.self, { (app) -> Future<Response> in
                                 return app.save(on: db).flatMap(to: Response.self) { (app) -> Future<Response> in
                                     // Save files
-                                    try extractor.save()
-                                    
-                                    // Save tokens
-                                    return handleTags(db: db, request: req, app: app).flatMap(to: Response.self) { (_) -> Future<Response> in
-                                        return try app.asResponse(.created, to: req)
-                                    }
+                                    // TODO: Remove the force unwrap!!!
+                                    return try extractor.save(Boost.config.fileHandler!).flatMap(to: Response.self, { (_) -> Future<Response> in
+                                        // Save tags
+                                        return handleTags(db: db, request: req, app: app).flatMap(to: Response.self) { (_) -> Future<Response> in
+                                            return try app.asResponse(.created, to: req)
+                                        }
+                                    })
                                 }
                             })
                         } catch {

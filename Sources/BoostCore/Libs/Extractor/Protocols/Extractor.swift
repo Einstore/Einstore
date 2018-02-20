@@ -10,6 +10,7 @@ import Vapor
 import ErrorsCore
 import ApiCore
 import DbCore
+import FileCore
 
 
 enum ExtractorError: FrontendError {
@@ -39,6 +40,10 @@ enum ExtractorError: FrontendError {
 
 
 protocol Extractor {
+    
+    var file: URL { get }
+    var archive: URL { get }
+    var sessionUUID: String { get }
     
     var iconData: Data? { get }
     var appName: String? { get }
@@ -71,9 +76,9 @@ extension Extractor {
         return app
     }
     
-    func save() throws {
-        // Save file
-        // Save icon
+    func save(_ fileHandler: Handler) throws -> Future<Void> {
+        // TODO: Save icon
+        return try fileHandler.upload(file: file.path, destination: sessionUUID + "/app.boost")
     }
     
 }

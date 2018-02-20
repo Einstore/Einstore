@@ -12,6 +12,7 @@ import ErrorsCore
 import Fluent
 import FluentPostgreSQL
 import DbCore
+import FileCore
 
 
 public class Boost {
@@ -36,10 +37,20 @@ public class Boost {
         }
     }
     
+    static var config: BoostConfig!
+    
     public static func configure(boostConfig: inout BoostConfig, _ config: inout Config, _ env: inout Vapor.Environment, _ services: inout Services) throws {
         guard let database = boostConfig.database else {
             fatalError("Missing database configuration in BoostConfig")
         }
+        
+        if boostConfig.fileHandler == nil {
+            boostConfig.fileHandler = try Filesystem(config: Filesystem.Config(homeDir: "/tmp/Boost/"))
+        }
+        
+        self.config = boostConfig
+        
+        ApiAuthMiddleware.allowedUri.append("/apps/upload")
         
         DbCore.migrationConfig.add(model: App.self, database: .db)
         DbCore.migrationConfig.add(model: Tag.self, database: .db)

@@ -3,6 +3,7 @@ import Vapor
 import BoostCore
 import DbCore
 import ApiCore
+import FileCore
 
 
 /// Called before your application initializes.
@@ -15,5 +16,7 @@ public func configure(_ config: inout Config, _ env: inout Vapor.Environment, _ 
     
     var boostConfig = BoostConfig()
     boostConfig.database = DbCore.envConfig(defaultDatabase: "boost")
+    // TODO: Make this come from an ENV var
+    boostConfig.fileHandler = try Filesystem(config: Filesystem.Config(homeDir: "/tmp/Boost/"))
     try Boost.configure(boostConfig: &boostConfig, &config, &env, &services)
 }
