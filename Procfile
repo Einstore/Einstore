@@ -1,1 +1,1 @@
-web: Run --hostname 0.0.0.0
+web: App --env=production --workdir=./ --config:servers.default.port=$PORT --config:postgresql.url=$DATABASE_URL

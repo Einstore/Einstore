@@ -31,10 +31,10 @@
         },
         "DB_NAME": {
             "description": "MySQL database name.",
-            "value": "localhost"
+            "value": "postgresql-elliptical-69134"
         }
     },
 	"buildpacks": [{
-		"url": "https://github.com/kylef/heroku-buildpack-swift"
+		"url": "https://github.com/vapor/heroku-buildpack"
 	}]
 }
