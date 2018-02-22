@@ -29,7 +29,7 @@ let package = Package(
             name: "FileCore",
             dependencies: [
                 "Vapor",
-                "ErrorCore"
+                "ErrorsCore"
             ]
         ),
         .target(
