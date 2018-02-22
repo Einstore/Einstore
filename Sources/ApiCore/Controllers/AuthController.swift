@@ -69,13 +69,13 @@ extension AuthController {
             throw AuthError.authenticationFailed
         }
         return req.withPooledConnection(to: .db) { (db) -> Future<Token> in
-            return User.query(on: db).filter(\User.email == login.email).filter(\User.password == login.password.passwordHash).first().flatMap(to: Token.self, { (user) -> Future<Token> in
+            return try User.query(on: db).filter(\User.email == login.email).filter(\User.password == login.password.passwordHash(req)).first().flatMap(to: Token.self, { (user) -> Future<Token> in
                 guard let user = user else {
                     throw AuthError.authenticationFailed
                 }
                 let token = try Token(user: user)
                 let tokenBackup = token
-                token.token = token.token.passwordHash
+                token.token = try token.token.passwordHash(req)
                 return token.save(on: db).map(to: Token.self, { _ in
                     tokenBackup.id = token.id
                     return tokenBackup

@@ -9,18 +9,7 @@ import Foundation
 import Vapor
 
 
-extension Future where T == Void {
-    
-    public static func make() -> Future<Void> {
-        let promise = Promise<Void>()
-        promise.complete()
-        return promise.future
-    }
-    
-}
-
-
-extension Future where T: Content {
+extension Future {
     
     public func flatten() -> Future<Void> {
         return map(to: Void.self, { (_) -> Void in
@@ -29,15 +18,3 @@ extension Future where T: Content {
     }
     
 }
-
-
-//extension Array where Element == Future<Void> {
-//    
-//    public func join() -> Future<Void> {
-//        return map(to: Void.self, { (_) -> Void in
-//            return Void()
-//        })
-//    }
-//    
-//}
-

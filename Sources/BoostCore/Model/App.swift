@@ -83,6 +83,10 @@ extension App {
         return siblings()
     }
     
+    var downloadKeys: Children<App, DownloadKey> {
+        return children(\.appId)
+    }
+    
 }
 
 // MARK: - Migrations

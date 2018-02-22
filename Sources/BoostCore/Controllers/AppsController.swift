@@ -38,7 +38,28 @@ class AppsController: Controller {
             }
         }
         
-        // TODO: Return an actual plist!
+        router.get("apps", DbCoreIdentifier.parameter, "auth") { (req) -> Future<Response> in
+            let id = try req.parameter(DbCoreIdentifier.self)
+            
+            return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
+                return appQuery(appId: id, db: db).first().flatMap(to: Response.self) { (app) -> Future<Response> in
+                    guard let appId = app?.id else {
+                        throw ContentError.unavailable
+                    }
+                    let key = DownloadKey(appId: appId)
+                    let originalToken: String = key.token
+                    key.token = try key.token.passwordHash(req)
+                    // TODO: Delete all expired tokens so the DB won't die on us after a few months!!!!!!!!
+                    return key.save(on: db).map(to: Response.self, { (key) -> Response in
+                        let response = try req.response.basic(status: .ok)
+                        key.token = originalToken
+                        response.http.body = try HTTPBody(DownloadKey.Public(downloadKey: key, request: req).asJson())
+                        return response
+                    })
+                }
+            }
+        }
+        
         router.get("apps", DbCoreIdentifier.parameter, "plist") { (req) -> Future<Response> in
             let id = try req.parameter(DbCoreIdentifier.self)
             
@@ -105,7 +126,7 @@ class AppsController: Controller {
         router.post("apps", "upload") { (req) -> Future<Response> in
             let token: String
             if Boost.uploadsRequireKey {
-                guard let t = req.http.headers.authorizationToken?.passwordHash else {
+                guard let t = try req.http.headers.authorizationToken?.passwordHash(req) else {
                     throw ErrorsCore.HTTPError.missingAuthorizationData
                 }
                 token = t
@@ -219,22 +240,7 @@ extension AppsController {
                 return futures.flatten()
             }
         }
-        return Future<Void>.make()
+        return Future(Void())
     }
     
 }
-
-
-/*
- 
- for tag in tags {
- 
- let t = Tag(id: nil, name: String(tag), identifier: String(tag).safeText)
- let future = app.tags.attach(t, on: db)
- futures.append(future)
- }
- return futures.map(to: Void.self, { (_) -> Void in
- return
- })
- 
- */

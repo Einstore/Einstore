@@ -17,4 +17,9 @@ extension Encodable {
         return plistData
     }
     
+    public func asJson() throws -> Data {
+        let jsonData = try JSONEncoder().encode(self)
+        return jsonData
+    }
+    
 }

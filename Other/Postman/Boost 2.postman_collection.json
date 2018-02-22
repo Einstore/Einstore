@@ -146,40 +146,6 @@
 			"response": []
 		},
 		{
-			"name": "Upload",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Token XXXXXX-XXXXXX-XXXXX-XXXX-XXXXXX"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{SERVER}}apps/upload?tags=[tag1,tag2,tag3,tag4]",
-					"host": [
-						"{{SERVER}}apps"
-					],
-					"path": [
-						"upload"
-					],
-					"query": [
-						{
-							"key": "tags",
-							"value": "[tag1,tag2,tag3,tag4]",
-							"equals": true
-						}
-					]
-				},
-				"description": null
-			},
-			"response": []
-		},
-		{
 			"name": "Teams (teams)",
 			"request": {
 				"method": "GET",
@@ -390,7 +356,7 @@
 			"response": []
 		},
 		{
-			"name": "Apps list",
+			"name": "Apps (apps)",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -406,23 +372,228 @@
 			"response": []
 		},
 		{
-			"name": "Apps",
+			"name": "Apps (apps/upload)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e5df00c9-6382-47b9-98ce-f2fc1870ff1b",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 201\"] = responseCode.code === 201;",
+							"",
+							"// Token check",
+							"tests[\"App has an id\"] = (jsonData[\"id\"].length > 0)",
+							"tests[\"App has a name\"] = (jsonData[\"name\"].length > 0)",
+							"tests[\"App has an identifier\"] = (jsonData[\"identifier\"].length > 2)",
+							"",
+							"postman.setEnvironmentVariable(\"APP_ID\", jsonData[\"id\"]);",
+							"",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
 					{
-						"key": "Content-Type",
-						"value": "application/json"
+						"key": "Authorization",
+						"value": "Token XXXXXX-XXXXXX-XXXXX-XXXX-XXXXXX"
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {
+						"src": ""
+					}
+				},
+				"url": {
+					"raw": "{{SERVER}}apps/upload?tags=tag1|tag2|tag3|tag4",
+					"host": [
+						"{{SERVER}}apps"
+					],
+					"path": [
+						"upload"
+					],
+					"query": [
+						{
+							"key": "tags",
+							"value": "tag1|tag2|tag3|tag4",
+							"equals": true
+						}
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Apps (apps/:id)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token XXXXXX-XXXXXX-XXXXX-XXXX-XXXXXX"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"name\": \"App\",\n  \"identifier\": \"identifier\",\n  \"platform\": 1,\n  \"size\": 12312,\n  \"detail\": \"detail\",\n  \"info\": \"info\",\n  \"commit\": \"commit\",\n  \"message\": \"message\",\n  \"devices\": \"devices\",\n  \"version\": \"version\",\n  \"build\": \"build\",\n  \"categoryId\": 1\n}"
+					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}apps",
+					"raw": "{{SERVER}}apps/{{APP_ID}}",
 					"host": [
 						"{{SERVER}}apps"
+					],
+					"path": [
+						"{{APP_ID}}"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Apps (apps/:id/auth)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token XXXXXX-XXXXXX-XXXXX-XXXX-XXXXXX"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}apps/{{APP_ID}}/auth",
+					"host": [
+						"{{SERVER}}apps"
+					],
+					"path": [
+						"{{APP_ID}}",
+						"auth"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Apps (apps/:id/plist)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token XXXXXX-XXXXXX-XXXXX-XXXX-XXXXXX"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}apps/{{APP_ID}}/plist",
+					"host": [
+						"{{SERVER}}apps"
+					],
+					"path": [
+						"{{APP_ID}}",
+						"plist"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Apps (apps/:id/file)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token XXXXXX-XXXXXX-XXXXX-XXXX-XXXXXX"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}apps/{{APP_ID}}/file",
+					"host": [
+						"{{SERVER}}apps"
+					],
+					"path": [
+						"{{APP_ID}}",
+						"file"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Apps (apps/:id/tags)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token XXXXXX-XXXXXX-XXXXX-XXXX-XXXXXX"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}apps/{{APP_ID}}/tags",
+					"host": [
+						"{{SERVER}}apps"
+					],
+					"path": [
+						"{{APP_ID}}",
+						"tags"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Apps (apps/:id)",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token XXXXXX-XXXXXX-XXXXX-XXXX-XXXXXX"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}apps/{{APP_ID}}",
+					"host": [
+						"{{SERVER}}apps"
+					],
+					"path": [
+						"{{APP_ID}}"
 					]
 				},
 				"description": null

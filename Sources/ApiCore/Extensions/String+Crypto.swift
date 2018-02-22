@@ -6,16 +6,22 @@
 //
 
 import Foundation
+import Vapor
 import Crypto
 
 
 extension String {
     
-    public var passwordHash: String {
-        guard let result: Data = try? BCrypt.make(message: self), let hashedString = String(bytes: result, encoding: .utf8) else {
-            fatalError("This should never happen")
+    public func passwordHash(_ req: Request) throws -> String {
+        if req.environment == .production {
+            let result: Data = try BCrypt.make(message: self)
+            guard let hashedString = String(bytes: result, encoding: .utf8) else {
+                fatalError("Should never happen!")
+            }
+            return hashedString
+        } else {
+            return self
         }
-        return hashedString
     }
     
     public var base64Decoded: String? {

@@ -25,6 +25,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		15626280203F7CFB00060489 /* DownloadKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1562627F203F7CFB00060489 /* DownloadKey.swift */; };
 		OBJ_1000 /* PostgreSQL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "PostgreSQL::PostgreSQL::Product" /* PostgreSQL.framework */; };
 		OBJ_1001 /* FluentSQL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Fluent::FluentSQL::Product" /* FluentSQL.framework */; };
 		OBJ_1002 /* SQL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "DatabaseKit::SQL::Product" /* SQL.framework */; };
@@ -4941,6 +4942,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1562627F203F7CFB00060489 /* DownloadKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadKey.swift; sourceTree = "<group>"; };
 		"Async::Async::Product" /* Async.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Async.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCore::Product" /* ApiCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCoreTests::Product" /* ApiCoreTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = ApiCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -7620,7 +7622,7 @@
 			path = Server;
 			sourceTree = "<group>";
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -7634,7 +7636,6 @@
 				OBJ_127 /* Dependencies */,
 				OBJ_841 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_500 /* URI */ = {
@@ -8698,6 +8699,7 @@
 				OBJ_101 /* AppTag.swift */,
 				OBJ_102 /* Tag.swift */,
 				OBJ_103 /* UploadKey.swift */,
+				1562627F203F7CFB00060489 /* DownloadKey.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -10159,7 +10161,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_841 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -10296,6 +10298,7 @@
 				OBJ_1546 /* ApkStrings.swift in Sources */,
 				OBJ_1547 /* BaseExtractor.swift in Sources */,
 				OBJ_1548 /* Ipa.swift in Sources */,
+				15626280203F7CFB00060489 /* DownloadKey.swift in Sources */,
 				OBJ_1549 /* Extractor.swift in Sources */,
 				OBJ_1550 /* App.swift in Sources */,
 				OBJ_1551 /* AppPlist.swift in Sources */,

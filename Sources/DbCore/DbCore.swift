@@ -19,6 +19,7 @@ public let DbCoreDefaultPort: UInt16 = 3306
 public class DbCore {
     
     public static var migrationConfig = MigrationConfig()
+    public static var databaseConfig: DatabaseConfig?
     
     public static func config(hostname: String, user: String, password: String?, database: String, port: UInt16 = DbCoreDefaultPort) -> DatabaseConfig {
         var databaseConfig = DatabaseConfig()
@@ -45,8 +46,10 @@ public class DbCore {
         return config(hostname: host, user: user, password: pass, database: dtbs, port: port)
     }
     
-    public static func configure(databaseConfig: DatabaseConfig,_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
+    public static func configure(databaseConfig: DatabaseConfig, _ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
         try services.register(FluentPostgreSQLProvider())
+        
+        self.databaseConfig = databaseConfig
         
         services.register(databaseConfig)
         services.register(migrationConfig)

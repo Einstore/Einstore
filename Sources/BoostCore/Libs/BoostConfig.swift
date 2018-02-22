@@ -12,6 +12,9 @@ import FileCore
 
 
 public struct BoostConfig {
+    
+    public var serverBaseUrl: String = "http://localhost:8080/"
+    
     public var database: DatabaseConfig? = nil
     public var fileHandler: Handler
     

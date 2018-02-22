@@ -51,6 +51,7 @@ public class Boost {
         ApiAuthMiddleware.allowedUri.append("/apps/upload")
         
         DbCore.migrationConfig.add(model: App.self, database: .db)
+        DbCore.migrationConfig.add(model: DownloadKey.self, database: .db)
         DbCore.migrationConfig.add(model: Tag.self, database: .db)
         DbCore.migrationConfig.add(model: AppTag.self, database: .db)
         DbCore.migrationConfig.add(model: UploadKey.self, database: .db)
