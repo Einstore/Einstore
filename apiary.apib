@@ -787,7 +787,7 @@ Deletes an app, returns a `204` ok but no response needed on success.
         }
 
 
-## App download generator [/apps/{id}/auth]
+## App download authenticator [/apps/{id}/auth]
 
 Use this endpoint to generate download authentication token for `plist` and `file` endpoints. These are neccessary in order to gain access to the binaries.
 
@@ -899,7 +899,7 @@ Download token will stay valid for 30 minutes to initialise a new connection. Ex
     + id (required, number) - Application ID
     + download (string) - Authentication token created using app auth generator
     
-
+    
 ### Binary file (app) [GET]
 
 - Mime type for iOS app is <b><i>application/octet-stream</i></b>
