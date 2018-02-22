@@ -9,12 +9,30 @@ import Foundation
 import Vapor
 
 
-public protocol WebError { }
+// TODO: Change to frontend errors!
+public enum GenericError: FrontendError {
+    
+    case impossibleSituation
+    
+    public var code: String {
+        return "generic"
+    }
+    
+    public var description: String {
+        return "This should never, ever happen!"
+    }
+    
+    public var status: HTTPStatus {
+        return .internalServerError
+    }
+    
+}
 
-
-public enum HTTPError: Error, WebError {
+public enum HTTPError: Error {
     case notAuthorized
     case missingRequestData
     case missingAuthorizationData
 }
+
+
 

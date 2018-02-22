@@ -28,21 +28,21 @@ class BaseExtractor {
     required init(file: URL) throws {
         self.file = file
         
-        let path = "/tmp"
-        archive = URL(fileURLWithPath: path)
+        archive = URL(fileURLWithPath: "/tmp/Boost")
         archive.appendPathComponent("extracted")
         archive.appendPathComponent(sessionUUID)
+        
+        print("Archive: \(sessionUUID)")
         
         try FileManager.default.createDirectory(at: archive, withIntermediateDirectories: true)
     }
     
-    static func decoder(file: String) throws -> Extractor {
+    static func decoder(file: String, platform: App.Platform) throws -> Extractor {
         let url = URL(fileURLWithPath: file)
-        let fileExtension: String = url.pathExtension
-        switch fileExtension {
-        case "ipa":
+        switch platform {
+        case .iOS:
             return try Ipa(file: url)
-        case "apk":
+        case .android:
             return try Apk(file: url)
         default:
             throw ExtractorError.unsupportedFile

@@ -76,9 +76,13 @@ extension Extractor {
         return app
     }
     
-    func save(_ fileHandler: Handler) throws -> Future<Void> {
-        // TODO: Save icon
-        return try fileHandler.upload(file: file.path, destination: sessionUUID + "/app.boost")
+    func save(_ app: App, _ fileHandler: Handler) throws -> Future<Void> {
+        var saves: [Future<Void>] = []
+        saves.append(try fileHandler.upload(file: file.path, destination: app.fileName))
+        if let iconData = iconData {
+            saves.append(try fileHandler.upload(file: iconData, destination: app.iconName))
+        }
+        return saves.flatten()
     }
     
 }

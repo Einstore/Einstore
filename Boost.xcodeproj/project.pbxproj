@@ -27,6 +27,7 @@
 /* Begin PBXBuildFile section */
 		15FB2E3A203CC9AE0071BE50 /* Handler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FB2E39203CC9AE0071BE50 /* Handler.swift */; };
 		15FB2E3C203CC9CA0071BE50 /* Filesystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FB2E3B203CC9CA0071BE50 /* Filesystem.swift */; };
+		15FB2E3E203DA42C0071BE50 /* App+Filename.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FB2E3D203DA42C0071BE50 /* App+Filename.swift */; };
 		OBJ_1000 /* Validation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Validation::Validation::Product" /* Validation.framework */; };
 		OBJ_1001 /* ServerSecurity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "TLS::ServerSecurity::Product" /* ServerSecurity.framework */; };
 		OBJ_1002 /* TemplateKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "TemplateKit::TemplateKit::Product" /* TemplateKit.framework */; };
@@ -4932,6 +4933,7 @@
 /* Begin PBXFileReference section */
 		15FB2E39203CC9AE0071BE50 /* Handler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Handler.swift; sourceTree = "<group>"; };
 		15FB2E3B203CC9CA0071BE50 /* Filesystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Filesystem.swift; sourceTree = "<group>"; };
+		15FB2E3D203DA42C0071BE50 /* App+Filename.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "App+Filename.swift"; sourceTree = "<group>"; };
 		"Async::Async::Product" /* Async.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Async.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCore::Product" /* ApiCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCoreTests::Product" /* ApiCoreTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = ApiCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -8400,6 +8402,7 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_77 /* Dictionary+Plist.swift */,
+				15FB2E3D203DA42C0071BE50 /* App+Filename.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -10281,6 +10284,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
+				15FB2E3E203DA42C0071BE50 /* App+Filename.swift in Sources */,
 				OBJ_1531 /* BoostCore.swift in Sources */,
 				OBJ_1532 /* AppsController.swift in Sources */,
 				OBJ_1533 /* TagsController.swift in Sources */,

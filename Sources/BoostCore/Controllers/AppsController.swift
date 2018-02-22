@@ -13,6 +13,7 @@ import FluentPostgreSQL
 import DbCore
 import ErrorsCore
 import FileCore
+import SwiftShell
 
 
 class AppsController: Controller {
@@ -82,14 +83,18 @@ class AppsController: Controller {
             let id = try req.parameter(DbCoreIdentifier.self)
             
             return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
-                // TODO: Delete all tags (if they don't have any more parent apps)
-                // TODO: Delete files too!
                 return appQuery(appId: id, db: db).first().flatMap(to: Response.self) { (app) -> Future<Response> in
                     guard let app: App = app else {
                         throw ContentError.unavailable
                     }
-                    // TODO: Delete all the files too!
-                    return try app.delete(on: db).flatten().asResponse(to: req)
+                    
+                    guard let appId = app.id else {
+                        throw GenericError.impossibleSituation
+                    }
+                    // TODO: Delete all tags (if they don't have any more parent apps)
+                    return app.delete(on: db).flatMap(to: Response.self, { (app) -> Future<Response> in
+                        return try Boost.config.fileHandler.delete(file: appId.uuidString).asResponse(to: req)
+                    })
                 }
             }
         }
@@ -122,32 +127,62 @@ class AppsController: Controller {
                         uploadToken = UploadKey(id: nil, teamId: teamId, name: "test", expires: nil, token: token)
                     }
                     return App.query(on: req).first().flatMap(to: Response.self, { (app) -> Future<Response> in
-                        //let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/bytecheck-debug.apk"
-                        //let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/AudiA6BiTurbo.ipa"
-                        //let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/harods-rc2-b1-15-android.apk"
-                        let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/HandyFleshlight WatchKit App 2017-01-05 10-10-35/HandyFleshlight WatchKit App.ipa"
-                        //let path = "/Users/pro/Desktop/Desktop - Dictator/Builds/app.ipa"
-                        
-                        let extractor: Extractor = try BaseExtractor.decoder(file: path)
-                        do {
-                            let promise: Promise<App> = try extractor.process(teamId: uploadToken.teamId)
-                            return promise.future.flatMap(to: Response.self, { (app) -> Future<Response> in
-                                return app.save(on: db).flatMap(to: Response.self) { (app) -> Future<Response> in
-                                    // Save files
-                                    // TODO: Remove the force unwrap!!!
-                                    return try extractor.save(Boost.config.fileHandler!).flatMap(to: Response.self, { (_) -> Future<Response> in
-                                        // Save tags
-                                        return handleTags(db: db, request: req, app: app).flatMap(to: Response.self) { (_) -> Future<Response> in
-                                            return try app.asResponse(.created, to: req)
-                                        }
-                                    })
+                        // TODO: Change to copy file when https://github.com/vapor/core/pull/83 is done
+                        return req.http.body.makeData(max: Filesize.gigabyte(1).value).flatMap(to: Response.self, { (data) -> Future<Response> in
+                            // TODO: -------- REFACTOR ---------
+                            let uuid = UUID()
+                            var path = URL(fileURLWithPath: "/tmp/Boost")
+                            try FileManager.default.createDirectory(at: path, withIntermediateDirectories: true)
+                            path = path.appendingPathComponent(uuid.uuidString).appendingPathExtension("boost")
+                            try data.write(to: path)
+                            let output: RunOutput = SwiftShell.run("unzip", "-Z1", path.path)
+                            
+                            let platform: App.Platform
+                            if output.succeeded {
+                                print(output.stdout)
+                                
+                                if output.stdout.contains("Payload/") {
+                                    platform = .iOS
                                 }
-                            })
-                        } catch {
-                            print(error.localizedDescription)
-                            try extractor.cleanUp()
-                            throw error
-                        }
+                                else if output.stdout.contains("AndroidManifest.xml") {
+                                    platform = .android
+                                }
+                                else {
+                                    throw ExtractorError.invalidAppContent
+                                }
+                            }
+                            else {
+                                print(output.stderror)
+                                throw ExtractorError.invalidAppContent
+                            }
+                            // */ -------- REFACTOR END ---------
+                            
+                            let extractor: Extractor = try BaseExtractor.decoder(file: path.path, platform: platform)
+                            do {
+                                let promise: Promise<App> = try extractor.process(teamId: uploadToken.teamId)
+                                return promise.future.flatMap(to: Response.self, { (app) -> Future<Response> in
+                                    return app.save(on: db).flatMap(to: Response.self) { (app) -> Future<Response> in
+                                        // Save files
+                                        // TODO: Remove the force unwrap!!!
+                                        return try extractor.save(app, Boost.config.fileHandler).flatMap(to: Response.self, { (_) -> Future<Response> in
+                                            try FileManager.default.removeItem(at: path) // Remove after refactor
+                                            
+                                            // Save tags
+                                            return handleTags(db: db, request: req, app: app).flatMap(to: Response.self) { (_) -> Future<Response> in
+                                                return try app.asResponse(.created, to: req)
+                                            }
+                                        })
+                                    }
+                                })
+                            } catch {
+                                print(error.localizedDescription)
+                                
+                                // Clean files
+                                try extractor.cleanUp()
+                                try FileManager.default.removeItem(at: path) // Remove after refactor
+                                throw error
+                            }
+                        })
                     })
                 })
             }

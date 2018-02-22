@@ -150,12 +150,12 @@ public class Filesystem: Handler {
         if !FileManager.default.fileExists(atPath: path.path) {
             do {
                 try FileManager.default.createDirectory(at: path, withIntermediateDirectories: true)
-                promise.complete()
             } catch {
                 throw FilesystemError.unableToCreatePath
             }
         }
         try file.write(to: url)
+        promise.complete()
         return promise.future
     }
     
@@ -178,17 +178,18 @@ public class Filesystem: Handler {
     
     public func delete(file: String) throws -> Future<Void> {
         let promise = Promise<Void>()
+        let path = config.homeDir.appendingPathComponent(file)
         // TODO: Make async
-        if FileManager.default.fileExists(atPath: file) {
+        if FileManager.default.fileExists(atPath: path.path) {
             do {
-                try FileManager.default.removeItem(at: config.homeDir.appendingPathComponent(file))
+                try FileManager.default.removeItem(at: path)
                 promise.complete()
             } catch {
                 throw FilesystemError.unableToDeleteFile
             }
         }
         else {
-            throw FilesystemError.fileMissing
+            promise.fail(FilesystemError.fileMissing)
         }
         return promise.future
     }

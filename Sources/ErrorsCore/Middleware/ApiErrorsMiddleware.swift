@@ -41,61 +41,33 @@ public final class ErrorsCoreMiddleware: Middleware, ServiceFactory {
     
     /// See `Middleware.respond`
     public func respond(to req: Request, chainingTo next: Responder) throws -> Future<Response> {
-        let promise = Promise(Response.self)
-        
-        func handleError(_ error: Swift.Error) throws {
+        return try next.respond(to: req).catchMap { (error) -> (Response) in
             if let frontendError = error as? FrontendError {
-                let res = try req.response.error(status: frontendError.status, error: frontendError.code, description: frontendError.description)
-                promise.complete(res)
-                return
+                let response = try req.response.error(status: frontendError.status, error: frontendError.code, description: frontendError.description)
+                return response
             }
-            
-            let reason: String
-            let status: HTTPStatus
-            
-            switch environment {
-            case .production:
-                if let abort = error as? AbortError {
-                    reason = abort.reason
-                    status = abort.status
-                } else {
-                    status = .internalServerError
-                    reason = "Something went wrong."
+            else {
+                let reason: String
+                switch self.environment {
+                case .production:
+                    if let abort = error as? AbortError {
+                        reason = abort.reason
+                    } else {
+                        reason = "Something went wrong."
+                    }
+                default:
+                    self.log.error(error.localizedDescription)
+                    
+                    if let debuggable = error as? Debuggable {
+                        reason = debuggable.reason
+                    } else if let abort = error as? AbortError {
+                        reason = abort.reason
+                    } else {
+                        reason = "Something went wrong."
+                    }
                 }
-            default:
-                log.error(error.localizedDescription)
-                
-                if let debuggable = error as? Debuggable {
-                    reason = debuggable.reason
-                } else if let abort = error as? AbortError {
-                    reason = abort.reason
-                } else {
-                    reason = "Something went wrong."
-                }
-                
-                if let abort = error as? AbortError {
-                    status = abort.status
-                } else {
-                    status = .internalServerError
-                }
+                return try req.response.internalServerError(message: reason)
             }
-            
-            let res = try req.response.internalServerError(message: reason)
-            res.http.status = status
-            promise.complete(res)
         }
-        
-        do {
-            try next.respond(to: req).do { res in
-                promise.complete(res)
-                }.catch { error in
-                    // TODO: This doesn't return anything?!
-                    try? handleError(error)
-            }
-        } catch {
-            try handleError(error)
-        }
-        
-        return promise.future
     }
 }

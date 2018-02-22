@@ -76,6 +76,7 @@ extension Ipa {
         }
     }
     
+    // TODO: Convert the implementation to use a Codable object
     private func parseInfoPlistFile(_ plist: [String: AnyObject]) throws {
         // Bundle ID
         guard let bundleId = plist["CFBundleIdentifier"] as? String else {
