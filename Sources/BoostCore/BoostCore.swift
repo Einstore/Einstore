@@ -44,9 +44,7 @@ public class Boost {
             fatalError("Missing database configuration in BoostConfig")
         }
         
-        if boostConfig.fileHandler == nil {
-            boostConfig.fileHandler = try Filesystem(config: Filesystem.Config(homeDir: "/tmp/Boost/"))
-        }
+        boostConfig.fileHandler = try Filesystem(config: Filesystem.Config(homeDir: "/tmp/Boost/"))
         
         self.config = boostConfig
         

@@ -39,16 +39,19 @@ class AppsController: Controller {
         }
         
         // TODO: Return an actual plist!
-        router.get("apps", DbCoreIdentifier.parameter, "plist") { (req) -> Future<App> in
+        router.get("apps", DbCoreIdentifier.parameter, "plist") { (req) -> Future<Response> in
             let id = try req.parameter(DbCoreIdentifier.self)
             
-            return req.withPooledConnection(to: .db) { (db) -> Future<App> in
-                return appQuery(appId: id, db: db).first().map(to: App.self, { (app) -> App in
+            return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
+                return appQuery(appId: id, db: db).first().map(to: Response.self) { (app) -> Response in
                     guard let app = app else {
                         throw ContentError.unavailable
                     }
-                    return app
-                })
+                    let response = try req.response.basic(status: .ok)
+                    response.http.headers = HTTPHeaders(dictionaryLiteral: (.contentType, "application/xml; charset=utf-8"))
+                    response.http.body = try HTTPBody(AppPlist(app: app, request: req).asPropertyList())
+                    return response
+                }
             }
         }
         
@@ -115,7 +118,7 @@ class AppsController: Controller {
             let teamId = DbCoreIdentifier()
             
             return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
-                return UploadKey.query(on: db).filter(\.token == token).first().flatMap(to: Response.self, { (matchingToken) -> Future<Response> in
+                return UploadKey.query(on: db).filter(\.token == token).first().flatMap(to: Response.self) { (matchingToken) -> Future<Response> in
                     let uploadToken: UploadKey
                     if Boost.uploadsRequireKey {
                         guard let t = matchingToken else {
@@ -126,9 +129,9 @@ class AppsController: Controller {
                     else {
                         uploadToken = UploadKey(id: nil, teamId: teamId, name: "test", expires: nil, token: token)
                     }
-                    return App.query(on: req).first().flatMap(to: Response.self, { (app) -> Future<Response> in
+                    return App.query(on: req).first().flatMap(to: Response.self) { (app) -> Future<Response> in
                         // TODO: Change to copy file when https://github.com/vapor/core/pull/83 is done
-                        return req.http.body.makeData(max: Filesize.gigabyte(1).value).flatMap(to: Response.self, { (data) -> Future<Response> in
+                        return req.http.body.makeData(max: Filesize.gigabyte(1).value).flatMap(to: Response.self) { (data) -> Future<Response> in
                             // TODO: -------- REFACTOR ---------
                             let uuid = UUID()
                             var path = URL(fileURLWithPath: "/tmp/Boost")
@@ -160,31 +163,28 @@ class AppsController: Controller {
                             let extractor: Extractor = try BaseExtractor.decoder(file: path.path, platform: platform)
                             do {
                                 let promise: Promise<App> = try extractor.process(teamId: uploadToken.teamId)
-                                return promise.future.flatMap(to: Response.self, { (app) -> Future<Response> in
+                                return promise.future.flatMap(to: Response.self) { (app) -> Future<Response> in
                                     return app.save(on: db).flatMap(to: Response.self) { (app) -> Future<Response> in
-                                        // Save files
                                         // TODO: Remove the force unwrap!!!
-                                        return try extractor.save(app, Boost.config.fileHandler).flatMap(to: Response.self, { (_) -> Future<Response> in
+                                        return try extractor.save(app, Boost.config.fileHandler).flatMap(to: Response.self) { (_) -> Future<Response> in
                                             try FileManager.default.removeItem(at: path) // Remove after refactor
                                             
                                             // Save tags
                                             return handleTags(db: db, request: req, app: app).flatMap(to: Response.self) { (_) -> Future<Response> in
                                                 return try app.asResponse(.created, to: req)
                                             }
-                                        })
+                                        }
                                     }
-                                })
+                                }
                             } catch {
-                                print(error.localizedDescription)
-                                
                                 // Clean files
                                 try extractor.cleanUp()
                                 try FileManager.default.removeItem(at: path) // Remove after refactor
                                 throw error
                             }
-                        })
-                    })
-                })
+                        }
+                    }
+                }
             }
         }
     }

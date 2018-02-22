@@ -28,6 +28,9 @@
 		15FB2E3A203CC9AE0071BE50 /* Handler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FB2E39203CC9AE0071BE50 /* Handler.swift */; };
 		15FB2E3C203CC9CA0071BE50 /* Filesystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FB2E3B203CC9CA0071BE50 /* Filesystem.swift */; };
 		15FB2E3E203DA42C0071BE50 /* App+Filename.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FB2E3D203DA42C0071BE50 /* App+Filename.swift */; };
+		15FB2E40203F060E0071BE50 /* Encodable+Tools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FB2E3F203F060E0071BE50 /* Encodable+Tools.swift */; };
+		15FB2E43203F08B10071BE50 /* AppPlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FB2E41203F08850071BE50 /* AppPlist.swift */; };
+		15FB2E45203F120B0071BE50 /* Request+URI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FB2E44203F120B0071BE50 /* Request+URI.swift */; };
 		OBJ_1000 /* Validation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Validation::Validation::Product" /* Validation.framework */; };
 		OBJ_1001 /* ServerSecurity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "TLS::ServerSecurity::Product" /* ServerSecurity.framework */; };
 		OBJ_1002 /* TemplateKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "TemplateKit::TemplateKit::Product" /* TemplateKit.framework */; };
@@ -264,7 +267,6 @@
 		OBJ_1538 /* ApkManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_84 /* ApkManifest.swift */; };
 		OBJ_1539 /* ApkStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_85 /* ApkStrings.swift */; };
 		OBJ_1540 /* BaseExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_86 /* BaseExtractor.swift */; };
-		OBJ_1541 /* Extractor+Tools.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_88 /* Extractor+Tools.swift */; };
 		OBJ_1542 /* Ipa.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_90 /* Ipa.swift */; };
 		OBJ_1543 /* Extractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_92 /* Extractor.swift */; };
 		OBJ_1544 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_94 /* App.swift */; };
@@ -4934,6 +4936,9 @@
 		15FB2E39203CC9AE0071BE50 /* Handler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Handler.swift; sourceTree = "<group>"; };
 		15FB2E3B203CC9CA0071BE50 /* Filesystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Filesystem.swift; sourceTree = "<group>"; };
 		15FB2E3D203DA42C0071BE50 /* App+Filename.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "App+Filename.swift"; sourceTree = "<group>"; };
+		15FB2E3F203F060E0071BE50 /* Encodable+Tools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Encodable+Tools.swift"; sourceTree = "<group>"; };
+		15FB2E41203F08850071BE50 /* AppPlist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPlist.swift; sourceTree = "<group>"; };
+		15FB2E44203F120B0071BE50 /* Request+URI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Request+URI.swift"; sourceTree = "<group>"; };
 		"Async::Async::Product" /* Async.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Async.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCore::Product" /* ApiCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCoreTests::Product" /* ApiCoreTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = ApiCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -5602,7 +5607,6 @@
 		OBJ_84 /* ApkManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApkManifest.swift; sourceTree = "<group>"; };
 		OBJ_85 /* ApkStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApkStrings.swift; sourceTree = "<group>"; };
 		OBJ_86 /* BaseExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseExtractor.swift; sourceTree = "<group>"; };
-		OBJ_88 /* Extractor+Tools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extractor+Tools.swift"; sourceTree = "<group>"; };
 		OBJ_9 /* ErrorsCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorsCoreTests.swift; sourceTree = "<group>"; };
 		OBJ_90 /* Ipa.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ipa.swift; sourceTree = "<group>"; };
 		OBJ_92 /* Extractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extractor.swift; sourceTree = "<group>"; };
@@ -7405,6 +7409,8 @@
 				OBJ_48 /* Request+Files.swift */,
 				OBJ_49 /* String+Crypto.swift */,
 				OBJ_50 /* String+Manipulation.swift */,
+				15FB2E3F203F060E0071BE50 /* Encodable+Tools.swift */,
+				15FB2E44203F120B0071BE50 /* Request+URI.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -8660,7 +8666,6 @@
 		OBJ_87 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_88 /* Extractor+Tools.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -8688,6 +8693,7 @@
 				OBJ_95 /* AppTag.swift */,
 				OBJ_96 /* Tag.swift */,
 				OBJ_97 /* UploadKey.swift */,
+				15FB2E41203F08850071BE50 /* AppPlist.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -10284,6 +10290,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
+				15FB2E43203F08B10071BE50 /* AppPlist.swift in Sources */,
 				15FB2E3E203DA42C0071BE50 /* App+Filename.swift in Sources */,
 				OBJ_1531 /* BoostCore.swift in Sources */,
 				OBJ_1532 /* AppsController.swift in Sources */,
@@ -10295,7 +10302,6 @@
 				OBJ_1538 /* ApkManifest.swift in Sources */,
 				OBJ_1539 /* ApkStrings.swift in Sources */,
 				OBJ_1540 /* BaseExtractor.swift in Sources */,
-				OBJ_1541 /* Extractor+Tools.swift in Sources */,
 				OBJ_1542 /* Ipa.swift in Sources */,
 				OBJ_1543 /* Extractor.swift in Sources */,
 				OBJ_1544 /* App.swift in Sources */,
@@ -10344,6 +10350,7 @@
 				OBJ_1695 /* UsersController.swift in Sources */,
 				OBJ_1696 /* Content+Response.swift in Sources */,
 				OBJ_1697 /* Date+Tools.swift in Sources */,
+				15FB2E40203F060E0071BE50 /* Encodable+Tools.swift in Sources */,
 				OBJ_1698 /* Future+Response.swift in Sources */,
 				OBJ_1699 /* Future+Tools.swift in Sources */,
 				OBJ_1700 /* HTTPHeaders+Tools.swift in Sources */,
@@ -10351,6 +10358,7 @@
 				OBJ_1702 /* Request+Files.swift in Sources */,
 				OBJ_1703 /* String+Crypto.swift in Sources */,
 				OBJ_1704 /* String+Manipulation.swift in Sources */,
+				15FB2E45203F120B0071BE50 /* Request+URI.swift in Sources */,
 				OBJ_1705 /* AuthError.swift in Sources */,
 				OBJ_1706 /* AuthenticationCache.swift in Sources */,
 				OBJ_1707 /* Decodable+Helpers.swift in Sources */,
