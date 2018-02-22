@@ -1,0 +1,1044 @@
+FORMAT: 1A
+HOST: http://api.appstorehq.net/
+
+
+
+
+# Boost
+
+Boost has a fairly simple API which leverages JWT authentication.
+
+Should you require any assistance implementing Boost's API, please feel free to contact us via our LiveUI Slack on channel <a href="http://bit.ly/2B0dEyt">#help-boost</a>
+[![Slack](https://img.shields.io/badge/join-our%20slack-745EAF.svg?style=flat)](http://bit.ly/2B0dEyt)
+
+Open source code licensed under Apache 2 license can be found on github.com: [![Slack](https://img.shields.io/badge/source-github.com-black.svg?style=flat)](https://github.com/manGoweb/Boost)
+
+
+## Install [/install]
+
+Installs default admin user. Login `admin@liveui.io`, password `admin`. 
+
+*Endpoint doesn't work in a `production` environment.*
+
+### Install [GET]
+
++ Response 200 (application/json; charset=utf-8)
+            
+    + Body
+
+            {
+                "code": "maintenance_ok"
+                "description": "Install finished"
+            }
+
++ Response 412 (application/json; charset=utf-8)
+
+        {
+            "error": "not_available"
+            "description": "Endpoint is not available in production mode"
+        }
+        
+        
+## Demo [/demo]
+
+Installs default admin user. Login `admin@liveui.io`, password `admin` plus a set of demo data for testing.
+
+*Endpoint doesn't work in a `production` environment.*
+
+### Demo [GET]
+
++ Response 200 (application/json; charset=utf-8)
+            
+    + Body
+
+            {
+                "code": "maintenance_ok"
+                "description": "Install finished"
+            }
+
++ Response 412 (application/json; charset=utf-8)
+
+        {
+            "error": "not_available"
+            "description": "Endpoint is not available in production mode"
+        }
+        
+        
+        
+## Authentication [/auth]
+
+When authenticating, first you need to get a permanent token which your client needs to store locally for further use.
+Response header also contains a JWT token which will be valid for 3 minutes. When JWT token expires it needs to be refreshed using "Refresh JWT token"
+
+### Get permanent token (BASIC auth) [GET]
+
+
++ Request
+    
+    + Headers
+
+            Authorization: Basic YWRtaW5AbGl2ZXVpLmlvOmFkbWlu
+
+
++ Response 200 (application/json; charset=utf-8)
+    + Headers
+
+            Authorization: Bearer eyJhbGciOiJIUzUxMiIsInVzZXIiOjEsInRva2VuIjoiRTk3OTYzMjItOURBNy00RTAwLTlCNTItOEI4RThBRjkwRDAxIiwidHlwIjoiSldUIn0.eyJleHAiOjE1MTU2MTMwOTN9.O8fDHdMlm_k5n0-CwntVs5FmnV2cdYB6QwfTcT4Oh6JI5V2ckNnV-QDrNAZPhKR2GZKgKMI7B5EJ6iffetU2hg
+            
+    + Body
+
+            {
+                "token": "EA58FE6F-E2A0-404D-A252-1BBFB286A072",
+                "last_used": "2018-01-10T18:38:35.762Z",
+                "user_id": 1
+            }
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed"
+            "error": "Unable to verify authorization token"
+        }
+
+### Get permanent token [POST]
+
+
++ Request
+    + Headers
+    
+            ContentType: application/json
+            
+
+    + Body
+    
+            {
+                "username": "admin@liveui.io"
+                "password": "s3cretPassw0rd"
+            }
+
++ Response 200 (application/json; charset=utf-8)
+    + Headers
+
+            Authorization: Bearer eyJhbGciOiJIUzUxMiIsInVzZXIiOjEsInRva2VuIjoiRTk3OTYzMjItOURBNy00RTAwLTlCNTItOEI4RThBRjkwRDAxIiwidHlwIjoiSldUIn0.eyJleHAiOjE1MTU2MTMwOTN9.O8fDHdMlm_k5n0-CwntVs5FmnV2cdYB6QwfTcT4Oh6JI5V2ckNnV-QDrNAZPhKR2GZKgKMI7B5EJ6iffetU2hg
+            ContentType: application/json; charset=utf-8
+            
+    + Body
+
+            {
+                "token": "EA58FE6F-E2A0-404D-A252-1BBFB286A072",
+                "last_used": "2018-01-10T18:38:35.762Z",
+                "user_id": 1
+            }
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed"
+            "error": "Unable to verify authorization token"
+        }
+
+
+## Token refresh [/token]
+
+JWT token needs to be refreshed after 30 seconds from the last request made. With each successful request the token's expiration is extended.
+
+
+### Refresh JWT token (BASIC auth) [GET]
+
+
++ Request
+    
+    + Headers
+
+            Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
+
+
++ Response 200 (application/json; charset=utf-8)
+
+    + Headers
+
+            Authorization: Bearer eyJhbGciOiJIUzUxMiIsInVzZXIiOjEsInRva2VuIjoiRTk3OTYzMjItOURBNy00RTAwLTlCNTItOEI4RThBRjkwRDAxIiwidHlwIjoiSldUIn0.eyJleHAiOjE1MTU2MTMwOTN9.O8fDHdMlm_k5n0-CwntVs5FmnV2cdYB6QwfTcT4Oh6JI5V2ckNnV-QDrNAZPhKR2GZKgKMI7B5EJ6iffetU2hg
+            ContentType: application/json; charset=utf-8
+            
+    + Body
+
+            {
+                "last_used": "2018-01-10T18:38:35.762Z",
+                "user_id": 1
+            }
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed"
+            "error": "Unable to verify authorization token"
+        }
+
+
+### Refresh JWT token [POST]
+
+
++ Request
+    
+    + Headers
+    
+            ContentType: application/json
+            
+    + Body
+    
+            {
+                "token": "EA58FE6F-E2A0-404D-A252-1BBFB286A072"
+            }
+
+
++ Response 200 (application/json; charset=utf-8)
+
+    + Headers
+
+            Authorization: Bearer eyJhbGciOiJIUzUxMiIsInVzZXIiOjEsInRva2VuIjoiRTk3OTYzMjItOURBNy00RTAwLTlCNTItOEI4RThBRjkwRDAxIiwidHlwIjoiSldUIn0.eyJleHAiOjE1MTU2MTMwOTN9.O8fDHdMlm_k5n0-CwntVs5FmnV2cdYB6QwfTcT4Oh6JI5V2ckNnV-QDrNAZPhKR2GZKgKMI7B5EJ6iffetU2hg
+            ContentType: application/json; charset=utf-8
+            
+    + Body
+
+            {
+                "last_used": "2018-01-10T18:38:35.762Z",
+                "user_id": 1
+            }
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed"
+            "error": "Unable to verify authorization token"
+        }
+
+
+## Teams [/teams]
+
+JWT token needs to be refreshed after 30 seconds from the last request made. With each successful request the token's expiration is extended.
+
+
+### List all available teams [GET]
+
+
++ Request
+    
+    + Headers
+
+            Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
+
+
++ Response 200 (application/json; charset=utf-8)
+            
+    + Body
+    
+            [
+                {
+                    "id": 1,
+                    "name": "Admin team",
+                    "identifier": "admin-team"
+                },
+                {
+                    "id": 2,
+                    "name": "Client",
+                    "identifier": "client"
+                }
+            ]
+
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed"
+            "error": "Unable to verify authorization token"
+        }
+
+
+
+### Create new team [POST]
+
+Team identifier needs to be unique for the whole platform. If sent in an incorect format, string in it will be formatted into a "safe text", for example `My amazing TEAM!` will be formatted into `my-amazing-team`.
+
++ Request
+    
+    + Headers
+
+            Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
+            
+    + Body
+    
+            {
+                "name": "My new team",
+                "identifier": "my-new-team"
+            }
+
+
+
++ Response 200 (application/json; charset=utf-8)
+            
+    + Body
+    
+            {
+                "id": 3,
+                "name": "My new team",
+                "identifier": "my-new-team"
+            }
+
++ Response 408 (application/json; charset=utf-8)
+
+        {
+            "code": "app_error"
+            "error": "Identifier already exists"
+        }
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed"
+            "error": "Unable to verify authorization token"
+        }
+
+
+
+## Teams check [/teams/check]
+
+
+### Check if team exists [POST]
+
+Team identifier needs to be unique for the whole platform. If sent in an incorect format, string in it will be formatted into a "safe text", for example `My amazing TEAM!` will be formatted into `my-amazing-team`.
+
++ Request
+    
+    + Headers
+
+            Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
+            
+    + Body
+    
+            {
+                "identifier": "my-new-team"
+            }
+
+
+
++ Response 200 (application/json; charset=utf-8)
+
+    + Body
+                
+            {
+                "code": "ok"
+                "error": "Identifier is available",
+                "identifier": "my-new-team"
+            }
+        
++ Response 408 (application/json; charset=utf-8)
+
+        {
+            "code": "app_error"
+            "error": "Identifier already exists"
+        }
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed"
+            "error": "Unable to verify authorization token"
+        }
+
+
+
+## Team [/teams/{id}]
+
+For updates, team identifier needs to be unique for the whole platform. If sent in an incorect format, string in it will be formatted into a "safe text", for example `My amazing TEAM!` will be formatted into `my-amazing-team`.
+
+
+### Get single team [GET]
+
+
++ Parameters
+    + id (required, number) - Id of the team
+
++ Request
+    
+    + Headers
+
+            Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
+            
+    + Body
+    
+            {
+                "identifier": "my-new-team"
+            }
+
+
+
++ Response 200 (application/json; charset=utf-8)
+
+    + Body
+                
+            {
+                "id": 3,
+                "name": "My team",
+                "identifier": "my-team"
+            }
+        
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed"
+            "error": "Unable to verify authorization token"
+        }
+
+
+
+### Update team [PUT]
+
+
++ Parameters
+    + id (required, number) - Id of the team
+
++ Request
+    
+    + Headers
+
+            Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
+            
+    + Body
+    
+            {
+                "name": "My updated team!",
+                "identifier": "my-updated-team"
+            }
+
+
+
++ Response 200 (application/json; charset=utf-8)
+
+    + Body
+                
+            {
+                "id": 3,
+                "name": "My updated team!",
+                "identifier": "my-updated-team"
+            }
+        
++ Response 408 (application/json; charset=utf-8)
+
+        {
+            "code": "app_error"
+            "error": "Identifier already exists"
+        }
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed"
+            "error": "Unable to verify authorization token"
+        }
+
+
+### Partially update team [PATCH]
+
+
++ Parameters
+    + id (required, number) - Id of the team
+
++ Request
+    
+    + Headers
+
+            Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
+            
+    + Body
+    
+            {
+                "name": "My updated team!"
+            }
+
+
+
++ Response 200 (application/json; charset=utf-8)
+
+    + Body
+                
+            {
+                "id": 3,
+                "name": "My updated team!",
+                "identifier": "my-team"
+            }
+        
++ Response 408 (application/json; charset=utf-8)
+
+        {
+            "code": "app_error"
+            "error": "Identifier already exists"
+        }
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed"
+            "error": "Unable to verify authorization token"
+        }
+
+
+
+
+## Overview [/overview{?sort,filter,platform}]
+
+JWT token is used to authenticate.
+
++ Parameters
+    + sort (optional, string) - Sort<br>
+        + Members
+            + name
+            + platform
+            + identifier
+        + Default: name
+    + filter (optional, array[String]) - Array of tag identifiers<br>Example: [lib_version_1.2.3|another-tag]<br>
+    + platform (optional, string) - Filter apps for a specific platform
+        + Members
+            + ios
+            + android
+
+### List [GET]
+
+Used to list all available apps grouped by platform and bundle id, mainly to be displayed on a "home page" of a client
+
+Results are sorted by app name by default.
+
++ Request
+    
+    + Headers
+
+            Authorization: Bearer eyJhbGciOiJIUzUxMiIsInVzZXIiOjEsInRva2VuIjoiRTk3OTYzMjItOURBNy00RTAwLTlCNTItOEI4RThBRjkwRDAxIiwidHlwIjoiSldUIn0
+
+
++ Response 200 (application/json; charset=utf-8)
+
+        [
+            {
+                "build": "123",
+                "basic": false,
+                "id": 1,
+                "platform": 1,
+                "team_id": 1,
+                "version": "1.2.3",
+                "identifier": "com.boost.super-app1",
+                "created": 535044877,
+                "name": "Super app 1",
+                "modified": 535044877
+            },
+            {
+                "build": "123",
+                "basic": false,
+                "id": 2,
+                "platform": 2,
+                "team_id": 1,
+                "version": "1.2.3",
+                "identifier": "com.boost.super-app1",
+                "created": 535044877,
+                "name": "Super app2",
+                "modified": 535044877
+            },
+            {
+                "build": "123",
+                "basic": false,
+                "id": 3,
+                "platform": 2,
+                "team_id": 1,
+                "version": "1.2.3",
+                "identifier": "com.boost.super-app1",
+                "created": 535044877,
+                "name": "Super app3",
+                "modified": 535044877
+            }
+        ]
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed"
+            "error": "authentication failed"
+        }
+
+## Upload [/upload?tags={tagsArray}]
+
+Upload token (headers) is used to authenticate. This can be created using `/upload-tokens` endpoint.
+
+### Upload new app [POST]
+
+1) When uploading new apps submit `.ipa` or `.apk` file as a full POST request payload. 
+2) Multiple tags should be separated by `|`, for example `/upload?tags=tag1|library_version_1.2.3|some%20Other%20tag`
+
+
++ Request (multipart/form-data)
+    
+    + Headers
+
+            Authorization: Token XXXXXX-XXXXXX-XXXXX-XXXX-XXXXXX
+
+
+
++ Response 201 (application/json; charset=utf-8)
+
+    + Body
+    
+            {
+                "build": "123",
+                "basic": false,
+                "id": 3,
+                "platform": 2,
+                "team_id": 1,
+                "version": "1.2.3",
+                "identifier": "com.boost.super-app1",
+                "created": 535044877,
+                "name": "Super app3",
+                "modified": 535044877
+            }
+            
+    + Attributes (App)
+            
+## Apps [/apps/{platform}/{identifier}]
+
+JWT token is used to authenticate.
+
+### List builds for app [GET]
+
+You may create your own question using this action. It takes a JSON
+object containing a question and a collection of answers in the
+form of choices.
+
++ Request
+    
+    + Headers
+
+            Authorization: Bearer eyJhbGciOiJIUzUxMiIsInVzZXIiOjEsInRva2VuIjoiRTk3OTYzMjItOURBNy00RTAwLTlCNTItOEI4RThBRjkwRDAxIiwidHlwIjoiSldUIn0
+
+
++ Response 200 (application/json; charset=utf-8)
+
+    + Body
+    
+            [
+                {
+                    "build": "123",
+                    "basic": false,
+                    "id": 1,
+                    "platform": 1,
+                    "team_id": 1,
+                    "version": "1.2.3",
+                    "identifier": "com.boost.super-app1",
+                    "created": 535044877,
+                    "name": "Super app 1",
+                    "modified": 535044877
+                },
+                {
+                    "build": "123",
+                    "basic": false,
+                    "id": 2,
+                    "platform": 2,
+                    "team_id": 1,
+                    "version": "1.2.3",
+                    "identifier": "com.boost.super-app1",
+                    "created": 535044877,
+                    "name": "Super app2",
+                    "modified": 535044877
+                },
+                {
+                    "build": "123",
+                    "basic": false,
+                    "id": 3,
+                    "platform": 2,
+                    "team_id": 1,
+                    "version": "1.2.3",
+                    "identifier": "com.boost.super-app1",
+                    "created": 535044877,
+                    "name": "Super app3",
+                    "modified": 535044877
+                }
+            ]
+            
+    + Attributes (Apps)
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed"
+            "error": "authentication failed"
+        }
+        
+
+## App [/apps/{id}{?depth}]
+
+JWT token is used to authenticate.
+
++ Parameters
+    + id (required, number) - Application ID
+    + depth (optional, number) - Returns tags related to the app if `depth > 0`<br>discarded on delete<br>
+        + Default: 0
+
+### App detail [GET]
+
+Return a single app detail.
+
++ Request
+    
+    + Headers
+
+            Authorization: Bearer eyJhbGciOiJIUzUxMiIsInVzZXIiOjEsInRva2VuIjoiRTk3OTYzMjItOURBNy00RTAwLTlCNTItOEI4RThBRjkwRDAxIiwidHlwIjoiSldUIn0
+
+
++ Response 200 (application/json; charset=utf-8)
+
+    + Body
+    
+            {
+                "build": "123",
+                "basic": false,
+                "id": 1,
+                "platform": 1,
+                "team_id": 1,
+                "version": "1.2.3",
+                "identifier": "com.boost.super-app1",
+                "created": 535044877,
+                "name": "Super app 1",
+                "modified": 535044877
+            }
+
+    + Attributes (App)
+            
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed"
+            "error": "authentication failed"
+        }
+        
+            
+### Update app [PUT]
+
+Updates an app. Only name of the 
+
++ Request
+    
+    + Headers
+
+            Authorization: Bearer eyJhbGciOiJIUzUxMiIsInVzZXIiOjEsInRva2VuIjoiRTk3OTYzMjItOURBNy00RTAwLTlCNTItOEI4RThBRjkwRDAxIiwidHlwIjoiSldUIn0
+            
+    + Body
+            
+            {
+                "basic": false,
+                "version": "1.2.7",
+                "build": "123",
+                "identifier": "com.boost.super-app1",
+                "name": "Updated app name"
+            }
+    
+    + Attributes (AppPut)
+
++ Response 200 (application/json; charset=utf-8)
+
+    + Body
+    
+            {
+                "build": "123",
+                "basic": false,
+                "id": 1,
+                "platform": 1,
+                "team_id": 1,
+                "version": "1.2.7",
+                "identifier": "com.boost.super-app1",
+                "created": 535044877,
+                "name": "Updated app name",
+                "modified": 535044877
+            }
+
+    + Attributes (App)
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed"
+            "error": "authentication failed"
+        }
+        
+            
+### Delete app [DELETE]
+
+Deletes an app, returns a `204` ok but no response needed on success.
+
++ Request
+    
+    + Headers
+
+            Authorization: Bearer eyJhbGciOiJIUzUxMiIsInVzZXIiOjEsInRva2VuIjoiRTk3OTYzMjItOURBNy00RTAwLTlCNTItOEI4RThBRjkwRDAxIiwidHlwIjoiSldUIn0
+
+
++ Response 204 (text/plain)
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed"
+            "error": "authentication failed"
+        }
+
+
+## App download generator [/apps/{id}/auth]
+
+Use this endpoint to generate download authentication token for `plist` and `file` endpoints. These are neccessary in order to gain access to the binaries.
+
+Download token will stay valid for 30 minutes
+
+JWT token is used to authenticate.
+
++ Parameters
+    + id (required, number) - Application ID
+    
+
+### Generate token [GET]
+
++ Request
+    
+    + Headers
+
+            Authorization: Bearer eyJhbGciOiJIUzUxMiIsInVzZXIiOjEsInRva2VuIjoiRTk3OTYzMjItOURBNy00RTAwLTlCNTItOEI4RThBRjkwRDAxIiwidHlwIjoiSldUIn0
+
++ Response 200 (application/json; charset=utf-8)
+            
+    + Body
+    
+            {
+                "download_token": "A40AD800-416E-462C-AFEE-9943410984F7",
+                "file": "https://api.yourstore.com/app/A40AD800-416E-462C-AFEE-9943410984F7/file?download=A40AD800-416E-462C-AFEE-9943410984F7",
+                "plist": "https://api.yourstore.com/app/A40AD800-416E-462C-AFEE-9943410984F7/plist?download=A40AD800-416E-462C-AFEE-9943410984F7",
+                "ios": "itms-services://?action=download-manifest&url=://api.yourstore.com/app/A40AD800-416E-462C-AFEE-9943410984F7/plist?download=A40AD800-416E-462C-AFEE-9943410984F7"
+            }
+                
+            
+            
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed"
+            "error": "authentication failed"
+        }
+  
+
+## iOS app info plist [/apps/{id}/plist{?download}]
+
+iOS applications require a special xml that needs to be referenced from the download link.
+
+The plist link (as well as the download token) will be returned by an app download generator and should have a following format:
+```
+<a href="itms-services://?action=download-manifest&url=https://api.yourstore.com/app/{APP_ID}/plist?download={DOWNLOAD_TOKEN}">Amazing App</a>
+```
+
+Download token will stay valid for 30 minutes
+
++ Parameters
+    + id (required, number) - Application ID
+    + download (string) - Authentication token created using app auth generator
+
+### PropertyList file [GET]
+
++ Response 200 (application/xml; charset=utf-8)
+
+    + Body
+                
+            <?xml version="1.0" encoding="UTF-8"?>
+            <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+            <plist version="1.0">
+                <dict>
+                    <key>items</key>
+                    <array>
+                        <dict>
+                            <key>assets</key>
+                            <array>
+                                <dict>
+                                    <key>kind</key>
+                                    <string>software-package</string>
+                                    <key>url</key>
+                                    <string>https://api.yourstore.com/app/A40AD800-416E-462C-AFEE-9943410984F7/file?download=A40AD800-416E-462C-AFEE-9943410984F7</string>
+                                </dict>
+                            </array>
+                            <key>metadata</key>
+                            <dict>
+                                <key>bundle-identifier</key>
+                                <string>io.liveui.adminer</string>
+                                <key>bundle-version</key>
+                                <string>4.0</string>
+                                <key>kind</key>
+                                <string>software</string>
+                                <key>title</key>
+                                <string>LiveUI Admin</string>
+                            </dict>
+                        </dict>
+                    </array>
+                </dict>
+            </plist>
+            
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed"
+            "error": "authentication failed"
+        }
+        
+   
+## Download app [/apps/{id}/file{?download}]
+
+The actual download link will be returned by an app download generator. For iOS apps, link is automatically included in the enterprise distribution Property List file.
+
+Download token will stay valid for 30 minutes to initialise a new connection. Existing connection won't get interrupted.
+
++ Parameters
+    + id (required, number) - Application ID
+    + download (string) - Authentication token created using app auth generator
+    
+
+### Binary file (app) [GET]
+
+- Mime type for iOS app is <b><i>application/octet-stream</i></b>
+- Mime type for Android app is <b><i>application/vnd.android.package-archive</i></b>
+
++ Response 200 (application/octet-stream)
+    
+    + Headers
+
+            Content-Length: 63474
+                
+            
+            
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed"
+            "error": "authentication failed"
+        }
+  
+  
+## Un-Install [/uninstall]
+
+Removes all database tables and data, this operation is irreversible. 
+
+*Endpoint doesn't work in a `production` environment.*
+
+### Un-Install [GET]
+
++ Response 200 (application/json; charset=utf-8)
+            
+    + Body
+
+            {
+                "code": "maintenance_ok"
+                "description": "Install finished"
+            }
+
++ Response 412 (application/json; charset=utf-8)
+
+        {
+            "error": "not_available"
+            "description": "Endpoint is not available in production mode"
+        }
+        
+        
+## Re-Install [/reinstall]
+
+Combination of **Un-Install** and #Install, loss of the original data is irreversible.
+
+*Endpoint doesn't work in a `production` environment.*
+
+### Re-Install [GET]
+
++ Response 200 (application/json; charset=utf-8)
+            
+    + Body
+
+            {
+                "code": "maintenance_ok"
+                "description": "Install finished"
+            }
+
++ Response 412 (application/json; charset=utf-8)
+
+        {
+            "error": "not_available"
+            "description": "Endpoint is not available in production mode"
+        }
+        
+
+## Show tables [/tables]
+
+Shows a list of database tables available. 
+
+*Endpoint doesn't work in a `production` environment.*
+
+### Show tables [GET]
+
++ Response 200 (application/json; charset=utf-8)
+            
+    + Body
+
+            [
+                "apps",
+                "fluent",
+                "tokens",
+                "users"
+            ]
+
++ Response 412 (application/json; charset=utf-8)
+
+        {
+            "error": "not_available"
+            "description": "Endpoint is not available in production mode"
+        }
+        
+
+
+            
+## Teapot [/teapot]
+
+No authentication is needed
+
+### Check [GET]
+
++ Response 418 (application/json; charset=utf-8)
+
+    + Body
+
+            {
+                "message": "I am a teapot!"
+            }
+
+
+# Data Structures
+
+## AppPut (object)
+- build: 567 (string, required) - Build number
+- basic: false (boolean, required) - App version
+- version: 1.2.3 (string, required) - App version
+- identifier: com.boost.super-app1 (number, required) - Bundle identifier
+- name: My app name (string, required) - Application name as displayed on the device
+
+## App (object)
+- id: 11 (number, required) - ID
+- platform: 1 (number, required) - Platform (1-iOS, 2-Android)
+- team_id: 42 (number, required) - Team id
+- created: 535044877 (number, required) - Date created (timestamp)
+- modified: 535044877 (number, required) - Date last modified (timestamp)
+- Include AppPut
+
+## Apps (array)
+- (array[App])
+
+## Tag (object)
+- id: 123 (number) - ID
+- name: my_custom_tag_123 (string, required) - Tag value
+
+
+## Tags (array)
++ (array[Tag])
