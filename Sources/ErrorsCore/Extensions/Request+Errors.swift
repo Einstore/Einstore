@@ -87,6 +87,20 @@ public struct RequestResponse {
         return response
     }
     
+    public func teapot() throws -> Response {
+        let response = try success(status: .imATeapot, code: "teapot", description: """
+            I'm a little teapot
+            Short and stouts
+            Here is my handle
+            Here is my spout
+            When I get all steamed up
+            I just shout
+            Tip me over and pour me out
+            """
+        )
+        return response
+    }
+    
     public func internalServerError(message: String) throws -> Response {
         let response = try error(status: .internalServerError, error: "server_err", description: message)
         return response

@@ -32,6 +32,10 @@ public class GenericController: Controller {
         router.delete(PathComponent.anything) { req in
             return try req.response.badUrl()
         }
+        
+        router.get("teapot") { req in
+            return try req.response.teapot()
+        }
     }
     
 }
