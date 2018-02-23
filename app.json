@@ -14,24 +14,28 @@
 	],
     "env": {
         "DB_HOST": {
-            "description": "MySQL database host.",
-            "value": "localhost"
+            "description": "PostgreSQL database host.",
+            "value": "localhost",
+            "required": true
         },
         "DB_PORT": {
-            "description": "MySQL database host.",
-            "value": 3306
+            "description": "PostgreSQL database host.",
+            "value": "5432",
+            "required": true
         },
         "DB_USER": {
-            "description": "MySQL database host.",
-            "value": "root"
+            "description": "PostgreSQL database host.",
+            "value": "boost",
+            "required": true
         },
         "DB_PASSWORD": {
-            "description": "MySQL database password.",
-            "value": ""
+            "description": "PostgreSQL database password.",
+            "required": true
         },
         "DB_NAME": {
-            "description": "MySQL database name.",
-            "value": "postgresql-elliptical-69134"
+            "description": "PostgreSQL database name.",
+            "value": "boost",
+            "required": true
         }
     },
 	"buildpacks": [{
