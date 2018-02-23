@@ -17,7 +17,7 @@ public struct ErrorResponse: Content {
 
 public struct SuccessResponse: Content {
     let code: String
-    let description: String
+    let description: String?
 }
 
 
@@ -51,7 +51,7 @@ public struct RequestResponse {
         return response
     }
     
-    public func success(status: HTTPStatus = .ok, code: String, description: String) throws -> Response {
+    public func success(status: HTTPStatus = .ok, code: String, description: String? = nil) throws -> Response {
         let response = try basic(status: status)
         
         let responseObject = SuccessResponse(code: code, description: description)
@@ -98,6 +98,11 @@ public struct RequestResponse {
             Tip me over and pour me out
             """
         )
+        return response
+    }
+    
+    public func ping() throws -> Response {
+        let response = try success(code: "pong")
         return response
     }
     

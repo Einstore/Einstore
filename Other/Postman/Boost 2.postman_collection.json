@@ -687,6 +687,38 @@
 				"description": null
 			},
 			"response": []
+		},
+		{
+			"name": "Teapot",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{SERVER}}teapot",
+					"host": [
+						"{{SERVER}}teapot"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Ping",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{SERVER}}ping",
+					"host": [
+						"{{SERVER}}ping"
+					]
+				},
+				"description": null
+			},
+			"response": []
 		}
 	]
 }

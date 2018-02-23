@@ -36,6 +36,10 @@ public class GenericController: Controller {
         router.get("teapot") { req in
             return try req.response.teapot()
         }
+        
+        router.get("ping") { req in
+            return try req.response.ping()
+        }
     }
     
 }
