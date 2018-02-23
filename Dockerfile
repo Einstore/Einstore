@@ -1,4 +1,4 @@
-FROM swiftdocker/swift:4.0
+FROM mangoweb/swift:4.1-alpha
 
 WORKDIR /boost
 
@@ -13,13 +13,13 @@ ADD Sources ./Sources
 ADD Tests ./Tests
 ADD Package.swift Package.resolved ./
 
-RUN swift build --configuration release
-RUN ln -s .build/x86_64-unknown-linux/release/Run ./boost
+RUN swift build --configuration debug
+RUN ln -s .build/x86_64-unknown-linux/debug/Run ./boost
 
 
-FROM swiftdocker/swift:4.0
+FROM mangoweb/swift:4.1-alpha
 
-COPY --from=0 /boost/.build/x86_64-unknown-linux/release/Run /app/boost
+COPY --from=0 /boost/.build/x86_64-unknown-linux/debug/Run /app/boost
 
 EXPOSE 8080
-CMD /app/boost serve -configDir=./Config
+CMD /app/boost serve --hostname 0.0.0.0
