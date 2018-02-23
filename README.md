@@ -15,44 +15,23 @@
 
 Boost is an enterprise mobile app distribution platform. Boost has been made originally to help us distribute mobile apps to our clients on our own platform but eventually we have decided to share our baby with the world. Let’s see what it will grow into!
 
+## Documentation
 
-## Tags
+The main documentation for boost can be found in our [GitHub.com Wiki](https://github.com/LiveUI/Boost/wiki). For API documentation go to our [Boost API documentation](https://boost.docs.apiary.io)
 
-Tags are very important part of the platform, they are the heart and soul of Boost. Tags are used to sort and find the right build you are looking for, to identify a release or to inform your testers of what is included in the build.
-
-When uploading the build you can specify any number of tags like versions of specific libraries, API integrations or just whatever else you might think of.
-
-Adding a tag to your upload from any CI is super easy, just add them to your curl (or any other program of your preference) and you are good to go. An example curl upload could look like this:
-
-```ruby
-curl https://api.appstorehq.net\
-	-f /build/folder/Boost-Client.apk\
-	-p “tag=crashlytics_1.35”
-	-p “tag=bumpup_2.0”
-	-p “tag=ci_build&example tag”
-	-p “tag=Branch: master”
-```
-
-Previous example will upload called `Boost-Client.apk` into your appstore and creates following tags: `crashlytics_1.35`, `bumpup_2.0`, `ci_build`, `example tag` and `Branch: master`. You can later search your appstore and filter builds by them.
-
-
-## Table of contents
-
-* [Slack](#slack)
-* [Features](#features)
-* [Frontend apps](#frontend-apps)
-* [Installation](#installation)
-* [Docker](#docker)
-* [macOS](#macos)
-* [Ubuntu](#ubuntu)
-* [Heroku](#heroku)
-* [Continuous Integration](#continuous-integration)
-* [Author](#author)
-* [License](#license)
+In the repo we also maintain a [Postman](https://www.getpostman.com) collection of all available requests [here](https://github.com/LiveUI/Boost/tree/master/Other/Postman). Use these to test any of the available endpoints.
 
 ## Slack
 
-Get help using and installing this product on our [Slack](http://bit.ly/2B0dEyt), channel <b>#help-boost</b>
+If the documentation is not good enough for you, feel free to join our slack channel and get help using and installing this product from us and other experienced users right away. [Slack](http://bit.ly/2B0dEyt), channel <b>#help-boost</b>
+
+## Test on Heroku
+
+If you after a quick example of what boost can do, get yourself a Heroku account (if you don't have one already) and see for yourself.
+
+To install on Heroku please press the button and follow the instructions:
+
+[![Deploy Boost enterprise appstore to Heroku](https://camo.githubusercontent.com/c0824806f5221ebb7d25e559568582dd39dd1170/68747470733a2f2f7777772e6865726f6b7563646e2e636f6d2f6465706c6f792f627574746f6e2e706e67)](https://heroku.com/deploy?template=https://github.com/LiveUI/Boost)
 
 ## Features
 
@@ -90,24 +69,13 @@ Get help using and installing this product on our [Slack](http://bit.ly/2B0dEyt)
 - [ ] Upload, process and install Windows app
 - [ ] Upload, process and display web app (.zip)
 
-#### Heroku
-
-[![Deploy Boost enterprise appstore to heroku](https://camo.githubusercontent.com/c0824806f5221ebb7d25e559568582dd39dd1170/68747470733a2f2f7777772e6865726f6b7563646e2e636f6d2f6465706c6f792f627574746f6e2e706e67)](https://heroku.com/deploy?template=https://github.com/LiveUI/Boost)
-
 ## Code contributions
 
 We love PR’s, we can’t get enough of them ... so if you have an interesting improvement, bug-fix or a new feature please don’t hesitate to get in touch. If you are not sure about something before you start the development you can always contact our dev and product team through our Slack.
 
-
-## API documentation
-
-A complete API documentation is on [Apiary.io](https://boost.docs.apiary.io/). In the repo we also maintain a [Postman](https://www.getpostman.com) collection of all available requests [here](https://github.com/LiveUI/Boost/tree/master/Other/Postman).
-
-[![Apiary.io API documentation for Boost](https://github.com/LiveUI/Boost/raw/master/Other/Images/apiary.png)](https://boost.docs.apiary.io/)
-
 ## Supplementary components
 
-BumpUp!
+#### BumpUp!
 Cloud based build number management system
 Like Boost, BumpUp! Is an open source feature licensed under Apache 2.0 license
 BumpUp! Is also available as a free service online.
@@ -115,23 +83,20 @@ Support for Android and all current Apple based operating systems
 BumpUp! Can be found here: http://github.com/liveui/bumpup
 Xxxxxxxxxxx include screenshot
 
-
-## OnDemand hosted service (sounds better than software as a service)
-
-We also provide a hosted service including a free tier for indie developers. For more information on our hosted services, please visit our website on http://www.boostappstore.com
-
-
 ## Support
 
 We try to support even our free tier clients through our Slack channel or create a Stack Overflow question tagging BoostXXXXXXXXXX.
 To signup for our Slack please visit http://xxxxxx.xxxxx.xx and we’ll send you an invitation email.
 
+## OnDemand hosted service (sounds better than software as a service)
+
+We also working on a hosted service including a free tier for indie developers. For more information on our hosted services, please visit our website on http://www.boostappstore.com
 
 ## Enterprise
 
 Our enterprise package contains a tailored solution designed to match your needs exactly. We have a team of amazing developers on standby to help you using remote desktops or even to fly them over, should you require help with the setup onsite.
 
-We are a dev house so happy to quote on any customisations you may need on request. Please contact us on enterprise@mangoweb.cz for further details.
+We are a dev house so happy to quote on any customisations you may need on request. Please contact us on enterprise@mangoweb.cz for further details or visit our website on http://www.boostappstore.com
 
 ## License
 
