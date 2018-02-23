@@ -114,7 +114,7 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "--port 9090"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
       <EnvironmentVariables>

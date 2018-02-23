@@ -42,19 +42,15 @@ public class AuthController: Controller {
 //
 //            })
 //        }
-//
+        
 //        router.post("token") { (req) -> Future<User.Auth> in
-//            do {
-//                return try req.content.decode(User.Auth.Token.self).flatMap(to: Token.self) { (loginData) -> Future<User.Auth> in
-//                    return req.withPooledConnection(to: .db) { (db) -> Future<User.Auth> in
-//                        return Token.query(on: db).filter(\Token.token == "token_value_xxxx".passwordHash).first().flatMap(to: User.Auth.self, { (token) -> Future<User.Auth> in
-//                            let promise = Promise<User.Auth>()
-//                            return promise.future
-//                        })
-//                    }
+//            return try req.content.decode(User.Auth.Token.self).flatMap(to: Token.self) { (loginData) -> Future<User.Auth> in
+//                return req.withPooledConnection(to: .db) { (db) -> Future<User.Auth> in
+//                    return Token.query(on: db).filter(\Token.token == "token_value_xxxx".passwordHash).first().flatMap(to: User.Auth.self, { (token) -> Future<User.Auth> in
+//                        let promise = Promise<User.Auth>()
+//                        return promise.future
+//                    })
 //                }
-//            } catch {
-//                throw AuthError.authenticationFailed
 //            }
 //        }
     }

@@ -49,14 +49,14 @@ public class Filesystem: Handler {
     
     public struct Config {
         
-        public static var envHomeDir: String? {
+        public static var envRootDir: String? {
             let env = ProcessInfo.processInfo.environment as [String: String]
-            return env["HOME"]
+            return env["LOCAL_ROOT"] ?? env["HOME"]
         }
         
         let homeDir: URL
         
-        public init(homeDir: String? = Config.envHomeDir) throws {
+        public init(homeDir: String? = Config.envRootDir) throws {
             guard let homeDir = homeDir else {
                 fatalError("Home directory hasn't been set and can not be found in environmental variables")
             }
