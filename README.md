@@ -21,6 +21,11 @@ The main documentation for boost can be found in our [GitHub.com Wiki](https://g
 
 In the repo we also maintain a [Postman](https://www.getpostman.com) collection of all available requests [here](https://github.com/LiveUI/Boost/tree/master/Other/Postman). Use these to test any of the available endpoints.
 
+#### Links:
+* [GitHub.com Wiki](https://github.com/LiveUI/Boost/wiki)
+* [API documentation](https://boost.docs.apiary.io)
+* [Postman collections](https://github.com/LiveUI/Boost/tree/master/Other/Postman)
+
 ## Slack
 
 If the documentation is not good enough for you, feel free to join our slack channel and get help using and installing this product from us and other experienced users right away. [Slack](http://bit.ly/2B0dEyt), channel <b>#help-boost</b>
