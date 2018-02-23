@@ -1,1 +1,1 @@
-web: Boost --hostname=0.0.0.0
+web: /app/scripts/heroku-entrypoint.sh
