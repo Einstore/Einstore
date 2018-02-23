@@ -11,6 +11,6 @@ echo "$DATABASE_URL" | while IFS="/:@" read -r _ _ _ DB_USER DB_PASSWORD DB_HOST
 	export DB_PORT
 	export DB_NAME
 
-	Run --hostname=0.0.0.0 --port="$PORT"
+	Run --hostname 0.0.0.0 --port $PORT
 	break
 done
