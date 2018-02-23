@@ -29,7 +29,6 @@ public final class Token: DbCoreModel {
     
     public var id: DbCoreIdentifier?
     public var userId: DbCoreIdentifier
-    public var user: User
     public var token: String
     public var expires: Date
     
@@ -37,10 +36,17 @@ public final class Token: DbCoreModel {
         guard let userId = user.id else {
             throw TokenError.missingUserId
         }
-        self.user = user
+//        self.user = user
         self.userId = userId
         self.token = UUID().uuidString
         self.expires = Date().addMonth(n: 1)
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case userId = "user_id"
+        case token
+        case expires
     }
 
 }
@@ -61,7 +67,7 @@ extension Token: Migration {
     public static func prepare(on connection: DbCoreConnection) -> Future<Void> {
         return Database.create(self, on: connection) { (schema) in
             schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.id.stringValue, isIdentifier: true)
-            schema.addField(type: DbCoreColumnType.id(), name: "user_id")
+            schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.userId.stringValue)
             schema.addField(type: DbCoreColumnType.varChar(64), name: CodingKeys.token.stringValue)
             schema.addField(type: DbCoreColumnType.datetime(), name: CodingKeys.expires.stringValue)
         }
