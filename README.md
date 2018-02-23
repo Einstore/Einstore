@@ -60,9 +60,8 @@ Get help using and installing this product on our [Slack](http://bit.ly/2B0dEyt)
 #### MVP (current)
 - [x] Build basic framework
 - [ ] Authenticate with username and password
-- [ ] Authenticate in enterprise environment (`ActiveDirectory`, etc ...)
-- [ ] Upload, process and install iOS app
-- [ ] Upload, process and install Android app
+- [x] Upload, process and install iOS app
+- [x] Upload, process and install Android app
 - [ ] Search apps by it's tags, name, platform and bundle Id
 - [ ] Integrated web client (web interface)
 - [ ] Create client accounts
@@ -70,6 +69,7 @@ Get help using and installing this product on our [Slack](http://bit.ly/2B0dEyt)
 
 
 #### Phase 2
+- [ ] Authenticate in enterprise environment (`ActiveDirectory`, etc ...)
 - [ ] Create client accounts
 - [ ] Upload, process and install tvOS app
 - [ ] Comment on builds
@@ -89,111 +89,14 @@ Get help using and installing this product on our [Slack](http://bit.ly/2B0dEyt)
 - [ ] Upload, process and install Windows app
 - [ ] Upload, process and display web app (.zip)
 
-## Frontend apps
-
-* [iOS app](https://github.com/manGoweb/Boost-iOS/)
-* [Android app](https://github.com/manGoweb/Boost-Android/)
-
-
-## Vapor
-
-Boost has been built on the top of a Vapor framework. We have picked Vapor as it was the most advanced Swift framework at the time. They also have an amazing support through their Slack channel where you very often able to talk to the developers themselves!
-
-Coming with version 3, Vapor has become fully asynchronous and non-blocking which made it even faster and efficient processing requests.
-
-## Installation process
-
-	- Info about Docker 
-		- Docker compose
-		- Configuring your own database
-	- Installing from repo
-		- Install pre-requisites using an install script from github.com
-		- Manually
-			- Installing Swift
-			- Installing Java
-			- Installing Python (if we don’t convert .py to swift)
-			- Installing MySQL
-	- Embedding boost in your Swift server app
-
-#### Docker
-
-```bash
-docker run -d -p 8080:8080 --name appstore liveui/boost
-```
-
-#### macOS
-
-```bash
-#brew install mysql
-#brew install python
-#brew install java
-brew install boost
-```
-
-#### Ubuntu 16.04 LTS
-
-```bash
-#brew install mysql
-#brew install python
-#brew install java
-brew install boost
-```
-
 #### Heroku
 
 [![Deploy Boost enterprise appstore to heroku](https://camo.githubusercontent.com/c0824806f5221ebb7d25e559568582dd39dd1170/68747470733a2f2f7777772e6865726f6b7563646e2e636f6d2f6465706c6f792f627574746f6e2e706e67)](https://heroku.com/deploy?template=https://github.com/LiveUI/Boost)
-
-
-## Integration
-
-Boost can be integrated by literally any CI system due to it’s API based core. The whole system including all of the admin panel functionality is a REST API. Usually the easiest way to upload a build is to use a CURL request. Example curl requests are listed below.
-
-Curl requests
-	- basic
-	- with tags
-
-You can also upload builds manually from our Web or native Android app. Upload feature is not available on any of the native iOS apps.
-
-Available parameters for app are 
-
-
-## Embedding Boost in any server side swift app
-
-Boost is just a Swift package managed by the SPM (Swift Package Manager) so it can be included in any swift server side app, although we would recommend using it within a Vapor 3 context only.
-
 
 ## Code contributions
 
 We love PR’s, we can’t get enough of them ... so if you have an interesting improvement, bug-fix or a new feature please don’t hesitate to get in touch. If you are not sure about something before you start the development you can always contact our dev and product team through our Slack.
 
-## Client apps
-
-We have already built three for you, a web based one which is distributed directly with this project, a native iOS app and an Android app. Both native apps are also distributed with all the source codes under an Apache 2.0 license. Code is available here:
-	- iOS
-	- Android
-	- Web app (included in the base package)
-
-XXXXXX Screenshots of all apps 
-
-
-## Custom clients
-
-As it has been mentioned above, the whole system is just a one big API so building your client will be super easy. You can always use one of our pre-built apps as a starting point. 
-
-We also have SDK’s for iOS and Android available here:
-	- JS client library
-	- iOS SDK
-	- Android SDK
-
-
-
-## Continuous integration
-
-You can upload a new build simply by sending the following `curl`
-
-```ruby
-curl -X POST -H "Authorization: Token XXXXXX-XXXXXX-XXXXXX-XXXX" -d @myfilename https://api.appstorehq.net?tags=some_tag_no1,some_tag_2
-```
 
 ## API documentation
 
