@@ -44,7 +44,7 @@ To install on Heroku please press the button and follow the instructions:
 
 #### MVP (current)
 - [x] Build basic framework
-- [ ] Authenticate with username and password
+- [x] Authenticate with username and password
 - [x] Upload, process and install iOS app
 - [x] Upload, process and install Android app
 - [ ] Search apps by it's tags, name, platform and bundle Id
