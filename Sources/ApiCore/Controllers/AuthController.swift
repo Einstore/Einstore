@@ -11,12 +11,13 @@ import FluentPostgreSQL
 import DbCore
 import Crypto
 import ErrorsCore
+import ApiCore
 
 
 public class AuthController: Controller {
     
     public static func boot(router: Router) throws {
-        router.get("auth") { (req)->Future<Token> in
+        router.get("auth") { (req)->Future<Response> in
             guard let token = req.http.headers.authorizationToken, let decoded = token.base64Decoded else {
                 throw AuthError.authenticationFailed
             }
@@ -27,20 +28,20 @@ public class AuthController: Controller {
             return try login(request: req, login: loginData)
         }
         
-        router.post("auth") { (req)->Future<Token> in
+        router.post("auth") { (req)->Future<Response> in
             do {
-                return try req.content.decode(User.Auth.Login.self).flatMap(to: Token.self, { (loginData) -> Future<Token> in
+                return try req.content.decode(User.Auth.Login.self).flatMap(to: Response.self) { (loginData) -> Future<Response> in
                     return try login(request: req, login: loginData)
-                })
+                }
             } catch {
                 throw AuthError.authenticationFailed
             }
         }
 
-//        router.get("token") { req in
-//            req.withPooledConnection(to: .db) { (db) -> Future<Token.Public> in
+//        router.get("token") { (req)->Future<Response> in
+//            req.withPooledConnection(to: .db) { (db) -> Future<Response> in
 //
-//            })
+//            }
 //        }
         
 //        router.post("token") { (req) -> Future<User.Auth> in
@@ -60,23 +61,25 @@ public class AuthController: Controller {
 
 extension AuthController {
     
-    static func login(request req: Request, login: User.Auth.Login) throws -> Future<Token> {
+    static func login(request req: Request, login: User.Auth.Login) throws -> Future<Response> {
         guard !login.email.isEmpty, !login.password.isEmpty else {
             throw AuthError.authenticationFailed
         }
-        return req.withPooledConnection(to: .db) { (db) -> Future<Token> in
-            return try User.query(on: db).filter(\User.email == login.email).filter(\User.password == login.password.passwordHash(req)).first().flatMap(to: Token.self, { (user) -> Future<Token> in
+        return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
+            return try User.query(on: db).filter(\User.email == login.email).filter(\User.password == login.password.passwordHash(req)).first().flatMap(to: Response.self) { (user) -> Future<Response> in
                 guard let user = user else {
                     throw AuthError.authenticationFailed
                 }
                 let token = try Token(user: user)
                 let tokenBackup = token
                 token.token = try token.token.passwordHash(req)
-                return token.save(on: db).map(to: Token.self, { _ in
+                return token.save(on: db).flatMap(to: Response.self) { token in
                     tokenBackup.id = token.id
-                    return tokenBackup
-                })
-            })
+                    let response = try tokenBackup.asResponse(.ok, to: req)
+                    // TODO: Add JWT token here!!!!!!!!!!!
+                    return response
+                }
+            }
         }
     }
     
