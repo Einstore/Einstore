@@ -718,7 +718,7 @@ Return a single app detail.
             
 ### Update app [PUT]
 
-Updates an app. Only name of the 
+Updates an app. Only name of the app can be updated.
 
 + Request
     
@@ -730,9 +730,6 @@ Updates an app. Only name of the
             
             {
                 "basic": false,
-                "version": "1.2.7",
-                "build": "123",
-                "identifier": "com.boost.super-app1",
                 "name": "Updated app name"
             }
     
@@ -1018,7 +1015,7 @@ No authentication is needed
 
 No authentication is needed
 
-### Ping [GET]
+### Check [GET]
 
 + Response 200 (application/json; charset=utf-8)
 
