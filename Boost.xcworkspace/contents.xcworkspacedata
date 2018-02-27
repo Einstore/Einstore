@@ -8,6 +8,15 @@
       location = "container:"
       name = "Configuration">
       <FileRef
+         location = "group:apiary.apib">
+      </FileRef>
+      <FileRef
+         location = "group:Dockerfile">
+      </FileRef>
+      <FileRef
+         location = "group:Makefile">
+      </FileRef>
+      <FileRef
          location = "group:app.json">
       </FileRef>
       <FileRef

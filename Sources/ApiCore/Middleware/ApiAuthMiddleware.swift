@@ -12,6 +12,7 @@ import HTTP
 import Service
 import Vapor
 import ErrorsCore
+import JWT
 
 
 public final class ApiAuthMiddleware: Middleware, ServiceFactory {

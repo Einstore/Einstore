@@ -6,20 +6,22 @@
 //
 
 import Foundation
+import Vapor
 import App
 import Dispatch
 import XCTest
 import Crypto
+import VaporTestTools
 
 
 final class StringCryptoTests : XCTestCase {
     
-    func testPasswordHash() throws {
-        XCTAssert("password".passwordHash == "")
-    }
-    
-    static let allTests = [
-        ("testPasswordHashWorks", testPasswordHash),
-        ]
+//    func testPasswordHash() throws {
+//        XCTAssert("password".passwordHash(Request()) == "")
+//    }
+//
+//    static let allTests = [
+//        ("testPasswordHashWorks", testPasswordHash),
+//        ]
     
 }

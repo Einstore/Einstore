@@ -42,16 +42,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Boost::ApiErrorsTests"
-               BuildableName = "ApiErrorsTests.xctest"
-               BlueprintName = "ApiErrorsTests"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "Boost::AppTests"
                BuildableName = "AppTests.xctest"
                BlueprintName = "AppTests"
@@ -75,6 +65,16 @@
                BlueprintIdentifier = "Boost::DbCoreTests"
                BuildableName = "DbCoreTests.xctest"
                BlueprintName = "DbCoreTests"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Boost::ErrorsCoreTests"
+               BuildableName = "ErrorsCoreTests.xctest"
+               BlueprintName = "ErrorsCoreTests"
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </TestableReference>

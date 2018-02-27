@@ -74,6 +74,15 @@
         }
       },
       {
+        "package": "JWT",
+        "repositoryURL": "https://github.com/vapor/jwt.git",
+        "state": {
+          "branch": null,
+          "revision": "b01a53c88c41a6d54afba1c7121790711801dad8",
+          "version": "3.0.0-beta.1.1"
+        }
+      },
+      {
         "package": "MimeLib",
         "repositoryURL": "https://github.com/manGoweb/MimeLib.git",
         "state": {

@@ -7,7 +7,8 @@ let package = Package(
         .package(url: "https://github.com/vapor/vapor.git", .exact("3.0.0-beta.3.1.3")),
         .package(url: "https://github.com/vapor/fluent-postgresql.git", .exact("1.0.0-beta.3")),
         .package(url: "https://github.com/vapor/fluent.git", .exact("3.0.0-beta.3")),
-//        .package(url: "https://github.com/vapor/jwt.git", .branch("beta")),
+        .package(url: "https://github.com/vapor/jwt.git", .exact("3.0.0-beta.1.1")),
+        //        .package(url: "https://github.com/vapor/jwt.git", .branch("beta")),
         .package(url: "https://github.com/manGoweb/MimeLib.git", .exact("1.0.0")),
         .package(url: "https://github.com/kareman/SwiftShell.git", .exact("4.0.0"))
     ],
@@ -61,17 +62,39 @@ let package = Package(
                 "Fluent",
                 "FluentPostgreSQL",
                 "ErrorsCore",
-                "DbCore"
+                "DbCore",
+                "JWT"
+            ]
+        ),
+        .target(
+            name: "VaporTestTools",
+            dependencies: [
+                "Vapor"
+            ]
+        ),
+        .target(
+            name: "ApiCoreTestTools",
+            dependencies: [
+                "Vapor",
+                "VaporTestTools"
+            ]
+        ),
+        .target(
+            name: "BoostTestTools",
+            dependencies: [
+                "Vapor",
+                "VaporTestTools",
+                "ApiCoreTestTools"
             ]
         ),
         .target(name: "Run", dependencies: [
             "App"
             ]),
-        .testTarget(name: "AppTests", dependencies: ["App"]),
-        .testTarget(name: "ApiCoreTests", dependencies: ["ApiCore"]),
-        .testTarget(name: "BoostCoreTests", dependencies: ["BoostCore"]),
-        .testTarget(name: "DbCoreTests", dependencies: ["DbCore"]),
-        .testTarget(name: "ErrorsCoreTests", dependencies: ["ErrorsCore"]),
+        .testTarget(name: "AppTests", dependencies: ["App", "VaporTestTools"]),
+        .testTarget(name: "ApiCoreTests", dependencies: ["ApiCore", "VaporTestTools", "ApiCoreTestTools"]),
+        .testTarget(name: "BoostCoreTests", dependencies: ["BoostCore", "VaporTestTools", "ApiCoreTestTools", "BoostTestTools"]),
+        .testTarget(name: "DbCoreTests", dependencies: ["DbCore", "VaporTestTools"]),
+        .testTarget(name: "ErrorsCoreTests", dependencies: ["ErrorsCore", "VaporTestTools"]),
         ]
 )
 

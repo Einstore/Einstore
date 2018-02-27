@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Boost::DbCore"
-               BuildableName = "DbCore.framework"
-               BlueprintName = "DbCore"
+               BlueprintIdentifier = "Boost::VaporTestTools"
+               BuildableName = "VaporTestTools.framework"
+               BlueprintName = "VaporTestTools"
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,9 +45,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "Boost::DbCore"
-            BuildableName = "DbCore.framework"
-            BlueprintName = "DbCore"
+            BlueprintIdentifier = "Boost::VaporTestTools"
+            BuildableName = "VaporTestTools.framework"
+            BlueprintName = "VaporTestTools"
             ReferencedContainer = "container:Boost.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -63,9 +63,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "Boost::DbCore"
-            BuildableName = "DbCore.framework"
-            BlueprintName = "DbCore"
+            BlueprintIdentifier = "Boost::VaporTestTools"
+            BuildableName = "VaporTestTools.framework"
+            BlueprintName = "VaporTestTools"
             ReferencedContainer = "container:Boost.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
