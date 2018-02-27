@@ -17,8 +17,8 @@ import DbCore
 
 extension TestableProperty where TestableType: Application {
     
-    public static func newBoostTestApp() throws -> Application {
-        let app = try newApiCoreTestApp({ (config, env, services) in
+    public static func newBoostTestApp() -> Application {
+        let app = newApiCoreTestApp({ (config, env, services) in
             let fileHandler = try! Filesystem(config: Filesystem.Config(homeDir: "/tmp/Boost/Tests"))
             var boostConfig = BoostConfig(fileHandler: fileHandler)
             boostConfig.database = DbCore.config(hostname: "localhost", user: "test", password: "aaaaaa", database: "boost-test")

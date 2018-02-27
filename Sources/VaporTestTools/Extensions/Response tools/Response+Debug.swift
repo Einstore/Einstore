@@ -25,7 +25,7 @@ extension TestableProperty where TestableType: Response {
         if let mediaType = element.content.mediaType {
             print("\tMedia type: \(mediaType.description)")
         }
-        if let stringContent = try? element.content.body.makeData(max: 500000).blockingAwait() {
+        if let stringContent = element.testable.contentString {
             print("\tContent:\n\(stringContent)")
         }
     }

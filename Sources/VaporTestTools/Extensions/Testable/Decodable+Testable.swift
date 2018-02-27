@@ -19,7 +19,7 @@ extension TestableProperty where TestableType: Decodable {
 
 extension TestableProperty where TestableType: Decodable {
     
-    public static func fromJSON(fileNamed fileName: String, ofType type: String? = nil, inBundle bundle: Bundle? = nil) throws -> TestableType {
+    public static func fromJSON(fileNamed fileName: String, ofType type: String? = nil, inBundle bundle: Bundle? = nil) -> TestableType {
         var bundle = bundle
         if bundle == nil {
             bundle = Bundle.main
@@ -28,24 +28,24 @@ extension TestableProperty where TestableType: Decodable {
             fatalError("Invalid filename")
         }
         let url = URL(fileURLWithPath: filePath)
-        return try fromJSON(file: url)
+        return fromJSON(file: url)
     }
     
-    public static func fromJSON(file fileUrl: URL) throws -> TestableType {
-        let data = try Data(contentsOf: fileUrl)
-        return try fromJSON(data: data)
+    public static func fromJSON(file fileUrl: URL) -> TestableType {
+        let data = try! Data(contentsOf: fileUrl)
+        return fromJSON(data: data)
     }
     
-    public static func fromJSON(string: String) throws -> TestableType {
+    public static func fromJSON(string: String) -> TestableType {
         guard let data = string.data(using: .utf8) else {
             fatalError("Invalid string")
         }
-        return try fromJSON(data: data)
+        return fromJSON(data: data)
     }
     
-    public static func fromJSON(data: Data) throws -> TestableType {
+    public static func fromJSON(data: Data) -> TestableType {
         let decoder = JSONDecoder()
-        let object = try decoder.decode(TestableType.self, from: data)
+        let object = try! decoder.decode(TestableType.self, from: data)
         return object
     }
     

@@ -27,7 +27,7 @@
 /* Begin PBXBuildFile section */
 		15F26FD32045F5E9000707F9 /* Encodable+Testable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15F26FD22045F5E9000707F9 /* Encodable+Testable.swift */; };
 		15F26FD52045F67C000707F9 /* String+Testable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15F26FD42045F67C000707F9 /* String+Testable.swift */; };
-		15F26FD72045F739000707F9 /* HTTPRequest+Testable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15F26FD62045F739000707F9 /* HTTPRequest+Testable.swift */; };
+		15F26FD72045F739000707F9 /* HTTPRequest+Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15F26FD62045F739000707F9 /* HTTPRequest+Response.swift */; };
 		15F26FDB2045F7ED000707F9 /* Response+Checks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15F26FDA2045F7ED000707F9 /* Response+Checks.swift */; };
 		15F26FDD2045FAB1000707F9 /* Response+Decoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15F26FDC2045FAB1000707F9 /* Response+Decoding.swift */; };
 		15F26FDF2045FBBF000707F9 /* Response+Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15F26FDE2045FBBF000707F9 /* Response+Debug.swift */; };
@@ -439,7 +439,6 @@
 		OBJ_1853 /* Async.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Async::Async::Product" /* Async.framework */; };
 		OBJ_1883 /* Application+Testable.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_72 /* Application+Testable.swift */; };
 		OBJ_1884 /* Decodable+Testable.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_73 /* Decodable+Testable.swift */; };
-		OBJ_1885 /* Request+Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_74 /* Request+Tests.swift */; };
 		OBJ_1886 /* XCTestCase+Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_75 /* XCTestCase+Tests.swift */; };
 		OBJ_1887 /* TestTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_76 /* TestTools.swift */; };
 		OBJ_1889 /* Vapor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Vapor::Vapor::Product" /* Vapor.framework */; };
@@ -5732,7 +5731,7 @@
 /* Begin PBXFileReference section */
 		15F26FD22045F5E9000707F9 /* Encodable+Testable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Encodable+Testable.swift"; sourceTree = "<group>"; };
 		15F26FD42045F67C000707F9 /* String+Testable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Testable.swift"; sourceTree = "<group>"; };
-		15F26FD62045F739000707F9 /* HTTPRequest+Testable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPRequest+Testable.swift"; sourceTree = "<group>"; };
+		15F26FD62045F739000707F9 /* HTTPRequest+Response.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPRequest+Response.swift"; sourceTree = "<group>"; };
 		15F26FDA2045F7ED000707F9 /* Response+Checks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Response+Checks.swift"; sourceTree = "<group>"; };
 		15F26FDC2045FAB1000707F9 /* Response+Decoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Response+Decoding.swift"; sourceTree = "<group>"; };
 		15F26FDE2045FBBF000707F9 /* Response+Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Response+Debug.swift"; sourceTree = "<group>"; };
@@ -6323,7 +6322,6 @@
 		OBJ_737 /* CommandRunnable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandRunnable.swift; sourceTree = "<group>"; };
 		OBJ_738 /* Console+Run.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Console+Run.swift"; sourceTree = "<group>"; };
 		OBJ_739 /* Output+Help.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Output+Help.swift"; sourceTree = "<group>"; };
-		OBJ_74 /* Request+Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Request+Tests.swift"; sourceTree = "<group>"; };
 		OBJ_740 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		OBJ_742 /* LogLevel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogLevel.swift; sourceTree = "<group>"; };
 		OBJ_743 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
@@ -7445,14 +7443,22 @@
 			path = Controllers;
 			sourceTree = "<group>";
 		};
-		15F26FEE204604B8000707F9 /* Make */ = {
+		15F26FEE204604B8000707F9 /* Requests */ = {
 			isa = PBXGroup;
 			children = (
-				15F26FD62045F739000707F9 /* HTTPRequest+Testable.swift */,
+				15F26FD62045F739000707F9 /* HTTPRequest+Response.swift */,
 				15F26FEF204604DE000707F9 /* Request+Make.swift */,
 				15F26FF12046050E000707F9 /* HTTPRequest+Make.swift */,
 			);
-			path = Make;
+			path = Requests;
+			sourceTree = "<group>";
+		};
+		15F26FF320461267000707F9 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_75 /* XCTestCase+Tests.swift */,
+			);
+			path = Tests;
 			sourceTree = "<group>";
 		};
 		OBJ_10 /* Extensions */ = {
@@ -8648,7 +8654,7 @@
 			path = Message;
 			sourceTree = "<group>";
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -8662,7 +8668,6 @@
 				OBJ_141 /* Dependencies */,
 				OBJ_867 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_505 /* Parser */ = {
@@ -9286,11 +9291,10 @@
 		OBJ_71 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				15F26FEE204604B8000707F9 /* Make */,
+				15F26FF320461267000707F9 /* Tests */,
+				15F26FEE204604B8000707F9 /* Requests */,
 				15F26FD92045F7C8000707F9 /* Response tools */,
 				15F26FD82045F7B7000707F9 /* Testable */,
-				OBJ_74 /* Request+Tests.swift */,
-				OBJ_75 /* XCTestCase+Tests.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -11418,7 +11422,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_867 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -11663,12 +11667,11 @@
 				15F26FF22046050E000707F9 /* HTTPRequest+Make.swift in Sources */,
 				OBJ_1884 /* Decodable+Testable.swift in Sources */,
 				15F26FF0204604DE000707F9 /* Request+Make.swift in Sources */,
-				OBJ_1885 /* Request+Tests.swift in Sources */,
 				15F26FE12045FEB0000707F9 /* Response+Getters.swift in Sources */,
 				15F26FE7204600DC000707F9 /* TestableProperty.swift in Sources */,
 				15F26FD32045F5E9000707F9 /* Encodable+Testable.swift in Sources */,
 				15F26FDB2045F7ED000707F9 /* Response+Checks.swift in Sources */,
-				15F26FD72045F739000707F9 /* HTTPRequest+Testable.swift in Sources */,
+				15F26FD72045F739000707F9 /* HTTPRequest+Response.swift in Sources */,
 				OBJ_1886 /* XCTestCase+Tests.swift in Sources */,
 				OBJ_1887 /* TestTools.swift in Sources */,
 				15F26FDD2045FAB1000707F9 /* Response+Decoding.swift in Sources */,

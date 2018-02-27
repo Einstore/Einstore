@@ -32,6 +32,8 @@ extension Testable {
     
 }
 
+extension Request: Testable { }
+extension HTTPRequest: Testable { }
 extension Response: Testable { }
 extension Application: Testable { }
 
