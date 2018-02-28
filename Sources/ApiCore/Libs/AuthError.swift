@@ -12,19 +12,27 @@ import Vapor
 
 public enum AuthError: FrontendError {
     case authenticationFailed
+    case serverError
     
     public var code: String {
         return "auth_error"
     }
     
     public var status: HTTPStatus {
-        return .unauthorized
+        switch self {
+        case .authenticationFailed:
+            return .unauthorized
+        case .serverError:
+            return .internalServerError
+        }
     }
     
     public var description: String {
         switch self {
         case .authenticationFailed:
             return "Authentication has failed"
+        case .serverError:
+            return "Server error"
         }
     }
 }

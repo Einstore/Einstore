@@ -29,7 +29,7 @@ class AuthControllerTests: XCTestCase, UsersTestCase {
         setupUsers()
     }
     
-    // MARK: Tests
+    // MARK: Login tests
     
     func testValidGetAuthRequest() {
         let req = HTTPRequest.testable.get(uri: "/auth", headers: [
@@ -95,6 +95,46 @@ class AuthControllerTests: XCTestCase, UsersTestCase {
     
     func testInvalidPostAuthRequest() {
         let req = HTTPRequest.testable.post(uri: "/auth", data: Data())
+        
+        do {
+            _ = try app.testable.response(throwingTo: req)
+            XCTFail()
+        } catch {
+            // Should fails
+        }
+    }
+    
+    // MARK: Token auth tests
+    
+    func testValidGetTokenAuthRequest() {
+        let req = HTTPRequest.testable.get(uri: "/token", headers: [
+            "Authorization": "Token YWRtaW5AbGl2ZXVpLmlvOmFkbWlu"
+            ])
+        do {
+            let res = try app.testable.response(throwingTo: req)
+            
+            res.testable.debug()
+            
+            let data = res.testable.content(as: Token.self)
+            // TODO: Refactor tests so they reuse following code (for post and get methods)
+            XCTAssertNotNil(data, "Token can't be nil")
+            if let data = data {
+                XCTAssertNotNil(data.id, "Token id can't be nil")
+                XCTAssertFalse(data.token.isEmpty, "Token data should be present")
+                XCTAssertTrue(data.expires.timeIntervalSince1970 > 0, "Token data should be present")
+                XCTAssertFalse(data.userId.uuidString.isEmpty, "Token data should be present")
+            }
+            
+            XCTAssertTrue(res.testable.has(statusCode: .ok), "Wrong status code")
+            XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing correct content type")
+        } catch {
+            print(error)
+            XCTFail()
+        }
+    }
+    
+    func testInvalidGetTokenAuthRequest() {
+        let req = HTTPRequest.testable.get(uri: "/token", headers: ["Bad-Headers": "For-Sure"])
         
         do {
             _ = try app.testable.response(throwingTo: req)

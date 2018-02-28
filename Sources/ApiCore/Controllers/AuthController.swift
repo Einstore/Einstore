@@ -37,28 +37,42 @@ public class AuthController: Controller {
             }
         }
 
-//        router.get("token") { (req)->Future<Response> in
-//            req.withPooledConnection(to: .db) { (db) -> Future<Response> in
-//
-//            }
-//        }
+        router.get("token") { (req)->Future<Response> in
+            guard let tokenString = req.http.headers.authorizationToken else {
+                throw AuthError.authenticationFailed
+            }
+            return try token(request: req, token: tokenString)
+        }
         
-//        router.post("token") { (req) -> Future<User.Auth> in
-//            return try req.content.decode(User.Auth.Token.self).flatMap(to: Token.self) { (loginData) -> Future<User.Auth> in
-//                return req.withPooledConnection(to: .db) { (db) -> Future<User.Auth> in
-//                    return Token.query(on: db).filter(\Token.token == "token_value_xxxx".passwordHash).first().flatMap(to: User.Auth.self, { (token) -> Future<User.Auth> in
-//                        let promise = Promise<User.Auth>()
-//                        return promise.future
-//                    })
-//                }
-//            }
-//        }
+        router.post("token") { (req) -> Future<Response> in
+            return try req.content.decode(User.Auth.Token.self).flatMap(to: Response.self) { (loginData) -> Future<Response> in
+                return try token(request: req, token: loginData.token)
+            }
+        }
     }
     
 }
 
 
 extension AuthController {
+    
+    static func token(request req: Request, token: String) throws -> Future<Response> {
+        return try Token.query(on: req).filter(\Token.token == token.passwordHash(req)).first().flatMap(to: Response.self, { (token) -> Future<Response> in
+            guard let token = token else {
+                throw AuthError.authenticationFailed
+            }
+            return User.with(id: token.userId, on: req).flatMap(to: Response.self, { (user) -> Future<Response> in
+                guard let user = user else {
+                    throw AuthError.authenticationFailed
+                }
+                return try Token.Public(token: token, user: user).asResponse(.ok, to: req).map(to: Response.self, { (response) -> Response in
+                    let jwt = try JWTHelper.jwtToken(for: user)
+                    response.http.headers["Authorization"] = "Bearer \(jwt)"
+                    return response
+                })
+            })
+        })
+    }
     
     static func login(request req: Request, login: User.Auth.Login) throws -> Future<Response> {
         guard !login.email.isEmpty, !login.password.isEmpty else {
@@ -74,12 +88,17 @@ extension AuthController {
                 token.token = try token.token.passwordHash(req)
                 return token.save(on: db).flatMap(to: Response.self) { token in
                     tokenBackup.id = token.id
-                    let response = try tokenBackup.asResponse(.ok, to: req)
-                    // TODO: Add JWT token here!!!!!!!!!!!
-                    return response
+                    
+                    let publicToken = Token.PublicFull(token: tokenBackup, user: user)
+                    return try publicToken.asResponse(.ok, to: req).map(to: Response.self, { (response) -> Response in
+                        let jwt = try JWTHelper.jwtToken(for: user)
+                        response.http.headers["Authorization"] = "Bearer \(jwt)"
+                        return response
+                    })
                 }
             }
         }
     }
     
 }
+

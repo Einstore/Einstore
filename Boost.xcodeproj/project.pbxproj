@@ -25,6 +25,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		15EF68F620476F0E001778A2 /* JWT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EF68F520476F0E001778A2 /* JWT.swift */; };
 		OBJ_1000 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_461 /* Package.swift */; };
 		OBJ_1006 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_508 /* Package.swift */; };
 		OBJ_1012 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_604 /* Package.swift */; };
@@ -6123,6 +6124,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		15EF68F520476F0E001778A2 /* JWT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JWT.swift; sourceTree = "<group>"; };
 		"Async::Async::Product" /* Async.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Async.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCore::Product" /* ApiCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCoreTestTools::Product" /* ApiCoreTestTools.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCoreTestTools.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -9200,6 +9202,7 @@
 				OBJ_59 /* Env.swift */,
 				OBJ_60 /* Filesize.swift */,
 				OBJ_61 /* Result.swift */,
+				15EF68F520476F0E001778A2 /* JWT.swift */,
 			);
 			path = Libs;
 			sourceTree = "<group>";
@@ -12362,6 +12365,7 @@
 				OBJ_2111 /* Future+Response.swift in Sources */,
 				OBJ_2112 /* Future+Tools.swift in Sources */,
 				OBJ_2113 /* HTTPHeaders+Tools.swift in Sources */,
+				15EF68F620476F0E001778A2 /* JWT.swift in Sources */,
 				OBJ_2114 /* Request+Auth.swift in Sources */,
 				OBJ_2115 /* Request+Files.swift in Sources */,
 				OBJ_2116 /* Request+URI.swift in Sources */,

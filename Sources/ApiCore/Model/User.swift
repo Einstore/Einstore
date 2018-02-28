@@ -104,6 +104,16 @@ extension User.Display {
     
 }
 
+// MARK: - Queries
+
+extension User {
+    
+    public static func with(id: DbCoreIdentifier, on connectable: DatabaseConnectable) -> Future<User?> {
+        return User.query(on: connectable).filter(\User.id == id).first()
+    }
+    
+}
+
 // MARK: - Migrations
 
 extension User: Migration {

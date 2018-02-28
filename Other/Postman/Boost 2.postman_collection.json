@@ -99,6 +99,44 @@
 		},
 		{
 			"name": "Auth (BASIC)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0a4fca42-18ee-49ac-bbe5-0fdca7102e0a",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"// Token check",
+							"tests[\"Token has an id\"] = (jsonData[\"id\"].length > 10)",
+							"tests[\"Token has a user\"] = (jsonData[\"user\"][\"id\"].length > 10)",
+							"tests[\"Token has a token\"] = (jsonData[\"token\"].length > 10)",
+							"tests[\"Token has expires\"] = (jsonData[\"expires\"] > 543533823)",
+							"",
+							"postman.setEnvironmentVariable(\"AUTH_TOKEN\", jsonData[\"token\"]);",
+							"",
+							"// JWT",
+							"var jwtAuthExists = responseHeaders.hasOwnProperty(\"Authorization\") || responseHeaders.hasOwnProperty(\"authorization\");",
+							"tests[\"JWT Token is present\"] = jwtAuthExists;",
+							"",
+							"if (jwtAuthExists) {",
+							"    var a = responseHeaders[\"Authorization\"] || responseHeaders[\"authorization\"];",
+							"    tests[\"JWT token has a bearer\"] = a.has(\"Bearer \");",
+							"    tests[\"JWT token has a value\"] = (a.length > 15);",
+							"    postman.setEnvironmentVariable(\"JWT_AUTH\", a.substring(7));",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [
@@ -109,7 +147,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"email\": \"admin@liveui.io\",\n\t\"password\": \"password123\"\n}"
+					"raw": "{\n  \"email\": \"admin@liveui.io\",\n  \"password\": \"password123\"\n}"
 				},
 				"url": {
 					"raw": "{{SERVER}}auth",
@@ -123,6 +161,44 @@
 		},
 		{
 			"name": "Auth",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "14b7eed6-43ce-4209-a4fb-ae3f9587c6f9",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"// Token check",
+							"tests[\"Token has an id\"] = (jsonData[\"id\"].length > 10)",
+							"tests[\"Token has a user\"] = (jsonData[\"user\"][\"id\"].length > 10)",
+							"tests[\"Token has a token\"] = (jsonData[\"token\"].length > 10)",
+							"tests[\"Token has expires\"] = (jsonData[\"expires\"] > 543533823)",
+							"",
+							"postman.setEnvironmentVariable(\"AUTH_TOKEN\", jsonData[\"token\"]);",
+							"",
+							"// JWT",
+							"var jwtAuthExists = responseHeaders.hasOwnProperty(\"Authorization\") || responseHeaders.hasOwnProperty(\"authorization\");",
+							"tests[\"JWT Token is present\"] = jwtAuthExists;",
+							"",
+							"if (jwtAuthExists) {",
+							"    var a = responseHeaders[\"Authorization\"] || responseHeaders[\"authorization\"];",
+							"    tests[\"JWT token has a bearer\"] = a.has(\"Bearer \");",
+							"    tests[\"JWT token has a value\"] = (a.length > 15);",
+							"    postman.setEnvironmentVariable(\"JWT_AUTH\", a.substring(7));",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -133,12 +209,131 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"email\": \"admin@liveui.io\",\n\t\"password\": \"admin\"\n}"
+					"raw": "{\n  \"email\": \"admin@liveui.io\",\n  \"password\": \"admin\"\n}"
 				},
 				"url": {
 					"raw": "{{SERVER}}auth",
 					"host": [
 						"{{SERVER}}auth"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "JWT refresh",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c318fae0-78c0-487d-b27e-8de7ce18acd3",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"// Token check",
+							"tests[\"Token has an id\"] = (jsonData[\"id\"].length > 10)",
+							"tests[\"Token has a user\"] = (jsonData[\"user\"][\"id\"].length > 10)",
+							"tests[\"Token has expires\"] = (jsonData[\"expires\"] > 543533823)",
+							"",
+							"// JWT",
+							"var jwtAuthExists = responseHeaders.hasOwnProperty(\"Authorization\") || responseHeaders.hasOwnProperty(\"authorization\");",
+							"tests[\"JWT Token is present\"] = jwtAuthExists;",
+							"",
+							"if (jwtAuthExists) {",
+							"    var a = responseHeaders[\"Authorization\"] || responseHeaders[\"authorization\"];",
+							"    tests[\"JWT token has a bearer\"] = a.has(\"Bearer \");",
+							"    tests[\"JWT token has a value\"] = (a.length > 15);",
+							"    postman.setEnvironmentVariable(\"JWT_AUTH\", a);",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token {{AUTH_TOKEN}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"admin@liveui.io\",\n  \"password\": \"password123\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}token",
+					"host": [
+						"{{SERVER}}token"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "JWT refresh",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c6c95c43-e38a-4de4-84db-f36fb089c4ec",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"// Token check",
+							"tests[\"Token has an id\"] = (jsonData[\"id\"].length > 10)",
+							"tests[\"Token has a user_id\"] = (jsonData[\"user_id\"].length > 10)",
+							"tests[\"Token has a token\"] = (jsonData[\"token\"].length > 10)",
+							"tests[\"Token has expires\"] = (jsonData[\"expires\"] > 543533823)",
+							"",
+							"// JWT",
+							"var jwtAuthExists = responseHeaders.hasOwnProperty(\"Authorization\") || responseHeaders.hasOwnProperty(\"authorization\");",
+							"tests[\"JWT Token is present\"] = jwtAuthExists;",
+							"",
+							"if (jwtAuthExists) {",
+							"    var a = responseHeaders[\"Authorization\"] || responseHeaders[\"authorization\"];",
+							"    tests[\"JWT token has a bearer\"] = a.has(\"Bearer \");",
+							"    tests[\"JWT token has a value\"] = (a.length > 15);",
+							"    postman.setEnvironmentVariable(\"JWT_AUTH\", a);",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"token\": \"{{AUTH_TOKEN}}\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}token",
+					"host": [
+						"{{SERVER}}token"
 					]
 				},
 				"description": null
@@ -410,9 +605,7 @@
 				],
 				"body": {
 					"mode": "file",
-					"file": {
-						"src": ""
-					}
+					"file": {}
 				},
 				"url": {
 					"raw": "{{SERVER}}apps/upload?tags=tag1|tag2|tag3|tag4",

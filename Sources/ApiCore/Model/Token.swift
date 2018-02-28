@@ -21,10 +21,30 @@ public final class Token: DbCoreModel {
         case missingUserId
     }
     
+    public final class PublicFull: DbCoreModel {
+        public var id: DbCoreIdentifier?
+        public var user: User
+        public var token: String
+        public var expires: Date
+        
+        public init(token: Token, user: User) {
+            self.id = token.id
+            self.user = user
+            self.token = token.token
+            self.expires = token.expires
+        }
+    }
+    
     public final class Public: DbCoreModel {
         public var id: DbCoreIdentifier?
         public var user: User
         public var expires: Date
+        
+        public init(token: Token, user: User) {
+            self.id = token.id
+            self.user = user
+            self.expires = token.expires
+        }
     }
     
     public var id: DbCoreIdentifier?
