@@ -44,6 +44,22 @@
    <Group
       location = "container:scripts"
       name = "Scripts">
+      <Group
+         location = "group:docker-shortcuts"
+         name = "docker-shortcuts">
+         <FileRef
+            location = "group:kill-all.sh">
+         </FileRef>
+         <FileRef
+            location = "group:build.sh">
+         </FileRef>
+         <FileRef
+            location = "group:test.sh">
+         </FileRef>
+      </Group>
+      <FileRef
+         location = "group:heroku-entrypoint.sh">
+      </FileRef>
       <FileRef
          location = "group:update.sh">
       </FileRef>

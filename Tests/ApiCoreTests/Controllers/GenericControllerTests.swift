@@ -41,6 +41,8 @@ class GenericControllerTests: XCTestCase {
         let req = Request.testable.http.get(uri: "/teapot")
         let res = app.testable.response(to: req)
         
+        res.testable.debug()
+        
         XCTAssertTrue(res.testable.has(statusCode: 418), "Wrong status code")
         XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
         XCTAssertTrue(res.testable.has(contentLength: 178), "Wrong content length")
@@ -49,7 +51,7 @@ class GenericControllerTests: XCTestCase {
     func testTables() {
         let req = Request.testable.http.get(uri: "/tables")
         let res = app.testable.response(to: req)
-        
+
         res.testable.debug()
     }
     

@@ -1,6 +1,6 @@
-import App
-import Dispatch
 import XCTest
+import DbCore
+import Dispatch
 
 
 final class DbCoreTests : XCTestCase {

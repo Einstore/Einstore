@@ -7,7 +7,7 @@
 
 import Foundation
 import Vapor
-import App
+import ApiCore
 import Dispatch
 import XCTest
 import Crypto

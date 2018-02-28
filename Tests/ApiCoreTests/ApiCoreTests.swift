@@ -1,22 +1,22 @@
-import App
-import Dispatch
 import XCTest
+import ApiCore
+import Dispatch
 import VaporTestTools
 
 
 final class ApiCoreTests : XCTestCase {
     
-    static let allTests = [
+    static let allTests: [(String, Any)] = [
         ("testNothing", testNothing),
-        ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests),
-        ]
+        ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests)
+    ]
     
     // MARK: Setup
     
     
     // MARK: Tests
     
-    func testNothing() throws {
+    func testNothing() {
         XCTAssert(true)
     }
     

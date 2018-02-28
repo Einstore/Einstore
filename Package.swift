@@ -10,7 +10,8 @@ let package = Package(
         .package(url: "https://github.com/vapor/jwt.git", .exact("3.0.0-beta.1.1")),
         //        .package(url: "https://github.com/vapor/jwt.git", .branch("beta")),
         .package(url: "https://github.com/manGoweb/MimeLib.git", .exact("1.0.0")),
-        .package(url: "https://github.com/kareman/SwiftShell.git", .exact("4.0.0"))
+        .package(url: "https://github.com/kareman/SwiftShell.git", .exact("4.0.0")),
+        .package(url: "https://github.com/LiveUI/VaporTestTools.git", .branch("master"))
     ],
     targets: [
         .target(
@@ -67,13 +68,15 @@ let package = Package(
             ]
         ),
         .target(
-            name: "VaporTestTools",
+            name: "ApiCoreTestTools",
             dependencies: [
-                "Vapor"
+                "Vapor",
+                "ApiCore",
+                "VaporTestTools"
             ]
         ),
         .target(
-            name: "ApiCoreTestTools",
+            name: "FluentTestTools",
             dependencies: [
                 "Vapor",
                 "VaporTestTools"
@@ -83,18 +86,46 @@ let package = Package(
             name: "BoostTestTools",
             dependencies: [
                 "Vapor",
+                "ApiCore",
+                "BoostCore",
                 "VaporTestTools",
                 "ApiCoreTestTools"
             ]
         ),
         .target(name: "Run", dependencies: [
             "App"
-            ]),
-        .testTarget(name: "AppTests", dependencies: ["App", "VaporTestTools"]),
-        .testTarget(name: "ApiCoreTests", dependencies: ["ApiCore", "VaporTestTools", "ApiCoreTestTools"]),
-        .testTarget(name: "BoostCoreTests", dependencies: ["BoostCore", "VaporTestTools", "ApiCoreTestTools", "BoostTestTools"]),
-        .testTarget(name: "DbCoreTests", dependencies: ["DbCore", "VaporTestTools"]),
-        .testTarget(name: "ErrorsCoreTests", dependencies: ["ErrorsCore", "VaporTestTools"]),
-        ]
+            ]
+        ),
+        .testTarget(name: "AppTests", dependencies: [
+            "App",
+            "VaporTestTools"
+            ]
+        ),
+        .testTarget(name: "ApiCoreTests", dependencies: [
+            "ApiCore",
+            "VaporTestTools",
+            "FluentTestTools",
+            "ApiCoreTestTools"
+            ]
+        ),
+        .testTarget(name: "BoostCoreTests", dependencies: [
+            "BoostCore",
+            "VaporTestTools",
+            "FluentTestTools",
+            "ApiCoreTestTools",
+            "BoostTestTools"
+            ]
+        ),
+        .testTarget(name: "DbCoreTests", dependencies: [
+            "DbCore",
+            "VaporTestTools"
+            ]
+        ),
+        .testTarget(name: "ErrorsCoreTests", dependencies: [
+            "ErrorsCore",
+            "VaporTestTools"
+            ]
+        )
+    ]
 )
 

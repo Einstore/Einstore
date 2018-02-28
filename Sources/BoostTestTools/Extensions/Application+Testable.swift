@@ -21,7 +21,7 @@ extension TestableProperty where TestableType: Application {
         let app = newApiCoreTestApp({ (config, env, services) in
             let fileHandler = try! Filesystem(config: Filesystem.Config(homeDir: "/tmp/Boost/Tests"))
             var boostConfig = BoostConfig(fileHandler: fileHandler)
-            boostConfig.database = DbCore.config(hostname: "localhost", user: "test", password: "aaaaaa", database: "boost-test")
+//            boostConfig.database = databaseConfig
             try! Boost.configure(boostConfig: &boostConfig, &config, &env, &services)
         }) { (router) in
             try? Boost.boot(router: router)

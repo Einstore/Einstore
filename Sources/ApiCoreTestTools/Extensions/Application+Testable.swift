@@ -6,20 +6,27 @@
 //
 
 import Foundation
+import DbCore
 import ApiCore
 import Vapor
+import Fluent
 import VaporTestTools
 
 
 extension TestableProperty where TestableType: Application {
     
-    public static func newApiCoreTestApp(_ configClosure: AppConfigClosure? = nil, _ routerClosure: AppRouterClosure? = nil) -> Application {
+    public static func newApiCoreTestApp(databaseConfig: DatabaseConfig? = nil, _ configClosure: AppConfigClosure? = nil, _ routerClosure: AppRouterClosure? = nil) -> Application {
+        let db = databaseConfig ?? DbCore.config(hostname: "localhost", user: "test", password: "aaaaaa", database: "boost-test")
         let app = new({ (config, env, services) in
-            try! ApiCore.configure(&config, &env, &services)
+            // Reset static configs
+            DbCore.migrationConfig = MigrationConfig()
+            ApiCore.middlewareConfig = MiddlewareConfig()
+            
             configClosure?(&config, &env, &services)
+            try! ApiCore.configure(databaseConfig: db, &config, &env, &services)
         }) { (router) in
-            try! ApiCore.boot(router: router)
             routerClosure?(router)
+            try! ApiCore.boot(router: router)
         }
         return app
     }

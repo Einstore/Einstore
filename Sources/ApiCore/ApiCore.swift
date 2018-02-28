@@ -32,7 +32,7 @@ public class ApiCore {
         TeamsController.self
     ]
     
-    public static func configure(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
+    public static func configure(databaseConfig: DatabaseConfig,_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
         DbCore.migrationConfig.add(model: Token.self, database: .db)
         DbCore.migrationConfig.add(model: Team.self, database: .db)
         DbCore.migrationConfig.add(model: User.self, database: .db)
@@ -53,6 +53,8 @@ public class ApiCore {
 //        services.register(isSingleton: true) { container in
 //            return AuthenticationCache()
 //        }
+        
+        try DbCore.configure(databaseConfig: databaseConfig, &config, &env, &services)
     }
     
     public static func boot(router: Router) throws {

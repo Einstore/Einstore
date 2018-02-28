@@ -162,6 +162,15 @@
           "revision": "3685f50e677d85da22c639584f0d5313aa3b3d81",
           "version": "3.0.0-beta.3.1.3"
         }
+      },
+      {
+        "package": "VaporTestTools",
+        "repositoryURL": "https://github.com/LiveUI/VaporTestTools.git",
+        "state": {
+          "branch": "master",
+          "revision": "720257b82091f10f0a1b97d33f73ef82cd08b9c0",
+          "version": null
+        }
       }
     ]
   },

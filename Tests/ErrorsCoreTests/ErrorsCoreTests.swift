@@ -1,6 +1,6 @@
-import App
-import Dispatch
 import XCTest
+import ErrorsCore
+import Dispatch
 
 
 final class ErrorsCoreTests : XCTestCase {

@@ -11,7 +11,6 @@ import FluentPostgreSQL
 import DbCore
 import Crypto
 import ErrorsCore
-import ApiCore
 
 
 public class AuthController: Controller {
