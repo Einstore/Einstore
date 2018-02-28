@@ -82,21 +82,22 @@ Response header also contains a JWT token which will be valid for 3 minutes. Whe
 + Response 200 (application/json; charset=utf-8)
     + Headers
 
-            Authorization: Bearer eyJhbGciOiJIUzUxMiIsInVzZXIiOjEsInRva2VuIjoiRTk3OTYzMjItOURBNy00RTAwLTlCNTItOEI4RThBRjkwRDAxIiwidHlwIjoiSldUIn0.eyJleHAiOjE1MTU2MTMwOTN9.O8fDHdMlm_k5n0-CwntVs5FmnV2cdYB6QwfTcT4Oh6JI5V2ckNnV-QDrNAZPhKR2GZKgKMI7B5EJ6iffetU2hg
+            Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MTk4NTk0ODIuOTgwNzgzOSwidXNlcklkIjoiNjMwQzk3RTYtQUM1Ni00MjEzLTg4MkItM0JFQkFFNTBCRjZEIn0.aPMfWZnHJSHa_rDxY-u9x-Vs-amQvxeVL8zGrPhwNGU
             
     + Body
 
             {
-                "token": "EA58FE6F-E2A0-404D-A252-1BBFB286A072",
-                "last_used": "2018-01-10T18:38:35.762Z",
-                "user_id": 1
+                "id": "6813CDEA-D494-4FE8-8793-2E4717F06B56",
+                "user_id": "630C97E6-AC56-4213-882B-3BEBAE50BF6D",
+                "token": "DD0FFF5F-1938-46C3-BFB2-D73590A2983A",
+                "expires": 543968164.15217698
             }
 
 + Response 401 (application/json; charset=utf-8)
 
         {
-            "code": "auth_failed"
-            "error": "Unable to verify authorization token"
+            "error": "auth_error",
+            "description": "Authentication has failed"
         }
 
 ### Get permanent token [POST]
@@ -118,22 +119,23 @@ Response header also contains a JWT token which will be valid for 3 minutes. Whe
 + Response 200 (application/json; charset=utf-8)
     + Headers
 
-            Authorization: Bearer eyJhbGciOiJIUzUxMiIsInVzZXIiOjEsInRva2VuIjoiRTk3OTYzMjItOURBNy00RTAwLTlCNTItOEI4RThBRjkwRDAxIiwidHlwIjoiSldUIn0.eyJleHAiOjE1MTU2MTMwOTN9.O8fDHdMlm_k5n0-CwntVs5FmnV2cdYB6QwfTcT4Oh6JI5V2ckNnV-QDrNAZPhKR2GZKgKMI7B5EJ6iffetU2hg
+            Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MTk4NTk0ODIuOTgwNzgzOSwidXNlcklkIjoiNjMwQzk3RTYtQUM1Ni00MjEzLTg4MkItM0JFQkFFNTBCRjZEIn0.aPMfWZnHJSHa_rDxY-u9x-Vs-amQvxeVL8zGrPhwNGU
             ContentType: application/json; charset=utf-8
             
     + Body
 
             {
-                "token": "EA58FE6F-E2A0-404D-A252-1BBFB286A072",
-                "last_used": "2018-01-10T18:38:35.762Z",
-                "user_id": 1
+                "id": "6813CDEA-D494-4FE8-8793-2E4717F06B56",
+                "user_id": "630C97E6-AC56-4213-882B-3BEBAE50BF6D",
+                "token": "DD0FFF5F-1938-46C3-BFB2-D73590A2983A",
+                "expires": 543968164.15217698
             }
 
 + Response 401 (application/json; charset=utf-8)
 
         {
-            "code": "auth_failed"
-            "error": "Unable to verify authorization token"
+            "error": "auth_error",
+            "description": "Authentication has failed"
         }
 
 
@@ -156,8 +158,7 @@ JWT token needs to be refreshed after 30 seconds from the last request made. Wit
 
     + Headers
 
-            Authorization: Bearer eyJhbGciOiJIUzUxMiIsInVzZXIiOjEsInRva2VuIjoiRTk3OTYzMjItOURBNy00RTAwLTlCNTItOEI4RThBRjkwRDAxIiwidHlwIjoiSldUIn0.eyJleHAiOjE1MTU2MTMwOTN9.O8fDHdMlm_k5n0-CwntVs5FmnV2cdYB6QwfTcT4Oh6JI5V2ckNnV-QDrNAZPhKR2GZKgKMI7B5EJ6iffetU2hg
-            ContentType: application/json; charset=utf-8
+            Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MTk4NTk0ODIuOTgwNzgzOSwidXNlcklkIjoiNjMwQzk3RTYtQUM1Ni00MjEzLTg4MkItM0JFQkFFNTBCRjZEIn0.aPMfWZnHJSHa_rDxY-u9x-Vs-amQvxeVL8zGrPhwNGU
             
     + Body
 
@@ -169,8 +170,8 @@ JWT token needs to be refreshed after 30 seconds from the last request made. Wit
 + Response 401 (application/json; charset=utf-8)
 
         {
-            "code": "auth_failed"
-            "error": "Unable to verify authorization token"
+            "error": "auth_error",
+            "description": "Authentication has failed"
         }
 
 
@@ -194,8 +195,7 @@ JWT token needs to be refreshed after 30 seconds from the last request made. Wit
 
     + Headers
 
-            Authorization: Bearer eyJhbGciOiJIUzUxMiIsInVzZXIiOjEsInRva2VuIjoiRTk3OTYzMjItOURBNy00RTAwLTlCNTItOEI4RThBRjkwRDAxIiwidHlwIjoiSldUIn0.eyJleHAiOjE1MTU2MTMwOTN9.O8fDHdMlm_k5n0-CwntVs5FmnV2cdYB6QwfTcT4Oh6JI5V2ckNnV-QDrNAZPhKR2GZKgKMI7B5EJ6iffetU2hg
-            ContentType: application/json; charset=utf-8
+            Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MTk4NTk0ODIuOTgwNzgzOSwidXNlcklkIjoiNjMwQzk3RTYtQUM1Ni00MjEzLTg4MkItM0JFQkFFNTBCRjZEIn0.aPMfWZnHJSHa_rDxY-u9x-Vs-amQvxeVL8zGrPhwNGU
             
     + Body
 
@@ -207,8 +207,8 @@ JWT token needs to be refreshed after 30 seconds from the last request made. Wit
 + Response 401 (application/json; charset=utf-8)
 
         {
-            "code": "auth_failed"
-            "error": "Unable to verify authorization token"
+            "error": "auth_error",
+            "description": "Authentication has failed"
         }
 
 
