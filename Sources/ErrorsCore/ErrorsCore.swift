@@ -28,10 +28,41 @@ public enum GenericError: FrontendError {
     
 }
 
-public enum HTTPError: Error {
+public enum HTTPError: FrontendError {
+    case notFound
     case notAuthorized
     case missingRequestData
     case missingAuthorizationData
+    
+    public var code: String {
+        return "http_error"
+    }
+    
+    public var description: String {
+        switch self {
+        case .notFound:
+            return "Not found"
+        case .notAuthorized:
+            return "Not authorised!!! Boo!"
+        case .missingRequestData:
+            return "Some request data are missing"
+        case .missingAuthorizationData:
+            return "Some authorization data are missing"
+        }
+    }
+    
+    public var status: HTTPStatus {
+        switch self {
+        case .notFound:
+            return .notFound
+        case .notAuthorized:
+            return .unauthorized
+        case .missingRequestData:
+            return .preconditionRequired
+        case .missingAuthorizationData:
+            return .preconditionRequired
+        }
+    }
 }
 
 

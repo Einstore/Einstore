@@ -10,4 +10,15 @@ import Vapor
 import Fluent
 import FluentPostgreSQL
 
-public protocol DbCoreModel: PostgreSQLUUIDModel, Content { }
+public protocol DbCoreModel: PostgreSQLUUIDModel, Content, Equatable { }
+
+
+// MARK: - Equating
+
+extension DbCoreModel {
+    
+    public static func ==(lhs: Self, rhs: Self) -> Bool {
+        return lhs.id == rhs.id
+    }
+    
+}

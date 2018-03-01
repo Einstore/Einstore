@@ -118,20 +118,20 @@ extension Team {
 
 extension Team {
     
-    public static func exists(identifier: String, on db: DbCoreConnection) -> Future<Bool> {
-        return Team.query(on: db).filter(\Team.identifier == identifier).count().map(to: Bool.self, { (count) -> Bool in
+    public static func exists(identifier: String, on connection: DatabaseConnectable) -> Future<Bool> {
+        return Team.query(on: connection).filter(\Team.identifier == identifier).count().map(to: Bool.self, { (count) -> Bool in
             return count > 0
         })
     }
     
-    public static func verifiedTeamQuery(connection db: DbCoreConnection, id: DbCoreIdentifier) throws -> QueryBuilder<Team> {
+    public static func verifiedTeamQuery(connection: DatabaseConnectable, id: DbCoreIdentifier) throws -> QueryBuilder<Team> {
 //        let teams = try req.authInfo.teamIds()
 //        return Team.query(on: req).filter(\Team.id == id).filter(\Team.id, in: teams)
-        return Team.query(on: db).filter(\Team.id == id)
+        return Team.query(on: connection).filter(\Team.id == id)
     }
     
-    public static func verifiedTeam(connection db: DbCoreConnection, id: DbCoreIdentifier) throws -> Future<Team> {
-        return try verifiedTeamQuery(connection: db, id: id).first().map(to: Team.self, { (team) -> Team in
+    public static func verifiedTeam(connection: DatabaseConnectable, id: DbCoreIdentifier) throws -> Future<Team> {
+        return try verifiedTeamQuery(connection: connection, id: id).first().map(to: Team.self, { (team) -> Team in
             guard let team = team else {
                 throw ContentError.unavailable
             }

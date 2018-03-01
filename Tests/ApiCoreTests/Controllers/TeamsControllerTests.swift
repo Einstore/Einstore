@@ -36,7 +36,13 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
         ("testGetSingleTeam", testGetSingleTeam),
         ("testUpdateSingleTeam", testUpdateSingleTeam),
         ("testPatchSingleTeam", testPatchSingleTeam),
-        ("testDeleteSingleTeam", testDeleteSingleTeam)
+        ("testDeleteSingleTeam", testDeleteSingleTeam),
+        ("testLinkUser", testLinkUser),
+        ("testTryLinkUserWhereHeIs", testTryLinkUserWhereHeIs),
+        ("testLinkUserThatDoesntExist", testLinkUserThatDoesntExist),
+        ("testUnlinkUser", testUnlinkUser),
+        ("testUnlinkUserThatDoesntExist", testUnlinkUserThatDoesntExist),
+        ("testTryUnlinkUserWhereHeIsNot", testTryUnlinkUserWhereHeIsNot)
     ]
     
     func testLinuxTests() {
@@ -65,13 +71,13 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
         XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
         
         let teams = res.testable.content(as: [Team].self)!
-        XCTAssertEqual(teams.count, 3, "There should be two teams in the database")
+        XCTAssertEqual(teams.count, 2, "There should be two teams in the database")
         XCTAssertTrue(teams.contains(where: { (team) -> Bool in
             return team.id == team1.id && team.id != nil
         }), "Newly created team is not present in the database")
-        XCTAssertTrue(teams.contains(where: { (team) -> Bool in
+        XCTAssertFalse(teams.contains(where: { (team) -> Bool in
             return team.id == team2.id && team.id != nil
-        }), "Newly created team is not present in the database")
+        }), "Team 2 should not be visible")
     }
     
     func testCreateTeam() {
@@ -144,6 +150,31 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
         
         XCTAssertTrue(res.testable.has(statusCode: .conflict), "Wrong status code")
         XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
+    }
+    
+    func testLinkUser() {
+        XCTFail()
+    }
+    
+    func testTryLinkUserWhereHeIs() {
+        XCTFail()
+    }
+    
+    func testLinkUserThatDoesntExist() {
+        XCTFail()
+    }
+    
+    func testUnlinkUser() {
+        XCTFail()
+    }
+    
+    func testUnlinkUserThatDoesntExist() {
+        // Should be same as testLinkUserThatDoesntExist
+        XCTFail()
+    }
+    
+    func testTryUnlinkUserWhereHeIsNot() {
+        XCTFail()
     }
     
     func testGetSingleTeam() {
