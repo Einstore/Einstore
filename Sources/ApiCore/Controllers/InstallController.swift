@@ -15,13 +15,18 @@ public class InstallController: Controller {
     
     public static func boot(router: Router) throws {
         router.get("install") { (req)->Future<Response> in
-            return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
-                return install(connection: db, request: req)
-            }
+            return install(on: req)
         }
         
         router.get("demo") { req in
-            return try req.response.maintenanceFinished(message: "Demo install finished")
+            return uninstall(on: req).flatMap(to: Response.self) { (_) -> Future<Response> in
+                let objects = [
+                    su.save(on: req)
+                ]
+                return objects.map(to: Response.self) { (Void) -> Response in
+                    return try req.response.maintenanceFinished(message: "Demo install finished")
+                }
+            }
         }
         
 //        router.get("uninstall") { (req)->Future<Response> in
@@ -39,9 +44,9 @@ public class InstallController: Controller {
 //        }
         
         router.get("reinstall") { (req)->Future<Response> in
-            return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
+            return uninstall(on: req).flatMap(to: Response.self) { (_) -> Future<Response> in
                 let objects = [
-                    install(connection: db, request: req)
+                    install(on: req)
                 ]
                 return objects.map(to: Response.self, { (_)  -> Response in
                     return try req.response.maintenanceFinished(message: "Re-install finished")
@@ -59,10 +64,22 @@ public class InstallController: Controller {
 
 extension InstallController {
     
-    static func install(connection db: DbCoreDatabase.Connection, request req: Request) -> Future<Response> {
-        let user = User(firstname: "Super", lastname: "Admin", email: "admin@liveui.io", password: "admin", disabled: false, su: true)
+    private static var su: User {
+        return User(firstname: "Super", lastname: "Admin", email: "admin@liveui.io", password: "admin", disabled: false, su: true)
+    }
+    
+    private static var adminTeam: Team {
+        return Team(name: "Admin team", identifier: "admin-team")
+    }
+    
+    private static func uninstall(on req: Request) -> Future<Void> {
+        return Future(Void())
+    }
+    
+    private static func install(on req: Request) -> Future<Response> {
         let objects = [
-            user.save(on: db)
+            su.save(on: req).flatten(),
+            adminTeam.save(on: req).flatten()
         ]
         return objects.map(to: Response.self, { (Void) -> Response in
             return try req.response.maintenanceFinished(message: "Install finished")

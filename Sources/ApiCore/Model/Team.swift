@@ -61,8 +61,20 @@ extension Team: Migration {
         public var identifier: String
     }
     
+    public struct Name: Content {
+        public var name: String
+        
+        public init(name: String) {
+            self.name = name
+        }
+    }
+    
     public struct Identifier: Content {
         public var identifier: String
+        
+        public init(identifier: String) {
+            self.identifier = identifier
+        }
     }
     
     public static var idKey: WritableKeyPath<Team, DbCoreIdentifier?> = \Team.id
@@ -92,6 +104,17 @@ extension Team.New: Insertable {
     
 }
 
+// MARK: - Relationships
+
+extension Team {
+    
+    public var users: Siblings<Team, User, TeamUser> {
+        return siblings()
+    }
+    
+}
+
+// MARK: - Queries
 
 extension Team {
     

@@ -14,12 +14,23 @@ import FluentTestTools
 import ApiCoreTestTools
 
 
-class UsersControllerTests: XCTestCase, UsersTestCase {
+class UsersControllerTests: XCTestCase, UsersTestCase, LinuxTests {
     
     var app: Application!
     
     var user1: User!
     var user2: User!
+    
+    // MARK: Linux
+    
+    static let allTests: [(String, Any)] = [
+        ("testGetUsers", testGetUsers),
+        ("testLinuxTests", testLinuxTests)
+    ]
+    
+    func testLinuxTests() {
+        doTestLinuxTestsAreOk()
+    }
     
     // MARK: Setup
     

@@ -13,11 +13,9 @@ import DbCore
 final class AuthenticationCache: Service {
     
     var userId: DbCoreIdentifier
-    var teamIds: [DbCoreIdentifier]
     
-    init(userId: DbCoreIdentifier, teamIds: [DbCoreIdentifier]) {
+    init(userId: DbCoreIdentifier) {
         self.userId = userId
-        self.teamIds = teamIds
     }
     
 }

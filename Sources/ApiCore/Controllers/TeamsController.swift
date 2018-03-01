@@ -33,22 +33,25 @@ class TeamsController: Controller {
         }
         
         router.post("teams") { (req) -> Future<Response> in
-            return try req.content.decode(Team.New.self).flatMap(to: Response.self, { (newTeam) -> Future<Response> in
+            return try req.content.decode(Team.New.self).flatMap(to: Response.self) { (newTeam) -> Future<Response> in
                 return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
-                    return Team.exists(identifier: newTeam.identifier, on: db).flatMap(to: Response.self, { (identifierExists) -> Future<Response> in
+                    return Team.exists(identifier: newTeam.identifier, on: db).flatMap(to: Response.self) { (identifierExists) -> Future<Response> in
                         if identifierExists {
                             throw Team.TeamError.identifierAlreadyExists
                         }
-                        return newTeam.insertable.save(on: db).flatMap(to: Response.self, { (team) -> Future<Response> in
+                        return newTeam.insertable.save(on: db).flatMap(to: Response.self) { (team) -> Future<Response> in
                             guard team.id != nil else {
                                 throw DbError.insertFailed
                             }
-                            
-                            return try team.asResponse(.created, to: req)
-                        })
-                    })
+                            return try req.me().flatMap(to: Response.self) { (user) -> Future<Response> in
+                                return team.users.attach(user, on: db).flatMap(to: Response.self) { (join) -> Future<Response> in
+                                    return try team.asResponse(.created, to: req)
+                                }
+                            }
+                        }
+                    }
                 }
-            })
+            }
         }
         
         router.post("teams", "check") { (req) -> Future<Response> in
@@ -139,7 +142,7 @@ extension TeamsController {
     
     static func delete(team: Team, request req: Request, on db: DatabaseConnectable) -> Future<Response> {
         return team.delete(on: db).map(to: Response.self, { (_) -> Response in
-            return try req.response.success(code: "deleted", description: "Team has been deleted")
+            return try req.response.noContent()
         })
     }
     

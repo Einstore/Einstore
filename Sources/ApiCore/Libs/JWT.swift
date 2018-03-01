@@ -11,7 +11,7 @@ import JWT
 public class JWTHelper {
     
     public static func jwtToken(for user: User) throws -> String {
-        let exp = ExpirationClaim(value: Date(timeIntervalSinceNow: (60 * 5))) // 5 minutes
+        let exp = ExpirationClaim(value: Date(timeIntervalSinceNow: (60 * 15))) // 15 minutes
         var jwt = JWT(payload: JWTAuthPayload(exp: exp, userId: user.id?.uuidString ?? ""))
         
         // TODO: Make the secret SECRET!!!!!!!!!!!!!!!!!!!!

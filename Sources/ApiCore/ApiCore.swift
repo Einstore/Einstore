@@ -36,6 +36,7 @@ public class ApiCore {
         DbCore.migrationConfig.add(model: Token.self, database: .db)
         DbCore.migrationConfig.add(model: Team.self, database: .db)
         DbCore.migrationConfig.add(model: User.self, database: .db)
+        DbCore.migrationConfig.add(model: TeamUser.self, database: .db)
         
         ApiCore.middlewareConfig.use(ApiAuthMiddleware.self)
         ApiCore.middlewareConfig.use(ErrorsCoreMiddleware.self)
@@ -50,9 +51,7 @@ public class ApiCore {
         services.register(ApiAuthMiddleware())
         
         // Authentication
-//        services.register(isSingleton: true) { container in
-//            return AuthenticationCache()
-//        }
+//        services.register(<#T##factory: ServiceFactory##ServiceFactory#>)
         
         try DbCore.configure(databaseConfig: databaseConfig, &config, &env, &services)
     }

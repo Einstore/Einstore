@@ -16,10 +16,10 @@ class UploadKeyController: Controller {
     
     static func boot(router: Router) throws {
         
-        router.get("keys") { (req) -> Future<[UploadKey]> in
-            let teams = try req.authInfo.teamIds()
-            return UploadKey.query(on: req).filter(\UploadKey.teamId, in: teams).all()
-        }
+//        router.get("keys") { (req) -> Future<[UploadKey]> in
+//            let teams = try req.authInfo.teamIds()
+//            return UploadKey.query(on: req).filter(\UploadKey.teamId, in: teams).all()
+//        }
         /*
         router.get("keys", DbCoreIdentifier.parameter) { (req) -> Future<App> in
             return App.query(on: req).first().flatMap(to: App.self, { (app) -> Future<App> in

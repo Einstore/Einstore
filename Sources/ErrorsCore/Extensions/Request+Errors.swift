@@ -11,13 +11,13 @@ import Fluent
 
 
 public struct ErrorResponse: Content {
-    let error: String
-    let description: String
+    public let error: String
+    public let description: String
 }
 
 public struct SuccessResponse: Content {
-    let code: String
-    let description: String?
+    public let code: String
+    public let description: String?
 }
 
 

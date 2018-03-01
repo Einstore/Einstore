@@ -104,6 +104,16 @@ extension User.Display {
     
 }
 
+// MARK: - Relationships
+
+extension User {
+    
+    public var teams: Siblings<User, Team, TeamUser> {
+        return siblings()
+    }
+    
+}
+
 // MARK: - Queries
 
 extension User {

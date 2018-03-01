@@ -11,3 +11,5 @@ import ApiCore
 
 
 extension User: Testable { }
+extension Team: Testable { }
+

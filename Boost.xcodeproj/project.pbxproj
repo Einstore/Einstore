@@ -25,7 +25,13 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		15D5663520485D05007F97C9 /* TeamUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D5663420485D05007F97C9 /* TeamUser.swift */; };
+		15D566BC2048879E007F97C9 /* Request+Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D566BB2048879E007F97C9 /* Request+Auth.swift */; };
 		15EF68F620476F0E001778A2 /* JWT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EF68F520476F0E001778A2 /* JWT.swift */; };
+		15EF68FB204814CC001778A2 /* LinuxTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EF68FA204814CC001778A2 /* LinuxTests.swift */; };
+		15EF68FD20481810001778A2 /* TeamsTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EF68FC20481810001778A2 /* TeamsTestCase.swift */; };
+		15EF68FF204818C0001778A2 /* Team+Testable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EF68FE204818C0001778A2 /* Team+Testable.swift */; };
+		15EF690120481AA7001778A2 /* TeamsControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EF690020481AA7001778A2 /* TeamsControllerTests.swift */; };
 		OBJ_1000 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_461 /* Package.swift */; };
 		OBJ_1006 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_508 /* Package.swift */; };
 		OBJ_1012 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_604 /* Package.swift */; };
@@ -389,7 +395,7 @@
 		OBJ_1818 /* GenericControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_129 /* GenericControllerTests.swift */; };
 		OBJ_1819 /* UsersControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_130 /* UsersControllerTests.swift */; };
 		OBJ_1820 /* UsersTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_132 /* UsersTestCase.swift */; };
-		OBJ_1821 /* String+CryptoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_133 /* String+CryptoTests.swift */; };
+		OBJ_1821 /* StringCryptoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_133 /* StringCryptoTests.swift */; };
 		OBJ_1823 /* ApiCoreTestTools.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Boost::ApiCoreTestTools::Product" /* ApiCoreTestTools.framework */; };
 		OBJ_1824 /* FluentTestTools.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Boost::FluentTestTools::Product" /* FluentTestTools.framework */; };
 		OBJ_1825 /* VaporTestTools.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "VaporTestTools::VaporTestTools::Product" /* VaporTestTools.framework */; };
@@ -543,7 +549,6 @@
 		OBJ_2111 /* Future+Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_45 /* Future+Response.swift */; };
 		OBJ_2112 /* Future+Tools.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_46 /* Future+Tools.swift */; };
 		OBJ_2113 /* HTTPHeaders+Tools.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_47 /* HTTPHeaders+Tools.swift */; };
-		OBJ_2114 /* Request+Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_48 /* Request+Auth.swift */; };
 		OBJ_2115 /* Request+Files.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_49 /* Request+Files.swift */; };
 		OBJ_2116 /* Request+URI.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_50 /* Request+URI.swift */; };
 		OBJ_2117 /* String+Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_51 /* String+Crypto.swift */; };
@@ -6124,7 +6129,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		15D5663420485D05007F97C9 /* TeamUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamUser.swift; sourceTree = "<group>"; };
+		15D566BB2048879E007F97C9 /* Request+Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Request+Auth.swift"; sourceTree = "<group>"; };
 		15EF68F520476F0E001778A2 /* JWT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JWT.swift; sourceTree = "<group>"; };
+		15EF68FA204814CC001778A2 /* LinuxTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinuxTests.swift; sourceTree = "<group>"; };
+		15EF68FC20481810001778A2 /* TeamsTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamsTestCase.swift; sourceTree = "<group>"; };
+		15EF68FE204818C0001778A2 /* Team+Testable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Team+Testable.swift"; sourceTree = "<group>"; };
+		15EF690020481AA7001778A2 /* TeamsControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamsControllerTests.swift; sourceTree = "<group>"; };
 		"Async::Async::Product" /* Async.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Async.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCore::Product" /* ApiCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCoreTestTools::Product" /* ApiCoreTestTools.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCoreTestTools.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -6184,7 +6195,7 @@
 		OBJ_13 /* ApiErrorsMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiErrorsMiddleware.swift; sourceTree = "<group>"; };
 		OBJ_130 /* UsersControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersControllerTests.swift; sourceTree = "<group>"; };
 		OBJ_132 /* UsersTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersTestCase.swift; sourceTree = "<group>"; };
-		OBJ_133 /* String+CryptoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+CryptoTests.swift"; sourceTree = "<group>"; };
+		OBJ_133 /* StringCryptoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringCryptoTests.swift; sourceTree = "<group>"; };
 		OBJ_135 /* DbCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DbCoreTests.swift; sourceTree = "<group>"; };
 		OBJ_137 /* BoostCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoostCoreTests.swift; sourceTree = "<group>"; };
 		OBJ_139 /* AppTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTests.swift; sourceTree = "<group>"; };
@@ -6478,7 +6489,6 @@
 		OBJ_476 /* TemplateTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateTag.swift; sourceTree = "<group>"; };
 		OBJ_478 /* PartialTemplateData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartialTemplateData.swift; sourceTree = "<group>"; };
 		OBJ_479 /* TemplateData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateData.swift; sourceTree = "<group>"; };
-		OBJ_48 /* Request+Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Request+Auth.swift"; sourceTree = "<group>"; };
 		OBJ_480 /* TemplateDataEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateDataEncoder.swift; sourceTree = "<group>"; };
 		OBJ_481 /* TemplateKeyedEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateKeyedEncoder.swift; sourceTree = "<group>"; };
 		OBJ_482 /* TemplateSingleValueEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateSingleValueEncoder.swift; sourceTree = "<group>"; };
@@ -7867,6 +7877,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		15EF68F82048147F001778A2 /* Libs */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_133 /* StringCryptoTests.swift */,
+			);
+			path = Libs;
+			sourceTree = "<group>";
+		};
 		OBJ_10 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -7974,10 +7992,10 @@
 		OBJ_125 /* ApiCoreTests */ = {
 			isa = PBXGroup;
 			children = (
+				15EF68F82048147F001778A2 /* Libs */,
 				OBJ_126 /* ApiCoreTests.swift */,
 				OBJ_127 /* Controllers */,
 				OBJ_131 /* Helpers */,
-				OBJ_133 /* String+CryptoTests.swift */,
 			);
 			name = ApiCoreTests;
 			path = Tests/ApiCoreTests;
@@ -7989,6 +8007,7 @@
 				OBJ_128 /* AuthControllerTests.swift */,
 				OBJ_129 /* GenericControllerTests.swift */,
 				OBJ_130 /* UsersControllerTests.swift */,
+				15EF690020481AA7001778A2 /* TeamsControllerTests.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -7996,7 +8015,9 @@
 		OBJ_131 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				15EF68FA204814CC001778A2 /* LinuxTests.swift */,
 				OBJ_132 /* UsersTestCase.swift */,
+				15EF68FC20481810001778A2 /* TeamsTestCase.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -8835,11 +8856,11 @@
 				OBJ_45 /* Future+Response.swift */,
 				OBJ_46 /* Future+Tools.swift */,
 				OBJ_47 /* HTTPHeaders+Tools.swift */,
-				OBJ_48 /* Request+Auth.swift */,
 				OBJ_49 /* Request+Files.swift */,
 				OBJ_50 /* Request+URI.swift */,
 				OBJ_51 /* String+Crypto.swift */,
 				OBJ_52 /* String+Manipulation.swift */,
+				15D566BB2048879E007F97C9 /* Request+Auth.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -9069,7 +9090,7 @@
 			path = Tag;
 			sourceTree = "<group>";
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -9083,7 +9104,6 @@
 				OBJ_147 /* Dependencies */,
 				OBJ_899 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_507 /* Mustache */ = {
@@ -9473,6 +9493,7 @@
 				OBJ_65 /* Team.swift */,
 				OBJ_66 /* Token.swift */,
 				OBJ_67 /* User.swift */,
+				15D5663420485D05007F97C9 /* TeamUser.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -9885,6 +9906,7 @@
 			children = (
 				OBJ_78 /* Application+Testable.swift */,
 				OBJ_79 /* User+Testable.swift */,
+				15EF68FE204818C0001778A2 /* Team+Testable.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -12026,7 +12048,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_899 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -12301,8 +12323,11 @@
 				OBJ_1817 /* AuthControllerTests.swift in Sources */,
 				OBJ_1818 /* GenericControllerTests.swift in Sources */,
 				OBJ_1819 /* UsersControllerTests.swift in Sources */,
+				15EF690120481AA7001778A2 /* TeamsControllerTests.swift in Sources */,
+				15EF68FD20481810001778A2 /* TeamsTestCase.swift in Sources */,
+				15EF68FB204814CC001778A2 /* LinuxTests.swift in Sources */,
 				OBJ_1820 /* UsersTestCase.swift in Sources */,
-				OBJ_1821 /* String+CryptoTests.swift in Sources */,
+				OBJ_1821 /* StringCryptoTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12310,6 +12335,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
+				15EF68FF204818C0001778A2 /* Team+Testable.swift in Sources */,
 				OBJ_1899 /* ApiCoreTestTools.swift in Sources */,
 				OBJ_1900 /* Application+Testable.swift in Sources */,
 				OBJ_1901 /* User+Testable.swift in Sources */,
@@ -12366,11 +12392,12 @@
 				OBJ_2112 /* Future+Tools.swift in Sources */,
 				OBJ_2113 /* HTTPHeaders+Tools.swift in Sources */,
 				15EF68F620476F0E001778A2 /* JWT.swift in Sources */,
-				OBJ_2114 /* Request+Auth.swift in Sources */,
+				15D5663520485D05007F97C9 /* TeamUser.swift in Sources */,
 				OBJ_2115 /* Request+Files.swift in Sources */,
 				OBJ_2116 /* Request+URI.swift in Sources */,
 				OBJ_2117 /* String+Crypto.swift in Sources */,
 				OBJ_2118 /* String+Manipulation.swift in Sources */,
+				15D566BC2048879E007F97C9 /* Request+Auth.swift in Sources */,
 				OBJ_2119 /* AuthError.swift in Sources */,
 				OBJ_2120 /* AuthenticationCache.swift in Sources */,
 				OBJ_2121 /* Decodable+Helpers.swift in Sources */,

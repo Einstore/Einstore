@@ -11,11 +11,29 @@ import VaporTestTools
 import ApiCoreTestTools
 
 
-class GenericControllerTests: XCTestCase {
+class GenericControllerTests: XCTestCase, LinuxTests {
     
     var app: Application!
     
-    // MARK: Setup
+    // MARK: Linux
+    
+    static let allTests: [(String, Any)] = [
+        ("testUnknownGet", testUnknownGet),
+        ("testUnknownPost", testUnknownPost),
+        ("testUnknownPut", testUnknownPut),
+        ("testUnknownPatch", testUnknownPatch),
+        ("testUnknownDelete", testUnknownDelete),
+        ("testPing", testPing),
+        ("testTeapot", testTeapot),
+        ("testTables", testTables),
+        ("testLinuxTests", testLinuxTests)
+    ]
+    
+    func testLinuxTests() {
+        doTestLinuxTestsAreOk()
+    }
+    
+   // MARK: Setup
     
     override func setUp() {
         super.setUp()
@@ -24,6 +42,51 @@ class GenericControllerTests: XCTestCase {
     }
     
     // MARK: Tests
+    
+    func testUnknownGet() {
+        let req = HTTPRequest.testable.get(uri: "/unknown")
+        let res = app.testable.response(to: req)
+        
+        res.testable.debug()
+        
+        testUnknown(response: res)
+    }
+    
+    func testUnknownPost() {
+        let req = HTTPRequest.testable.post(uri: "/unknown")
+        let res = app.testable.response(to: req)
+        
+        res.testable.debug()
+        
+        testUnknown(response: res)
+    }
+    
+    func testUnknownPut() {
+        let req = HTTPRequest.testable.put(uri: "/unknown")
+        let res = app.testable.response(to: req)
+        
+        res.testable.debug()
+        
+        testUnknown(response: res)
+    }
+    
+    func testUnknownPatch() {
+        let req = HTTPRequest.testable.patch(uri: "/unknown")
+        let res = app.testable.response(to: req)
+        
+        res.testable.debug()
+        
+        testUnknown(response: res)
+    }
+    
+    func testUnknownDelete() {
+        let req = HTTPRequest.testable.delete(uri: "/unknown")
+        let res = app.testable.response(to: req)
+        
+        res.testable.debug()
+        
+        testUnknown(response: res)
+    }
     
     func testPing() {
         let req = HTTPRequest.testable.get(uri: "/ping")
@@ -53,6 +116,15 @@ class GenericControllerTests: XCTestCase {
         let res = app.testable.response(to: req)
 
         res.testable.debug()
+    }
+    
+}
+
+
+extension GenericControllerTests {
+    
+    private func testUnknown(response res: Response) {
+        XCTAssertTrue(res.testable.has(statusCode: .notFound), "Wrong status code. Should be not found (404)")
     }
     
 }

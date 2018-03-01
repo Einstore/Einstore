@@ -8,16 +8,35 @@
 import XCTest
 import Vapor
 import VaporTestTools
+import FluentTestTools
 import ApiCoreTestTools
 @testable import ApiCore
 
 
-class AuthControllerTests: XCTestCase, UsersTestCase {
+class AuthControllerTests: XCTestCase, UsersTestCase, LinuxTests {
     
     var app: Application!
     
     var user1: User!
     var user2: User!
+    
+    // MARK: Linux
+    
+    static let allTests: [(String, Any)] = [
+        ("testValidGetAuthRequest", testValidGetAuthRequest),
+        ("testInvalidGetAuthRequest", testInvalidGetAuthRequest),
+        ("testValidPostAuthRequest", testValidPostAuthRequest),
+        ("testInvalidPostAuthRequest", testInvalidPostAuthRequest),
+        ("testValidGetTokenAuthRequest", testValidGetTokenAuthRequest),
+        ("testInvalidGetTokenAuthRequest", testInvalidGetTokenAuthRequest),
+        ("testValidPostTokenAuthRequest", testValidPostTokenAuthRequest),
+        ("testInvalidPostTokenAuthRequest", testInvalidPostTokenAuthRequest),
+        ("testLinuxTests", testLinuxTests)
+    ]
+    
+    func testLinuxTests() {
+        doTestLinuxTestsAreOk()
+    }
     
     // MARK: Setup
     
@@ -25,6 +44,8 @@ class AuthControllerTests: XCTestCase, UsersTestCase {
         super.setUp()
         
         app = Application.testable.newApiCoreTestApp()
+        
+        app.testable.delete(allFor: Token.self)
         
         setupUsers()
     }
@@ -145,6 +166,9 @@ extension AuthControllerTests {
     private func checkAuthResult(_ res: Response) {
         res.testable.debug()
         
+        let count = app.testable.count(allFor: Token.self)
+        XCTAssertEqual(count, 1, "There should be one auth key entry in the db")
+        
         let data = res.testable.content(as: Token.PublicFull.self)
         
         XCTAssertNotNil(data, "Token can't be nil")
@@ -167,7 +191,7 @@ extension AuthControllerTests {
         XCTAssertNotNil(data, "Token can't be nil")
         if let data = data {
             XCTAssertNotNil(data.id, "Token id can't be nil")
-            XCTAssertTrue(data.expires.timeIntervalSince1970 > 0, "Token expiry date should be present")
+            XCTAssertTrue(data.expires.timeIntervalSince1970 > Date().timeIntervalSince1970, "Token expiry date should be present")
             XCTAssertFalse(data.user.id!.uuidString.isEmpty, "User ID data should be present")
         }
         

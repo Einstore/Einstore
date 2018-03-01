@@ -44,7 +44,6 @@ final public class App: DbCoreModel {
     public var platform: String
     public var created: Date?
     public var modified: Date?
-    public var availableToAll: Bool
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -56,11 +55,10 @@ final public class App: DbCoreModel {
         case platform
         case created
         case modified
-        case availableToAll = "basic"
     }
 
 
-    public init(id: DbCoreIdentifier? = nil, teamId: DbCoreIdentifier?, name: String, identifier: String, version: String, build: String, platform: Platform, availableToAll: Bool = false) {
+    public init(id: DbCoreIdentifier? = nil, teamId: DbCoreIdentifier?, name: String, identifier: String, version: String, build: String, platform: Platform) {
         self.id = id
         self.teamId = teamId
         self.name = name
@@ -70,7 +68,6 @@ final public class App: DbCoreModel {
         self.platform = platform.rawValue
         self.created = Date()
         self.modified = Date()
-        self.availableToAll = availableToAll
     }
     
 }
@@ -104,7 +101,6 @@ extension App: Migration {
             schema.addField(type: DbCoreColumnType.varChar(10), name: CodingKeys.platform.stringValue)
             schema.addField(type: DbCoreColumnType.datetime(), name: CodingKeys.created.stringValue)
             schema.addField(type: DbCoreColumnType.datetime(), name: CodingKeys.modified.stringValue)
-            schema.addField(type: DbCoreColumnType.bool(), name: CodingKeys.availableToAll.stringValue)
         }
     }
     
