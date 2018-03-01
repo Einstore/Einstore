@@ -42,7 +42,8 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
         ("testLinkUserThatDoesntExist", testLinkUserThatDoesntExist),
         ("testUnlinkUser", testUnlinkUser),
         ("testUnlinkUserThatDoesntExist", testUnlinkUserThatDoesntExist),
-        ("testTryUnlinkUserWhereHeIsNot", testTryUnlinkUserWhereHeIsNot)
+        ("testTryUnlinkUserWhereHeIsNot", testTryUnlinkUserWhereHeIsNot),
+        ("testGetTeamUsers", testGetTeamUsers)
     ]
     
     func testLinuxTests() {
@@ -186,6 +187,20 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
         testTeam(res: res)
         
         XCTAssertTrue(res.testable.has(statusCode: .ok), "Wrong status code")
+    }
+    
+    func testGetTeamUsers() {
+        let req = HTTPRequest.testable.get(uri: URI(rawValue: "/teams/\(team1.id!.uuidString)/users")!)
+        let res = app.testable.response(to: req)
+        
+        res.testable.debug()
+        
+        let users = res.testable.content(as: [User].self)!
+        XCTAssertEqual(users.count, 1, "Team 1 should have 1 user")
+        XCTAssertTrue(users.contains(user1), "Team 1 should contain User 1")
+        
+        XCTAssertTrue(res.testable.has(statusCode: .ok), "Wrong status code")
+        XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
     }
     
     func testUpdateSingleTeam() {

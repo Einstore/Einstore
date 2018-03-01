@@ -58,7 +58,6 @@ class TeamsController: Controller {
     }
     
     static func boot(router: Router) throws {
-        
         router.get("teams") { (req) -> Future<[Team]> in
             return try req.me().flatMap(to: [Team].self) { (user) -> Future<[Team]> in
                 return try user.teams.query(on: req).all()
@@ -138,6 +137,13 @@ class TeamsController: Controller {
                 }
             }).catchMap { (error) -> Team in
                 throw ErrorsCore.HTTPError.notFound
+            }
+        }
+        
+        router.get("teams", DbCoreIdentifier.parameter, "users") { (req) -> Future<[User]> in
+            let id = try req.parameter(DbCoreIdentifier.self)
+            return try Team.verifiedTeam(connection: req, id: id).flatMap(to: [User].self) { (team) -> Future<[User]> in
+                return try team.users.query(on: req).all()
             }
         }
         
