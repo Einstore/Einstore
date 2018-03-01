@@ -10,7 +10,7 @@ import JWT
 
 public class JWTHelper {
     
-    static func jwtToken(for user: User) throws -> String {
+    public static func jwtToken(for user: User) throws -> String {
         let exp = ExpirationClaim(value: Date(timeIntervalSinceNow: (60 * 5))) // 5 minutes
         var jwt = JWT(payload: JWTAuthPayload(exp: exp, userId: user.id?.uuidString ?? ""))
         

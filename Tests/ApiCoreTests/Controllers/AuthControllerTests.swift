@@ -9,7 +9,7 @@ import XCTest
 import Vapor
 import VaporTestTools
 import ApiCoreTestTools
-import ApiCore
+@testable import ApiCore
 
 
 class AuthControllerTests: XCTestCase, UsersTestCase {
@@ -38,20 +38,7 @@ class AuthControllerTests: XCTestCase, UsersTestCase {
         do {
             let res = try app.testable.response(throwingTo: req)
             
-            res.testable.debug()
-            
-            let data = res.testable.content(as: Token.self)
-            // TODO: Refactor tests so they reuse following code (for post and get methods)
-            XCTAssertNotNil(data, "Token can't be nil")
-            if let data = data {
-                XCTAssertNotNil(data.id, "Token id can't be nil")
-                XCTAssertFalse(data.token.isEmpty, "Token data should be present")
-                XCTAssertTrue(data.expires.timeIntervalSince1970 > 0, "Token data should be present")
-                XCTAssertFalse(data.userId.uuidString.isEmpty, "Token data should be present")
-            }
-            
-            XCTAssertTrue(res.testable.has(statusCode: .ok), "Wrong status code")
-            XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing correct content type")
+            checkAuthResult(res)
         } catch {
             print(error)
             XCTFail()
@@ -60,7 +47,6 @@ class AuthControllerTests: XCTestCase, UsersTestCase {
     
     func testInvalidGetAuthRequest() {
         let req = HTTPRequest.testable.get(uri: "/auth", headers: ["Bad-Headers": "For-Sure"])
-        
         do {
             _ = try app.testable.response(throwingTo: req)
             XCTFail()
@@ -74,19 +60,7 @@ class AuthControllerTests: XCTestCase, UsersTestCase {
         do {
             let res = try app.testable.response(throwingTo: req)
             
-            res.testable.debug()
-            
-            let data = res.testable.content(as: Token.self)
-            XCTAssertNotNil(data, "Token can't be nil")
-            if let data = data {
-                XCTAssertNotNil(data.id, "Token id can't be nil")
-                XCTAssertFalse(data.token.isEmpty, "Token data should be present")
-                XCTAssertTrue(data.expires.timeIntervalSince1970 > 0, "Token data should be present")
-                XCTAssertFalse(data.userId.uuidString.isEmpty, "Token data should be present")
-            }
-            
-            XCTAssertTrue(res.testable.has(statusCode: .ok), "Wrong status code")
-            XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing correct content type")
+            checkAuthResult(res)
         } catch {
             print(error)
             XCTFail()
@@ -95,7 +69,6 @@ class AuthControllerTests: XCTestCase, UsersTestCase {
     
     func testInvalidPostAuthRequest() {
         let req = HTTPRequest.testable.post(uri: "/auth", data: Data())
-        
         do {
             _ = try app.testable.response(throwingTo: req)
             XCTFail()
@@ -107,26 +80,15 @@ class AuthControllerTests: XCTestCase, UsersTestCase {
     // MARK: Token auth tests
     
     func testValidGetTokenAuthRequest() {
+        let t = token()
+        
         let req = HTTPRequest.testable.get(uri: "/token", headers: [
-            "Authorization": "Token YWRtaW5AbGl2ZXVpLmlvOmFkbWlu"
+            "Authorization": "Token \(t.token)"
             ])
         do {
             let res = try app.testable.response(throwingTo: req)
             
-            res.testable.debug()
-            
-            let data = res.testable.content(as: Token.self)
-            // TODO: Refactor tests so they reuse following code (for post and get methods)
-            XCTAssertNotNil(data, "Token can't be nil")
-            if let data = data {
-                XCTAssertNotNil(data.id, "Token id can't be nil")
-                XCTAssertFalse(data.token.isEmpty, "Token data should be present")
-                XCTAssertTrue(data.expires.timeIntervalSince1970 > 0, "Token data should be present")
-                XCTAssertFalse(data.userId.uuidString.isEmpty, "Token data should be present")
-            }
-            
-            XCTAssertTrue(res.testable.has(statusCode: .ok), "Wrong status code")
-            XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing correct content type")
+            checkTokenResult(res)
         } catch {
             print(error)
             XCTFail()
@@ -135,13 +97,82 @@ class AuthControllerTests: XCTestCase, UsersTestCase {
     
     func testInvalidGetTokenAuthRequest() {
         let req = HTTPRequest.testable.get(uri: "/token", headers: ["Bad-Headers": "For-Sure"])
-        
         do {
             _ = try app.testable.response(throwingTo: req)
             XCTFail()
         } catch {
             // Should fails
         }
+    }
+    
+    func testValidPostTokenAuthRequest() {
+        let t = token()
+        
+        let req = try! HTTPRequest.testable.post(uri: "/token", data: User.Auth.Token(token: t.token).asJson(), headers: ["Content-Type": "application/json; charset=utf-8"])
+        do {
+            let res = try app.testable.response(throwingTo: req)
+            
+            checkTokenResult(res)
+        } catch {
+            print(error)
+            XCTFail()
+        }
+    }
+    
+    func testInvalidPostTokenAuthRequest() {
+        let req = HTTPRequest.testable.post(uri: "/token", data: Data())
+        do {
+            _ = try app.testable.response(throwingTo: req)
+            XCTFail()
+        } catch {
+            // Should fails
+        }
+    }
+    
+}
+
+
+extension AuthControllerTests {
+    
+    private func token() -> Token.PublicFull {
+        let req = try! HTTPRequest.testable.post(uri: "/auth", data: User.Auth.Login(email: "admin@liveui.io", password: "admin").asJson(), headers: ["Content-Type": "application/json; charset=utf-8"])
+        let res = try! app.testable.response(throwingTo: req)
+        res.testable.debug()
+        let token = res.testable.content(as: Token.PublicFull.self)!
+        return token
+    }
+    
+    private func checkAuthResult(_ res: Response) {
+        res.testable.debug()
+        
+        let data = res.testable.content(as: Token.PublicFull.self)
+        
+        XCTAssertNotNil(data, "Token can't be nil")
+        if let data = data {
+            XCTAssertNotNil(data.id, "Token id can't be nil")
+            XCTAssertFalse(data.token.isEmpty, "Token data should be present")
+            XCTAssertTrue(data.expires.timeIntervalSince1970 > 0, "Token data should be present")
+            XCTAssertFalse(data.user.id!.uuidString.isEmpty, "Token data should be present")
+        }
+        
+        XCTAssertTrue(res.testable.has(statusCode: .ok), "Wrong status code")
+        XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing correct content type")
+    }
+    
+    private func checkTokenResult(_ res: Response) {
+        res.testable.debug()
+        
+        let data = res.testable.content(as: Token.Public.self)
+        
+        XCTAssertNotNil(data, "Token can't be nil")
+        if let data = data {
+            XCTAssertNotNil(data.id, "Token id can't be nil")
+            XCTAssertTrue(data.expires.timeIntervalSince1970 > 0, "Token expiry date should be present")
+            XCTAssertFalse(data.user.id!.uuidString.isEmpty, "User ID data should be present")
+        }
+        
+        XCTAssertTrue(res.testable.has(statusCode: .ok), "Wrong status code")
+        XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing correct content type")
     }
     
 }
