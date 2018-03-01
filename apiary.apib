@@ -26,14 +26,14 @@ Installs default admin user. Login `admin@liveui.io`, password `admin`.
     + Body
 
             {
-                "code": "maintenance_ok"
+                "code": "maintenance_ok",
                 "description": "Install finished"
             }
 
 + Response 412 (application/json; charset=utf-8)
 
         {
-            "error": "not_available"
+            "error": "not_available",
             "description": "Endpoint is not available in production mode"
         }
         
@@ -51,14 +51,14 @@ Installs default admin user. Login `admin@liveui.io`, password `admin` plus a se
     + Body
 
             {
-                "code": "maintenance_ok"
+                "code": "maintenance_ok",
                 "description": "Install finished"
             }
 
 + Response 412 (application/json; charset=utf-8)
 
         {
-            "error": "not_available"
+            "error": "not_available",
             "description": "Endpoint is not available in production mode"
         }
         
@@ -87,10 +87,19 @@ Response header also contains a JWT token which will be valid for 3 minutes. Whe
     + Body
 
             {
-                "id": "6813CDEA-D494-4FE8-8793-2E4717F06B56",
-                "user_id": "630C97E6-AC56-4213-882B-3BEBAE50BF6D",
-                "token": "DD0FFF5F-1938-46C3-BFB2-D73590A2983A",
-                "expires": 543968164.15217698
+                "expires": 543969500.30378401,
+                "id": "62D26F36-4E50-4D5C-921D-A0B30672BC83",
+                "token": "F8CAB8E4-F507-46AC-9F15-B2C369C23126",
+                "user": {
+                    "password": "admin",
+                    "id": "630C97E6-AC56-4213-882B-3BEBAE50BF6D",
+                    "lastname": "Admin",
+                    "registered": 541114427,
+                    "firstname": "Super",
+                    "email": "admin@liveui.io",
+                    "su": true,
+                    "disabled": false
+                }
             }
 
 + Response 401 (application/json; charset=utf-8)
@@ -110,9 +119,9 @@ Response header also contains a JWT token which will be valid for 3 minutes. Whe
             
 
     + Body
-    
+
             {
-                "username": "admin@liveui.io"
+                "username": "admin@liveui.io",
                 "password": "s3cretPassw0rd"
             }
 
@@ -120,15 +129,23 @@ Response header also contains a JWT token which will be valid for 3 minutes. Whe
     + Headers
 
             Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MTk4NTk0ODIuOTgwNzgzOSwidXNlcklkIjoiNjMwQzk3RTYtQUM1Ni00MjEzLTg4MkItM0JFQkFFNTBCRjZEIn0.aPMfWZnHJSHa_rDxY-u9x-Vs-amQvxeVL8zGrPhwNGU
-            ContentType: application/json; charset=utf-8
             
     + Body
 
             {
-                "id": "6813CDEA-D494-4FE8-8793-2E4717F06B56",
-                "user_id": "630C97E6-AC56-4213-882B-3BEBAE50BF6D",
-                "token": "DD0FFF5F-1938-46C3-BFB2-D73590A2983A",
-                "expires": 543968164.15217698
+                "expires": 543969500.30378401,
+                "id": "62D26F36-4E50-4D5C-921D-A0B30672BC83",
+                "token": "F8CAB8E4-F507-46AC-9F15-B2C369C23126",
+                "user": {
+                    "password": "admin",
+                    "id": "630C97E6-AC56-4213-882B-3BEBAE50BF6D",
+                    "lastname": "Admin",
+                    "registered": 541114427,
+                    "firstname": "Super",
+                    "email": "admin@liveui.io",
+                    "su": true,
+                    "disabled": false
+                }
             }
 
 + Response 401 (application/json; charset=utf-8)
@@ -185,7 +202,7 @@ JWT token needs to be refreshed after 30 seconds from the last request made. Wit
             ContentType: application/json
             
     + Body
-    
+
             {
                 "token": "EA58FE6F-E2A0-404D-A252-1BBFB286A072"
             }
@@ -230,7 +247,7 @@ JWT token needs to be refreshed after 30 seconds from the last request made. Wit
 + Response 200 (application/json; charset=utf-8)
             
     + Body
-    
+
             [
                 {
                     "id": 1,
@@ -248,7 +265,7 @@ JWT token needs to be refreshed after 30 seconds from the last request made. Wit
 + Response 401 (application/json; charset=utf-8)
 
         {
-            "code": "auth_failed"
+            "code": "auth_failed",
             "error": "Unable to verify authorization token"
         }
 
@@ -263,9 +280,10 @@ Team identifier needs to be unique for the whole platform. If sent in an incorec
     + Headers
 
             Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
+            ContentType: application/json
             
     + Body
-    
+
             {
                 "name": "My new team",
                 "identifier": "my-new-team"
@@ -276,24 +294,24 @@ Team identifier needs to be unique for the whole platform. If sent in an incorec
 + Response 200 (application/json; charset=utf-8)
             
     + Body
-    
+
             {
                 "id": 3,
                 "name": "My new team",
                 "identifier": "my-new-team"
             }
 
-+ Response 408 (application/json; charset=utf-8)
++ Response 409 (application/json; charset=utf-8)
 
         {
-            "code": "app_error"
+            "code": "app_error",
             "error": "Identifier already exists"
         }
 
 + Response 401 (application/json; charset=utf-8)
 
         {
-            "code": "auth_failed"
+            "code": "auth_failed",
             "error": "Unable to verify authorization token"
         }
 
@@ -311,9 +329,10 @@ Team identifier needs to be unique for the whole platform. If sent in an incorec
     + Headers
 
             Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
+            ContentType: application/json
             
     + Body
-    
+
             {
                 "identifier": "my-new-team"
             }
@@ -323,9 +342,9 @@ Team identifier needs to be unique for the whole platform. If sent in an incorec
 + Response 200 (application/json; charset=utf-8)
 
     + Body
-                
+
             {
-                "code": "ok"
+                "code": "ok",
                 "error": "Identifier is available",
                 "identifier": "my-new-team"
             }
@@ -333,14 +352,14 @@ Team identifier needs to be unique for the whole platform. If sent in an incorec
 + Response 408 (application/json; charset=utf-8)
 
         {
-            "code": "app_error"
+            "code": "app_error",
             "error": "Identifier already exists"
         }
 
 + Response 401 (application/json; charset=utf-8)
 
         {
-            "code": "auth_failed"
+            "code": "auth_failed",
             "error": "Unable to verify authorization token"
         }
 
@@ -362,19 +381,13 @@ For updates, team identifier needs to be unique for the whole platform. If sent 
     + Headers
 
             Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
-            
-    + Body
-    
-            {
-                "identifier": "my-new-team"
-            }
 
 
 
 + Response 200 (application/json; charset=utf-8)
 
     + Body
-                
+
             {
                 "id": 3,
                 "name": "My team",
@@ -385,7 +398,7 @@ For updates, team identifier needs to be unique for the whole platform. If sent 
 + Response 401 (application/json; charset=utf-8)
 
         {
-            "code": "auth_failed"
+            "code": "auth_failed",
             "error": "Unable to verify authorization token"
         }
 
@@ -402,9 +415,10 @@ For updates, team identifier needs to be unique for the whole platform. If sent 
     + Headers
 
             Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
+            ContentType: application/json
             
     + Body
-    
+
             {
                 "name": "My updated team!",
                 "identifier": "my-updated-team"
@@ -415,7 +429,7 @@ For updates, team identifier needs to be unique for the whole platform. If sent 
 + Response 200 (application/json; charset=utf-8)
 
     + Body
-                
+
             {
                 "id": 3,
                 "name": "My updated team!",
@@ -425,14 +439,14 @@ For updates, team identifier needs to be unique for the whole platform. If sent 
 + Response 408 (application/json; charset=utf-8)
 
         {
-            "code": "app_error"
+            "code": "app_error",
             "error": "Identifier already exists"
         }
 
 + Response 401 (application/json; charset=utf-8)
 
         {
-            "code": "auth_failed"
+            "code": "auth_failed",
             "error": "Unable to verify authorization token"
         }
 
@@ -448,9 +462,10 @@ For updates, team identifier needs to be unique for the whole platform. If sent 
     + Headers
 
             Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
+            ContentType: application/json
             
     + Body
-    
+
             {
                 "name": "My updated team!"
             }
@@ -460,7 +475,7 @@ For updates, team identifier needs to be unique for the whole platform. If sent 
 + Response 200 (application/json; charset=utf-8)
 
     + Body
-                
+
             {
                 "id": 3,
                 "name": "My updated team!",
@@ -470,14 +485,149 @@ For updates, team identifier needs to be unique for the whole platform. If sent 
 + Response 408 (application/json; charset=utf-8)
 
         {
-            "code": "app_error"
+            "code": "app_error",
             "error": "Identifier already exists"
         }
 
 + Response 401 (application/json; charset=utf-8)
 
         {
-            "code": "auth_failed"
+            "code": "auth_failed",
+            "error": "Unable to verify authorization token"
+        }
+
+
+## List team users [/teams/{id}/users]
+
+List active users of a team.
+
+### List [GET]
+
++ Request
+    
+    + Headers
+
+            Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
+
+
+
++ Response 200 (application/json; charset=utf-8)
+
+        [
+            {
+                "id": "630C97E6-AC56-4213-882B-3BEBAE50BF6D",
+                "lastname": "Admin",
+                "registered": 541114427,
+                "su": true,
+                "email": "admin@liveui.io",
+                "firstname": "Super",
+                "disabled": false
+            },
+            {
+                "id": "59ECA5DB-6603-4C08-B910-B32922A34FA9",
+                "lastname": "Rafaj",
+                "registered": 541550120,
+                "su": false,
+                "email": "dev@liveui.io",
+                "firstname": "Ondrej",
+                "disabled": false
+            }
+        ]
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed",
+            "error": "Unable to verify authorization token"
+        }
+        
+        
+## Link user to a team [/teams/{id}/link]
+
+Link an existing user to a team.
+
+### Link [POST]
+
++ Request
+    
+    + Headers
+
+            Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
+            ContentType: application/json
+            
+    + Body
+
+            {
+                "user_id": "630C97E6-AC56-4213-882B-3BEBAE50BF6D"
+            }
+
+
+
++ Response 200 (application/json; charset=utf-8)
+
+    + Body
+
+            {
+                "code": "ok",
+                "error": "User has been added to the team"
+            }
+        
++ Response 409 (application/json; charset=utf-8)
+
+        {
+            "code": "team_error",
+            "error": "User is already a member of the team"
+        }
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed",
+            "error": "Unable to verify authorization token"
+        }
+
+
+## Remove user from a team [/teams/{id}/unlink]
+
+Reverse the effect of an invitation. User will be removed from the team but won't be completely deleted.
+
+### Unlink [POST]
+
++ Request
+    
+    + Headers
+
+            Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
+            ContentType: application/json
+            
+    + Body
+
+            {
+                "user_id": "630C97E6-AC56-4213-882B-3BEBAE50BF6D"
+            }
+
+
+
++ Response 200 (application/json; charset=utf-8)
+
+    + Body
+
+            {
+                "code": "ok",
+                "error": "User has been removed from the team"
+            }
+        
++ Response 404 (application/json; charset=utf-8)
+
+        {
+            "code": "team_error",
+            "error": "User not found"
+        }
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed",
             "error": "Unable to verify authorization token"
         }
 
@@ -558,7 +708,7 @@ Results are sorted by app name by default.
 + Response 401 (application/json; charset=utf-8)
 
         {
-            "code": "auth_failed"
+            "code": "auth_failed",
             "error": "authentication failed"
         }
 
@@ -577,13 +727,14 @@ Upload token (headers) is used to authenticate. This can be created using `/uplo
     + Headers
 
             Authorization: Token XXXXXX-XXXXXX-XXXXX-XXXX-XXXXXX
+            ContentType: application/ocet-stream
 
 
 
 + Response 201 (application/json; charset=utf-8)
 
     + Body
-    
+
             {
                 "build": "123",
                 "basic": false,
@@ -619,7 +770,7 @@ form of choices.
 + Response 200 (application/json; charset=utf-8)
 
     + Body
-    
+
             [
                 {
                     "build": "123",
@@ -664,7 +815,7 @@ form of choices.
 + Response 401 (application/json; charset=utf-8)
 
         {
-            "code": "auth_failed"
+            "code": "auth_failed",
             "error": "authentication failed"
         }
         
@@ -692,7 +843,7 @@ Return a single app detail.
 + Response 200 (application/json; charset=utf-8)
 
     + Body
-    
+
             {
                 "build": "123",
                 "basic": false,
@@ -711,7 +862,7 @@ Return a single app detail.
 + Response 401 (application/json; charset=utf-8)
 
         {
-            "code": "auth_failed"
+            "code": "auth_failed",
             "error": "authentication failed"
         }
         
@@ -727,7 +878,7 @@ Updates an app. Only name of the app can be updated.
             Authorization: Bearer eyJhbGciOiJIUzUxMiIsInVzZXIiOjEsInRva2VuIjoiRTk3OTYzMjItOURBNy00RTAwLTlCNTItOEI4RThBRjkwRDAxIiwidHlwIjoiSldUIn0
             
     + Body
-            
+
             {
                 "basic": false,
                 "name": "Updated app name"
@@ -738,7 +889,7 @@ Updates an app. Only name of the app can be updated.
 + Response 200 (application/json; charset=utf-8)
 
     + Body
-    
+
             {
                 "build": "123",
                 "basic": false,
@@ -757,7 +908,7 @@ Updates an app. Only name of the app can be updated.
 + Response 401 (application/json; charset=utf-8)
 
         {
-            "code": "auth_failed"
+            "code": "auth_failed",
             "error": "authentication failed"
         }
         
@@ -778,7 +929,7 @@ Deletes an app, returns a `204` ok but no response needed on success.
 + Response 401 (application/json; charset=utf-8)
 
         {
-            "code": "auth_failed"
+            "code": "auth_failed",
             "error": "authentication failed"
         }
 
@@ -806,7 +957,7 @@ JWT token is used to authenticate.
 + Response 200 (application/json; charset=utf-8)
             
     + Body
-    
+
             {
                 "download_token": "A40AD800-416E-462C-AFEE-9943410984F7",
                 "file": "https://api.yourstore.com/app/A40AD800-416E-462C-AFEE-9943410984F7/file?download=A40AD800-416E-462C-AFEE-9943410984F7",
@@ -819,7 +970,7 @@ JWT token is used to authenticate.
 + Response 401 (application/json; charset=utf-8)
 
         {
-            "code": "auth_failed"
+            "code": "auth_failed",
             "error": "authentication failed"
         }
   
@@ -844,7 +995,7 @@ Download token will stay valid for 30 minutes
 + Response 200 (application/xml; charset=utf-8)
 
     + Body
-                
+
             <?xml version="1.0" encoding="UTF-8"?>
             <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
             <plist version="1.0">
@@ -880,7 +1031,7 @@ Download token will stay valid for 30 minutes
 + Response 401 (application/json; charset=utf-8)
 
         {
-            "code": "auth_failed"
+            "code": "auth_failed",
             "error": "authentication failed"
         }
         
@@ -906,13 +1057,12 @@ Download token will stay valid for 30 minutes to initialise a new connection. Ex
     + Headers
 
             Content-Length: 63474
-                
-            
+
             
 + Response 401 (application/json; charset=utf-8)
 
         {
-            "code": "auth_failed"
+            "code": "auth_failed",
             "error": "authentication failed"
         }
   
@@ -930,14 +1080,14 @@ Removes all database tables and data, this operation is irreversible.
     + Body
 
             {
-                "code": "maintenance_ok"
+                "code": "maintenance_ok",
                 "description": "Install finished"
             }
 
 + Response 412 (application/json; charset=utf-8)
 
         {
-            "error": "not_available"
+            "error": "not_available",
             "description": "Endpoint is not available in production mode"
         }
         
@@ -955,14 +1105,14 @@ Combination of **Un-Install** and #Install, loss of the original data is irrever
     + Body
 
             {
-                "code": "maintenance_ok"
+                "code": "maintenance_ok",
                 "description": "Install finished"
             }
 
 + Response 412 (application/json; charset=utf-8)
 
         {
-            "error": "not_available"
+            "error": "not_available",
             "description": "Endpoint is not available in production mode"
         }
         
@@ -989,7 +1139,7 @@ Shows a list of database tables available.
 + Response 412 (application/json; charset=utf-8)
 
         {
-            "error": "not_available"
+            "error": "not_available",
             "description": "Endpoint is not available in production mode"
         }
         
