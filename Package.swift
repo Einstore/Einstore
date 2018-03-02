@@ -64,7 +64,8 @@ let package = Package(
                 "FluentPostgreSQL",
                 "ErrorsCore",
                 "DbCore",
-                "JWT"
+                "JWT",
+                "Gravatar"
             ]
         ),
         .target(
@@ -92,6 +93,12 @@ let package = Package(
                 "ApiCoreTestTools"
             ]
         ),
+        .target(
+            name: "Gravatar",
+            dependencies: [
+                "Vapor"
+            ]
+        ),
         .target(name: "Run", dependencies: [
             "App"
             ]
@@ -99,6 +106,10 @@ let package = Package(
         .testTarget(name: "AppTests", dependencies: [
             "App",
             "VaporTestTools"
+            ]
+        ),
+        .testTarget(name: "GravatarTests", dependencies: [
+            "Gravatar"
             ]
         ),
         .testTarget(name: "ApiCoreTests", dependencies: [

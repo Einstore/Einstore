@@ -72,6 +72,31 @@ public final class User: DbCoreModel {
         }
     }
     
+    public final class AllSearch: Content {
+        
+        public var id: DbCoreIdentifier?
+        public var firstname: String
+        public var lastname: String
+        public var avatar: String
+        public var registered: Date
+        public var disabled: Bool
+        public var su: Bool
+        
+        required public init(user: User) {
+            id = user.id
+            firstname = user.firstname
+            // TODO: Obscure lastname if needed!!!
+            lastname = user.lastname
+            registered = user.registered
+            disabled = user.disabled
+            su = user.su
+            
+            let email = user.email
+            avatar = email.imageUrlFromMail
+        }
+        
+    }
+    
     public var id: DbCoreIdentifier?
     public var firstname: String
     public var lastname: String
@@ -150,4 +175,3 @@ extension User: Migration {
     }
     
 }
-

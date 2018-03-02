@@ -24,8 +24,9 @@ class UsersControllerTests: XCTestCase, UsersTestCase, LinuxTests {
     // MARK: Linux
     
     static let allTests: [(String, Any)] = [
+        ("testLinuxTests", testLinuxTests),
         ("testGetUsers", testGetUsers),
-        ("testLinuxTests", testLinuxTests)
+        ("testSearchUsersWithoutParams", testSearchUsersWithoutParams)
     ]
     
     func testLinuxTests() {
@@ -61,6 +62,21 @@ class UsersControllerTests: XCTestCase, UsersTestCase, LinuxTests {
         XCTAssertTrue(users.contains(where: { (user) -> Bool in
             return user.id == user2.id && user.id != nil
         }), "Newly created user is not present in the database")
+    }
+    
+    func testSearchUsersWithoutParams() {
+        let req = HTTPRequest.testable.get(uri: "/users/search")
+        let res = app.testable.response(to: req)
+        
+        res.testable.debug()
+        
+        XCTAssertTrue(res.testable.has(statusCode: .ok), "Wrong status code")
+        XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
+        
+        let users = res.testable.content(as: [User.AllSearch].self)!
+        XCTAssertEqual(users.count, 2, "There should be two users in the database")
+        XCTAssertEqual(users[0].id, user1.id, "Avatar is not in the correct format")
+        XCTAssertEqual(users[0].avatar, "https://www.gravatar.com/avatar/e7e8b7ac59a724a481bec410d0cb44a4", "Avatar is not in the correct format")
     }
     
 }
