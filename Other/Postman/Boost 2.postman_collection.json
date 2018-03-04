@@ -348,6 +348,10 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
 				"body": {
@@ -370,25 +374,34 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "7f0250dc-4854-4613-8165-9bbf5a712a4e",
+						"id": "ec85a8e6-d175-41af-81ea-3b0942b49fa1",
 						"type": "text/javascript",
 						"exec": [
+							"var no = postman.getEnvironmentVariable(\"NEXT_TEST_TEAM_IDENTIFIER_NO\");",
+							"if (no === null) {",
+							"    no = 0",
+							"}",
+							"postman.setEnvironmentVariable(\"NEXT_TEST_TEAM_IDENTIFIER_NO\", (parseInt(no) + 1));",
+							"",
 							"var jsonData = JSON.parse(responseBody);",
 							"",
 							"// Status code",
 							"tests[\"Status code is 201\"] = responseCode.code === 201;",
 							"",
-							"// Token check",
-							"tests[\"Team has an id\"] = (jsonData[\"id\"] > 0)",
-							"tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
-							"tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
-							"",
-							"postman.setEnvironmentVariable(\"TEST_TEAM_ID\", jsonData[\"id\"]);",
-							"",
+							"if (responseCode.code === 201) {",
+							"    // Token check",
+							"    tests[\"Team has an id\"] = (jsonData[\"id\"].length > 0)",
+							"    tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
+							"    tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
+							"    ",
+							"    postman.setEnvironmentVariable(\"TEST_TEAM_ID\", jsonData[\"id\"]);",
+							"}",
 							"",
 							"// Content type",
 							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
 						]
 					}
 				}
@@ -399,11 +412,15 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin8\"\n}"
+					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin-{{NEXT_TEST_TEAM_IDENTIFIER_NO}}\"\n}"
 				},
 				"url": {
 					"raw": "{{SERVER}}teams",
@@ -423,6 +440,10 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
 				"body": {
@@ -450,6 +471,10 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
 				"body": {
@@ -470,6 +495,38 @@
 			"response": []
 		},
 		{
+			"name": "Teams (teams/:id/users)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/users",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}",
+						"users"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
 			"name": "Teams (teams/:id)",
 			"request": {
 				"method": "PATCH",
@@ -477,6 +534,10 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
 				"body": {
@@ -504,6 +565,10 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
 				"body": {
@@ -531,6 +596,10 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
 				"body": {
@@ -551,10 +620,67 @@
 			"response": []
 		},
 		{
+			"name": "Users (users)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{SERVER}}users",
+					"host": [
+						"{{SERVER}}users"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Users (users/search)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{SERVER}}users/search?q=raf",
+					"host": [
+						"{{SERVER}}users"
+					],
+					"path": [
+						"search"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "raf",
+							"equals": true
+						}
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
 			"name": "Apps (apps)",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					}
+				],
 				"body": {},
 				"url": {
 					"raw": "{{SERVER}}apps",
@@ -634,7 +760,7 @@
 				"header": [
 					{
 						"key": "Authorization",
-						"value": "Token XXXXXX-XXXXXX-XXXXX-XXXX-XXXXXX"
+						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
 				"body": {
@@ -661,7 +787,7 @@
 				"header": [
 					{
 						"key": "Authorization",
-						"value": "Token XXXXXX-XXXXXX-XXXXX-XXXX-XXXXXX"
+						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
 				"body": {
@@ -689,7 +815,7 @@
 				"header": [
 					{
 						"key": "Authorization",
-						"value": "Token XXXXXX-XXXXXX-XXXXX-XXXX-XXXXXX"
+						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
 				"body": {
@@ -717,7 +843,7 @@
 				"header": [
 					{
 						"key": "Authorization",
-						"value": "Token XXXXXX-XXXXXX-XXXXX-XXXX-XXXXXX"
+						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
 				"body": {
@@ -745,7 +871,7 @@
 				"header": [
 					{
 						"key": "Authorization",
-						"value": "Token XXXXXX-XXXXXX-XXXXX-XXXX-XXXXXX"
+						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
 				"body": {
@@ -773,7 +899,7 @@
 				"header": [
 					{
 						"key": "Authorization",
-						"value": "Token XXXXXX-XXXXXX-XXXXX-XXXX-XXXXXX"
+						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
 				"body": {
@@ -794,15 +920,196 @@
 			"response": []
 		},
 		{
-			"name": "Users",
+			"name": "Upload keys (keys)",
 			"request": {
 				"method": "GET",
-				"header": [],
-				"body": {},
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
-					"raw": "{{SERVER}}users",
+					"raw": "{{SERVER}}keys",
 					"host": [
-						"{{SERVER}}users"
+						"{{SERVER}}keys"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Upload keys (apps/:id/keys)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/keys",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}",
+						"keys"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Upload keys (apps/:id/keys)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "59050043-3791-4cd9-a687-2991cff02a0e",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 201\"] = responseCode.code === 201;",
+							"",
+							"// Token check",
+							"tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
+							"tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
+							"tests[\"Key has a token\"] = (jsonData[\"token\"].length > 0)",
+							"tests[\"Key has a correct team_id\"] = (jsonData[\"team_id\"] == postman.getEnvironmentVariable(\"TEST_TEAM_ID\"))",
+							"",
+							"postman.setEnvironmentVariable(\"TEST_UPLOAD_KEY_ID\", jsonData[\"id\"]);",
+							"",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Upload key yo!\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/keys",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}",
+						"keys"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Upload keys (keys/:id)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}keys/{{TEST_UPLOAD_KEY_ID}}",
+					"host": [
+						"{{SERVER}}keys"
+					],
+					"path": [
+						"{{TEST_UPLOAD_KEY_ID}}"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Upload keys (keys/:id)",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Upload key changed yohoho!\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}keys/{{TEST_UPLOAD_KEY_ID}}",
+					"host": [
+						"{{SERVER}}keys"
+					],
+					"path": [
+						"{{TEST_UPLOAD_KEY_ID}}"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Upload keys (keys/:id)",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}keys/{{TEST_UPLOAD_KEY_ID}}",
+					"host": [
+						"{{SERVER}}keys"
+					],
+					"path": [
+						"{{TEST_UPLOAD_KEY_ID}}"
 					]
 				},
 				"description": null
@@ -827,22 +1134,6 @@
 					"raw": "{{SERVER}}register",
 					"host": [
 						"{{SERVER}}register"
-					]
-				},
-				"description": null
-			},
-			"response": []
-		},
-		{
-			"name": "Teams",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {},
-				"url": {
-					"raw": "{{SERVER}}teams",
-					"host": [
-						"{{SERVER}}teams"
 					]
 				},
 				"description": null
