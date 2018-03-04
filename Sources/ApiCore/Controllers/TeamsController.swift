@@ -59,9 +59,8 @@ class TeamsController: Controller {
     
     static func boot(router: Router) throws {
         router.get("teams") { (req) -> Future<[Team]> in
-            return try req.me.user().flatMap(to: [Team].self) { (user) -> Future<[Team]> in
-                return try user.teams.query(on: req).all()
-            }
+            let me = try req.me.user()
+            return try me.teams.query(on: req).all()
         }
         
         router.get("teams", DbCoreIdentifier.parameter) { (req) -> Future<Team> in
@@ -79,10 +78,9 @@ class TeamsController: Controller {
                         guard team.id != nil else {
                             throw DbError.insertFailed
                         }
-                        return try req.me.user().flatMap(to: Response.self) { user in
-                            return team.users.attach(user, on: req).flatMap(to: Response.self) { join in
-                                return try team.asResponse(.created, to: req)
-                            }
+                        let me = try req.me.user()
+                        return team.users.attach(me, on: req).flatMap(to: Response.self) { join in
+                            return try team.asResponse(.created, to: req)
                         }
                     }
                 }
@@ -190,28 +188,27 @@ extension TeamsController {
         return try req.me.verifiedTeam(id: id).flatMap(to: Response.self, { team in
             return try team.users.query(on: req).all().flatMap(to: Response.self) { teamUsers in
                 return User.query(on: req).filter(\User.id == id).first().flatMap(to: Response.self) { user in
-                    return try req.me.user().flatMap(to: Response.self) { me in
-                        guard let user = user else {
+                    let me = try req.me.user()
+                    guard let user = user else {
+                        throw TeamError.userNotFound
+                    }
+                    if user.id == me.id && action == .unlink && teamUsers.count <= 1 {
+                        throw TeamError.youAreTheLastUser
+                    }
+                    if teamUsers.contains(user) {
+                        if action == .link {
+                            throw TeamError.userAlreadyMember
+                        }
+                    } else {
+                        if action == .unlink {
                             throw TeamError.userNotFound
                         }
-                        if user.id == me.id && action == .unlink && teamUsers.count <= 1 {
-                            throw TeamError.youAreTheLastUser
-                        }
-                        if teamUsers.contains(user) {
-                            if action == .link {
-                                throw TeamError.userAlreadyMember
-                            }
-                        } else {
-                            if action == .unlink {
-                                throw TeamError.userNotFound
-                            }
-                        }
-                        
-                        let res = (action == .link) ? team.users.attach(user, on: req).flatten() : team.users.detach(user, on: req)
-                        return res.map(to: Response.self) { (_) -> Response in
-                            let message = (action == .link) ? "User has been added to the team" : "User has been removed from the team"
-                            return try req.response.success(status: .ok, code: "ok", description: message)
-                        }
+                    }
+                    
+                    let res = (action == .link) ? team.users.attach(user, on: req).flatten() : team.users.detach(user, on: req)
+                    return res.map(to: Response.self) { (_) -> Response in
+                        let message = (action == .link) ? "User has been added to the team" : "User has been removed from the team"
+                        return try req.response.success(status: .ok, code: "ok", description: message)
                     }
                 }
             }

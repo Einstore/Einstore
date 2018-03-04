@@ -53,7 +53,10 @@ public class ApiCore {
         services.register(ApiAuthMiddleware())
         
         // Authentication
-//        services.register(<#T##factory: ServiceFactory##ServiceFactory#>)
+        let jwtSecret = ProcessInfo.processInfo.environment["JWT_SECRET"] ?? "secret"
+        let jwtService = JWTService(secret: jwtSecret)
+        services.register(jwtService)
+        services.register(AuthenticationCache())
         
         try DbCore.configure(databaseConfig: databaseConfig, &config, &env, &services)
     }

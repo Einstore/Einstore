@@ -21,19 +21,17 @@ public struct Me {
         self.request = request
     }
     
-    public func user() throws -> Future<User> {
-        return User.query(on: request).sort(\User.su, .descending).first().map(to: User.self) { (user) -> User in
-            guard let user = user else {
-                throw AuthError.authenticationFailed
-            }
-            return user
+    public func user() throws -> User {
+        let authenticationCache = try request.make(AuthenticationCache.self, for: Request.self)
+        guard let user = authenticationCache[User.self] else {
+            throw ErrorsCore.HTTPError.notAuthorized
         }
+        return user
     }
     
     public func teams() throws -> Future<Teams> {
-        return try self.user().flatMap(to: Teams.self) { me in
-            return try me.teams.query(on: self.request).all()
-        }
+        let me = try user()
+        return try me.teams.query(on: self.request).all()
     }
     
     public func verifiedTeam(id teamId: DbCoreIdentifier) throws -> Future<Team> {

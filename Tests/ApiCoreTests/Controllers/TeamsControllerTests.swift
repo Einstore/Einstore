@@ -88,7 +88,7 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
         
         // Test current status of the ME user
         let fakeReq = app.testable.fakeRequest()
-        let me = try! fakeReq.me.user().await(on: fakeReq)
+        let me = try! fakeReq.me.user()
         count = try! me.teams.query(on: fakeReq).count().await(on: fakeReq)
         XCTAssertEqual(count, 1, "User should not have any team attached")
         

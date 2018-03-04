@@ -22,8 +22,8 @@ extension TestableProperty where TestableType: Application {
             DbCore.migrationConfig = MigrationConfig()
             ApiCore.middlewareConfig = MiddlewareConfig()
             
-            configClosure?(&config, &env, &services)
             try! ApiCore.configure(databaseConfig: db, &config, &env, &services)
+            configClosure?(&config, &env, &services)
         }) { (router) in
             routerClosure?(router)
             try! ApiCore.boot(router: router)

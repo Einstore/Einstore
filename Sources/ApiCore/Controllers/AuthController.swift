@@ -29,7 +29,7 @@ public class AuthController: Controller {
         
         router.post("auth") { (req)->Future<Response> in
             do {
-                return try req.content.decode(User.Auth.Login.self).flatMap(to: Response.self) { (loginData) -> Future<Response> in
+                return try req.content.decode(User.Auth.Login.self).flatMap(to: Response.self) { loginData in
                     return try login(request: req, login: loginData)
                 }
             } catch {
@@ -57,29 +57,29 @@ public class AuthController: Controller {
 extension AuthController {
     
     static func token(request req: Request, token: String) throws -> Future<Response> {
-        return try Token.query(on: req).filter(\Token.token == token.passwordHash(req)).first().flatMap(to: Response.self, { (token) -> Future<Response> in
+        return try Token.query(on: req).filter(\Token.token == token.passwordHash(req)).first().flatMap(to: Response.self) { token in
             guard let token = token else {
                 throw AuthError.authenticationFailed
             }
-            return User.with(id: token.userId, on: req).flatMap(to: Response.self, { (user) -> Future<Response> in
+            return User.with(id: token.userId, on: req).flatMap(to: Response.self) { user in
                 guard let user = user else {
                     throw AuthError.authenticationFailed
                 }
-                return try Token.Public(token: token, user: user).asResponse(.ok, to: req).map(to: Response.self, { (response) -> Response in
-                    let jwt = try JWTHelper.jwtToken(for: user)
-                    response.http.headers["Authorization"] = "Bearer \(jwt)"
+                return try Token.Public(token: token, user: user).asResponse(.ok, to: req).map(to: Response.self) { response in
+                    let jwtService = try req.make(JWTService.self)
+                    response.http.headers["Authorization"] = try "Bearer \(jwtService.signUserToToken(user: user))"
                     return response
-                })
-            })
-        })
+                }
+            }
+        }
     }
     
     static func login(request req: Request, login: User.Auth.Login) throws -> Future<Response> {
         guard !login.email.isEmpty, !login.password.isEmpty else {
             throw AuthError.authenticationFailed
         }
-        return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
-            return try User.query(on: db).filter(\User.email == login.email).filter(\User.password == login.password.passwordHash(req)).first().flatMap(to: Response.self) { (user) -> Future<Response> in
+        return req.withPooledConnection(to: .db) { db in
+            return try User.query(on: db).filter(\User.email == login.email).filter(\User.password == login.password.passwordHash(req)).first().flatMap(to: Response.self) { user in
                 guard let user = user else {
                     throw AuthError.authenticationFailed
                 }
@@ -90,11 +90,11 @@ extension AuthController {
                     tokenBackup.id = token.id
                     
                     let publicToken = Token.PublicFull(token: tokenBackup, user: user)
-                    return try publicToken.asResponse(.ok, to: req).map(to: Response.self, { (response) -> Response in
-                        let jwt = try JWTHelper.jwtToken(for: user)
-                        response.http.headers["Authorization"] = "Bearer \(jwt)"
+                    return try publicToken.asResponse(.ok, to: req).map(to: Response.self) { response in
+                        let jwtService = try req.make(JWTService.self)
+                        response.http.headers["Authorization"] = try "Bearer \(jwtService.signUserToToken(user: user))"
                         return response
-                    })
+                    }
                 }
             }
         }

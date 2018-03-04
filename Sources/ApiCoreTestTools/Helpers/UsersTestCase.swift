@@ -10,7 +10,7 @@ import XCTest
 import Vapor
 import VaporTestTools
 import FluentTestTools
-import ApiCore
+@testable import ApiCore
 
 
 public protocol UsersTestCase: class {
@@ -33,6 +33,9 @@ extension UsersTestCase {
         
         user1 = User.testable.createSu(on: app)
         _ = try! adminTeam.users.attach(user1, on: req).await(on: req)
+        
+        let authenticationCache = try! app.make(AuthenticationCache.self, for: Request.self)
+        authenticationCache[User.self] = user1
         
         user2 = User.testable.create(on: app)
         _ = try! adminTeam.users.attach(user2, on: req).await(on: req)
