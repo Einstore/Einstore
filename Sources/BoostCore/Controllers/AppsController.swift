@@ -124,6 +124,7 @@ class AppsController: Controller {
         }
         
         router.post("apps", "upload") { (req) -> Future<Response> in
+            // TODO: Add JWT authentication for manual web uploads!!!!!!!!!!!!!
             let token: String
             if Boost.uploadsRequireKey {
                 guard let t = try req.http.headers.authorizationToken?.passwordHash(req) else {

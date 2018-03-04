@@ -2,6 +2,7 @@ import XCTest
 import ApiCore
 import Dispatch
 import VaporTestTools
+import ApiCoreTestTools
 
 
 final class ApiCoreTests : XCTestCase, LinuxTests {

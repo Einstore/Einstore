@@ -12,7 +12,7 @@ import VaporTestTools
 import ApiCore
 
 
-protocol TeamsTestCase: UsersTestCase {
+public protocol TeamsTestCase: UsersTestCase {
     var app: Application! { get }
     var team1: Team! { get set }
     var team2: Team! { get set }
@@ -21,7 +21,7 @@ protocol TeamsTestCase: UsersTestCase {
 
 extension TeamsTestCase {
     
-    func setupTeams() {
+    public func setupTeams() {
         setupUsers()
         
         let req = app.testable.fakeRequest()

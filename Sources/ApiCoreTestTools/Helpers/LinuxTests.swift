@@ -9,7 +9,7 @@ import Foundation
 import XCTest
 
 
-protocol LinuxTests {
+public protocol LinuxTests {
     static var defaultTestSuite: XCTestSuite { get }
     static var allTests: [(String, Any)] { get }
     func testLinuxTests()
@@ -18,7 +18,7 @@ protocol LinuxTests {
 
 extension LinuxTests {
     
-    func doTestLinuxTestsAreOk() {
+    public func doTestLinuxTestsAreOk() {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         // Count number of methods
         let thisClass = type(of: self)

@@ -9,10 +9,11 @@ import Foundation
 import XCTest
 import Vapor
 import VaporTestTools
+import FluentTestTools
 import ApiCore
 
 
-protocol UsersTestCase: class {
+public protocol UsersTestCase: class {
     var app: Application! { get }
     var user1: User! { get set }
     var user2: User! { get set }
@@ -21,7 +22,7 @@ protocol UsersTestCase: class {
 
 extension UsersTestCase {
     
-    func setupUsers() {
+    public func setupUsers() {
         app.testable.delete(allFor: TeamUser.self)
         app.testable.delete(allFor: Team.self)
         app.testable.delete(allFor: User.self)

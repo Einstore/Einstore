@@ -20,7 +20,6 @@ public final class Team: DbCoreModel {
     
     public enum TeamError: FrontendError {
         case identifierAlreadyExists
-        case teamDoesntExist
         
         public var code: String {
             return "app_error"
@@ -34,8 +33,6 @@ public final class Team: DbCoreModel {
             switch self {
             case .identifierAlreadyExists:
                 return "Identifier already exists"
-            case .teamDoesntExist:
-                return "Team doesn't exist"
             }
         }
         
@@ -124,19 +121,19 @@ extension Team {
         })
     }
     
-    public static func verifiedTeamQuery(connection: DatabaseConnectable, id: DbCoreIdentifier) throws -> QueryBuilder<Team> {
-//        let teams = try req.authInfo.teamIds()
-//        return Team.query(on: req).filter(\Team.id == id).filter(\Team.id, in: teams)
-        return Team.query(on: connection).filter(\Team.id == id)
-    }
-    
-    public static func verifiedTeam(connection: DatabaseConnectable, id: DbCoreIdentifier) throws -> Future<Team> {
-        return try verifiedTeamQuery(connection: connection, id: id).first().map(to: Team.self, { (team) -> Team in
-            guard let team = team else {
-                throw ContentError.unavailable
-            }
-            return team
-        })
-    }
+//    public static func verifiedTeamQuery(connection: DatabaseConnectable, id: DbCoreIdentifier) throws -> QueryBuilder<Team> {
+////        let teams = try req.authInfo.teamIds()
+////        return Team.query(on: req).filter(\Team.id == id).filter(\Team.id, in: teams)
+//        return Team.query(on: connection).filter(\Team.id == id)
+//    }
+//    
+//    public static func verifiedTeam(connection: DatabaseConnectable, id: DbCoreIdentifier) throws -> Future<Team> {
+//        return try verifiedTeamQuery(connection: connection, id: id).first().map(to: Team.self, { (team) -> Team in
+//            guard let team = team else {
+//                throw ContentError.unavailable
+//            }
+//            return team
+//        })
+//    }
     
 }

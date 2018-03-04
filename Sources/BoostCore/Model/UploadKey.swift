@@ -18,11 +18,47 @@ public typealias UploadKeys = [UploadKey]
 
 final public class UploadKey: DbCoreModel {
     
+    public struct New: Codable {
+        public var name: String
+        public var expires: Date?
+    }
+    
+    public struct Display: DbCoreModel {
+        
+        public static let entity: String = "uploadkeys"
+//        public static let name: String = "uploadkeys"
+        
+        public var id: DbCoreIdentifier?
+        public var teamId: DbCoreIdentifier
+        public var name: String
+        public var expires: Date?
+        
+        enum CodingKeys: String, CodingKey {
+            case id
+            case teamId = "team_id"
+            case name
+            case expires
+        }
+        
+        public init(id: DbCoreIdentifier? = nil, teamId: DbCoreIdentifier, name: String, expires: Date? = Date()) {
+            self.id = id
+            self.teamId = teamId
+            self.name = name
+            self.expires = expires
+        }
+        
+        init(key: UploadKey) {
+            self.id = key.id
+            self.teamId = key.teamId
+            self.name = key.name
+            self.expires = key.expires
+        }
+    }
+    
     public static var idKey: WritableKeyPath<UploadKey, DbCoreIdentifier?> = \UploadKey.id
     
     public var id: DbCoreIdentifier?
     public var teamId: DbCoreIdentifier
-    public var team: Team? = nil
     public var name: String
     public var expires: Date?
     public var token: String
@@ -30,7 +66,6 @@ final public class UploadKey: DbCoreModel {
     enum CodingKeys: String, CodingKey {
         case id
         case teamId = "team_id"
-        case team
         case name
         case expires
         case token
@@ -42,6 +77,13 @@ final public class UploadKey: DbCoreModel {
         self.name = name
         self.expires = expires
         self.token = token
+    }
+    
+    init(new: New, teamId: DbCoreIdentifier) {
+        self.teamId = teamId
+        self.name = new.name
+        self.expires = new.expires
+        self.token = UUID().uuidString
     }
     
 }
@@ -62,6 +104,16 @@ extension UploadKey: Migration {
     
     public static func revert(on connection: DbCoreConnection) -> Future<Void> {
         return Database.delete(UploadKey.self, on: connection)
+    }
+    
+}
+
+// MARK: Helpers
+
+extension UploadKey {
+    
+    public func asDisplay() -> UploadKey.Display {
+        return UploadKey.Display(key: self)
     }
     
 }

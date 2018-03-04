@@ -18,7 +18,7 @@ public class UsersController: Controller {
         }
         
         router.get("users", "search") { (req) -> Future<[User.AllSearch]> in
-            // TODO: Add limiter/pagination!!
+            // TODO: Add proper limiter/pagination!!
             // TODO: Add the actual search!!!!!!!
             return User.query(on: req).all().map(to: [User.AllSearch].self) { (users) -> [User.AllSearch] in
                 return users.compactMap({ (user) -> User.AllSearch in

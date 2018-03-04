@@ -77,6 +77,12 @@ public struct RequestResponse {
         return response
     }
     
+    public func deleted() throws -> Response {
+        let res = try noContent()
+        res.http.status.message = "Deleted"
+        return res
+    }
+    
     public func onlyInDebug() throws -> Response {
         let response = try error(status: .preconditionFailed, error: "not_available", description: "Endpoint is not available in production mode")
         return response
