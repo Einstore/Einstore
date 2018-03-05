@@ -15,7 +15,7 @@ import BoostTestTools
 @testable import BoostCore
 
 
-class UploadKeyControllerTests: XCTestCase, UploadKeyTestCaseSetup, LinuxTests {
+class UploadKeysControllerTests: XCTestCase, UploadKeyTestCaseSetup, LinuxTests {
     
     var app: Application!
     
@@ -61,7 +61,7 @@ class UploadKeyControllerTests: XCTestCase, UploadKeyTestCaseSetup, LinuxTests {
         setupUploadKeys()
     }
     
-    // MARK: Login tests
+    // MARK: Tests
     
     func testGetUploadKeysForUser() {
         let req = HTTPRequest.testable.get(uri: "/keys", authorizedUser: user1, on: app)

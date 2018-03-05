@@ -15,6 +15,7 @@ import FluentTestTools
 
 public protocol UsersTestCase: class {
     var app: Application! { get }
+    
     var user1: User! { get set }
     var user2: User! { get set }
 }

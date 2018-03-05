@@ -17,8 +17,6 @@ import ApiCoreTestTools
 
 
 public protocol UploadKeyTestCaseSetup: TeamsTestCase {
-    var app: Application! { get }
-    
     var key1: UploadKey! { get set }
     var key2: UploadKey! { get set }
     var key3: UploadKey! { get set }

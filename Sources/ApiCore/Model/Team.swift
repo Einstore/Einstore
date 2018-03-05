@@ -121,19 +121,17 @@ extension Team {
         })
     }
     
-//    public static func verifiedTeamQuery(connection: DatabaseConnectable, id: DbCoreIdentifier) throws -> QueryBuilder<Team> {
-////        let teams = try req.authInfo.teamIds()
-////        return Team.query(on: req).filter(\Team.id == id).filter(\Team.id, in: teams)
-//        return Team.query(on: connection).filter(\Team.id == id)
-//    }
-//    
-//    public static func verifiedTeam(connection: DatabaseConnectable, id: DbCoreIdentifier) throws -> Future<Team> {
-//        return try verifiedTeamQuery(connection: connection, id: id).first().map(to: Team.self, { (team) -> Team in
-//            guard let team = team else {
-//                throw ContentError.unavailable
-//            }
-//            return team
-//        })
-//    }
+}
+
+// MARK: - Helpers
+
+extension Array where Element == Team {
+    
+    public var ids: [DbCoreIdentifier] {
+        let teamIds = compactMap({ (team) -> DbCoreIdentifier in
+            return team.id!
+        })
+        return teamIds
+    }
     
 }

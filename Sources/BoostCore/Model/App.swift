@@ -20,12 +20,12 @@ final public class App: DbCoreModel {
     
     public enum Platform: String, Codable, KeyStringDecodable {
         case unknown
-        case iOS = "ios"
-        case tvOS = "tvos"
+        case ios = "ios"
+        case tvos = "tvos"
         case url = "url"
         case simulator = "simulator"
         case android = "android"
-        case macOS = "macos"
+        case macos = "macos"
         case windows = "windows"
         
         public static var keyStringTrue: App.Platform = .unknown

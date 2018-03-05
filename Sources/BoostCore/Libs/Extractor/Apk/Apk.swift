@@ -157,7 +157,7 @@ class Apk: BaseExtractor, Extractor {
             try getOtherApplicationInfo()
             try getApplicationIcon()
             
-            let a = try app(platform: .iOS, teamId: teamId)
+            let a = try app(platform: .ios, teamId: teamId)
             promise.complete(a)
         } catch {
             promise.fail(error)

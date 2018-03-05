@@ -20,10 +20,7 @@ class UploadKeyController: Controller {
         router.get("keys") { (req) -> Future<[UploadKey.Display]> in
             let me = try req.me.user()
             return try me.teams.query(on: req).all().flatMap(to: [UploadKey.Display].self) { teams in
-                let teamIds = teams.compactMap({ (team) -> DbCoreIdentifier in
-                    return team.id!
-                })
-                return UploadKey.Display.query(on: req).filter(\UploadKey.Display.teamId, in: teamIds).all()
+                return UploadKey.Display.query(on: req).filter(\UploadKey.Display.teamId, in: teams.ids).all()
             }
         }
         

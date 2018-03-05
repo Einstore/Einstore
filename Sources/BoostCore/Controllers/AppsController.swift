@@ -16,27 +16,51 @@ import FileCore
 import SwiftShell
 
 
+extension QueryBuilder where Model == App {
+    
+    func appFilters() -> Self {
+        var s = self
+        s = s.range(lower: 0, upper: 1000)
+//        s = s.filter(\App.platform == App.Platform.ios.rawValue)
+        return s
+    }
+    
+    func safeApp(id: DbCoreIdentifier, teamIds: [DbCoreIdentifier]) -> Self {
+        return self
+    }
+    
+}
+
+
 class AppsController: Controller {
     
     static func boot(router: Router) throws {
-        router.get("apps") { (req) -> Future<[App]> in
-            return req.withPooledConnection(to: .db) { (db) -> Future<[App]> in
-                return App.query(on: db).all()
+        router.get("apps") { (req) -> Future<Apps> in
+            return try req.me.teams().flatMap(to: Apps.self) { teams in
+                return App.query(on: req).filter(\App.teamId, in: teams.ids).appFilters().all()
+            }
+        }
+        
+        router.get("teams", DbCoreIdentifier.parameter, "apps") { (req) -> Future<Apps> in
+            let teamId = try req.parameter(DbCoreIdentifier.self)
+            return try req.me.verifiedTeam(id: teamId).flatMap(to: Apps.self) { team in
+                return App.query(on: req).filter(\App.teamId == team.id).appFilters().all()
             }
         }
         
         router.get("apps", DbCoreIdentifier.parameter) { (req) -> Future<App> in
-            let id = try req.parameter(DbCoreIdentifier.self)
-            
-            return req.withPooledConnection(to: .db) { (db) -> Future<App> in
-                return appQuery(appId: id, db: db).first().map(to: App.self, { (app) -> App in
+            let appId = try req.parameter(DbCoreIdentifier.self)
+            return try req.me.teams().flatMap(to: App.self) { teams in
+                return App.query(on: req).safeApp(id: appId, teamIds: teams.ids).first().map(to: App.self) { (app) -> App in
                     guard let app = app else {
-                        throw ContentError.unavailable
+                        throw ErrorsCore.HTTPError.notFound
                     }
                     return app
-                })
+                }
             }
         }
+        
+        /*
         
         router.get("apps", DbCoreIdentifier.parameter, "auth") { (req) -> Future<Response> in
             let id = try req.parameter(DbCoreIdentifier.self)
@@ -122,6 +146,7 @@ class AppsController: Controller {
                 }
             }
         }
+        // */
         
         router.post("apps", "upload") { (req) -> Future<Response> in
             // TODO: Add JWT authentication for manual web uploads!!!!!!!!!!!!!
@@ -167,7 +192,7 @@ class AppsController: Controller {
                                 print(output.stdout)
                                 
                                 if output.stdout.contains("Payload/") {
-                                    platform = .iOS
+                                    platform = .ios
                                 }
                                 else if output.stdout.contains("AndroidManifest.xml") {
                                     platform = .android
@@ -215,10 +240,6 @@ class AppsController: Controller {
 
 
 extension AppsController {
-    
-    static func appQuery(appId: DbCoreIdentifier, db: DbCoreConnection) -> QueryBuilder<App> {
-        return App.query(on: db).filter(\App.id == appId)
-    }
     
     static func handleTags(db: DbCoreConnection, request req: Request, app: App) -> Future<Void> {
         if let query = try? req.query.decode([String: String].self) {

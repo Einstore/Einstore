@@ -40,7 +40,7 @@ class BaseExtractor {
     static func decoder(file: String, platform: App.Platform) throws -> Extractor {
         let url = URL(fileURLWithPath: file)
         switch platform {
-        case .iOS:
+        case .ios:
             return try Ipa(file: url)
         case .android:
             return try Apk(file: url)

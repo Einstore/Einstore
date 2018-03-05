@@ -30,6 +30,9 @@
 		1538D26B204DDDEA00194A3B /* UploadKey+Testable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1538D26A204DDDEA00194A3B /* UploadKey+Testable.swift */; };
 		1538D26D204DDF3D00194A3B /* BoostTestTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1538D26C204DDF3D00194A3B /* BoostTestTools.swift */; };
 		1538D26F204DE03A00194A3B /* Team+UploadKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1538D26E204DE03A00194A3B /* Team+UploadKeys.swift */; };
+		1538D271204DF4F200194A3B /* AppsControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1538D270204DF4F200194A3B /* AppsControllerTests.swift */; };
+		1538D273204DF59D00194A3B /* AppTestCaseSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1538D272204DF59D00194A3B /* AppTestCaseSetup.swift */; };
+		1538D277204E033100194A3B /* App+Testable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1538D276204E033100194A3B /* App+Testable.swift */; };
 		15D575A3204CC1FC007F97C9 /* FluentDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D575A2204CC1FC007F97C9 /* FluentDesign.swift */; };
 		15D575A5204D9DB4007F97C9 /* HTTPRequest+Make.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D575A4204D9DB4007F97C9 /* HTTPRequest+Make.swift */; };
 		OBJ_1004 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_378 /* Package.swift */; };
@@ -191,7 +194,7 @@
 		OBJ_1385 /* CodableKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Core::CodableKit::Product" /* CodableKit.framework */; };
 		OBJ_1386 /* Debugging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Core::Debugging::Product" /* Debugging.framework */; };
 		OBJ_1387 /* Async.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Async::Async::Product" /* Async.framework */; };
-		OBJ_1430 /* UploadKeyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_151 /* UploadKeyTests.swift */; };
+		OBJ_1430 /* UploadKeysControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_151 /* UploadKeysControllerTests.swift */; };
 		OBJ_1432 /* BoostTestTools.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Boost::BoostTestTools::Product" /* BoostTestTools.framework */; };
 		OBJ_1433 /* ApiCoreTestTools.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Boost::ApiCoreTestTools::Product" /* ApiCoreTestTools.framework */; };
 		OBJ_1434 /* FluentTestTools.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Boost::FluentTestTools::Product" /* FluentTestTools.framework */; };
@@ -6615,6 +6618,9 @@
 		1538D26A204DDDEA00194A3B /* UploadKey+Testable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UploadKey+Testable.swift"; sourceTree = "<group>"; };
 		1538D26C204DDF3D00194A3B /* BoostTestTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoostTestTools.swift; sourceTree = "<group>"; };
 		1538D26E204DE03A00194A3B /* Team+UploadKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Team+UploadKeys.swift"; sourceTree = "<group>"; };
+		1538D270204DF4F200194A3B /* AppsControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppsControllerTests.swift; sourceTree = "<group>"; };
+		1538D272204DF59D00194A3B /* AppTestCaseSetup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTestCaseSetup.swift; sourceTree = "<group>"; };
+		1538D276204E033100194A3B /* App+Testable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "App+Testable.swift"; sourceTree = "<group>"; };
 		15D575A2204CC1FC007F97C9 /* FluentDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluentDesign.swift; sourceTree = "<group>"; };
 		15D575A4204D9DB4007F97C9 /* HTTPRequest+Make.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPRequest+Make.swift"; sourceTree = "<group>"; };
 		"Async::Async::Product" /* Async.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Async.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -6689,7 +6695,7 @@
 		OBJ_145 /* StringCryptoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringCryptoTests.swift; sourceTree = "<group>"; };
 		OBJ_147 /* GravatarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GravatarTests.swift; sourceTree = "<group>"; };
 		OBJ_149 /* DbCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DbCoreTests.swift; sourceTree = "<group>"; };
-		OBJ_151 /* UploadKeyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadKeyTests.swift; sourceTree = "<group>"; };
+		OBJ_151 /* UploadKeysControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadKeysControllerTests.swift; sourceTree = "<group>"; };
 		OBJ_153 /* AppTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTests.swift; sourceTree = "<group>"; };
 		OBJ_155 /* ErrorsCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorsCoreTests.swift; sourceTree = "<group>"; };
 		OBJ_156 /* Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resources; sourceTree = SOURCE_ROOT; };
@@ -8447,6 +8453,7 @@
 			isa = PBXGroup;
 			children = (
 				1538D268204DDA7E00194A3B /* UploadKeyTestCaseSetup.swift */,
+				1538D272204DF59D00194A3B /* AppTestCaseSetup.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -8571,6 +8578,7 @@
 			children = (
 				OBJ_129 /* Application+Testable.swift */,
 				1538D26A204DDDEA00194A3B /* UploadKey+Testable.swift */,
+				1538D276204E033100194A3B /* App+Testable.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -8667,7 +8675,8 @@
 		OBJ_150 /* BoostCoreTests */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_151 /* UploadKeyTests.swift */,
+				OBJ_151 /* UploadKeysControllerTests.swift */,
+				1538D270204DF4F200194A3B /* AppsControllerTests.swift */,
 			);
 			name = BoostCoreTests;
 			path = Tests/BoostCoreTests;
@@ -12971,7 +12980,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_1430 /* UploadKeyTests.swift in Sources */,
+				OBJ_1430 /* UploadKeysControllerTests.swift in Sources */,
+				1538D271204DF4F200194A3B /* AppsControllerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12997,8 +13007,10 @@
 			files = (
 				1538D269204DDA7E00194A3B /* UploadKeyTestCaseSetup.swift in Sources */,
 				OBJ_1649 /* Application+Testable.swift in Sources */,
+				1538D273204DF59D00194A3B /* AppTestCaseSetup.swift in Sources */,
 				1538D26B204DDDEA00194A3B /* UploadKey+Testable.swift in Sources */,
 				1538D26D204DDF3D00194A3B /* BoostTestTools.swift in Sources */,
+				1538D277204E033100194A3B /* App+Testable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

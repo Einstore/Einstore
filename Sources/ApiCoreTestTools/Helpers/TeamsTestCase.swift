@@ -13,7 +13,6 @@ import ApiCore
 
 
 public protocol TeamsTestCase: UsersTestCase {
-    var app: Application! { get }
     var team1: Team! { get set }
     var team2: Team! { get set }
 }

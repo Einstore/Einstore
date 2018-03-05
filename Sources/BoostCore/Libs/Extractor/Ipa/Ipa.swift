@@ -36,7 +36,7 @@ class Ipa: BaseExtractor, Extractor {
                 try self.parse()
                 try self.cleanUp()
                 
-                let a = try app(platform: .iOS, teamId: teamId)
+                let a = try app(platform: .ios, teamId: teamId)
                 promise.complete(a)
             } catch {
                 promise.fail(error)
