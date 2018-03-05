@@ -76,6 +76,7 @@ class UploadKeyController: Controller {
                 return try req.me.verifiedTeam(id: key.teamId).flatMap(to: UploadKey.Display.self) { team in
                     return try req.content.decode(UploadKey.New.self).flatMap(to: UploadKey.Display.self) { newKey in
                         key.name = newKey.name
+                        key.expires = newKey.expires
                         return key.save(on: req).map(to: UploadKey.Display.self) { key in
                             return key.asDisplay()
                         }
