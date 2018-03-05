@@ -8,6 +8,7 @@
 import Foundation
 import XCTest
 import Vapor
+import Fluent
 import VaporTestTools
 import FluentTestTools
 import ApiCoreTestTools
@@ -15,14 +16,16 @@ import ApiCoreTestTools
 @testable import BoostCore
 
 
-public protocol UploadKeyTestCase: TeamsTestCase {
+public protocol UploadKeyTestCaseSetup: TeamsTestCase {
     var app: Application! { get }
-    var user1: User! { get set }
-    var user2: User! { get set }
+    
+    var key1: UploadKey! { get set }
+    var key2: UploadKey! { get set }
+    var key3: UploadKey! { get set }
 }
 
 
-extension UploadKeyTestCase {
+extension UploadKeyTestCaseSetup {
     
     public func setupUploadKeys() {
         app.testable.delete(allFor: UploadKey.self)
@@ -31,16 +34,9 @@ extension UploadKeyTestCase {
         
         let req = app.testable.fakeRequest()
         
-        let adminTeam = Team.testable.create("Admin team", on: app)
-        
-        user1 = User.testable.createSu(on: app)
-        _ = try! adminTeam.users.attach(user1, on: req).await(on: req)
-        
-        let authenticationCache = try! app.make(AuthenticationCache.self, for: Request.self)
-        authenticationCache[User.self] = user1
-        
-        user2 = User.testable.create(on: app)
-        _ = try! adminTeam.users.attach(user2, on: req).await(on: req)
+        key1 = UploadKey.testable.create(name: "key1", team: team1, on: app)
+        key2 = UploadKey.testable.create(name: "key2", team: team1, on: app)
+        key3 = UploadKey.testable.create(name: "key3", team: team2, on: app)
     }
     
 }

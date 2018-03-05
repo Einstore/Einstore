@@ -12,14 +12,22 @@ import FluentTestTools
 import ApiCoreTestTools
 import BoostTestTools
 @testable import ApiCore
+@testable import BoostCore
 
 
-class UploadKeyControllerTests: XCTestCase, UsersTestCase, LinuxTests {
-    
+class UploadKeyControllerTests: XCTestCase, UploadKeyTestCaseSetup, LinuxTests {
+
     var app: Application!
     
     var user1: User!
     var user2: User!
+    
+    var team1: Team!
+    var team2: Team!
+    
+    var key1: UploadKey!
+    var key2: UploadKey!
+    var key3: UploadKey!
     
     // MARK: Linux
     

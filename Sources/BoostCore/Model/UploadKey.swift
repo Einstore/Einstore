@@ -71,7 +71,7 @@ final public class UploadKey: DbCoreModel {
         case token
     }
     
-    init(id: DbCoreIdentifier?, teamId: DbCoreIdentifier, name: String, expires: Date?, token: String) {
+    public init(id: DbCoreIdentifier? = nil, teamId: DbCoreIdentifier, name: String, expires: Date? = nil, token: String = UUID().uuidString) {
         self.id = id
         self.teamId = teamId
         self.name = name
@@ -79,11 +79,21 @@ final public class UploadKey: DbCoreModel {
         self.token = token
     }
     
-    init(new: New, teamId: DbCoreIdentifier) {
+    public init(new: New, teamId: DbCoreIdentifier) {
         self.teamId = teamId
         self.name = new.name
         self.expires = new.expires
         self.token = UUID().uuidString
+    }
+    
+}
+
+// MARK: - Relations
+
+extension UploadKey {
+    
+    public var team: Parent<UploadKey, Team> {
+        return parent(\.teamId)
     }
     
 }
@@ -108,7 +118,7 @@ extension UploadKey: Migration {
     
 }
 
-// MARK: Helpers
+// MARK: - Helpers
 
 extension UploadKey {
     

@@ -27,6 +27,9 @@
 
 /* Begin PBXBuildFile section */
 		1538D269204DDA7E00194A3B /* UploadKeyTestCaseSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1538D268204DDA7E00194A3B /* UploadKeyTestCaseSetup.swift */; };
+		1538D26B204DDDEA00194A3B /* UploadKey+Testable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1538D26A204DDDEA00194A3B /* UploadKey+Testable.swift */; };
+		1538D26D204DDF3D00194A3B /* BoostTestTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1538D26C204DDF3D00194A3B /* BoostTestTools.swift */; };
+		1538D26F204DE03A00194A3B /* Team+UploadKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1538D26E204DE03A00194A3B /* Team+UploadKeys.swift */; };
 		15D575A3204CC1FC007F97C9 /* FluentDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D575A2204CC1FC007F97C9 /* FluentDesign.swift */; };
 		15D575A5204D9DB4007F97C9 /* HTTPRequest+Make.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D575A4204D9DB4007F97C9 /* HTTPRequest+Make.swift */; };
 		OBJ_1004 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_378 /* Package.swift */; };
@@ -6609,6 +6612,9 @@
 
 /* Begin PBXFileReference section */
 		1538D268204DDA7E00194A3B /* UploadKeyTestCaseSetup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadKeyTestCaseSetup.swift; sourceTree = "<group>"; };
+		1538D26A204DDDEA00194A3B /* UploadKey+Testable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UploadKey+Testable.swift"; sourceTree = "<group>"; };
+		1538D26C204DDF3D00194A3B /* BoostTestTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoostTestTools.swift; sourceTree = "<group>"; };
+		1538D26E204DE03A00194A3B /* Team+UploadKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Team+UploadKeys.swift"; sourceTree = "<group>"; };
 		15D575A2204CC1FC007F97C9 /* FluentDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluentDesign.swift; sourceTree = "<group>"; };
 		15D575A4204D9DB4007F97C9 /* HTTPRequest+Make.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPRequest+Make.swift"; sourceTree = "<group>"; };
 		"Async::Async::Product" /* Async.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Async.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -8468,6 +8474,7 @@
 			children = (
 				OBJ_105 /* App+Filename.swift */,
 				OBJ_106 /* Dictionary+Plist.swift */,
+				1538D26E204DE03A00194A3B /* Team+UploadKeys.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -8553,6 +8560,7 @@
 			children = (
 				1538D267204DDA4E00194A3B /* Helpers */,
 				OBJ_128 /* Extensions */,
+				1538D26C204DDF3D00194A3B /* BoostTestTools.swift */,
 			);
 			name = BoostTestTools;
 			path = Sources/BoostTestTools;
@@ -8562,6 +8570,7 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_129 /* Application+Testable.swift */,
+				1538D26A204DDDEA00194A3B /* UploadKey+Testable.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -12988,6 +12997,8 @@
 			files = (
 				1538D269204DDA7E00194A3B /* UploadKeyTestCaseSetup.swift in Sources */,
 				OBJ_1649 /* Application+Testable.swift in Sources */,
+				1538D26B204DDDEA00194A3B /* UploadKey+Testable.swift in Sources */,
+				1538D26D204DDF3D00194A3B /* BoostTestTools.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13014,6 +13025,7 @@
 				OBJ_1749 /* DownloadKey.swift in Sources */,
 				OBJ_1750 /* Tag.swift in Sources */,
 				OBJ_1751 /* UploadKey.swift in Sources */,
+				1538D26F204DE03A00194A3B /* Team+UploadKeys.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
