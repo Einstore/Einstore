@@ -39,7 +39,8 @@ public final class ApiAuthMiddleware: Middleware, ServiceFactory {
         "/auth",
         "/token",
         "/ping",
-        "/teapot"
+        "/teapot",
+        "/teams/check"
     ]
     
     public static var debugUri: [String] = [
@@ -59,9 +60,7 @@ public final class ApiAuthMiddleware: Middleware, ServiceFactory {
                 return try next.respond(to: req)
             }
             else {
-                let promise = Promise<Response>()
-                try promise.complete(req.response.onlyInDebug())
-                return promise.future
+                return try Future(req.response.onlyInDebug())
             }
         }
         
@@ -69,18 +68,22 @@ public final class ApiAuthMiddleware: Middleware, ServiceFactory {
         guard ApiAuthMiddleware.allowedUri.contains(req.http.uri.path) else {
             printUrl(req: req, type: .secured)
             
-            // JWT auth
+            // Get JWT token
             guard let token = req.http.headers.authorizationToken else {
                 return try Future(req.response.notAuthorized())
             }
             let jwtService: JWTService = try req.make()
-            let userPayload = try JWT<JWTAuthPayload>(from: token, verifiedUsing: jwtService.signer).payload
-            let authenticationCache = try req.make(AuthenticationCache.self, for: Request.self)
+            
+            // Get user payload
+            guard let userPayload = try? JWT<JWTAuthPayload>(from: token, verifiedUsing: jwtService.signer).payload else {
+                return try Future(req.response.authExpired())
+            }
             
             return User.find(userPayload.userId, on: req).flatMap(to: Response.self) { user in
                 guard let user = user else {
-                    throw ErrorsCore.HTTPError.notAuthorized
+                    return try Future(req.response.notAuthorized())
                 }
+                let authenticationCache = try req.make(AuthenticationCache.self, for: Request.self)
                 authenticationCache[User.self] = user
                 return try next.respond(to: req)
             }

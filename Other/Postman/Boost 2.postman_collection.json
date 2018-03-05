@@ -9,6 +9,9 @@
 		{
 			"name": "Install",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "GET",
 				"header": [],
 				"body": {
@@ -28,6 +31,9 @@
 		{
 			"name": "Demo",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "GET",
 				"header": [
 					{
@@ -52,6 +58,9 @@
 		{
 			"name": "Re-Install",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "GET",
 				"header": [
 					{
@@ -76,6 +85,9 @@
 		{
 			"name": "Un-Install",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "GET",
 				"header": [
 					{
@@ -138,13 +150,23 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin@liveui.io",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Basic YWRtaW5AbGl2ZXVpLmlvOmFkbWlu"
-					}
-				],
+				"header": [],
 				"body": {
 					"mode": "raw",
 					"raw": "{\n  \"email\": \"admin@liveui.io\",\n  \"password\": \"password123\"\n}"
@@ -200,6 +222,9 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "POST",
 				"header": [
 					{
@@ -227,7 +252,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "c318fae0-78c0-487d-b27e-8de7ce18acd3",
+						"id": "9d95079a-2a8b-4522-a62f-c96a98cfb2ba",
 						"type": "text/javascript",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
@@ -248,7 +273,7 @@
 							"    var a = responseHeaders[\"Authorization\"] || responseHeaders[\"authorization\"];",
 							"    tests[\"JWT token has a bearer\"] = a.has(\"Bearer \");",
 							"    tests[\"JWT token has a value\"] = (a.length > 15);",
-							"    postman.setEnvironmentVariable(\"JWT_AUTH\", a);",
+							"    postman.setEnvironmentVariable(\"JWT_AUTH\", a.substring(7));",
 							"}",
 							"",
 							"// Content type",
@@ -259,6 +284,9 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "GET",
 				"header": [
 					{
@@ -286,7 +314,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "c6c95c43-e38a-4de4-84db-f36fb089c4ec",
+						"id": "1512bc88-43bb-4ec2-a819-b0872e3cae15",
 						"type": "text/javascript",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
@@ -296,8 +324,7 @@
 							"",
 							"// Token check",
 							"tests[\"Token has an id\"] = (jsonData[\"id\"].length > 10)",
-							"tests[\"Token has a user_id\"] = (jsonData[\"user_id\"].length > 10)",
-							"tests[\"Token has a token\"] = (jsonData[\"token\"].length > 10)",
+							"tests[\"Token has a user_id\"] = (jsonData[\"user\"][\"id\"].length > 10)",
 							"tests[\"Token has expires\"] = (jsonData[\"expires\"] > 543533823)",
 							"",
 							"// JWT",
@@ -308,7 +335,7 @@
 							"    var a = responseHeaders[\"Authorization\"] || responseHeaders[\"authorization\"];",
 							"    tests[\"JWT token has a bearer\"] = a.has(\"Bearer \");",
 							"    tests[\"JWT token has a value\"] = (a.length > 15);",
-							"    postman.setEnvironmentVariable(\"JWT_AUTH\", a);",
+							"    postman.setEnvironmentVariable(\"JWT_AUTH\", a.substring(7));",
 							"}",
 							"",
 							"// Content type",
@@ -319,6 +346,9 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "POST",
 				"header": [
 					{
@@ -348,10 +378,6 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
 				"body": {
@@ -1119,6 +1145,9 @@
 		{
 			"name": "Register",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "POST",
 				"header": [
 					{
@@ -1159,6 +1188,9 @@
 		{
 			"name": "Show tables",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "GET",
 				"header": [],
 				"body": {},
@@ -1175,6 +1207,9 @@
 		{
 			"name": "Teapot",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "GET",
 				"header": [],
 				"body": {},
@@ -1191,6 +1226,9 @@
 		{
 			"name": "Ping",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "GET",
 				"header": [],
 				"body": {},
@@ -1203,6 +1241,38 @@
 				"description": null
 			},
 			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{JWT_AUTH}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "bd8a2c58-ab40-4e1d-8335-cca3a3a32c6d",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "ce39d7b5-21e6-4183-ae88-4c99099551b3",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }

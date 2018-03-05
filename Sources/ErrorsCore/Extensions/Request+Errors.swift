@@ -72,6 +72,11 @@ public struct RequestResponse {
         return response
     }
     
+    public func authExpired() throws -> Response {
+        let response = try error(status: .unauthorized, error: "not_authorized", description: "Authorization expired")
+        return response
+    }
+    
     public func badUrl() throws -> Response {
         let response = try error(status: .notFound, error: "not_found", description: "Endpoint doesn't exist; See http://boost.docs.apiary.io for API documentation")
         return response

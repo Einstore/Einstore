@@ -17,7 +17,6 @@ import ErrorsCore
 class UploadKeyController: Controller {
     
     static func boot(router: Router) throws {
-        
         router.get("keys") { (req) -> Future<[UploadKey.Display]> in
             let me = try req.me.user()
             return try me.teams.query(on: req).all().flatMap(to: [UploadKey.Display].self) { teams in

@@ -46,7 +46,7 @@ class UsersControllerTests: XCTestCase, UsersTestCase, LinuxTests {
     // MARK: Tests
     
     func testGetUsers() {
-        let req = HTTPRequest.testable.get(uri: "/users")
+        let req = HTTPRequest.testable.get(uri: "/users", authorizedUser: user1, on: app)
         let res = app.testable.response(to: req)
 
         res.testable.debug()
@@ -65,7 +65,7 @@ class UsersControllerTests: XCTestCase, UsersTestCase, LinuxTests {
     }
     
     func testSearchUsersWithoutParams() {
-        let req = HTTPRequest.testable.get(uri: "/users/search")
+        let req = HTTPRequest.testable.get(uri: "/users/search", authorizedUser: user1, on: app)
         let res = app.testable.response(to: req)
         
         res.testable.debug()

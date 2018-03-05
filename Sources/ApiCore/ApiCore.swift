@@ -39,6 +39,7 @@ public class ApiCore {
         DbCore.migrationConfig.add(model: TeamUser.self, database: .db)
         
         User.Display.defaultDatabase = .db
+        FluentDesign.defaultDatabase = .db
         
         ApiCore.middlewareConfig.use(ApiAuthMiddleware.self)
         ApiCore.middlewareConfig.use(ErrorsCoreMiddleware.self)

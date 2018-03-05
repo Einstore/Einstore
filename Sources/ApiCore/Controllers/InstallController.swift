@@ -55,7 +55,8 @@ public class InstallController: Controller {
         }
         
         router.get("tables") { req in
-            return req.dbHelpers.showTables()
+            // TODO: Show table names and other info
+            return FluentDesign.query(on: req).all()
         }
     }
     

@@ -24,7 +24,12 @@ class UploadKeyControllerTests: XCTestCase, UsersTestCase, LinuxTests {
     // MARK: Linux
     
     static let allTests: [(String, Any)] = [
-        ("testValidGetAuthRequest", testValidGetAuthRequest),
+        ("testGetUploadKeysForUser", testGetUploadKeysForUser),
+        ("testGetUploadKeysForTeam", testGetUploadKeysForTeam),
+        ("testCreateUploadKey", testCreateUploadKey),
+        ("testChangeUploadKeyName", testChangeUploadKeyName),
+        ("testDeleteUploadKey", testDeleteUploadKey),
+        ("testGetOneUploadKey", testGetOneUploadKey),
         ("testLinuxTests", testLinuxTests)
     ]
     
@@ -46,18 +51,43 @@ class UploadKeyControllerTests: XCTestCase, UsersTestCase, LinuxTests {
     
     // MARK: Login tests
     
-    func testValidGetAuthRequest() {
-//        let req = HTTPRequest.testable.get(uri: "/auth", headers: [
-//            "Authorization": "Basic YWRtaW5AbGl2ZXVpLmlvOmFkbWlu"
-//            ])
-//        do {
-//            let res = try app.testable.response(throwingTo: req)
-//            
-//            checkAuthResult(res)
-//        } catch {
-//            print(error)
-//            XCTFail()
-//        }
+    func testGetUploadKeysForUser() {
+        let req = HTTPRequest.testable.get(uri: "/users", authorizedUser: user1, on: app)
+        let res = app.testable.response(to: req)
+        
+        res.testable.debug()
+        
+        XCTAssertTrue(res.testable.has(statusCode: .ok), "Wrong status code")
+        XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
+        
+        let users = res.testable.content(as: [User].self)!
+        XCTAssertEqual(users.count, 2, "There should be two users in the database")
+        XCTAssertTrue(users.contains(where: { (user) -> Bool in
+            return user.id == user1.id && user.id != nil
+        }), "Newly created user is not present in the database")
+        XCTAssertTrue(users.contains(where: { (user) -> Bool in
+            return user.id == user2.id && user.id != nil
+        }), "Newly created user is not present in the database")
+    }
+    
+    func testGetUploadKeysForTeam() {
+        
+    }
+    
+    func testCreateUploadKey() {
+        
+    }
+    
+    func testChangeUploadKeyName() {
+        
+    }
+    
+    func testDeleteUploadKey() {
+        
+    }
+    
+    func testGetOneUploadKey() {
+        
     }
     
 }

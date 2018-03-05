@@ -7,7 +7,7 @@
 
 import Foundation
 import DbCore
-import ApiCore
+@testable import ApiCore
 import Vapor
 import Fluent
 import VaporTestTools
@@ -28,6 +28,7 @@ extension TestableProperty where TestableType: Application {
             routerClosure?(router)
             try! ApiCore.boot(router: router)
         }
+        
         return app
     }
     

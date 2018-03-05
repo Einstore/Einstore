@@ -26,6 +26,9 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		1538D269204DDA7E00194A3B /* UploadKeyTestCaseSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1538D268204DDA7E00194A3B /* UploadKeyTestCaseSetup.swift */; };
+		15D575A3204CC1FC007F97C9 /* FluentDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D575A2204CC1FC007F97C9 /* FluentDesign.swift */; };
+		15D575A5204D9DB4007F97C9 /* HTTPRequest+Make.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D575A4204D9DB4007F97C9 /* HTTPRequest+Make.swift */; };
 		OBJ_1004 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_378 /* Package.swift */; };
 		OBJ_1010 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_456 /* Package.swift */; };
 		OBJ_1016 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_475 /* Package.swift */; };
@@ -6605,6 +6608,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1538D268204DDA7E00194A3B /* UploadKeyTestCaseSetup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadKeyTestCaseSetup.swift; sourceTree = "<group>"; };
+		15D575A2204CC1FC007F97C9 /* FluentDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluentDesign.swift; sourceTree = "<group>"; };
+		15D575A4204D9DB4007F97C9 /* HTTPRequest+Make.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPRequest+Make.swift"; sourceTree = "<group>"; };
 		"Async::Async::Product" /* Async.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Async.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCore::Product" /* ApiCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCoreTestTools::Product" /* ApiCoreTestTools.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCoreTestTools.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -8431,6 +8437,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1538D267204DDA4E00194A3B /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				1538D268204DDA7E00194A3B /* UploadKeyTestCaseSetup.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
 		OBJ_10 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -8537,6 +8551,7 @@
 		OBJ_127 /* BoostTestTools */ = {
 			isa = PBXGroup;
 			children = (
+				1538D267204DDA4E00194A3B /* Helpers */,
 				OBJ_128 /* Extensions */,
 			);
 			name = BoostTestTools;
@@ -9681,7 +9696,7 @@
 			path = Parser;
 			sourceTree = "<group>";
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -9695,7 +9710,6 @@
 				OBJ_161 /* Dependencies */,
 				OBJ_913 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_502 /* Serializer */ = {
@@ -10263,6 +10277,7 @@
 				OBJ_72 /* TeamUser.swift */,
 				OBJ_73 /* Token.swift */,
 				OBJ_74 /* User.swift */,
+				15D575A2204CC1FC007F97C9 /* FluentDesign.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -10667,6 +10682,7 @@
 				OBJ_85 /* Application+Testable.swift */,
 				OBJ_86 /* Team+Testable.swift */,
 				OBJ_87 /* User+Testable.swift */,
+				15D575A4204D9DB4007F97C9 /* HTTPRequest+Make.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -12725,7 +12741,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_913 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -12970,6 +12986,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
+				1538D269204DDA7E00194A3B /* UploadKeyTestCaseSetup.swift in Sources */,
 				OBJ_1649 /* Application+Testable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -13046,6 +13063,7 @@
 				OBJ_1987 /* ApiCoreTestTools.swift in Sources */,
 				OBJ_1988 /* Application+Testable.swift in Sources */,
 				OBJ_1989 /* Team+Testable.swift in Sources */,
+				15D575A5204D9DB4007F97C9 /* HTTPRequest+Make.swift in Sources */,
 				OBJ_1990 /* User+Testable.swift in Sources */,
 				OBJ_1991 /* LinuxTests.swift in Sources */,
 				OBJ_1992 /* TeamsTestCase.swift in Sources */,
@@ -13089,6 +13107,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
+				15D575A3204CC1FC007F97C9 /* FluentDesign.swift in Sources */,
 				OBJ_2195 /* ApiCore.swift in Sources */,
 				OBJ_2196 /* Configuration.swift in Sources */,
 				OBJ_2197 /* AuthController.swift in Sources */,

@@ -19,6 +19,7 @@ class TeamsController: Controller {
         case userNotFound
         case cantAddYourself
         case userAlreadyMember
+        case userNotMember
         case youAreTheLastUser
         
         var code: String {
@@ -33,6 +34,8 @@ class TeamsController: Controller {
                 return "One just can not add themselves to another peoples team my friend!"
             case .userAlreadyMember:
                 return "User is already a member of the team"
+            case .userNotMember:
+                return "User is not a member of the team"
             case .youAreTheLastUser:
                 return "You are the last user in this team; Please delete the team instead"
             }
@@ -45,6 +48,8 @@ class TeamsController: Controller {
             case .cantAddYourself:
                 return .conflict
             case .userAlreadyMember:
+                return .conflict
+            case .userNotMember:
                 return .conflict
             case .youAreTheLastUser:
                 return .conflict
@@ -142,11 +147,11 @@ class TeamsController: Controller {
             return try req.me.verifiedTeam(id: id)
         }
         
-        router.patch("teams", DbCoreIdentifier.parameter, "link") { (req) -> Future<Response> in
+        router.post("teams", DbCoreIdentifier.parameter, "link") { (req) -> Future<Response> in
             return try processLinking(request: req, action: .link)
         }
         
-        router.patch("teams", DbCoreIdentifier.parameter, "unlink") { (req) -> Future<Response> in
+        router.post("teams", DbCoreIdentifier.parameter, "unlink") { (req) -> Future<Response> in
             return try processLinking(request: req, action: .unlink)
         }
         
@@ -184,36 +189,36 @@ extension TeamsController {
     }
     
     private static func processLinking(request req: Request, action: TeamsController.LinkAction) throws -> Future<Response> {
-        let id = try req.parameter(DbCoreIdentifier.self)
-        return try req.me.verifiedTeam(id: id).flatMap(to: Response.self, { team in
+        let teamId = try req.parameter(DbCoreIdentifier.self)
+        return try req.me.verifiedTeam(id: teamId).flatMap(to: Response.self) { team in
             return try team.users.query(on: req).all().flatMap(to: Response.self) { teamUsers in
-                return User.query(on: req).filter(\User.id == id).first().flatMap(to: Response.self) { user in
-                    let me = try req.me.user()
-                    guard let user = user else {
-                        throw TeamError.userNotFound
-                    }
-                    if user.id == me.id && action == .unlink && teamUsers.count <= 1 {
-                        throw TeamError.youAreTheLastUser
-                    }
-                    if teamUsers.contains(user) {
-                        if action == .link {
-                            throw TeamError.userAlreadyMember
-                        }
-                    } else {
-                        if action == .unlink {
+                return try req.content.decode(User.Id.self).flatMap(to: Response.self) { userId in
+                    return User.query(on: req).filter(\User.id == userId.id).first().flatMap(to: Response.self) { user in
+                        let me = try req.me.user()
+                        guard let user = user else {
                             throw TeamError.userNotFound
                         }
-                    }
-                    
-                    let res = (action == .link) ? team.users.attach(user, on: req).flatten() : team.users.detach(user, on: req)
-                    return res.map(to: Response.self) { (_) -> Response in
-                        let message = (action == .link) ? "User has been added to the team" : "User has been removed from the team"
-                        return try req.response.success(status: .ok, code: "ok", description: message)
+                        if user.id == me.id && action == .unlink && teamUsers.count <= 1 {
+                            throw TeamError.youAreTheLastUser
+                        }
+                        if teamUsers.contains(user) {
+                            if action == .link {
+                                throw TeamError.userAlreadyMember
+                            }
+                        } else {
+                            if action == .unlink {
+                                throw TeamError.userNotMember
+                            }
+                        }
+                        
+                        let res = (action == .link) ? team.users.attach(user, on: req).flatten() : team.users.detach(user, on: req)
+                        return res.map(to: Response.self) { (_) -> Response in
+                            let message = (action == .link) ? "User has been added to the team" : "User has been removed from the team"
+                            return try req.response.success(status: .ok, code: "ok", description: message)
+                        }
                     }
                 }
             }
-        }).catchMap { (error) -> (Response) in
-            throw ErrorsCore.HTTPError.notFound
         }
     }
     

@@ -7,13 +7,17 @@
 
 import XCTest
 import Vapor
+import ApiCore
 import VaporTestTools
 import ApiCoreTestTools
 
 
-class GenericControllerTests: XCTestCase, LinuxTests {
+class GenericControllerTests: XCTestCase, UsersTestCase, LinuxTests {
     
     var app: Application!
+    
+    var user1: User!
+    var user2: User!
     
     // MARK: Linux
     
@@ -39,12 +43,14 @@ class GenericControllerTests: XCTestCase, LinuxTests {
         super.setUp()
         
         app = Application.testable.newApiCoreTestApp()
+        
+        setupUsers()
     }
     
     // MARK: Tests
     
     func testUnknownGet() {
-        let req = HTTPRequest.testable.get(uri: "/unknown")
+        let req = HTTPRequest.testable.get(uri: "/unknown", authorizedUser: user1, on: app)
         let res = app.testable.response(to: req)
         
         res.testable.debug()
@@ -53,7 +59,7 @@ class GenericControllerTests: XCTestCase, LinuxTests {
     }
     
     func testUnknownPost() {
-        let req = HTTPRequest.testable.post(uri: "/unknown")
+        let req = HTTPRequest.testable.post(uri: "/unknown", authorizedUser: user1, on: app)
         let res = app.testable.response(to: req)
         
         res.testable.debug()
@@ -62,7 +68,7 @@ class GenericControllerTests: XCTestCase, LinuxTests {
     }
     
     func testUnknownPut() {
-        let req = HTTPRequest.testable.put(uri: "/unknown")
+        let req = HTTPRequest.testable.put(uri: "/unknown", authorizedUser: user1, on: app)
         let res = app.testable.response(to: req)
         
         res.testable.debug()
@@ -71,7 +77,7 @@ class GenericControllerTests: XCTestCase, LinuxTests {
     }
     
     func testUnknownPatch() {
-        let req = HTTPRequest.testable.patch(uri: "/unknown")
+        let req = HTTPRequest.testable.patch(uri: "/unknown", authorizedUser: user1, on: app)
         let res = app.testable.response(to: req)
         
         res.testable.debug()
@@ -80,7 +86,7 @@ class GenericControllerTests: XCTestCase, LinuxTests {
     }
     
     func testUnknownDelete() {
-        let req = HTTPRequest.testable.delete(uri: "/unknown")
+        let req = HTTPRequest.testable.delete(uri: "/unknown", authorizedUser: user1, on: app)
         let res = app.testable.response(to: req)
         
         res.testable.debug()
@@ -124,6 +130,8 @@ class GenericControllerTests: XCTestCase, LinuxTests {
 extension GenericControllerTests {
     
     private func testUnknown(response res: Response) {
+        res.testable.debug()
+        
         XCTAssertTrue(res.testable.has(statusCode: .notFound), "Wrong status code. Should be not found (404)")
     }
     

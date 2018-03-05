@@ -50,7 +50,6 @@ public final class User: DbCoreModel {
     public final class Display: DbCoreModel {
         
         public static let entity: String = "users"
-        public static let name: String = "users"
         
         public var id: DbCoreIdentifier?
         public var firstname: String
@@ -61,7 +60,7 @@ public final class User: DbCoreModel {
         public var disabled: Bool
         public var su: Bool
         
-        init(firstname: String, lastname: String, email: String, expires: Date? = nil, disabled: Bool = true, su: Bool = false) {
+        public init(firstname: String, lastname: String, email: String, expires: Date? = nil, disabled: Bool = true, su: Bool = false) {
             self.firstname = firstname
             self.lastname = lastname
             self.email = email
@@ -70,6 +69,18 @@ public final class User: DbCoreModel {
             self.disabled = disabled
             self.su = su
         }
+        
+        public init(_ user: User) {
+            self.id = user.id
+            self.firstname = user.firstname
+            self.lastname = user.lastname
+            self.email = user.email
+            self.expires = user.expires
+            self.registered = user.registered
+            self.disabled = user.disabled
+            self.su = user.su
+        }
+        
     }
     
     public final class AllSearch: Content {
@@ -95,6 +106,14 @@ public final class User: DbCoreModel {
             avatar = email.imageUrlFromMail
         }
         
+    }
+    
+    public struct Id: Content {
+        public var id: DbCoreIdentifier?
+        
+        public init(id: DbCoreIdentifier) {
+            self.id = id
+        }
     }
     
     public var id: DbCoreIdentifier?

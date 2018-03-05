@@ -23,13 +23,13 @@ public final class Token: DbCoreModel {
     
     public final class PublicFull: DbCoreModel {
         public var id: DbCoreIdentifier?
-        public var user: User
+        public var user: User.Display
         public var token: String
         public var expires: Date
         
         public init(token: Token, user: User) {
             self.id = token.id
-            self.user = user
+            self.user = User.Display(user)
             self.token = token.token
             self.expires = token.expires
         }
@@ -37,12 +37,12 @@ public final class Token: DbCoreModel {
     
     public final class Public: DbCoreModel {
         public var id: DbCoreIdentifier?
-        public var user: User
+        public var user: User.Display
         public var expires: Date
         
         public init(token: Token, user: User) {
             self.id = token.id
-            self.user = user
+            self.user = User.Display(user)
             self.expires = token.expires
         }
     }
