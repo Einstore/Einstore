@@ -26,6 +26,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		1538D87B204F367300194A3B /* Tag+Equatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1538D87A204F367300194A3B /* Tag+Equatable.swift */; };
 		OBJ_1002 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_241 /* Package.swift */; };
 		OBJ_1008 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_299 /* Package.swift */; };
 		OBJ_1014 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_388 /* Package.swift */; };
@@ -6630,6 +6631,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1538D87A204F367300194A3B /* Tag+Equatable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Tag+Equatable.swift"; sourceTree = "<group>"; };
 		"Async::Async::Product" /* Async.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Async.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCore::Product" /* ApiCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCoreTestTools::Product" /* ApiCoreTestTools.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCoreTestTools.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -8504,6 +8506,7 @@
 				OBJ_107 /* App+Filename.swift */,
 				OBJ_108 /* Dictionary+Plist.swift */,
 				OBJ_109 /* Team+UploadKeys.swift */,
+				1538D87A204F367300194A3B /* Tag+Equatable.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -13057,6 +13060,7 @@
 			files = (
 				OBJ_1751 /* BoostCore.swift in Sources */,
 				OBJ_1752 /* AppsController.swift in Sources */,
+				1538D87B204F367300194A3B /* Tag+Equatable.swift in Sources */,
 				OBJ_1753 /* TagsController.swift in Sources */,
 				OBJ_1754 /* UploadKeyController.swift in Sources */,
 				OBJ_1755 /* App+Filename.swift in Sources */,
