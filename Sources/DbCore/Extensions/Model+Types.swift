@@ -32,6 +32,10 @@ public struct DbCoreColumnType {
         return PostgreSQLColumn(type: .bool)
     }
     
+    public static func text() -> PostgreSQLColumn {
+        return PostgreSQLColumn(type: .text)
+    }
+
 }
 
 

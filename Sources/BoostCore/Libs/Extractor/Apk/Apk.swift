@@ -44,7 +44,7 @@ class Apk: BaseExtractor, Extractor {
     var apktoolUrl: URL {
         get {
             var url: URL = binUrl
-            url.appendPathComponent("apktool_2.2.1.jar")
+            url.appendPathComponent("apktool_2.3.1.jar")
             return url
         }
     }
@@ -86,7 +86,7 @@ class Apk: BaseExtractor, Extractor {
     }
     
     private func getOtherApplicationInfo() throws {
-        appIdentifier = manifest?.manifest.application.identifier
+        appIdentifier = manifest?.manifest.application.identifier ?? manifest?.manifest.package
         versionLong = manifest?.manifest.platformBuildVersionName
         versionShort = manifest?.manifest.platformBuildVersionCode
     }
@@ -138,7 +138,12 @@ class Apk: BaseExtractor, Extractor {
             let jsonUrl = archive.appendingPathComponent("Decoded/AndroidManifest.json")
             try runAndPrint(xml2jsonUrl.path, "-t", "xml2json", "-o", jsonUrl.path, xmlUrl.path)
             
-            manifest = try ApkManifest.decode.fromJSON(file: jsonUrl)
+            do {
+                manifest = try ApkManifest.decode.fromJSON(file: jsonUrl)
+            } catch {
+                print(error)
+                throw error
+            }
         }
     }
     
@@ -147,7 +152,7 @@ class Apk: BaseExtractor, Extractor {
         
         do {
             // Extract archive
-            try runAndPrint("java", "-jar", apktoolUrl.path, "d", file.path, "-o", extractedApkFolder.path, "-f")
+            try runAndPrint("java", "-jar", apktoolUrl.path, "d", "-sf", file.path, "-o", extractedApkFolder.path)
             
             // Parse manifest file
             try parseManifest()
@@ -157,7 +162,7 @@ class Apk: BaseExtractor, Extractor {
             try getOtherApplicationInfo()
             try getApplicationIcon()
             
-            let a = try app(platform: .ios, teamId: teamId)
+            let a = try app(platform: .android, teamId: teamId)
             promise.complete(a)
         } catch {
             promise.fail(error)

@@ -13,3 +13,4 @@ DerivedData/
 .DS_Store
 
 # End of https://www.gitignore.io/api/vapor
+/tmp

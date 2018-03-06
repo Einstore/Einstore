@@ -134,4 +134,8 @@ extension Array where Element == Team {
         return teamIds
     }
     
+    public func contains(_ teamId: DbCoreIdentifier) -> Bool {
+        return ids.contains(teamId)
+    }
+    
 }

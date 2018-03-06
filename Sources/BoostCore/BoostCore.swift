@@ -17,8 +17,6 @@ import FileCore
 
 public class Boost {
     
-    public static var uploadsRequireKey: Bool = false
-    
     public static func boot(_ app: Application) throws {
         
     }

@@ -13,7 +13,32 @@ import Fluent
 import VaporTestTools
 
 
+public struct Paths {
+    
+    public var rootUrl: URL {
+        let config = DirectoryConfig.detect()
+        let url = URL(fileURLWithPath: config.workDir)
+        return url
+    }
+    
+    public var resourcesUrl: URL {
+        let url = rootUrl.appendingPathComponent("Resources")
+        return url
+    }
+    
+    public var publicUrl: URL {
+        let url = rootUrl.appendingPathComponent("Public")
+        return url
+    }
+    
+}
+
+
 extension TestableProperty where TestableType: Application {
+    
+    public static var paths: Paths {
+        return Paths()
+    }
     
     public static func newApiCoreTestApp(databaseConfig: DatabaseConfig? = nil, _ configClosure: AppConfigClosure? = nil, _ routerClosure: AppRouterClosure? = nil) -> Application {
         let db = databaseConfig ?? DbCore.config(hostname: "localhost", user: "test", password: "aaaaaa", database: "boost-test")

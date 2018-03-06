@@ -25,8 +25,11 @@ extension QueryBuilder where Model == App {
         return s
     }
     
-    func safeApp(id: DbCoreIdentifier, teamIds: [DbCoreIdentifier]) -> Self {
-        return self
+    func safeApp(appId: DbCoreIdentifier, teamIds: [DbCoreIdentifier]) -> Self {
+        return group(.and) { and in
+            and.filter(\App.id == appId)
+            and.filter(\App.teamId, in: teamIds)
+        }
     }
     
 }
@@ -35,6 +38,7 @@ extension QueryBuilder where Model == App {
 class AppsController: Controller {
     
     static func boot(router: Router) throws {
+        // Overview
         router.get("apps") { (req) -> Future<Apps> in
             return try req.me.teams().flatMap(to: Apps.self) { teams in
                 return App.query(on: req).filter(\App.teamId, in: teams.ids).appFilters().all()
@@ -43,15 +47,18 @@ class AppsController: Controller {
         
         router.get("teams", DbCoreIdentifier.parameter, "apps") { (req) -> Future<Apps> in
             let teamId = try req.parameter(DbCoreIdentifier.self)
-            return try req.me.verifiedTeam(id: teamId).flatMap(to: Apps.self) { team in
-                return App.query(on: req).filter(\App.teamId == team.id).appFilters().all()
+            return try req.me.teams().flatMap(to: Apps.self) { teams in
+                guard teams.contains(teamId) else {
+                    throw ErrorsCore.HTTPError.notFound
+                }
+                return App.query(on: req).filter(\App.teamId, in: teams.ids).appFilters().all()
             }
         }
         
         router.get("apps", DbCoreIdentifier.parameter) { (req) -> Future<App> in
             let appId = try req.parameter(DbCoreIdentifier.self)
             return try req.me.teams().flatMap(to: App.self) { teams in
-                return App.query(on: req).safeApp(id: appId, teamIds: teams.ids).first().map(to: App.self) { (app) -> App in
+                return App.query(on: req).safeApp(appId: appId, teamIds: teams.ids).first().map(to: App.self) { (app) -> App in
                     guard let app = app else {
                         throw ErrorsCore.HTTPError.notFound
                     }
@@ -61,7 +68,6 @@ class AppsController: Controller {
         }
         
         /*
-        
         router.get("apps", DbCoreIdentifier.parameter, "auth") { (req) -> Future<Response> in
             let id = try req.parameter(DbCoreIdentifier.self)
             
@@ -145,93 +151,26 @@ class AppsController: Controller {
                     })
                 }
             }
-        }
-        // */
+         }
+         // */
         
-        router.post("apps", "upload") { (req) -> Future<Response> in
-            // TODO: Add JWT authentication for manual web uploads!!!!!!!!!!!!!
-            let token: String
-            if Boost.uploadsRequireKey {
-                guard let t = try req.http.headers.authorizationToken?.passwordHash(req) else {
-                    throw ErrorsCore.HTTPError.missingAuthorizationData
-                }
-                token = t
+        router.post("apps") { (req) -> Future<Response> in
+            guard let token = try req.http.headers.authorizationToken?.passwordHash(req) else {
+                throw ErrorsCore.HTTPError.missingAuthorizationData
             }
-            else {
-                token = "XXXX-XXXX-XXXX-XXXX"
-            }
-            
-            // TODO: Make this a proper teamId by checking the API key
-            let teamId = DbCoreIdentifier()
-            
-            return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
-                return UploadKey.query(on: db).filter(\.token == token).first().flatMap(to: Response.self) { (matchingToken) -> Future<Response> in
-                    let uploadToken: UploadKey
-                    if Boost.uploadsRequireKey {
-                        guard let t = matchingToken else {
-                            throw AuthError.authenticationFailed
-                        }
-                        uploadToken = t
-                    }
-                    else {
-                        uploadToken = UploadKey(id: nil, teamId: teamId, name: "test", expires: nil, token: token)
-                    }
-                    return App.query(on: req).first().flatMap(to: Response.self) { (app) -> Future<Response> in
-                        // TODO: Change to copy file when https://github.com/vapor/core/pull/83 is done
-                        return req.http.body.makeData(max: Filesize.gigabyte(1).value).flatMap(to: Response.self) { (data) -> Future<Response> in
-                            // TODO: -------- REFACTOR ---------
-                            let uuid = UUID()
-                            var path = URL(fileURLWithPath: "/tmp/Boost")
-                            try FileManager.default.createDirectory(at: path, withIntermediateDirectories: true)
-                            path = path.appendingPathComponent(uuid.uuidString).appendingPathExtension("boost")
-                            try data.write(to: path)
-                            let output: RunOutput = SwiftShell.run("unzip", "-Z1", path.path)
-                            
-                            let platform: App.Platform
-                            if output.succeeded {
-                                print(output.stdout)
-                                
-                                if output.stdout.contains("Payload/") {
-                                    platform = .ios
-                                }
-                                else if output.stdout.contains("AndroidManifest.xml") {
-                                    platform = .android
-                                }
-                                else {
-                                    throw ExtractorError.invalidAppContent
-                                }
-                            }
-                            else {
-                                print(output.stderror)
-                                throw ExtractorError.invalidAppContent
-                            }
-                            // */ -------- REFACTOR END ---------
-                            
-                            let extractor: Extractor = try BaseExtractor.decoder(file: path.path, platform: platform)
-                            do {
-                                let promise: Promise<App> = try extractor.process(teamId: uploadToken.teamId)
-                                return promise.future.flatMap(to: Response.self) { (app) -> Future<Response> in
-                                    return app.save(on: db).flatMap(to: Response.self) { (app) -> Future<Response> in
-                                        // TODO: Remove the force unwrap!!!
-                                        return try extractor.save(app, Boost.config.fileHandler).flatMap(to: Response.self) { (_) -> Future<Response> in
-                                            try FileManager.default.removeItem(at: path) // Remove after refactor
-                                            
-                                            // Save tags
-                                            return handleTags(db: db, request: req, app: app).flatMap(to: Response.self) { (_) -> Future<Response> in
-                                                return try app.asResponse(.created, to: req)
-                                            }
-                                        }
-                                    }
-                                }
-                            } catch {
-                                // Clean files
-                                try extractor.cleanUp()
-                                try FileManager.default.removeItem(at: path) // Remove after refactor
-                                throw error
-                            }
-                        }
-                    }
+            return UploadKey.query(on: req).filter(\.token == token).first().flatMap(to: Response.self) { (uploadToken) -> Future<Response> in
+                guard let uploadToken = uploadToken else {
+                    throw AuthError.authenticationFailed
                 }
+                
+                return upload(teamId: uploadToken.teamId, on: req)
+            }
+        }
+        
+        router.post("teams", DbCoreIdentifier.parameter, "apps") { (req) -> Future<Response> in
+            let teamId = try req.parameter(DbCoreIdentifier.self)
+            return try req.me.verifiedTeam(id: teamId).flatMap(to: Response.self) { (team) -> Future<Response> in
+                return upload(teamId: teamId, on: req)
             }
         }
     }
@@ -241,21 +180,78 @@ class AppsController: Controller {
 
 extension AppsController {
     
-    static func handleTags(db: DbCoreConnection, request req: Request, app: App) -> Future<Void> {
+    static func upload(teamId: DbCoreIdentifier, on req: Request) -> Future<Response> {
+        return App.query(on: req).first().flatMap(to: Response.self) { (app) -> Future<Response> in
+            // TODO: Change to copy file when https://github.com/vapor/core/pull/83 is done
+            return req.http.body.makeData(max: Filesize.gigabyte(1).value).flatMap(to: Response.self) { (data) -> Future<Response> in
+                // TODO: -------- REFACTOR ---------
+                let uuid = UUID()
+                var path = URL(fileURLWithPath: "/tmp/Boost")
+                try FileManager.default.createDirectory(at: path, withIntermediateDirectories: true)
+                path = path.appendingPathComponent(uuid.uuidString).appendingPathExtension("boost")
+                try data.write(to: path)
+                let output: RunOutput = SwiftShell.run("unzip", "-l", path.path)
+                
+                let platform: App.Platform
+                if output.succeeded {
+                    print(output.stdout)
+                    
+                    if output.stdout.contains("Payload/") {
+                        platform = .ios
+                    }
+                    else if output.stdout.contains("AndroidManifest.xml") {
+                        platform = .android
+                    }
+                    else {
+                        throw ExtractorError.invalidAppContent
+                    }
+                }
+                else {
+                    print(output.stderror)
+                    throw ExtractorError.invalidAppContent
+                }
+                // */ -------- REFACTOR END (or just carry on and make me better!) ---------
+                
+                let extractor: Extractor = try BaseExtractor.decoder(file: path.path, platform: platform)
+                do {
+                    let promise: Promise<App> = try extractor.process(teamId: teamId)
+                    return promise.future.flatMap(to: Response.self) { (app) -> Future<Response> in
+                        return app.save(on: req).flatMap(to: Response.self) { (app) -> Future<Response> in
+                            return try extractor.save(app, Boost.config.fileHandler).flatMap(to: Response.self) { (_) -> Future<Response> in
+                                try FileManager.default.removeItem(at: path) // Remove after refactor
+                                
+                                // Save tags
+                                return handleTags(on: req, app: app).flatMap(to: Response.self) { (_) -> Future<Response> in
+                                    return try app.asResponse(.created, to: req)
+                                }
+                            }
+                        }
+                    }
+                } catch {
+                    // Clean files
+                    try extractor.cleanUp()
+                    try FileManager.default.removeItem(at: path) // Remove after refactor
+                    throw error
+                }
+            }
+        }
+    }
+    
+    static func handleTags(on req: Request, app: App) -> Future<Void> {
         if let query = try? req.query.decode([String: String].self) {
             if let tags = query["tags"]?.split(separator: "|") {
                 var futures: [Future<Void>] = []
                 // TODO: Optimise to work without the for loop
                 for tagSubstring in tags {
                     let tag = String(tagSubstring)
-                    let future = Tag.query(on: db).filter(\Tag.identifier == tag).first().flatMap(to: Void.self, { (tagObject) -> Future<Void> in
+                    let future = Tag.query(on: req).filter(\Tag.identifier == tag).first().flatMap(to: Void.self, { (tagObject) -> Future<Void> in
                         guard let tagObject = tagObject else {
                             let t = Tag(id: nil, name: tag, identifier: tag.safeText)
-                            return t.save(on: db).flatMap(to: Void.self, { (tag) -> Future<Void> in
-                                return app.tags.attach(tag, on: db).flatten()
+                            return t.save(on: req).flatMap(to: Void.self, { (tag) -> Future<Void> in
+                                return app.tags.attach(tag, on: req).flatten()
                             })
                         }
-                        return app.tags.attach(tagObject, on: db).flatten()
+                        return app.tags.attach(tagObject, on: req).flatten()
                     })
                     futures.append(future)
                 }

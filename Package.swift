@@ -73,7 +73,8 @@ let package = Package(
             dependencies: [
                 "Vapor",
                 "ApiCore",
-                "VaporTestTools"
+                "VaporTestTools",
+                "FluentTestTools"
             ]
         ),
         .target(

@@ -60,19 +60,18 @@ protocol Extractor {
 extension Extractor {
     
     var binUrl: URL {
-        get {
-            let config = DirectoryConfig.detect()
-            var url: URL = URL(fileURLWithPath: config.workDir).appendingPathComponent("Resources")
-            url.appendPathComponent("bin")
-            return url
-        }
+        let config = DirectoryConfig.detect()
+        var url: URL = URL(fileURLWithPath: config.workDir).appendingPathComponent("Resources")
+        url.appendPathComponent("bin")
+        return url
     }
     
     func app(platform: App.Platform, teamId: DbCoreIdentifier) throws -> App {
-        guard let appName = appName, let appIdentifier = appIdentifier, let versionLong = versionLong, let versionShort = versionShort else {
+        guard let appName = appName, let appIdentifier = appIdentifier else {
             throw ExtractorError.invalidAppContent
         }
-        let app = App(teamId: teamId, name: appName, identifier: appIdentifier, version: versionLong, build: versionShort, platform: platform)
+        // TODO: Add info which will be all the decompiled data together!!
+        let app = App(teamId: teamId, name: appName, identifier: appIdentifier, version: versionLong ?? "0.0", build: versionShort ?? "0", platform: platform)
         return app
     }
     

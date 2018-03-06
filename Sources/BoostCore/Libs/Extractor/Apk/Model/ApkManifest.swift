@@ -14,7 +14,7 @@ struct ApkManifest: Codable {
     struct Manifest: Codable {
         
         struct Application: Codable {
-            let identifier: String
+            let identifier: String?
             let nameAddress: String
             let roundIcon: String?
             let icon: String?
@@ -28,7 +28,7 @@ struct ApkManifest: Codable {
         }
         
         struct Permission: Codable {
-            let name: String
+            let name: String?
             
             enum CodingKeys: String, CodingKey {
                 case name = "@{http://schemas.android.com/apk/res/android}name"
@@ -39,7 +39,7 @@ struct ApkManifest: Codable {
         let platformBuildVersionName: String?
         let platformBuildVersionCode: String?
         let application: Application
-        let usesPermission: [Permission]
+        let usesPermission: [Permission]?
         
         
         enum CodingKeys: String, CodingKey {

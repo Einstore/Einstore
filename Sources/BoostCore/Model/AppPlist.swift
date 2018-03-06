@@ -61,7 +61,7 @@ public struct AppPlist: Codable {
             
             public init(app: App) {
                 self.bundleIdentifier = app.identifier
-                self.bundleVersion = app.version
+                self.bundleVersion = app.version ?? ""
                 self.title = app.name
             }
             
