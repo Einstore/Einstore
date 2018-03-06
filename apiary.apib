@@ -712,22 +712,24 @@ Results are sorted by app name by default.
             "error": "authentication failed"
         }
 
-## Upload [/upload?tags={tagsArray}]
+## App web upload [/apps?tags={tagsArray}]
 
-Upload token (headers) is used to authenticate. This can be created using `/upload-tokens` endpoint.
+Upload token (headers) is used to authenticate. It can be created using `/keys` endpoint.
 
 ### Upload new app [POST]
 
-1) When uploading new apps submit `.ipa` or `.apk` file as a full POST request payload. 
-2) Multiple tags should be separated by `|`, for example `/upload?tags=tag1|library_version_1.2.3|some%20Other%20tag`
-
+- When uploading new apps submit `.ipa` or `.apk` file as a full POST request payload. 
+- Multiple tags should be separated by `|`, for example `/upload?tags=tag1|library_version_1.2.3|some%20Other%20tag`
+- Mime types (ContentType)
+   - iOS app is <b><i>application/octet-stream</i></b>
+   - Android app is <b><i>application/vnd.android.package-archive</i></b>
 
 + Request (multipart/form-data)
     
     + Headers
 
-            Authorization: Token XXXXXX-XXXXXX-XXXXX-XXXX-XXXXXX
-            ContentType: application/ocet-stream
+            Authorization: Bearer eyJhbGciOiJIUzUxMiIsInVzZXIiOjEsInRva2VuIjoiRTk3OTYzMjItOURBNy00RTAwLTlCNTItOEI4RThBRjkwRDAxIiwidHlwIjoiSldUIn0
+            ContentType: application/octet-stream
 
 
 
@@ -1067,6 +1069,265 @@ Download token will stay valid for 30 minutes to initialise a new connection. Ex
         }
   
   
+## Upload API keys [/teams/{id}/keys]
+
+In order to upload an app you need an upload API key. Keys are bound to teams so any app uploaded using an upload key will be assigned to the selected team.
+
+
+### List all for a team [GET]
+
+
++ Parameters
+    + id (required, number) - Id of the team
+
++ Request
+    
+    + Headers
+
+            Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
+
+
+
++ Response 200 (application/json; charset=utf-8)
+
+    + Body
+
+            {
+                "id": 3,
+                "name": "My team",
+                "identifier": "my-team"
+            }
+        
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed",
+            "error": "Unable to verify authorization token"
+        }
+
+
+
+### Create key in a team [POST]
+
+
++ Parameters
+    + id (required, number) - Id of the team
+
++ Request
+    
+    + Headers
+
+            Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
+            ContentType: application/json
+            
+    + Body
+
+            {
+                "name": "My updated team!",
+                "identifier": "my-updated-team"
+            }
+
+
+
++ Response 200 (application/json; charset=utf-8)
+
+    + Body
+
+            {
+                "id": 3,
+                "name": "My updated team!",
+                "identifier": "my-updated-team"
+            }
+        
++ Response 408 (application/json; charset=utf-8)
+
+        {
+            "code": "app_error",
+            "error": "Identifier already exists"
+        }
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed",
+            "error": "Unable to verify authorization token"
+        }
+
+
+
+## ... per user [/keys/]
+
+
+### List all for a user [GET]
+
++ Request
+    
+    + Headers
+
+            Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
+
+
+
++ Response 200 (application/json; charset=utf-8)
+
+        [
+            {
+                "id": "630C97E6-AC56-4213-882B-3BEBAE50BF6D",
+                "lastname": "Admin",
+                "registered": 541114427,
+                "su": true,
+                "email": "admin@liveui.io",
+                "firstname": "Super",
+                "disabled": false
+            },
+            {
+                "id": "59ECA5DB-6603-4C08-B910-B32922A34FA9",
+                "lastname": "Rafaj",
+                "registered": 541550120,
+                "su": false,
+                "email": "dev@liveui.io",
+                "firstname": "Ondrej",
+                "disabled": false
+            }
+        ]
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed",
+            "error": "Unable to verify authorization token"
+        }
+
+
+## Upload API key [/keys/{id}]
+
+
+### Get [GET]
+
++ Request
+    
+    + Headers
+
+            Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
+
+
+
++ Response 200 (application/json; charset=utf-8)
+
+        [
+            {
+                "id": "630C97E6-AC56-4213-882B-3BEBAE50BF6D",
+                "lastname": "Admin",
+                "registered": 541114427,
+                "su": true,
+                "email": "admin@liveui.io",
+                "firstname": "Super",
+                "disabled": false
+            },
+            {
+                "id": "59ECA5DB-6603-4C08-B910-B32922A34FA9",
+                "lastname": "Rafaj",
+                "registered": 541550120,
+                "su": false,
+                "email": "dev@liveui.io",
+                "firstname": "Ondrej",
+                "disabled": false
+            }
+        ]
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed",
+            "error": "Unable to verify authorization token"
+        }
+        
+
+### Update [PUT]
+
++ Request
+    
+    + Headers
+
+            Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
+
+
+
++ Response 200 (application/json; charset=utf-8)
+
+        [
+            {
+                "id": "630C97E6-AC56-4213-882B-3BEBAE50BF6D",
+                "lastname": "Admin",
+                "registered": 541114427,
+                "su": true,
+                "email": "admin@liveui.io",
+                "firstname": "Super",
+                "disabled": false
+            },
+            {
+                "id": "59ECA5DB-6603-4C08-B910-B32922A34FA9",
+                "lastname": "Rafaj",
+                "registered": 541550120,
+                "su": false,
+                "email": "dev@liveui.io",
+                "firstname": "Ondrej",
+                "disabled": false
+            }
+        ]
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed",
+            "error": "Unable to verify authorization token"
+        }
+
+
+
+### Delete [DELETE]
+
++ Request
+    
+    + Headers
+
+            Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
+
+
+
++ Response 200 (application/json; charset=utf-8)
+
+        [
+            {
+                "id": "630C97E6-AC56-4213-882B-3BEBAE50BF6D",
+                "lastname": "Admin",
+                "registered": 541114427,
+                "su": true,
+                "email": "admin@liveui.io",
+                "firstname": "Super",
+                "disabled": false
+            },
+            {
+                "id": "59ECA5DB-6603-4C08-B910-B32922A34FA9",
+                "lastname": "Rafaj",
+                "registered": 541550120,
+                "su": false,
+                "email": "dev@liveui.io",
+                "firstname": "Ondrej",
+                "disabled": false
+            }
+        ]
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed",
+            "error": "Unable to verify authorization token"
+        }
+        
+
+
 ## Un-Install [/uninstall]
 
 Removes all database tables and data, this operation is irreversible. 
