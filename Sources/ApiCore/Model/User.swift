@@ -179,7 +179,7 @@ extension User: Migration {
             schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.id.stringValue, isIdentifier: true)
             schema.addField(type: DbCoreColumnType.varChar(80), name: CodingKeys.firstname.stringValue)
             schema.addField(type: DbCoreColumnType.varChar(80), name: CodingKeys.lastname.stringValue)
-            schema.addField(type: DbCoreColumnType.varChar(140), name: CodingKeys.email.stringValue)
+            schema.addField(type: DbCoreColumnType.varChar(141), name: CodingKeys.email.stringValue)
             schema.addField(type: DbCoreColumnType.varChar(64), name: CodingKeys.password.stringValue, isOptional: true)
             schema.addField(type: DbCoreColumnType.varChar(64), name: CodingKeys.token.stringValue, isOptional: true)
             schema.addField(type: DbCoreColumnType.datetime(), name: CodingKeys.expires.stringValue, isOptional: true)
