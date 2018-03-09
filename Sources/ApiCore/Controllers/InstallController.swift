@@ -78,13 +78,13 @@ extension InstallController {
     }
     
     private static func install(on req: Request) -> Future<Response> {
-        let objects = [
-            su.save(on: req).flatten(),
-            adminTeam.save(on: req).flatten()
-        ]
-        return objects.map(to: Response.self, { (Void) -> Response in
-            return try req.response.maintenanceFinished(message: "Install finished")
-        })
+        return su.save(on: req).flatMap(to: Response.self) { user in
+            return adminTeam.save(on: req).flatMap(to: Response.self) { team in
+                return team.users.attach(user, on: req).map(to: Response.self) { join in
+                    return try req.response.maintenanceFinished(message: "Install finished")
+                }
+            }
+        }
     }
     
 }
