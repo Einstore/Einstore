@@ -124,6 +124,11 @@
             isEnabled = "YES">
          </EnvironmentVariable>
          <EnvironmentVariable
+            key = "DB_HOST"
+            value = "localhost"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
             key = "DB_LOGGING"
             value = "1"
             isEnabled = "NO">
