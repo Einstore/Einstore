@@ -16,6 +16,7 @@ import FileCore
 enum ExtractorError: FrontendError {
     case unsupportedFile
     case invalidAppContent
+    case errorSavingFile
     
     public var code: String {
         return "app_error"
@@ -34,6 +35,8 @@ enum ExtractorError: FrontendError {
             return "Invalid file type"
         case .invalidAppContent:
             return "Invalid or unsupported app content"
+        case .errorSavingFile:
+            return "Unable to save app file on the server"
         }
     }
 }
@@ -43,7 +46,6 @@ protocol Extractor {
     
     var file: URL { get }
     var archive: URL { get }
-    var sessionUUID: String { get }
     
     var iconData: Data? { get }
     var appName: String? { get }
@@ -51,11 +53,11 @@ protocol Extractor {
     var versionShort: String? { get }
     var versionLong: String? { get }
     
-    init(file: URL) throws
+    init(file: URL, request: Request) throws
     func process(teamId: DbCoreIdentifier) throws -> Promise<App>
-    func cleanUp() throws
     
 }
+
 
 extension Extractor {
     
@@ -71,17 +73,32 @@ extension Extractor {
             throw ExtractorError.invalidAppContent
         }
         // TODO: Add info which will be all the decompiled data together!!
-        let app = App(teamId: teamId, name: appName, identifier: appIdentifier, version: versionLong ?? "0.0", build: versionShort ?? "0", platform: platform)
+        let app = App(teamId: teamId, name: appName, identifier: appIdentifier, version: versionLong ?? "0.0", build: versionShort ?? "0", platform: platform, hasIcon: (iconData != nil))
         return app
     }
     
-    func save(_ app: App, _ fileHandler: Handler) throws -> Future<Void> {
+    func save(_ app: App, request req: Request, _ fileHandler: FileHandler) throws -> Future<Void> {
         var saves: [Future<Void>] = []
-        saves.append(try fileHandler.upload(file: file.path, destination: app.fileName))
-        if let iconData = iconData {
-            saves.append(try fileHandler.upload(file: iconData, destination: app.iconName))
+        guard let path = app.appPath, let folder = app.targetFolderPath else {
+            throw ExtractorError.errorSavingFile
         }
-        return saves.flatten()
+        
+        try Boost.storageFileHandler.createFolderStructure(url: folder)
+        
+        let tempFile = App.tempAppFile(on: req)
+        saves.append(try fileHandler.move(from: tempFile, to: path))
+        if let iconData = iconData, let path = app.iconPath?.path {
+            saves.append(try fileHandler.save(data: iconData, to: path))
+        }
+        return saves.flatten().map(to: Void.self) { _ in
+            try self.cleanUp()
+        }
+    }
+    
+    // MARK: Cleaning
+    
+    func cleanUp() throws {
+        try Boost.tempFileHandler.delete(url: archive)
     }
     
 }

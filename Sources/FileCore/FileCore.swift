@@ -1,14 +1,15 @@
+////
+////  Boost.swift
+////  FileCore
+////
+////  Created by Ondrej Rafaj on 20/2/2018.
+////
 //
-//  Boost.swift
-//  FileCore
+//import Foundation
+//import Vapor
 //
-//  Created by Ondrej Rafaj on 20/2/2018.
 //
+//public class FileCore {
+//    
+//}
 
-import Foundation
-import Vapor
-
-
-public class FileCore {
-    
-}

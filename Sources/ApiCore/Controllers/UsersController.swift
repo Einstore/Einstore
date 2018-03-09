@@ -21,9 +21,9 @@ public class UsersController: Controller {
             // TODO: Add proper limiter/pagination!!
             // TODO: Add the actual search!!!!!!!
             return User.query(on: req).all().map(to: [User.AllSearch].self) { (users) -> [User.AllSearch] in
-                return users.compactMap({ (user) -> User.AllSearch in
+                return users.compactMap { (user) -> User.AllSearch in
                     return User.AllSearch(user: user)
-                })
+                }
             }
         }
     }

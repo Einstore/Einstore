@@ -25,4 +25,23 @@ extension Date {
         return cal.date(byAdding: .second, value: n, to: self)!
     }
     
+    public var day: Int {
+        let calendar = NSCalendar(calendarIdentifier: NSCalendar.Identifier.gregorian)
+        return calendar?.component(NSCalendar.Unit.day, from: self) ?? 0
+    }
+    
+    public var month: Int {
+        let calendar = NSCalendar(calendarIdentifier: NSCalendar.Identifier.gregorian)
+        return calendar?.component(NSCalendar.Unit.month, from: self) ?? 0
+    }
+    
+    public var year: Int {
+        let calendar = NSCalendar(calendarIdentifier: NSCalendar.Identifier.gregorian)
+        return calendar?.component(NSCalendar.Unit.year, from: self) ?? 0
+    }
+    
+    public var dateFolderPath: String {
+        return "\(year)/\(month)/\(day)"
+    }
+    
 }

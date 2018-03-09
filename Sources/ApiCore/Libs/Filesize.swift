@@ -10,11 +10,11 @@ import Foundation
 
 
 public enum Filesize {
-    case kilobyte(Int)
-    case megabyte(Int)
-    case gigabyte(Int)
+    case kilobyte(Double)
+    case megabyte(Double)
+    case gigabyte(Double)
     
-    public var value: Int {
+    public var value: Double {
         switch self {
         case .kilobyte(let no):
             return (no * 1000)

@@ -16,9 +16,11 @@ public struct BoostConfig {
     public var serverBaseUrl: String = "http://localhost:8080/"
     
     public var database: DatabaseConfig? = nil
-    public var fileHandler: Handler
     
-    public init(fileHandler: Handler) {
-        self.fileHandler = fileHandler
+    public var tempFileConfig = TempFileConfig()
+    public var storageFileConfig = StorageFileConfig()
+    
+    public init() {
+        
     }
 }

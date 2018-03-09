@@ -34,7 +34,6 @@ class Ipa: BaseExtractor, Extractor {
             do {
                 try runAndPrint("unzip", "-o", self.file.path, "-d", self.archive.path)
                 try self.parse()
-                try self.cleanUp()
                 
                 let a = try app(platform: .ios, teamId: teamId)
                 promise.complete(a)
@@ -44,12 +43,6 @@ class Ipa: BaseExtractor, Extractor {
 //        }
         
         return promise
-    }
-    
-    // MARK: Cleaning
-    
-    func cleanUp() throws {
-        try FileManager.default.removeItem(at: self.archive)
     }
     
 }
@@ -144,8 +137,8 @@ extension Ipa {
         try iconData.write(to: iconUrl)
         
         // TODO: Normalize binary image
-//        let normalize = binUrl.appendingPathComponent("normalize.py")
-//        try runAndPrint(normalize.path, "-t", "xml2json", "-o", jsonUrl.path, xmlUrl.path)
+        let normalize = binUrl.appendingPathComponent("normalize.py")
+        try runAndPrint("python", normalize.path, iconUrl.path)
     }
     
     private func parseIcon(_ plist: [String: AnyObject]) throws {

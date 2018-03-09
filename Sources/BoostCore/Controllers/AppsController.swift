@@ -183,14 +183,14 @@ extension AppsController {
     static func upload(teamId: DbCoreIdentifier, on req: Request) -> Future<Response> {
         return App.query(on: req).first().flatMap(to: Response.self) { (app) -> Future<Response> in
             // TODO: Change to copy file when https://github.com/vapor/core/pull/83 is done
-            return req.http.body.makeData(max: Filesize.gigabyte(1).value).flatMap(to: Response.self) { (data) -> Future<Response> in
+            return req.fileData.flatMap(to: Response.self) { (data) -> Future<Response> in
                 // TODO: -------- REFACTOR ---------
-                let uuid = UUID()
-                var path = URL(fileURLWithPath: "/tmp/Boost")
-                try FileManager.default.createDirectory(at: path, withIntermediateDirectories: true)
-                path = path.appendingPathComponent(uuid.uuidString).appendingPathExtension("boost")
-                try data.write(to: path)
-                let output: RunOutput = SwiftShell.run("unzip", "-l", path.path)
+                try Boost.tempFileHandler.createFolderStructure(url: App.tempAppFolder(on: req))
+                
+                let tempFilePath = App.tempAppFile(on: req)
+                try data.write(to: tempFilePath)
+                
+                let output: RunOutput = SwiftShell.run("unzip", "-l", tempFilePath.path)
                 
                 let platform: App.Platform
                 if output.succeeded {
@@ -212,15 +212,12 @@ extension AppsController {
                 }
                 // */ -------- REFACTOR END (or just carry on and make me better!) ---------
                 
-                let extractor: Extractor = try BaseExtractor.decoder(file: path.path, platform: platform)
+                let extractor: Extractor = try BaseExtractor.decoder(file: tempFilePath.path, platform: platform, on: req)
                 do {
                     let promise: Promise<App> = try extractor.process(teamId: teamId)
                     return promise.future.flatMap(to: Response.self) { (app) -> Future<Response> in
                         return app.save(on: req).flatMap(to: Response.self) { (app) -> Future<Response> in
-                            return try extractor.save(app, Boost.config.fileHandler).flatMap(to: Response.self) { (_) -> Future<Response> in
-                                try FileManager.default.removeItem(at: path) // Remove after refactor
-                                
-                                // Save tags
+                            return try extractor.save(app, request: req, Boost.storageFileHandler).flatMap(to: Response.self) { (_) -> Future<Response> in
                                 return handleTags(on: req, app: app).flatMap(to: Response.self) { (_) -> Future<Response> in
                                     return try app.asResponse(.created, to: req)
                                 }
@@ -228,9 +225,7 @@ extension AppsController {
                         }
                     }
                 } catch {
-                    // Clean files
                     try extractor.cleanUp()
-                    try FileManager.default.removeItem(at: path) // Remove after refactor
                     throw error
                 }
             }
@@ -241,10 +236,9 @@ extension AppsController {
         if let query = try? req.query.decode([String: String].self) {
             if let tags = query["tags"]?.split(separator: "|") {
                 var futures: [Future<Void>] = []
-                // TODO: Optimise to work without the for loop
-                for tagSubstring in tags {
+                tags.forEach { (tagSubstring) in
                     let tag = String(tagSubstring)
-                    let future = Tag.query(on: req).filter(\Tag.identifier == tag).first().flatMap(to: Void.self, { (tagObject) -> Future<Void> in
+                    let future = Tag.query(on: req).filter(\Tag.identifier == tag).first().flatMap(to: Void.self) { (tagObject) -> Future<Void> in
                         guard let tagObject = tagObject else {
                             let t = Tag(id: nil, name: tag, identifier: tag.safeText)
                             return t.save(on: req).flatMap(to: Void.self, { (tag) -> Future<Void> in
@@ -252,7 +246,7 @@ extension AppsController {
                             })
                         }
                         return app.tags.attach(tagObject, on: req).flatten()
-                    })
+                    }
                     futures.append(future)
                 }
                 return futures.flatten()

@@ -18,7 +18,8 @@ public typealias Apps = [App]
 
 final public class App: DbCoreModel {
     
-    public enum Platform: String, Codable, KeyStringDecodable {
+    public enum Platform: String, Codable, KeyStringDecodable, PostgreSQLType {
+        
         case unknown
         case ios = "ios"
         case tvos = "tvos"
@@ -30,6 +31,34 @@ final public class App: DbCoreModel {
         
         public static var keyStringTrue: App.Platform = .unknown
         public static var keyStringFalse: App.Platform = .unknown
+        
+        public var fileExtension: String {
+            switch self {
+            case .ios:
+                return "ipa"
+            case .android:
+                return "apk"
+            default:
+                return "app.boost"
+            }
+        }
+        
+        // MARK: PostgreSQLType stuff n magic
+        
+        public static var postgreSQLDataType: PostgreSQLDataType = .varchar
+        public static var postgreSQLDataArrayType: PostgreSQLDataType = .varchar
+        
+        public static func convertFromPostgreSQLData(_ data: PostgreSQLData) throws -> App.Platform {
+            guard let data = data.data, let stringValue = String.init(data: data, encoding: .utf8) else {
+                return .unknown
+            }
+            return Platform(rawValue: stringValue) ?? .unknown
+        }
+        
+        public func convertToPostgreSQLData() throws -> PostgreSQLData {
+            return PostgreSQLData(type: .varchar, format: .text, data: rawValue.data(using: .utf8))
+        }
+        
     }
     
     public static var idKey: WritableKeyPath<App, DbCoreIdentifier?> = \App.id
@@ -40,11 +69,12 @@ final public class App: DbCoreModel {
     public var identifier: String
     public var version: String
     public var build: String
-    //public var platform: Platform
-    public var platform: String
+    public var platform: Platform
+    //public var platform: String
     public var created: Date?
     public var modified: Date?
     public var info: String?
+    public var hasIcon: Bool
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -57,20 +87,22 @@ final public class App: DbCoreModel {
         case created
         case modified
         case info
+        case hasIcon = "icon"
     }
 
 
-    public init(id: DbCoreIdentifier? = nil, teamId: DbCoreIdentifier?, name: String, identifier: String, version: String, build: String, platform: Platform, info: String? = nil) {
+    public init(id: DbCoreIdentifier? = nil, teamId: DbCoreIdentifier?, name: String, identifier: String, version: String, build: String, platform: Platform, info: String? = nil, hasIcon: Bool = false) {
         self.id = id
         self.teamId = teamId
         self.name = name
         self.identifier = identifier
         self.version = version
         self.build = build
-        self.platform = platform.rawValue
+        self.platform = platform
         self.created = Date()
         self.modified = Date()
         self.info = info
+        self.hasIcon = hasIcon
     }
     
 }
@@ -105,6 +137,7 @@ extension App: Migration {
             schema.addField(type: DbCoreColumnType.datetime(), name: CodingKeys.created.stringValue)
             schema.addField(type: DbCoreColumnType.datetime(), name: CodingKeys.modified.stringValue)
             schema.addField(type: DbCoreColumnType.text(), name: CodingKeys.info.stringValue, isOptional: true)
+            schema.addField(type: DbCoreColumnType.bool(), name: CodingKeys.hasIcon.stringValue)
         }
     }
     
@@ -113,3 +146,4 @@ extension App: Migration {
     }
     
 }
+

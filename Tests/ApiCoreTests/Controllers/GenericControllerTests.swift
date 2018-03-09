@@ -51,77 +51,77 @@ class GenericControllerTests: XCTestCase, UsersTestCase, LinuxTests {
     
     func testUnknownGet() {
         let req = HTTPRequest.testable.get(uri: "/unknown", authorizedUser: user1, on: app)
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        testUnknown(response: res)
+        testUnknown(response: r.response)
     }
     
     func testUnknownPost() {
         let req = HTTPRequest.testable.post(uri: "/unknown", authorizedUser: user1, on: app)
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        testUnknown(response: res)
+        testUnknown(response: r.response)
     }
     
     func testUnknownPut() {
         let req = HTTPRequest.testable.put(uri: "/unknown", authorizedUser: user1, on: app)
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        testUnknown(response: res)
+        testUnknown(response: r.response)
     }
     
     func testUnknownPatch() {
         let req = HTTPRequest.testable.patch(uri: "/unknown", authorizedUser: user1, on: app)
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        testUnknown(response: res)
+        testUnknown(response: r.response)
     }
     
     func testUnknownDelete() {
         let req = HTTPRequest.testable.delete(uri: "/unknown", authorizedUser: user1, on: app)
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        testUnknown(response: res)
+        testUnknown(response: r.response)
     }
     
     func testPing() {
         let req = HTTPRequest.testable.get(uri: "/ping")
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        XCTAssertTrue(res.testable.has(statusCode: .ok), "Wrong status code")
-        XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
-        XCTAssertTrue(res.testable.has(contentLength: 15), "Wrong content length")
-        XCTAssertTrue(res.testable.has(content: "{\"code\":\"pong\"}"), "Incorrect content")
+        XCTAssertTrue(r.response.testable.has(statusCode: .ok), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
+        XCTAssertTrue(r.response.testable.has(contentLength: 15), "Wrong content length")
+        XCTAssertTrue(r.response.testable.has(content: "{\"code\":\"pong\"}"), "Incorrect content")
     }
     
     func testTeapot() {
         let req = Request.testable.http.get(uri: "/teapot")
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        XCTAssertTrue(res.testable.has(statusCode: 418), "Wrong status code")
-        XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
-        XCTAssertTrue(res.testable.has(contentLength: 178), "Wrong content length")
+        XCTAssertTrue(r.response.testable.has(statusCode: 418), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
+        XCTAssertTrue(r.response.testable.has(contentLength: 178), "Wrong content length")
     }
     
     func testTables() {
         let req = Request.testable.http.get(uri: "/tables")
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
 
-        res.testable.debug()
+        r.response.testable.debug()
     }
     
 }

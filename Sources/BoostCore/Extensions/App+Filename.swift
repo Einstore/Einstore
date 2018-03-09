@@ -6,22 +6,42 @@
 //
 
 import Foundation
+import Vapor
 
 
 extension App {
     
     public var iconName: String {
-        guard let id = id else {
-            fatalError("fileName should not be called on an app that hasn't been created yet")
-        }
-        return "\(id.uuidString)/icon.png"
+        return "icon.png"
     }
     
     public var fileName: String {
-        guard let id = id else {
-            fatalError("fileName should not be called on an app that hasn't been created yet")
+        return "app.\(platform.fileExtension)"
+    }
+    
+    public var targetFolderPath: URL? {
+        guard let id = self.id, let created = self.created else {
+            return nil
         }
-        return "\(id.uuidString)/app.boost"
+        return URL(fileURLWithPath: Boost.config.storageFileConfig.mainFolderPath)
+            .appendingPathComponent(created.dateFolderPath)
+            .appendingPathComponent(id.uuidString)
+    }
+    
+    public var iconPath: URL? {
+        return targetFolderPath?.appendingPathComponent(iconName)
+    }
+    
+    public var appPath: URL? {
+        return targetFolderPath?.appendingPathComponent(fileName)
+    }
+    
+    public static func tempAppFolder(on req: Request) -> URL {
+        return URL(fileURLWithPath: Boost.config.tempFileConfig.mainFolderPath).appendingPathComponent(req.sessionId.uuidString)
+    }
+    
+    public static func tempAppFile(on req: Request) -> URL {
+        return tempAppFolder(on: req).appendingPathComponent("tmp.boost")
     }
     
 }

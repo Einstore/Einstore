@@ -71,36 +71,44 @@ class AppsControllerTests: XCTestCase, AppTestCaseSetup, LinuxTests {
     
     // MARK: Tests
     
+    func testRequestHoldsUUID() {
+        let req = HTTPRequest.testable.get(uri: "/apps", authorizedUser: user1, on: app)
+        
+        let r = app.testable.response(to: req)
+        
+        r.response.testable.debug()
+    }
+    
     func testGetAppsOverview() {
         let count = app.testable.count(allFor: App.self)
         XCTAssertEqual(count, 107, "There should be right amount of apps to begin with")
         
         let req = HTTPRequest.testable.get(uri: "/apps", authorizedUser: user1, on: app)
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        let keys = res.testable.content(as: Apps.self)!
+        let keys = r.response.testable.content(as: Apps.self)!
         
         XCTAssertEqual(keys.count, 100, "There should be right amount of apps")
         
-        XCTAssertTrue(res.testable.has(statusCode: .ok), "Wrong status code")
-        XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
+        XCTAssertTrue(r.response.testable.has(statusCode: .ok), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
     }
     
     func testOldIosApp() {
-        doTestJWTUpload(appFileName: "app.ipa", platform: .ios, name: "iDeviant", identifier: "com.fuerteint.iDeviant", version: "4.0", build: "1.0")
+        doTestJWTUpload(appFileName: "app.ipa", platform: .ios, name: "iDeviant", identifier: "com.fuerteint.iDeviant", version: "4.0", build: "1.0", iconSize: 4776)
         // TODO: Test token upload
     }
     
     func testUnobfuscatedApkUploadWithJWTAuth() {
         // TODO: Make another app!!!!!!!!!
-        doTestJWTUpload(appFileName: "app.apk", platform: .android, name: "Bytecheck", identifier: "cz.vhrdina.bytecheck.ByteCheckApplication", version: "7.1.1", build: "25")
+        doTestJWTUpload(appFileName: "app.apk", platform: .android, name: "Bytecheck", identifier: "cz.vhrdina.bytecheck.ByteCheckApplication", version: "7.1.1", build: "25", iconSize: 2018)
         // TODO: Test token upload
     }
     
     func testObfuscatedApkUploadWithJWTAuth() {
-        doTestJWTUpload(appFileName: "app-obfuscated.apk", platform: .android, name: "BoostTest", identifier: "io.liveui.boosttest")
+        doTestJWTUpload(appFileName: "app-obfuscated.apk", platform: .android, name: "BoostTest", identifier: "io.liveui.boosttest", iconSize: 9250)
     }
     
 }
@@ -108,7 +116,7 @@ class AppsControllerTests: XCTestCase, AppTestCaseSetup, LinuxTests {
 
 extension AppsControllerTests {
     
-    private func doTestJWTUpload(appFileName fileName: String, platform: App.Platform, name: String, identifier: String, version: String? = nil, build: String? = nil, tags: [String] = ["tagging_like_crazy", "All Year Round"]) {
+    private func doTestJWTUpload(appFileName fileName: String, platform: App.Platform, name: String, identifier: String, version: String? = nil, build: String? = nil, tags: [String] = ["tagging_like_crazy", "All Year Round"], iconSize: Int? = nil) {
         let appUrl = Application.testable.paths.resourcesUrl.appendingPathComponent("Demo").appendingPathComponent(fileName)
         let postData = try! Data(contentsOf: appUrl)
         let encodedTags: String = tags.joined(separator: "|").addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
@@ -117,10 +125,10 @@ extension AppsControllerTests {
             ], authorizedUser: user1, on: app
         )
         
-        doTest(request: req, platform: platform, name: name, identifier: identifier, version: version, build: build, tags: tags)
+        doTest(request: req, platform: platform, name: name, identifier: identifier, version: version, build: build, tags: tags, iconSize: iconSize)
     }
     
-    private func doTestTokenUpload(appFileName fileName: String, platform: App.Platform, name: String, identifier: String, version: String? = nil, build: String? = nil, tags: [String] = ["tagging_like_crazy", "All Year Round"]) {
+    private func doTestTokenUpload(appFileName fileName: String, platform: App.Platform, name: String, identifier: String, version: String? = nil, build: String? = nil, tags: [String] = ["tagging_like_crazy", "All Year Round"], iconSize: Int? = nil) {
         let appUrl = Application.testable.paths.resourcesUrl.appendingPathComponent("Demo").appendingPathComponent(fileName)
         let postData = try! Data(contentsOf: appUrl)
         let encodedTags: String = tags.joined(separator: "|").addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
@@ -129,29 +137,47 @@ extension AppsControllerTests {
             ], authorizedUser: user1, on: app
         )
         
-        doTest(request: req, platform: platform, name: name, identifier: identifier, version: version, build: build, tags: tags)
+        doTest(request: req, platform: platform, name: name, identifier: identifier, version: version, build: build, tags: tags, iconSize: iconSize)
     }
     
-    private func doTest(request req: HTTPRequest, platform: App.Platform, name: String, identifier: String, version: String?, build: String?, tags: [String]) {
+    @discardableResult private func doTest(request req: HTTPRequest, platform: App.Platform, name: String, identifier: String, version: String?, build: String?, tags: [String], iconSize: Int?) -> TestResponse {
+        // Check initial app count
         var count = app.testable.count(allFor: App.self)
         XCTAssertEqual(count, 107, "There should be right amount of apps to begin with")
         
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        let object = res.testable.content(as: App.self)!
+        let object = r.response.testable.content(as: App.self)!
         
-        XCTAssertEqual(object.platform, platform.rawValue, "Wrong platform")
+        // Check parsed values
+        XCTAssertEqual(object.platform, platform, "Wrong platform")
         XCTAssertEqual(object.name, name, "Wrong name")
         XCTAssertEqual(object.identifier, identifier, "Wrong identifier")
         XCTAssertEqual(object.version, version ?? "0.0", "Wrong version")
         XCTAssertEqual(object.build, build ?? "0", "Wrong build")
         
-        // TODO: Test app file has been created and moved to the correct location!!!!!!!!!!
-        // TODO: Test images are all ok!!!!!!!!!
-        // TODO: Test all files have been deleted!!!!!
+        // Temp file should have been deleted
+        var pathUrl = App.tempAppFile(on: r.request)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: pathUrl.path), "Temporary file should have been deleted")
         
+        // App should be saved in the persistent storage
+        pathUrl = object.appPath!
+        XCTAssertTrue(FileManager.default.fileExists(atPath: pathUrl.path), "Persistent file should be present")
+        
+        // Test images are all ok
+        if let iconSize = iconSize, let iconPath = object.iconPath {
+            XCTAssertTrue(FileManager.default.fileExists(atPath: iconPath.path), "Icon file should be present")
+            XCTAssertEqual(try! Data(contentsOf: iconPath).count, iconSize, "Icon file size doesn't match")
+        }
+        else if object.hasIcon {
+            XCTFail("Icon is set on the App object but it has not been tested")
+        }
+        
+        // TODO: Test iOS images are decoded!!!!!!!!!
+        
+        // Check all created tags
         let fakeReq = app.testable.fakeRequest()
         let allTags = try! object.tags.query(on: fakeReq).all().await(on: fakeReq)
         for tag in tags {
@@ -159,8 +185,11 @@ extension AppsControllerTests {
             XCTAssertTrue(allTags.contains(identifier: tag.safeText), "Tag needs to be present")
         }
         
+        // Check final app count after the upload
         count = app.testable.count(allFor: App.self)
         XCTAssertEqual(count, 108, "There should be right amount of apps to begin with")
+        
+        return r
     }
     
 }

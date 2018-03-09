@@ -59,6 +59,9 @@ public class ApiCore {
         services.register(jwtService)
         services.register(AuthenticationCache())
         
+        // UUID service
+        services.register(RequestIdService.self)
+        
         try DbCore.configure(databaseConfig: databaseConfig, &config, &env, &services)
     }
     

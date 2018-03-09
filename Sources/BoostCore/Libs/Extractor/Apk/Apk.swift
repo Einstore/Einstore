@@ -168,16 +168,7 @@ class Apk: BaseExtractor, Extractor {
             promise.fail(error)
         }
         
-        // Cleanup
-        try cleanUp()
-        
         return promise
-    }
-    
-    // MARK: Cleaning
-    
-    func cleanUp() throws {
-        try FileManager.default.removeItem(at: self.archive)
     }
     
 }

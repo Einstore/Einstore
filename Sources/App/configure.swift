@@ -15,9 +15,9 @@ public func configure(_ config: inout Config, _ env: inout Vapor.Environment, _ 
     Env.print()
     
     // TODO: Make this come from an ENV var
-    let fileHandler = try Filesystem(config: Filesystem.Config(homeDir: "/tmp/Boost/"))
+//    let fileHandler = try Filesystem(config: Filesystem.Config(homeDir: "/tmp/Boost"))
     
-    var boostConfig = BoostConfig(fileHandler: fileHandler)
+    var boostConfig = BoostConfig()
     boostConfig.database = DbCore.envConfig(defaultDatabase: "boost")
     
     try Boost.configure(boostConfig: &boostConfig, &config, &env, &services)

@@ -37,12 +37,43 @@ public class Boost {
     
     static var config: BoostConfig!
     
+    private static var _tempFileHandler: FileHandler?
+    public static var tempFileHandler: FileHandler {
+        get {
+            if let handler = _tempFileHandler {
+                return handler
+            }
+            let handler = LocalFileHandler()
+            _tempFileHandler = handler
+            return handler
+        }
+        set {
+            _tempFileHandler = newValue
+        }
+    }
+    
+    private static var _storageFileHandler: FileHandler?
+    public static var storageFileHandler: FileHandler {
+        get {
+            if let handler = _storageFileHandler {
+                return handler
+            }
+            let handler = LocalFileHandler()
+            _storageFileHandler = handler
+            return handler
+        }
+        set {
+            _storageFileHandler = newValue
+        }
+    }
+    
+    
     public static func configure(boostConfig: inout BoostConfig, _ config: inout Config, _ env: inout Vapor.Environment, _ services: inout Services) throws {
         guard let database = boostConfig.database else {
             fatalError("Missing database configuration in BoostConfig")
         }
         
-        boostConfig.fileHandler = try Filesystem(config: Filesystem.Config(homeDir: "/tmp/Boost/"))
+//        boostConfig.fileHandler = try Filesystem(config: Filesystem.Config(homeDir: "/tmp/Boost/"))
         
         self.config = boostConfig
         

@@ -57,9 +57,9 @@ class AuthControllerTests: XCTestCase, UsersTestCase, LinuxTests {
             "Authorization": "Basic YWRtaW5AbGl2ZXVpLmlvOmFkbWlu"
             ])
         do {
-            let res = try app.testable.response(throwingTo: req)
+            let r = try app.testable.response(throwingTo: req)
             
-            checkAuthResult(res)
+            checkAuthResult(r.response)
         } catch {
             print(error)
             XCTFail()
@@ -79,9 +79,9 @@ class AuthControllerTests: XCTestCase, UsersTestCase, LinuxTests {
     func testValidPostAuthRequest() {
         let req = try! HTTPRequest.testable.post(uri: "/auth", data: User.Auth.Login(email: "admin@liveui.io", password: "admin").asJson(), headers: ["Content-Type": "application/json; charset=utf-8"])
         do {
-            let res = try app.testable.response(throwingTo: req)
+            let r = try app.testable.response(throwingTo: req)
             
-            checkAuthResult(res)
+            checkAuthResult(r.response)
         } catch {
             print(error)
             XCTFail()
@@ -107,9 +107,9 @@ class AuthControllerTests: XCTestCase, UsersTestCase, LinuxTests {
             "Authorization": "Token \(t.token)"
             ])
         do {
-            let res = try app.testable.response(throwingTo: req)
+            let r = try app.testable.response(throwingTo: req)
             
-            checkTokenResult(res)
+            checkTokenResult(r.response)
         } catch {
             print(error)
             XCTFail()
@@ -131,9 +131,9 @@ class AuthControllerTests: XCTestCase, UsersTestCase, LinuxTests {
         
         let req = try! HTTPRequest.testable.post(uri: "/token", data: User.Auth.Token(token: t.token).asJson(), headers: ["Content-Type": "application/json; charset=utf-8"])
         do {
-            let res = try app.testable.response(throwingTo: req)
+            let r = try app.testable.response(throwingTo: req)
             
-            checkTokenResult(res)
+            checkTokenResult(r.response)
         } catch {
             print(error)
             XCTFail()
@@ -157,9 +157,9 @@ extension AuthControllerTests {
     
     private func token() -> Token.PublicFull {
         let req = try! HTTPRequest.testable.post(uri: "/auth", data: User.Auth.Login(email: "admin@liveui.io", password: "admin").asJson(), headers: ["Content-Type": "application/json; charset=utf-8"])
-        let res = try! app.testable.response(throwingTo: req)
-        res.testable.debug()
-        let token = res.testable.content(as: Token.PublicFull.self)!
+        let r = try! app.testable.response(throwingTo: req)
+        r.response.testable.debug()
+        let token = r.response.testable.content(as: Token.PublicFull.self)!
         return token
     }
     

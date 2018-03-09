@@ -47,14 +47,14 @@ class UsersControllerTests: XCTestCase, UsersTestCase, LinuxTests {
     
     func testGetUsers() {
         let req = HTTPRequest.testable.get(uri: "/users", authorizedUser: user1, on: app)
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
 
-        res.testable.debug()
+        r.response.testable.debug()
 
-        XCTAssertTrue(res.testable.has(statusCode: .ok), "Wrong status code")
-        XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
+        XCTAssertTrue(r.response.testable.has(statusCode: .ok), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
         
-        let users = res.testable.content(as: [User].self)!
+        let users = r.response.testable.content(as: [User].self)!
         XCTAssertEqual(users.count, 2, "There should be two users in the database")
         XCTAssertTrue(users.contains(where: { (user) -> Bool in
             return user.id == user1.id && user.id != nil
@@ -66,14 +66,14 @@ class UsersControllerTests: XCTestCase, UsersTestCase, LinuxTests {
     
     func testSearchUsersWithoutParams() {
         let req = HTTPRequest.testable.get(uri: "/users/search", authorizedUser: user1, on: app)
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        XCTAssertTrue(res.testable.has(statusCode: .ok), "Wrong status code")
-        XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
+        XCTAssertTrue(r.response.testable.has(statusCode: .ok), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
         
-        let users = res.testable.content(as: [User.AllSearch].self)!
+        let users = r.response.testable.content(as: [User.AllSearch].self)!
         XCTAssertEqual(users.count, 2, "There should be two users in the database")
         XCTAssertEqual(users[0].id, user1.id, "Avatar is not in the correct format")
         XCTAssertEqual(users[0].avatar, "https://www.gravatar.com/avatar/e7e8b7ac59a724a481bec410d0cb44a4", "Avatar is not in the correct format")

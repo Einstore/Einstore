@@ -66,14 +66,14 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
     
     func testGetTeams() {
         let req = HTTPRequest.testable.get(uri: "/teams", authorizedUser: user1, on: app)
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        XCTAssertTrue(res.testable.has(statusCode: .ok), "Wrong status code")
-        XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
+        XCTAssertTrue(r.response.testable.has(statusCode: .ok), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
         
-        let teams = res.testable.content(as: [Team].self)!
+        let teams = r.response.testable.content(as: [Team].self)!
         XCTAssertEqual(teams.count, 2, "There should be two teams in the database")
         XCTAssertTrue(teams.contains(where: { (team) -> Bool in
             return team.id == team1.id && team.id != nil
@@ -101,18 +101,18 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
             "Content-Type": "application/json; charset=utf-8"
             ] , authorizedUser: user1, on: app
         )
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        if let team = testTeam(res: res, originalTeam: post) {
+        if let team = testTeam(res: r.response, originalTeam: post) {
             // Test team has been attached to the ME user
             let allUsers = try! team.users.query(on: fakeReq).all().await(on: fakeReq)
             XCTAssertEqual(allUsers.count, 1, "Team should have 1 user attached")
             XCTAssertEqual(allUsers[0].id, me.id, "Team should have ME user attached")
             
             // Test the rest!
-            XCTAssertTrue(res.testable.has(statusCode: .created), "Wrong status code")
+            XCTAssertTrue(r.response.testable.has(statusCode: .created), "Wrong status code")
             
             count = app.testable.count(allFor: Team.self)
             XCTAssertEqual(count, 4, "There should be three team entries in the db")
@@ -125,16 +125,16 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
             "Content-Type": "application/json; charset=utf-8"
             ]
         )
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        let data = res.testable.content(as: SuccessResponse.self)!
+        let data = r.response.testable.content(as: SuccessResponse.self)!
         XCTAssertEqual(data.code, "ok")
         XCTAssertEqual(data.description, "Identifier available")
         
-        XCTAssertTrue(res.testable.has(statusCode: .ok), "Wrong status code")
-        XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
+        XCTAssertTrue(r.response.testable.has(statusCode: .ok), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
     }
     
     func testInvalidTeamNameCheck() {
@@ -143,16 +143,16 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
             "Content-Type": "application/json; charset=utf-8"
             ]
         )
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        let data = res.testable.content(as: ErrorResponse.self)!
+        let data = r.response.testable.content(as: ErrorResponse.self)!
         XCTAssertEqual(data.error, "app_error")
         XCTAssertEqual(data.description, "Identifier already exists")
         
-        XCTAssertTrue(res.testable.has(statusCode: .conflict), "Wrong status code")
-        XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
+        XCTAssertTrue(r.response.testable.has(statusCode: .conflict), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
     }
     
     func testLinkUser() {
@@ -168,16 +168,16 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
             "Content-Type": "application/json; charset=utf-8"
             ], authorizedUser: user1, on: app
         )
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        let data = res.testable.content(as: SuccessResponse.self)!
+        let data = r.response.testable.content(as: SuccessResponse.self)!
         XCTAssertEqual(data.code, "ok")
         XCTAssertEqual(data.description, "User has been added to the team")
         
-        XCTAssertTrue(res.testable.has(statusCode: .ok), "Wrong status code")
-        XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
+        XCTAssertTrue(r.response.testable.has(statusCode: .ok), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
         
         count = try! team1.users.query(on: fakeReq).count().await(on: fakeReq)
         XCTAssertEqual(count, 2, "Team should have two users at the end")
@@ -193,16 +193,16 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
             "Content-Type": "application/json; charset=utf-8"
             ], authorizedUser: user1, on: app
         )
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        let data = res.testable.content(as: ErrorResponse.self)!
+        let data = r.response.testable.content(as: ErrorResponse.self)!
         XCTAssertEqual(data.error, "team_error")
         XCTAssertEqual(data.description, "User is already a member of the team")
         
-        XCTAssertTrue(res.testable.has(statusCode: .conflict), "Wrong status code")
-        XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
+        XCTAssertTrue(r.response.testable.has(statusCode: .conflict), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
         
         count = try! team1.users.query(on: fakeReq).count().await(on: fakeReq)
         XCTAssertEqual(count, 1, "Team should have two users at the end")
@@ -218,16 +218,16 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
             "Content-Type": "application/json; charset=utf-8"
             ], authorizedUser: user1, on: app
         )
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        let data = res.testable.content(as: ErrorResponse.self)!
+        let data = r.response.testable.content(as: ErrorResponse.self)!
         XCTAssertEqual(data.error, "team_error")
         XCTAssertEqual(data.description, "User not found")
         
-        XCTAssertTrue(res.testable.has(statusCode: .notFound), "Wrong status code")
-        XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
+        XCTAssertTrue(r.response.testable.has(statusCode: .notFound), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
         
         count = try! team1.users.query(on: fakeReq).count().await(on: fakeReq)
         XCTAssertEqual(count, 1, "Team should have two users at the end")
@@ -247,16 +247,16 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
             "Content-Type": "application/json; charset=utf-8"
             ], authorizedUser: user1, on: app
         )
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        let data = res.testable.content(as: SuccessResponse.self)!
+        let data = r.response.testable.content(as: SuccessResponse.self)!
         XCTAssertEqual(data.code, "ok")
         XCTAssertEqual(data.description, "User has been removed from the team")
         
-        XCTAssertTrue(res.testable.has(statusCode: .ok), "Wrong status code")
-        XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
+        XCTAssertTrue(r.response.testable.has(statusCode: .ok), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
         
         count = try! team1.users.query(on: fakeReq).count().await(on: fakeReq)
         XCTAssertEqual(count, 1, "Team should have two users at the end")
@@ -272,16 +272,16 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
             "Content-Type": "application/json; charset=utf-8"
             ], authorizedUser: user1, on: app
         )
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        let data = res.testable.content(as: ErrorResponse.self)!
+        let data = r.response.testable.content(as: ErrorResponse.self)!
         XCTAssertEqual(data.error, "team_error")
         XCTAssertEqual(data.description, "You are the last user in this team; Please delete the team instead")
         
-        XCTAssertTrue(res.testable.has(statusCode: .conflict), "Wrong status code")
-        XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
+        XCTAssertTrue(r.response.testable.has(statusCode: .conflict), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
         
         count = try! team1.users.query(on: fakeReq).count().await(on: fakeReq)
         XCTAssertEqual(count, 1, "Team should have two users at the end")
@@ -297,16 +297,16 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
             "Content-Type": "application/json; charset=utf-8"
             ], authorizedUser: user1, on: app
         )
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        let data = res.testable.content(as: ErrorResponse.self)!
+        let data = r.response.testable.content(as: ErrorResponse.self)!
         XCTAssertEqual(data.error, "team_error")
         XCTAssertEqual(data.description, "User not found")
         
-        XCTAssertTrue(res.testable.has(statusCode: .notFound), "Wrong status code")
-        XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
+        XCTAssertTrue(r.response.testable.has(statusCode: .notFound), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
         
         count = try! team1.users.query(on: fakeReq).count().await(on: fakeReq)
         XCTAssertEqual(count, 1, "Team should have two users at the end")
@@ -322,16 +322,16 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
             "Content-Type": "application/json; charset=utf-8"
             ], authorizedUser: user1, on: app
         )
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        let data = res.testable.content(as: ErrorResponse.self)!
+        let data = r.response.testable.content(as: ErrorResponse.self)!
         XCTAssertEqual(data.error, "team_error")
         XCTAssertEqual(data.description, "User is not a member of the team")
         
-        XCTAssertTrue(res.testable.has(statusCode: .conflict), "Wrong status code")
-        XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
+        XCTAssertTrue(r.response.testable.has(statusCode: .conflict), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
         
         count = try! team1.users.query(on: fakeReq).count().await(on: fakeReq)
         XCTAssertEqual(count, 1, "Team should have two users at the end")
@@ -339,27 +339,27 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
     
     func testGetSingleTeam() {
         let req = try! HTTPRequest.testable.get(uri: "/teams/\(team1.id!.uuidString)".makeURI(), authorizedUser: user1, on: app)
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        testTeam(res: res)
+        testTeam(res: r.response)
         
-        XCTAssertTrue(res.testable.has(statusCode: .ok), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(statusCode: .ok), "Wrong status code")
     }
     
     func testGetTeamUsers() {
         let req = try! HTTPRequest.testable.get(uri: "/teams/\(team1.id!.uuidString)/users".makeURI(), authorizedUser: user1, on: app)
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        let users = res.testable.content(as: [User].self)!
+        let users = r.response.testable.content(as: [User].self)!
         XCTAssertEqual(users.count, 1, "Team 1 should have 1 user")
         XCTAssertTrue(users.contains(user1), "Team 1 should contain User 1")
         
-        XCTAssertTrue(res.testable.has(statusCode: .ok), "Wrong status code")
-        XCTAssertTrue(res.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
+        XCTAssertTrue(r.response.testable.has(statusCode: .ok), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
     }
     
     func testUpdateSingleTeam() {
@@ -372,15 +372,15 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
             "Content-Type": "application/json; charset=utf-8"
             ], authorizedUser: user1, on: app
         )
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        if let data = testTeam(res: res) {
+        if let data = testTeam(res: r.response) {
             XCTAssertEqual(data.name, testName, "Name of the team doesn't match")
             XCTAssertEqual(data.identifier, testName.safeText, "Identifier of the team doesn't match")
         }
-        XCTAssertTrue(res.testable.has(statusCode: .ok), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(statusCode: .ok), "Wrong status code")
     }
     
     // PATCH
@@ -391,15 +391,15 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
             "Content-Type": "application/json; charset=utf-8"
             ], authorizedUser: user1, on: app
         )
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        if let data = testTeam(res: res) {
+        if let data = testTeam(res: r.response) {
             XCTAssertEqual(data.name, testName, "Name of the team doesn't match")
             XCTAssertEqual(data.identifier, testName.safeText, "Identifier of the team doesn't match")
         }
-        XCTAssertTrue(res.testable.has(statusCode: .ok), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(statusCode: .ok), "Wrong status code")
     }
     
     func testDeleteSingleTeam() {
@@ -407,11 +407,11 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
         XCTAssertEqual(count, 3)
         
         let req = try! HTTPRequest.testable.delete(uri: "/teams/\(team1.id!.uuidString)".makeURI(), authorizedUser: user1, on: app)
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        XCTAssertTrue(res.testable.has(statusCode: .noContent), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(statusCode: .noContent), "Wrong status code")
         
         let all = app.testable.all(for: Team.self)
         XCTAssertEqual(all.count, 2)
@@ -425,11 +425,11 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
         XCTAssertEqual(count, 3)
         
         let req = try! HTTPRequest.testable.delete(uri: "/teams/\(team2.id!.uuidString)".makeURI(), authorizedUser: user1, on: app)
-        let res = app.testable.response(to: req)
+        let r = app.testable.response(to: req)
         
-        res.testable.debug()
+        r.response.testable.debug()
         
-        XCTAssertTrue(res.testable.has(statusCode: .notFound), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(statusCode: .notFound), "Wrong status code")
         
         let all = app.testable.all(for: Team.self)
         XCTAssertEqual(all.count, 3)

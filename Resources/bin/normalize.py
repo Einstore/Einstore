@@ -23,7 +23,7 @@ def getNormalizedPNG(filename):
     idatAcc = ""
     breakLoop = False
     
-    # For each chunk in the PNG file    
+    # For each chunk in the PNG file
     while chunkPos < len(oldPNG):
         skip = False
         
@@ -47,7 +47,7 @@ def getNormalizedPNG(filename):
             idatAcc += chunkData
             skip = True
 
-        # Removing CgBI chunk        
+        # Removing CgBI chunk
         if chunkType == "CgBI":
             skip = True
 
@@ -79,8 +79,8 @@ def getNormalizedPNG(filename):
 
             # Compressing the image chunk
             chunkData = newdata
-            chunkData = compress( chunkData )
-            chunkLength = len( chunkData )
+            chunkData = compress(chunkData)
+            chunkLength = len(chunkData)
             chunkCRC = crc32(chunkType)
             chunkCRC = crc32(chunkData, chunkCRC)
             chunkCRC = (chunkCRC + 0x100000000) % 0x100000000
@@ -127,27 +127,32 @@ def getFiles(base):
         if stat.S_ISDIR(st.st_mode):
             if not filepath in _dirs:
                 getFiles(filepath)
-                _dirs.append( filepath )
+                _dirs.append(filepath)
                 
         elif file[-4:].lower() == ".png":
             if not filepath in _pngs:
-                _pngs.append( filepath )
+                _pngs.append(filepath)
             
     if base == ".":
         return _dirs, _pngs
 
-dirs, pngs = getFiles(".")
-
-if len(pngs) == 0:
-    print "0"
+if sys.argv[1] != None:
+    print "normalize.py"
+    print "Converting: " + sys.argv[1]
+    updatePNG(sys.argv[1])
     exit()
-    
+else:
+    dirs, pngs = getFiles(".")
 
-normalized = 0
-for ipng in xrange(len(pngs)):
-    perc = (float(ipng) / len(pngs)) * 100.0
-    if updatePNG(pngs[ipng]):
-        normalized += 1
+    if len(pngs) == 0:
+        print "0"
+        exit()
 
-print "%d" % normalized
-exit()
+    normalized = 0
+    for ipng in xrange(len(pngs)):
+        perc = (float(ipng) / len(pngs)) * 100.0
+        if updatePNG(pngs[ipng]):
+            normalized += 1
+
+    print "%d" % normalized
+    exit()
