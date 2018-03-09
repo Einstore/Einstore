@@ -168,9 +168,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Boost::Gravatar"
-               BuildableName = "Gravatar.framework"
-               BlueprintName = "Gravatar"
+               BlueprintIdentifier = "Boost::Mailgun"
+               BuildableName = "Mailgun.framework"
+               BlueprintName = "Mailgun"
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -653,16 +653,6 @@
                BlueprintIdentifier = "Boost::DbCoreTests"
                BuildableName = "DbCoreTests.xctest"
                BlueprintName = "DbCoreTests"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Boost::GravatarTests"
-               BuildableName = "GravatarTests.xctest"
-               BlueprintName = "GravatarTests"
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </TestableReference>

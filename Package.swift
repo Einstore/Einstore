@@ -53,7 +53,8 @@ let package = Package(
                 "ErrorsCore",
                 "DbCore",
                 "SwiftShell",
-                "FileCore"
+                "FileCore",
+                "Mailgun"
             ]
         ),
         .target(
@@ -65,7 +66,7 @@ let package = Package(
                 "ErrorsCore",
                 "DbCore",
                 "JWT",
-                "Gravatar"
+                "Mailgun"
             ]
         ),
         .target(
@@ -95,7 +96,7 @@ let package = Package(
             ]
         ),
         .target(
-            name: "Gravatar",
+            name: "Mailgun",
             dependencies: [
                 "Vapor"
             ]
@@ -107,10 +108,6 @@ let package = Package(
         .testTarget(name: "AppTests", dependencies: [
             "App",
             "VaporTestTools"
-            ]
-        ),
-        .testTarget(name: "GravatarTests", dependencies: [
-            "Gravatar"
             ]
         ),
         .testTarget(name: "ApiCoreTests", dependencies: [

@@ -23,4 +23,5 @@ public struct BoostConfig {
     public init() {
         
     }
+    
 }
