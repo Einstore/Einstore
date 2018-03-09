@@ -17,6 +17,14 @@ public class UsersController: Controller {
             return User.Display.query(on: req).all()
         }
         
+        router.post("users") { (req) -> Future<Response> in
+            return try req.content.decode(User.Registration.self).flatMap(to: Response.self) { user in
+                return try user.newUser(on: req).save(on: req).flatMap(to: Response.self) { user in
+                    return try user.asDisplay().asResponse(.created, to: req)
+                }
+            }
+        }
+        
         router.get("users", "search") { (req) -> Future<[User.AllSearch]> in
             // TODO: Add proper limiter/pagination!!
             // TODO: Add the actual search!!!!!!!

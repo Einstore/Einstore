@@ -48,7 +48,7 @@ extension AppTestCaseSetup {
     }
     
     public func deleteAllFiles() {
-        
+        // TODO: Clean test files!!!!!!!
     }
     
 }

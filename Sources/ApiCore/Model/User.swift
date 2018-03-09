@@ -22,6 +22,11 @@ public final class User: DbCoreModel {
         public var lastname: String
         public var email: String
         public var password: String
+        
+        public func newUser(on req: Request) throws -> User {
+            let user = try User(firstname: firstname, lastname: lastname, email: email, password: password.passwordHash(req), token: nil, expires: nil, disabled: false, su: false)
+            return user
+        }
     }
     
     public struct Auth {
@@ -191,6 +196,15 @@ extension User: Migration {
     
     public static func revert(on connection: DbCoreConnection) -> Future<Void> {
         return Database.delete(User.self, on: connection)
+    }
+    
+}
+
+
+extension User {
+    
+    public func asDisplay() -> User.Display {
+        return User.Display(self)
     }
     
 }

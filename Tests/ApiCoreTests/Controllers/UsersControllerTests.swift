@@ -7,12 +7,11 @@
 
 import Foundation
 import XCTest
-import ApiCore
+@testable import ApiCore
 import Vapor
 import VaporTestTools
 import FluentTestTools
 import ApiCoreTestTools
-
 
 class UsersControllerTests: XCTestCase, UsersTestCase, LinuxTests {
     
@@ -26,6 +25,7 @@ class UsersControllerTests: XCTestCase, UsersTestCase, LinuxTests {
     static let allTests: [(String, Any)] = [
         ("testLinuxTests", testLinuxTests),
         ("testGetUsers", testGetUsers),
+        ("testRegisterUser", testRegisterUser),
         ("testSearchUsersWithoutParams", testSearchUsersWithoutParams)
     ]
     
@@ -48,9 +48,9 @@ class UsersControllerTests: XCTestCase, UsersTestCase, LinuxTests {
     func testGetUsers() {
         let req = HTTPRequest.testable.get(uri: "/users", authorizedUser: user1, on: app)
         let r = app.testable.response(to: req)
-
+        
         r.response.testable.debug()
-
+        
         XCTAssertTrue(r.response.testable.has(statusCode: .ok), "Wrong status code")
         XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
         
@@ -62,6 +62,35 @@ class UsersControllerTests: XCTestCase, UsersTestCase, LinuxTests {
         XCTAssertTrue(users.contains(where: { (user) -> Bool in
             return user.id == user2.id && user.id != nil
         }), "Newly created user is not present in the database")
+    }
+    
+    func testRegisterUser() {
+        let post = User.Registration(firstname: "Lemmy", lastname: "Kilmister", email: "lemmy@liveui.io", password: "passw0rd")
+        let req = try! HTTPRequest.testable.post(uri: "/users", data: post.asJson(), headers: [
+            "Content-Type": "application/json; charset=utf-8"
+            ]
+        )
+        let r = app.testable.response(to: req)
+        
+        r.response.testable.debug()
+        
+        // Check returned data
+        let object = r.response.testable.content(as: User.Display.self)!
+        XCTAssertEqual(object.firstname, post.firstname, "Firstname doesn't match")
+        XCTAssertEqual(object.lastname, post.lastname, "Lastname doesn't match")
+        XCTAssertEqual(object.email, post.email, "Email doesn't match")
+        
+        // Check it has been actually saved
+        let user = app.testable.one(for: User.self, id: object.id!)!
+        XCTAssertEqual(user.firstname, post.firstname, "Firstname doesn't match")
+        XCTAssertEqual(user.lastname, post.lastname, "Lastname doesn't match")
+        XCTAssertEqual(user.email, post.email, "Email doesn't match")
+        XCTAssertEqual(user.password, try! post.password.passwordHash(r.request), "Password doesn't match")
+        XCTAssertEqual(user.disabled, false, "Disabled should be false")
+        XCTAssertEqual(user.su, false, "SU should be false")
+        
+        XCTAssertTrue(r.response.testable.has(statusCode: .created), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
     }
     
     func testSearchUsersWithoutParams() {

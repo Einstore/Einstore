@@ -18,6 +18,10 @@ public typealias UploadKeys = [UploadKey]
 
 final public class UploadKey: DbCoreModel {
     
+    public struct Token: Codable {
+        public var token: String
+    }
+    
     public struct New: Codable {
         public var name: String
         public var expires: Date?

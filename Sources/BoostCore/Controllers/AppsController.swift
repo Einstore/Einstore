@@ -155,10 +155,10 @@ class AppsController: Controller {
          // */
         
         router.post("apps") { (req) -> Future<Response> in
-            guard let token = try req.http.headers.authorizationToken?.passwordHash(req) else {
+            guard let token = try? req.query.decode(UploadKey.Token.self) else {
                 throw ErrorsCore.HTTPError.missingAuthorizationData
             }
-            return UploadKey.query(on: req).filter(\.token == token).first().flatMap(to: Response.self) { (uploadToken) -> Future<Response> in
+            return UploadKey.query(on: req).filter(\.token == token.token).first().flatMap(to: Response.self) { (uploadToken) -> Future<Response> in
                 guard let uploadToken = uploadToken else {
                     throw AuthError.authenticationFailed
                 }

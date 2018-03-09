@@ -12,6 +12,7 @@ import VaporTestTools
 import FluentTestTools
 import ApiCoreTestTools
 import BoostTestTools
+import ErrorsCore
 @testable import ApiCore
 @testable import BoostCore
 
@@ -42,6 +43,7 @@ class AppsControllerTests: XCTestCase, AppTestCaseSetup, LinuxTests {
     static let allTests: [(String, Any)] = [
         ("testGetAppsOverview", testGetAppsOverview),
         ("testOldIosApp", testOldIosApp),
+        ("testOldIosAppTokenUpload", testOldIosAppTokenUpload),
         ("testUnobfuscatedApkUploadWithJWTAuth", testUnobfuscatedApkUploadWithJWTAuth),
         ("testObfuscatedApkUploadWithJWTAuth", testObfuscatedApkUploadWithJWTAuth),
         ("testLinuxTests", testLinuxTests)
@@ -98,7 +100,28 @@ class AppsControllerTests: XCTestCase, AppTestCaseSetup, LinuxTests {
     
     func testOldIosApp() {
         doTestJWTUpload(appFileName: "app.ipa", platform: .ios, name: "iDeviant", identifier: "com.fuerteint.iDeviant", version: "4.0", build: "1.0", iconSize: 4776)
-        // TODO: Test token upload
+    }
+    
+    func testOldIosAppTokenUpload() {
+        doTestTokenUpload(appFileName: "app.ipa", platform: .ios, name: "iDeviant", identifier: "com.fuerteint.iDeviant", version: "4.0", build: "1.0", iconSize: 4776)
+    }
+    
+    func testBadTokenUpload() {
+        let appUrl = Application.testable.paths.resourcesUrl.appendingPathComponent("Demo").appendingPathComponent("app.ipa")
+        let postData = try! Data(contentsOf: appUrl)
+        let req = try! HTTPRequest.testable.post(uri: "/apps?token=bad_token_yo".makeURI(), data: postData, headers: [
+            "Content-Type": "application/octet-stream"
+            ]
+        )
+        
+        let r = app.testable.response(to: req)
+        
+        r.response.testable.debug()
+        
+        let object = r.response.testable.content(as: ErrorResponse.self)!
+        
+        XCTAssertEqual(object.error, "auth_error", "Wrong code")
+        XCTAssertEqual(object.description, "Authentication has failed", "Wrong desctiption")
     }
     
     func testUnobfuscatedApkUploadWithJWTAuth() {
@@ -116,23 +139,23 @@ class AppsControllerTests: XCTestCase, AppTestCaseSetup, LinuxTests {
 
 extension AppsControllerTests {
     
-    private func doTestJWTUpload(appFileName fileName: String, platform: App.Platform, name: String, identifier: String, version: String? = nil, build: String? = nil, tags: [String] = ["tagging_like_crazy", "All Year Round"], iconSize: Int? = nil) {
+    private func doTestTokenUpload(appFileName fileName: String, platform: App.Platform, name: String, identifier: String, version: String? = nil, build: String? = nil, tags: [String] = ["tagging_like_crazy", "All Year Round"], iconSize: Int? = nil) {
         let appUrl = Application.testable.paths.resourcesUrl.appendingPathComponent("Demo").appendingPathComponent(fileName)
         let postData = try! Data(contentsOf: appUrl)
         let encodedTags: String = tags.joined(separator: "|").addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
-        let req = try! HTTPRequest.testable.post(uri: "/teams/\(team1.id!.uuidString)/apps?tags=\(encodedTags)".makeURI(), data: postData, headers: [
+        let req = try! HTTPRequest.testable.post(uri: "/apps?tags=\(encodedTags)&token=\(key1.token)".makeURI(), data: postData, headers: [
             "Content-Type": (platform == .ios ? "application/octet-stream" : "application/vnd.android.package-archive")
-            ], authorizedUser: user1, on: app
+            ]
         )
         
         doTest(request: req, platform: platform, name: name, identifier: identifier, version: version, build: build, tags: tags, iconSize: iconSize)
     }
     
-    private func doTestTokenUpload(appFileName fileName: String, platform: App.Platform, name: String, identifier: String, version: String? = nil, build: String? = nil, tags: [String] = ["tagging_like_crazy", "All Year Round"], iconSize: Int? = nil) {
+    private func doTestJWTUpload(appFileName fileName: String, platform: App.Platform, name: String, identifier: String, version: String? = nil, build: String? = nil, tags: [String] = ["tagging_like_crazy", "All Year Round"], iconSize: Int? = nil) {
         let appUrl = Application.testable.paths.resourcesUrl.appendingPathComponent("Demo").appendingPathComponent(fileName)
         let postData = try! Data(contentsOf: appUrl)
         let encodedTags: String = tags.joined(separator: "|").addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
-        let req = try! HTTPRequest.testable.post(uri: "/apps?tags=\(encodedTags)&token=AAAAAAAAAA".makeURI(), data: postData, headers: [
+        let req = try! HTTPRequest.testable.post(uri: "/teams/\(team1.id!.uuidString)/apps?tags=\(encodedTags)".makeURI(), data: postData, headers: [
             "Content-Type": (platform == .ios ? "application/octet-stream" : "application/vnd.android.package-archive")
             ], authorizedUser: user1, on: app
         )

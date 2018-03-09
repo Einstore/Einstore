@@ -35,12 +35,16 @@ public final class ApiAuthMiddleware: Middleware, ServiceFactory {
         return self
     }
     
-    public static var allowedUri: [String] = [
+    public static var allowedGetUri: [String] = [
         "/auth",
         "/token",
         "/ping",
         "/teapot",
         "/teams/check"
+    ]
+    
+    public static var allowedPostUri: [String] = [
+        "/users"
     ]
     
     public static var debugUri: [String] = [
@@ -64,8 +68,17 @@ public final class ApiAuthMiddleware: Middleware, ServiceFactory {
             }
         }
         
+        func allowed(request req: Request) -> Bool {
+            if req.http.method == .get {
+                return ApiAuthMiddleware.allowedGetUri.contains(req.http.uri.path)
+            } else if req.http.method == .post {
+                return ApiAuthMiddleware.allowedPostUri.contains(req.http.uri.path)
+            }
+            return false
+        }
+        
         // Secured URI
-        guard ApiAuthMiddleware.allowedUri.contains(req.http.uri.path) else {
+        guard allowed(request: req) else {
             printUrl(req: req, type: .secured)
             
             // Get JWT token
