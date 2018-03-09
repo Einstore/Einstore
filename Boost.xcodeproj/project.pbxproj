@@ -25,6 +25,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		1573F666205327B700F9CCF1 /* Gravatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1573F665205327B700F9CCF1 /* Gravatar.swift */; };
 		OBJ_1005 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_233 /* Package.swift */; };
 		OBJ_1011 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_251 /* Package.swift */; };
 		OBJ_1017 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_309 /* Package.swift */; };
@@ -6425,6 +6426,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1573F665205327B700F9CCF1 /* Gravatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gravatar.swift; sourceTree = "<group>"; };
 		"Async::Async::Product" /* Async.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Async.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCore::Product" /* ApiCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCoreTestTools::Product" /* ApiCoreTestTools.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCoreTestTools.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -9934,6 +9936,7 @@
 				OBJ_73 /* Filesize.swift */,
 				OBJ_74 /* RequestIdService.swift */,
 				OBJ_75 /* Result.swift */,
+				1573F665205327B700F9CCF1 /* Gravatar.swift */,
 			);
 			path = Libs;
 			sourceTree = "<group>";
@@ -12919,6 +12922,7 @@
 				OBJ_2183 /* HTTPHeaders+Tools.swift in Sources */,
 				OBJ_2184 /* Request+Auth.swift in Sources */,
 				OBJ_2185 /* Request+Files.swift in Sources */,
+				1573F666205327B700F9CCF1 /* Gravatar.swift in Sources */,
 				OBJ_2186 /* Request+URI.swift in Sources */,
 				OBJ_2187 /* String+Crypto.swift in Sources */,
 				OBJ_2188 /* String+Manipulation.swift in Sources */,

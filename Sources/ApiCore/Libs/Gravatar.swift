@@ -1,12 +1,11 @@
 //
 //  Gravatar.swift
-//  Gravatar
+//  ApiCore
 //
-//  Created by Ondrej Rafaj on 02/03/2018.
+//  Created by Ondrej Rafaj on 09/03/2018.
 //
 
 import Foundation
-import Vapor
 
 
 public class Gravatar {
