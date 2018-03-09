@@ -18,7 +18,7 @@ public typealias DownloadKeys = [DownloadKey]
 
 final public class DownloadKey: DbCoreModel {
     
-    public struct Public: Codable {
+    public struct Public: Content {
         var token: String
         let plist: String
         let file: String

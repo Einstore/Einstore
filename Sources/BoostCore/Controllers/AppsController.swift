@@ -58,7 +58,7 @@ class AppsController: Controller {
         router.get("apps", DbCoreIdentifier.parameter) { (req) -> Future<App> in
             let appId = try req.parameter(DbCoreIdentifier.self)
             return try req.me.teams().flatMap(to: App.self) { teams in
-                return App.query(on: req).safeApp(appId: appId, teamIds: teams.ids).first().map(to: App.self) { (app) -> App in
+                return App.query(on: req).safeApp(appId: appId, teamIds: teams.ids).first().map(to: App.self) { app in
                     guard let app = app else {
                         throw ErrorsCore.HTTPError.notFound
                     }
@@ -67,36 +67,31 @@ class AppsController: Controller {
             }
         }
         
-        /*
         router.get("apps", DbCoreIdentifier.parameter, "auth") { (req) -> Future<Response> in
-            let id = try req.parameter(DbCoreIdentifier.self)
-            
-            return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
-                return appQuery(appId: id, db: db).first().flatMap(to: Response.self) { (app) -> Future<Response> in
-                    guard let appId = app?.id else {
-                        throw ContentError.unavailable
+            let appId = try req.parameter(DbCoreIdentifier.self)
+            return try req.me.teams().flatMap(to: Response.self) { teams in
+                return App.query(on: req).safeApp(appId: appId, teamIds: teams.ids).first().flatMap(to: Response.self) { app in
+                    guard let app = app, let appId = app.id else {
+                        throw ErrorsCore.HTTPError.notFound
                     }
                     let key = DownloadKey(appId: appId)
                     let originalToken: String = key.token
                     key.token = try key.token.passwordHash(req)
                     // TODO: Delete all expired tokens so the DB won't die on us after a few months!!!!!!!!
-                    return key.save(on: db).map(to: Response.self, { (key) -> Response in
-                        let response = try req.response.basic(status: .ok)
+                    return key.save(on: req).flatMap(to: Response.self) { key in
                         key.token = originalToken
-                        response.http.body = try HTTPBody(DownloadKey.Public(downloadKey: key, request: req).asJson())
-                        return response
-                    })
+                        return try DownloadKey.Public(downloadKey: key, request: req).asResponse(.ok, to: req)
+                    }
                 }
             }
         }
         
         router.get("apps", DbCoreIdentifier.parameter, "plist") { (req) -> Future<Response> in
-            let id = try req.parameter(DbCoreIdentifier.self)
-            
-            return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
-                return appQuery(appId: id, db: db).first().map(to: Response.self) { (app) -> Response in
+            let appId = try req.parameter(DbCoreIdentifier.self)
+            return try req.me.teams().flatMap(to: Response.self) { teams in
+                return App.query(on: req).safeApp(appId: appId, teamIds: teams.ids).first().map(to: Response.self) { app in
                     guard let app = app else {
-                        throw ContentError.unavailable
+                        throw ErrorsCore.HTTPError.notFound
                     }
                     let response = try req.response.basic(status: .ok)
                     response.http.headers = HTTPHeaders(dictionaryLiteral: (.contentType, "application/xml; charset=utf-8"))
@@ -106,6 +101,7 @@ class AppsController: Controller {
             }
         }
         
+        /*
         // TODO: Return an actual file!
         router.get("apps", DbCoreIdentifier.parameter, "file") { (req) -> Future<App> in
             let id = try req.parameter(DbCoreIdentifier.self)
@@ -119,40 +115,55 @@ class AppsController: Controller {
                 })
             }
         }
+        // */
         
-        router.get("apps", DbCoreIdentifier.parameter, "tags") { (req) -> Future<[Tag]> in
-            let id = try req.parameter(DbCoreIdentifier.self)
-            
-            return req.withPooledConnection(to: .db) { (db) -> Future<[Tag]> in
-                return appQuery(appId: id, db: db).first().flatMap(to: [Tag].self, { (app) -> Future<[Tag]> in
-                    guard let app: App = app else {
-                        throw ContentError.unavailable
+        router.get("apps", DbCoreIdentifier.parameter, "tags") { (req) -> Future<Tags> in
+            let appId = try req.parameter(DbCoreIdentifier.self)
+            return try req.me.teams().flatMap(to: Tags.self) { teams in
+                return App.query(on: req).safeApp(appId: appId, teamIds: teams.ids).first().flatMap(to: Tags.self) { app in
+                    guard let app = app else {
+                        throw ErrorsCore.HTTPError.notFound
                     }
-                    return try app.tags.query(on: db).all()
-                })
+                    return try app.tags.query(on: req).all()
+                }
             }
         }
         
         router.delete("apps", DbCoreIdentifier.parameter) { (req) -> Future<Response> in
-            let id = try req.parameter(DbCoreIdentifier.self)
-            
-            return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
-                return appQuery(appId: id, db: db).first().flatMap(to: Response.self) { (app) -> Future<Response> in
-                    guard let app: App = app else {
-                        throw ContentError.unavailable
+            let appId = try req.parameter(DbCoreIdentifier.self)
+            return try req.me.teams().flatMap(to: Response.self) { teams in
+                return App.query(on: req).safeApp(appId: appId, teamIds: teams.ids).first().flatMap(to: Response.self) { app in
+                    guard let app = app else {
+                        throw ErrorsCore.HTTPError.notFound
                     }
-                    
-                    guard let appId = app.id else {
-                        throw GenericError.impossibleSituation
+                    return try app.tags.query(on: req).all().flatMap(to: Response.self) { tags in
+                        var futures: [Future<Void>] = []
+                        
+                        // Delete all tags
+                        try tags.forEach({ tag in
+                            let tagFuture = try tag.apps.query(on: req).count().flatMap(to: Void.self) { count in
+                                if count <= 1 {
+                                    return tag.delete(on: req).flatten()
+                                }
+                                else {
+                                    return app.tags.detach(tag, on: req).flatten()
+                                }
+                            }
+                            futures.append(tagFuture)
+                        })
+                        
+                        // Delete all files
+                        guard let path = app.targetFolderPath else {
+                            return Future(try req.response.internalServerError(message: "Unable to delete files"))
+                        }
+                        let deleteFuture = try Boost.storageFileHandler.delete(url: path)
+                        futures.append(deleteFuture)
+                        
+                        return try futures.flatten().asResponse(to: req)
                     }
-                    // TODO: Delete all tags (if they don't have any more parent apps)
-                    return app.delete(on: db).flatMap(to: Response.self, { (app) -> Future<Response> in
-                        return try Boost.config.fileHandler.delete(file: appId.uuidString).asResponse(to: req)
-                    })
                 }
             }
-         }
-         // */
+        }
         
         router.post("apps") { (req) -> Future<Response> in
             guard let token = try? req.query.decode(UploadKey.Token.self) else {
