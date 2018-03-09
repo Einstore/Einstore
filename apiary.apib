@@ -229,6 +229,92 @@ JWT token needs to be refreshed after 30 seconds from the last request made. Wit
         }
 
 
+## Users [/users]
+
+
+### List all users [GET]
+
+List all users in teams shared by the authenticated user.
+
+
++ Request
+    
+    + Headers
+
+            Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
+
+
++ Response 200 (application/json; charset=utf-8)
+            
+    + Body
+
+            [
+                {
+                    "id": 1,
+                    "name": "Admin team",
+                    "identifier": "admin-team"
+                },
+                {
+                    "id": 2,
+                    "name": "Client",
+                    "identifier": "client"
+                }
+            ]
+
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed",
+            "error": "Unable to verify authorization token"
+        }
+
+
+
+### Register user [POST]
+
+This endpoint is not secured and should be used for new registrations
+
++ Request
+    
+    + Headers
+
+            Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
+            ContentType: application/json
+            
+    + Body
+
+            {
+                "firstname": "Lemmy",
+                "lastname": "Kilmister",
+                "email": "lemmy@liveui.io",
+                "password": "sup3rS3cr3t"
+            }
+
+
+
++ Response 200 (application/json; charset=utf-8)
+            
+    + Body
+
+            {
+                "email": "lemmy@liveui.io",
+                "lastname": "Kilmister",
+                "registered": 542296870.67299497,
+                "disabled": true,
+                "su": false,
+                "firstname": "Lemmy"
+            }
+
++ Response 409 (application/json; charset=utf-8)
+
+        {
+            "code": "user_error",
+            "error": "Email already exists"
+        }
+
+
+
 ## Teams [/teams]
 
 JWT token needs to be refreshed after 30 seconds from the last request made. With each successful request the token's expiration is extended.
