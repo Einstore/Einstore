@@ -40,7 +40,7 @@ To install on Heroku please press the button and follow the instructions:
 
 ## Features
 
-**Warning! - *Project is not finished, contact us on Slack for ETA or follow the status below***
+> **Warning! - *Project is not finished, contact us on Slack for ETA or follow the status below***
 
 #### MVP (current)
 - [x] Build basic framework
@@ -53,16 +53,17 @@ To install on Heroku please press the button and follow the instructions:
 
 
 #### Phase 2
+- [ ] Support for S3 (and others through protocol) to store files
 - [ ] Authenticate in enterprise environment (`ActiveDirectory`, etc ...)
 - [ ] Create client accounts
-- [ ] Upload, process and install tvOS app
-- [ ] Comment on builds
 - [ ] Native iOS client
 - [ ] Native Android client
 - [ ] Email notifications (new builds, clents, etc)
 
 
 #### Phase 3
+- [ ] Native tvOS client
+- [ ] Comment on builds
 - [ ] Create virtual apps for web-apps (urls)
 - [ ] Authenticate in enterprise environment (custom plugins and integrations for common systems)
 
@@ -90,7 +91,7 @@ Xxxxxxxxxxx include screenshot
 ## Support
 
 We try to support even our free tier clients through our Slack channel or create a Stack Overflow question tagging BoostXXXXXXXXXX.
-To signup for our Slack please visit http://xxxxxx.xxxxx.xx and we’ll send you an invitation email.
+To signup for our Slack please visit http://bit.ly/2B0dEyt and we’ll send you an invitation email.
 
 ## OnDemand hosted service (sounds better than software as a service)
 
