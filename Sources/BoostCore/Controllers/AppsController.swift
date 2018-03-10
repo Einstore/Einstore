@@ -77,10 +77,11 @@ class AppsController: Controller {
                     let key = DownloadKey(appId: appId)
                     let originalToken: String = key.token
                     key.token = try key.token.passwordHash(req)
-                    // TODO: Delete all expired tokens so the DB won't die on us after a few months!!!!!!!!
                     return key.save(on: req).flatMap(to: Response.self) { key in
-                        key.token = originalToken
-                        return try DownloadKey.Public(downloadKey: key, request: req).asResponse(.ok, to: req)
+                        return DownloadKey.query(on: req).filter(\DownloadKey.added < Date().addMinute(n: -15)).delete().flatMap(to: Response.self) { _ in
+                            key.token = originalToken
+                            return try DownloadKey.Public(downloadKey: key, request: req).asResponse(.ok, to: req)
+                        }
                     }
                 }
             }
@@ -151,6 +152,9 @@ class AppsController: Controller {
                             }
                             futures.append(tagFuture)
                         })
+                        
+                        // Delete app
+                        futures.append(app.delete(on: req).flatten())
                         
                         // Delete all files
                         guard let path = app.targetFolderPath else {

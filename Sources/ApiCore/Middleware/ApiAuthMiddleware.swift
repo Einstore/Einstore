@@ -40,11 +40,13 @@ public final class ApiAuthMiddleware: Middleware, ServiceFactory {
         "/token",
         "/ping",
         "/teapot",
-        "/teams/check"
     ]
     
     public static var allowedPostUri: [String] = [
-        "/users"
+        "/users",
+        "/auth",
+        "/token",
+        "/teams/check"
     ]
     
     public static var debugUri: [String] = [

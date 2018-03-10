@@ -30,7 +30,7 @@ final public class Tag: DbCoreModel {
         case identifier
     }
     
-    public init(id: DbCoreIdentifier?, name: String, identifier: String) {
+    public init(id: DbCoreIdentifier? = nil, name: String, identifier: String) {
         self.id = id
         self.name = name
         self.identifier = identifier

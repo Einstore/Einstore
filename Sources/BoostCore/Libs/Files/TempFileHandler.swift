@@ -70,12 +70,16 @@ public class LocalFileHandler: FileHandler {
     }
     
     public func delete(path: String) throws -> Future<Void> {
-        try FileManager.default.removeItem(atPath: path)
+        if FileManager.default.fileExists(atPath: path) {
+            try FileManager.default.removeItem(atPath: path)
+        }
         return Future(Void())
     }
     
     public func delete(url: URL) throws -> Future<Void> {
-        try FileManager.default.removeItem(at: url)
+        if FileManager.default.fileExists(atPath: url.path) {
+            try FileManager.default.removeItem(at: url)
+        }
         return Future(Void())
     }
     

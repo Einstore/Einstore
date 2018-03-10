@@ -146,7 +146,7 @@ class AuthControllerTests: XCTestCase, UsersTestCase, LinuxTests {
             _ = try app.testable.response(throwingTo: req)
             XCTFail()
         } catch {
-            // Should fails
+            // Should fail
         }
     }
     

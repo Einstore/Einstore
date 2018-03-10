@@ -42,10 +42,13 @@ class AppsControllerTests: XCTestCase, AppTestCaseSetup, LinuxTests {
     
     static let allTests: [(String, Any)] = [
         ("testGetAppsOverview", testGetAppsOverview),
+        ("testDeleteApp", testDeleteApp),
+        ("testCantDeleteOtherPeoplesApp", testCantDeleteOtherPeoplesApp),
         ("testOldIosApp", testOldIosApp),
         ("testOldIosAppTokenUpload", testOldIosAppTokenUpload),
         ("testUnobfuscatedApkUploadWithJWTAuth", testUnobfuscatedApkUploadWithJWTAuth),
         ("testObfuscatedApkUploadWithJWTAuth", testObfuscatedApkUploadWithJWTAuth),
+        ("testBadTokenUpload", testBadTokenUpload),
         ("testLinuxTests", testLinuxTests)
     ]
     
@@ -73,14 +76,6 @@ class AppsControllerTests: XCTestCase, AppTestCaseSetup, LinuxTests {
     
     // MARK: Tests
     
-    func testRequestHoldsUUID() {
-        let req = HTTPRequest.testable.get(uri: "/apps", authorizedUser: user1, on: app)
-        
-        let r = app.testable.response(to: req)
-        
-        r.response.testable.debug()
-    }
-    
     func testGetAppsOverview() {
         let count = app.testable.count(allFor: App.self)
         XCTAssertEqual(count, 107, "There should be right amount of apps to begin with")
@@ -90,12 +85,53 @@ class AppsControllerTests: XCTestCase, AppTestCaseSetup, LinuxTests {
         
         r.response.testable.debug()
         
-        let keys = r.response.testable.content(as: Apps.self)!
+        let objects = r.response.testable.content(as: Apps.self)!
         
-        XCTAssertEqual(keys.count, 100, "There should be right amount of apps")
+        XCTAssertEqual(objects.count, 99, "There should be right amount of apps")
         
         XCTAssertTrue(r.response.testable.has(statusCode: .ok), "Wrong status code")
         XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
+    }
+    
+    func testDeleteApp() {
+        var count = app.testable.count(allFor: App.self)
+        XCTAssertEqual(count, 107, "There should be right amount of apps to begin with")
+        
+        let req = try! HTTPRequest.testable.delete(uri: "/apps/\(app1.id!.uuidString)".makeURI(), authorizedUser: user1, on: app)
+        let r = app.testable.response(to: req)
+        
+        r.response.testable.debug()
+        
+        // TODO: Test all tags were deleted!!!!
+        // TODO: Test all files were deleted!!!!
+        
+        XCTAssertTrue(r.response.testable.has(statusCode: .noContent), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
+        
+        count = app.testable.count(allFor: App.self)
+        XCTAssertEqual(count, 106, "There should be right amount of apps to finish with")
+    }
+    
+    func testCantDeleteOtherPeoplesApp() {
+        var count = app.testable.count(allFor: App.self)
+        XCTAssertEqual(count, 107, "There should be right amount of apps to begin with")
+        
+        let req = try! HTTPRequest.testable.delete(uri: "/apps/\(app2.id!.uuidString)".makeURI(), authorizedUser: user1, on: app)
+        let r = app.testable.response(to: req)
+        
+        r.response.testable.debug()
+        
+        let object = app.testable.one(for: App.self, id: app2!.id!)!
+        let tagsCount = try! object.tags.query(on: r.request).count().await(on: r.request)
+        XCTAssertEqual(tagsCount, 2)
+        
+        // TODO: Test files are still there!!!
+        
+        XCTAssertTrue(r.response.testable.has(statusCode: .notFound), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
+        
+        count = app.testable.count(allFor: App.self)
+        XCTAssertEqual(count, 107, "There should be right amount of apps to finish with")
     }
     
     func testOldIosApp() {

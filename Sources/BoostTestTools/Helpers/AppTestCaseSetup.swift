@@ -30,7 +30,12 @@ extension AppTestCaseSetup {
         setupUploadKeys()
         
         app1 = App.testable.create(team: team1, name: "App 1", version: "1.2.3", build: "123456", platform: .ios, on: app)
-        app2 = App.testable.create(team: team1, name: "App 2", identifier: "app2", version: "3.2.1", build: "654321", platform: .android, on: app)
+        app1.testable.addTag(name: "common tag", identifier: "common-tag", on: app)
+        app1.testable.addTag(name: "tag for app 1", identifier: "tag-for-app-1", on: app)
+        
+        app2 = App.testable.create(team: team2, name: "App 2", identifier: "app2", version: "3.2.1", build: "654321", platform: .android, on: app)
+        app2.testable.addTag(name: "common tag", identifier: "common-tag", on: app)
+        app2.testable.addTag(name: "tag for app 2", identifier: "tag-for-app-2", on: app)
         
         for x in 0...6 {
             for i in 0...6 {

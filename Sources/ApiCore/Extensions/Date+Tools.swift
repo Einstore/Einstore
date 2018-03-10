@@ -20,6 +20,11 @@ extension Date {
         return cal.date(byAdding: .day, value: n, to: self)!
     }
     
+    public func addMinute(n: Int) -> Date {
+        let cal = NSCalendar.current
+        return cal.date(byAdding: .minute, value: n, to: self)!
+    }
+    
     public func addSec(n: Int) -> Date {
         let cal = NSCalendar.current
         return cal.date(byAdding: .second, value: n, to: self)!

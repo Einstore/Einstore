@@ -50,7 +50,6 @@ final public class DownloadKey: DbCoreModel {
         case added
     }
     
-    
     public init(id: DbCoreIdentifier? = nil, appId: DbCoreIdentifier) {
         self.id = id
         self.appId = appId
