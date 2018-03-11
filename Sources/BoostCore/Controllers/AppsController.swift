@@ -123,18 +123,23 @@ class AppsController: Controller {
             }
         }
         
-        /*
-        router.get("apps", DbCoreIdentifier.parameter, "file") { (req) -> Future<App> in
+        //*
+        router.get("apps", DbCoreIdentifier.parameter, "file") { (req) -> Future<Response> in
             // TODO: Validate via download token
-            let id = try req.parameter(DbCoreIdentifier.self)
-            
-            return req.withPooledConnection(to: .db) { (db) -> Future<App> in
-                return appQuery(appId: id, db: db).first().map(to: App.self, { (app) -> App in
+            let appId = try req.parameter(DbCoreIdentifier.self)
+            return try req.me.teams().flatMap(to: Response.self) { teams in
+                return App.query(on: req).safeApp(appId: appId, teamIds: teams.ids).first().map(to: Response.self) { app in
                     guard let app = app else {
-                        throw ContentError.unavailable
+                        throw ErrorsCore.HTTPError.notFound
                     }
-                    return app
-                })
+                    guard app.platform == .ios else {
+                        throw AppsError.invalidPlatform
+                    }
+                    let response = try req.streamFile(at: app.appPath!.path)
+                    response.http.status = .ok
+                    response.http.headers = HTTPHeaders(dictionaryLiteral: (.contentType, "\(app.platform.mime)"))
+                    return response
+                }
             }
         }
         // */

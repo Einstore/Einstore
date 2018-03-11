@@ -43,6 +43,17 @@ final public class App: DbCoreModel {
             }
         }
         
+        public var mime: String {
+            switch self {
+            case .ios:
+                return "application/octet-stream"
+            case .android:
+                return "application/vnd.android.package-archive"
+            default:
+                return "application/unknown"
+            }
+        }
+        
         // MARK: PostgreSQLType stuff n magic
         
         public static var postgreSQLDataType: PostgreSQLDataType = .varchar
