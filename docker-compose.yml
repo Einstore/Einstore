@@ -1,0 +1,26 @@
+version: '3.1'
+
+services:
+    web:
+        build: .
+        ports:
+            - "8080:8080"
+        volumes:
+            - .:/tmp
+        environment:
+            DB_HOST: db
+            DB_USER: boost
+            DB_PASSWORD: aaaaaa
+            DB_NAME: boost
+    db:
+        image: postgres
+        restart: always
+        environment:
+            POSTGRES_USER: boost
+            POSTGRES_PASSWORD: aaaaaa
+            POSTGRES_DB: boost
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - 8081:8080

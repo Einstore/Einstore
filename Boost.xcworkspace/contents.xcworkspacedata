@@ -8,10 +8,16 @@
       location = "container:"
       name = "Configuration">
       <FileRef
+         location = "group:Docker">
+      </FileRef>
+      <FileRef
          location = "group:apiary.apib">
       </FileRef>
       <FileRef
          location = "group:Dockerfile">
+      </FileRef>
+      <FileRef
+         location = "group:docker-compose.yml">
       </FileRef>
       <FileRef
          location = "group:Makefile">

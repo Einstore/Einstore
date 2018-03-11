@@ -37,6 +37,23 @@ extension QueryBuilder where Model == App {
 
 class AppsController: Controller {
     
+    enum AppsError: FrontendError {
+        case invalidPlatform
+        
+        var code: String {
+            return "app_error"
+        }
+        
+        var description: String {
+            return "Unsupported platform"
+        }
+        
+        var status: HTTPStatus {
+            return .conflict
+        }
+        
+    }
+    
     static func boot(router: Router) throws {
         // Overview
         router.get("apps") { (req) -> Future<Apps> in
@@ -88,11 +105,15 @@ class AppsController: Controller {
         }
         
         router.get("apps", DbCoreIdentifier.parameter, "plist") { (req) -> Future<Response> in
+            // TODO: Validate via download token
             let appId = try req.parameter(DbCoreIdentifier.self)
             return try req.me.teams().flatMap(to: Response.self) { teams in
                 return App.query(on: req).safeApp(appId: appId, teamIds: teams.ids).first().map(to: Response.self) { app in
                     guard let app = app else {
                         throw ErrorsCore.HTTPError.notFound
+                    }
+                    guard app.platform == .ios else {
+                        throw AppsError.invalidPlatform
                     }
                     let response = try req.response.basic(status: .ok)
                     response.http.headers = HTTPHeaders(dictionaryLiteral: (.contentType, "application/xml; charset=utf-8"))
@@ -103,8 +124,8 @@ class AppsController: Controller {
         }
         
         /*
-        // TODO: Return an actual file!
         router.get("apps", DbCoreIdentifier.parameter, "file") { (req) -> Future<App> in
+            // TODO: Validate via download token
             let id = try req.parameter(DbCoreIdentifier.self)
             
             return req.withPooledConnection(to: .db) { (db) -> Future<App> in

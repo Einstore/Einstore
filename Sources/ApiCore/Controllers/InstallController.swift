@@ -13,6 +13,22 @@ import DbCore
 
 public class InstallController: Controller {
     
+    public enum InstallError: FrontendError {
+        case dataExists
+        
+        public var code: String {
+            return "install_failed"
+        }
+        
+        public var description: String {
+            return "Data already exists"
+        }
+        
+        public var status: HTTPStatus {
+            return .preconditionFailed
+        }
+    }
+    
     public static func boot(router: Router) throws {
         router.get("install") { (req)->Future<Response> in
             return install(on: req)
@@ -78,10 +94,15 @@ extension InstallController {
     }
     
     private static func install(on req: Request) -> Future<Response> {
-        return su.save(on: req).flatMap(to: Response.self) { user in
-            return adminTeam.save(on: req).flatMap(to: Response.self) { team in
-                return team.users.attach(user, on: req).map(to: Response.self) { join in
-                    return try req.response.maintenanceFinished(message: "Install finished")
+        return User.query(on: req).count().flatMap(to: Response.self) { count in
+            if count > 0 {
+                throw InstallError.dataExists
+            }
+            return su.save(on: req).flatMap(to: Response.self) { user in
+                return adminTeam.save(on: req).flatMap(to: Response.self) { team in
+                    return team.users.attach(user, on: req).map(to: Response.self) { join in
+                        return try req.response.maintenanceFinished(message: "Installation finished, login as admin@liveui.io/admin")
+                    }
                 }
             }
         }

@@ -20,15 +20,12 @@ RUN \
 
 RUN \
     apt-get update && \
-    apt-get install -y openjdk-7-jdk && \
+    apt-get install -y openjdk-8-jdk && \
     rm -rf /var/lib/apt/lists/*
-ENV JAVA_HOME /usr/lib/jvm/java-7-openjdk-amd64
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
 
 RUN swift build --configuration debug
 RUN ln -s .build/x86_64-unknown-linux/debug/Run ./boost
-
-
-FROM mangoweb/swift:4.1-alpha
 
 COPY --from=0 /boost/.build/x86_64-unknown-linux/debug/Run /app/boost
 
