@@ -12,6 +12,8 @@ services:
             DB_USER: boost
             DB_PASSWORD: aaaaaa
             DB_NAME: boost
+            TMP_FOLDER: /tmp/Boost
+            PERSISTENT_FOLDER: /home/Boost
     db:
         image: postgres
         restart: always

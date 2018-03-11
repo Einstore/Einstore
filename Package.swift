@@ -8,7 +8,7 @@ let package = Package(
         .package(url: "https://github.com/vapor/fluent-postgresql.git", .exact("1.0.0-beta.3")),
         .package(url: "https://github.com/vapor/fluent.git", .exact("3.0.0-beta.3")),
         .package(url: "https://github.com/vapor/jwt.git", .exact("3.0.0-beta.1.1")),
-        .package(url: "https://github.com/kareman/SwiftShell.git", .exact("4.0.0")),
+        .package(url: "https://github.com/kareman/SwiftShell.git", .exact("4.0.2")),
         .package(url: "https://github.com/LiveUI/VaporTestTools.git", .branch("master"))
     ],
     targets: [
