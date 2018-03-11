@@ -29,7 +29,7 @@ public final class ApiAuthMiddleware: Middleware, ServiceFactory {
     
     public var serviceTag: String?
     
-    public var serviceIsSingleton: Bool = false
+    public var serviceIsSingleton: Bool = true
     
     public func makeService(for worker: Container) throws -> Any {
         return self

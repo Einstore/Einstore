@@ -84,8 +84,12 @@ public class Boost {
         DbCore.migrationConfig.add(model: Tag.self, database: .db)
         DbCore.migrationConfig.add(model: AppTag.self, database: .db)
         DbCore.migrationConfig.add(model: UploadKey.self, database: .db)
+        DbCore.migrationConfig.add(model: ErrorLog.self, database: .db)
         
         UploadKey.Display.defaultDatabase = .db
+        
+        // TODO: Make optional!
+        services.register(ErrorLoggingMiddleware())
         
         try ApiCore.configure(databaseConfig: database, &config, &env, &services)
     }

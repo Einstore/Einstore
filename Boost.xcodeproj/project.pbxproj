@@ -25,6 +25,8 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		154E45E72055EA8300AAB528 /* ErrorLoggingMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154E45E62055EA8300AAB528 /* ErrorLoggingMiddleware.swift */; };
+		1594EFA62055E7F600F0F253 /* ErrorLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1594EFA52055E7F600F0F253 /* ErrorLog.swift */; };
 		OBJ_1002 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_230 /* Package.swift */; };
 		OBJ_1008 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_248 /* Package.swift */; };
 		OBJ_1014 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_306 /* Package.swift */; };
@@ -6426,6 +6428,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		154E45E62055EA8300AAB528 /* ErrorLoggingMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorLoggingMiddleware.swift; sourceTree = "<group>"; };
+		1594EFA52055E7F600F0F253 /* ErrorLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorLog.swift; sourceTree = "<group>"; };
 		"Async::Async::Product" /* Async.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Async.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCore::Product" /* ApiCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCoreTestTools::Product" /* ApiCoreTestTools.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCoreTestTools.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -9518,7 +9522,7 @@
 			path = AST;
 			sourceTree = "<group>";
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -9534,7 +9538,6 @@
 				OBJ_178 /* Dependencies */,
 				OBJ_930 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_508 /* Data */ = {
@@ -10114,6 +10117,7 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_73 /* ApiAuthMiddleware.swift */,
+				154E45E62055EA8300AAB528 /* ErrorLoggingMiddleware.swift */,
 			);
 			path = Middleware;
 			sourceTree = "<group>";
@@ -10187,6 +10191,7 @@
 				OBJ_77 /* TeamUser.swift */,
 				OBJ_78 /* Token.swift */,
 				OBJ_79 /* User.swift */,
+				1594EFA52055E7F600F0F253 /* ErrorLog.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -12520,7 +12525,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_930 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -12911,6 +12916,7 @@
 			files = (
 				OBJ_2168 /* ApiCore.swift in Sources */,
 				OBJ_2169 /* Configuration.swift in Sources */,
+				154E45E72055EA8300AAB528 /* ErrorLoggingMiddleware.swift in Sources */,
 				OBJ_2170 /* AuthController.swift in Sources */,
 				OBJ_2171 /* GenericController.swift in Sources */,
 				OBJ_2172 /* InstallController.swift in Sources */,
@@ -12939,6 +12945,7 @@
 				OBJ_2195 /* ApiAuthMiddleware.swift in Sources */,
 				OBJ_2196 /* FluentDesign.swift in Sources */,
 				OBJ_2197 /* Team.swift in Sources */,
+				1594EFA62055E7F600F0F253 /* ErrorLog.swift in Sources */,
 				OBJ_2198 /* TeamUser.swift in Sources */,
 				OBJ_2199 /* Token.swift in Sources */,
 				OBJ_2200 /* User.swift in Sources */,

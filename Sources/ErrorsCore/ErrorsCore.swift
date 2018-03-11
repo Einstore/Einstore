@@ -43,7 +43,7 @@ public enum HTTPError: FrontendError {
         case .notFound:
             return "Not found"
         case .notAuthorized:
-            return "Not authorised!!! Boo!"
+            return "You shall not pass!"
         case .missingRequestData:
             return "Some request data are missing"
         case .missingAuthorizationData:
