@@ -18,7 +18,12 @@ public typealias DownloadKeys = [DownloadKey]
 
 final public class DownloadKey: DbCoreModel {
     
+    public struct Token: Codable {
+        public var token: String
+    }
+    
     public struct Public: Content {
+        let appId: DbCoreIdentifier
         var token: String
         let plist: String
         let file: String
@@ -27,12 +32,21 @@ final public class DownloadKey: DbCoreModel {
         init(downloadKey: DownloadKey, request req: Request) {
             self.token = downloadKey.token
             
-            guard let url = URL(string: Boost.config.serverBaseUrl)?.appendingPathComponent("app") else {
+            guard let url = URL(string: Boost.config.serverBaseUrl)?.appendingPathComponent("apps") else {
                 fatalError("Server URL is not properly configured")
             }
-            self.plist = url.appendingPathComponent("\(downloadKey.appId.uuidString)/plist?download=\(downloadKey.token)").absoluteString
-            self.file = url.appendingPathComponent("\(downloadKey.appId.uuidString)/file?download=\(downloadKey.token)").absoluteString
+            self.plist = url.appendingPathComponent("plist?token=\(downloadKey.token)").absoluteString
+            self.file = url.appendingPathComponent("file?token=\(downloadKey.token)").absoluteString
             self.ios = "itms-services://?action=download-manifest&url=\(self.plist)"
+            self.appId = downloadKey.appId
+        }
+        
+        enum CodingKeys: String, CodingKey {
+            case appId = "app_id"
+            case token
+            case plist
+            case file
+            case ios
         }
     }
     

@@ -104,11 +104,13 @@ class AppsController: Controller {
             }
         }
         
-        router.get("apps", DbCoreIdentifier.parameter, "plist") { (req) -> Future<Response> in
-            // TODO: Validate via download token
-            let appId = try req.parameter(DbCoreIdentifier.self)
-            return try req.me.teams().flatMap(to: Response.self) { teams in
-                return App.query(on: req).safeApp(appId: appId, teamIds: teams.ids).first().map(to: Response.self) { app in
+        router.get("apps", "plist") { (req) -> Future<Response> in
+            let token = try req.query.decode(DownloadKey.Token.self)
+            return DownloadKey.query(on: req).filter(\DownloadKey.token == token.token).first().flatMap(to: Response.self) { key in
+                guard let key = key else {
+                    throw ErrorsCore.HTTPError.notAuthorized
+                }
+                return App.query(on: req).filter(\App.id == key.appId).first().map(to: Response.self) { app in
                     guard let app = app else {
                         throw ErrorsCore.HTTPError.notFound
                     }
@@ -123,26 +125,28 @@ class AppsController: Controller {
             }
         }
         
-        //*
-        router.get("apps", DbCoreIdentifier.parameter, "file") { (req) -> Future<Response> in
-            // TODO: Validate via download token
-            let appId = try req.parameter(DbCoreIdentifier.self)
-            return try req.me.teams().flatMap(to: Response.self) { teams in
-                return App.query(on: req).safeApp(appId: appId, teamIds: teams.ids).first().map(to: Response.self) { app in
+        router.get("apps", "file") { (req) -> Future<Response> in
+            let token = try req.query.decode(DownloadKey.Token.self)
+            return DownloadKey.query(on: req).filter(\DownloadKey.token == token.token).first().flatMap(to: Response.self) { key in
+                guard let key = key else {
+                    throw ErrorsCore.HTTPError.notAuthorized
+                }
+                return App.query(on: req).filter(\App.id == key.appId).first().map(to: Response.self) { app in
                     guard let app = app else {
                         throw ErrorsCore.HTTPError.notFound
                     }
                     guard app.platform == .ios else {
                         throw AppsError.invalidPlatform
                     }
-                    let response = try req.streamFile(at: app.appPath!.path)
-                    response.http.status = .ok
-                    response.http.headers = HTTPHeaders(dictionaryLiteral: (.contentType, "\(app.platform.mime)"))
+//                    let response = try req.streamFile(at: app.appPath!.path)
+                    let response = try req.response.basic(status: .ok)
+                    response.http.headers = HTTPHeaders(dictionaryLiteral: (.contentType, "\(app.platform.mime)"), (.contentDisposition, "attachment; filename=\"\(app.name.safeText).\(app.platform.fileExtension)\""))
+                    let appData = try Data(contentsOf: app.appPath!, options: [])
+                    response.http.body = HTTPBody.init(appData)
                     return response
                 }
             }
         }
-        // */
         
         router.get("apps", DbCoreIdentifier.parameter, "tags") { (req) -> Future<Tags> in
             let appId = try req.parameter(DbCoreIdentifier.self)

@@ -73,10 +73,10 @@ public class Boost {
             fatalError("Missing database configuration in BoostConfig")
         }
         
-//        boostConfig.fileHandler = try Filesystem(config: Filesystem.Config(homeDir: "/tmp/Boost/"))
-        
         self.config = boostConfig
         
+        ApiAuthMiddleware.allowedGetUri.append("/apps/plist")
+        ApiAuthMiddleware.allowedGetUri.append("/apps/file")
         ApiAuthMiddleware.allowedPostUri.append("/apps")
         
         DbCore.migrationConfig.add(model: App.self, database: .db)

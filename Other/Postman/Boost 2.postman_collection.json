@@ -1012,6 +1012,38 @@
 		},
 		{
 			"name": "Apps (apps/:id/auth)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c075b435-49e3-494c-940d-02f1613f4776",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"if (responseCode.code === 200) {",
+							"    // Token check",
+							"    tests[\"Download token has an ios url\"] = (jsonData[\"ios\"].length > 10)",
+							"    tests[\"Download token has a file url\"] = (jsonData[\"file\"].length > 10)",
+							"    tests[\"Download token has a token\"] = (jsonData[\"token\"].length > 10)",
+							"    tests[\"Download token has a plist url\"] = (jsonData[\"plist\"].length > 10)",
+							"    tests[\"Download token has an app_id\"] = (jsonData[\"app_id\"].length > 10)",
+							"    ",
+							"    postman.setEnvironmentVariable(\"DOWNLOAD_TOKEN\", jsonData[\"token\"]);",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						]
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [
@@ -1039,7 +1071,7 @@
 			"response": []
 		},
 		{
-			"name": "Apps (apps/:id/plist)",
+			"name": "Apps (apps/plist)",
 			"request": {
 				"method": "GET",
 				"header": [
@@ -1053,13 +1085,19 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}apps/{{APP_ID}}/plist",
+					"raw": "{{SERVER}}apps/plist?token={{DOWNLOAD_TOKEN}}",
 					"host": [
 						"{{SERVER}}apps"
 					],
 					"path": [
-						"{{APP_ID}}",
 						"plist"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "{{DOWNLOAD_TOKEN}}",
+							"equals": true
+						}
 					]
 				},
 				"description": null
@@ -1067,7 +1105,7 @@
 			"response": []
 		},
 		{
-			"name": "Apps (apps/:id/file)",
+			"name": "Apps (apps/file)",
 			"request": {
 				"method": "GET",
 				"header": [
@@ -1081,13 +1119,19 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}apps/{{APP_ID}}/file",
+					"raw": "{{SERVER}}apps/file?token={{DOWNLOAD_TOKEN}}",
 					"host": [
 						"{{SERVER}}apps"
 					],
 					"path": [
-						"{{APP_ID}}",
 						"file"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "{{DOWNLOAD_TOKEN}}",
+							"equals": true
+						}
 					]
 				},
 				"description": null

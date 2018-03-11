@@ -40,7 +40,7 @@ public struct AppPlist: Codable {
                 guard let serverUrl = req.serverURL() else {
                     throw AppPlistError.missingServerUrl
                 }
-                self.url = serverUrl.appendingPathComponent(app.id!.uuidString).appendingPathComponent("app.boost").absoluteString
+                self.url = serverUrl.appendingPathComponent("app.boost").absoluteString
             }
             
         }
