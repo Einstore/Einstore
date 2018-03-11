@@ -115,7 +115,7 @@ Response header also contains a JWT token which will be valid for 3 minutes. Whe
 + Request
     + Headers
     
-            ContentType: application/json
+            Content-Type: application/json
             
 
     + Body
@@ -199,7 +199,7 @@ JWT token needs to be refreshed after 30 seconds from the last request made. Wit
     
     + Headers
     
-            ContentType: application/json
+            Content-Type: application/json
             
     + Body
 
@@ -280,7 +280,7 @@ This endpoint is not secured and should be used for new registrations
     + Headers
 
             Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
-            ContentType: application/json
+            Content-Type: application/json
             
     + Body
 
@@ -366,7 +366,7 @@ Team identifier needs to be unique for the whole platform. If sent in an incorec
     + Headers
 
             Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
-            ContentType: application/json
+            Content-Type: application/json
             
     + Body
 
@@ -415,7 +415,7 @@ Team identifier needs to be unique for the whole platform. If sent in an incorec
     + Headers
 
             Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
-            ContentType: application/json
+            Content-Type: application/json
             
     + Body
 
@@ -451,7 +451,7 @@ Team identifier needs to be unique for the whole platform. If sent in an incorec
 
 
 
-## Team [/teams/{id}]
+## Team [/teams/{teamId}]
 
 For updates, team identifier needs to be unique for the whole platform. If sent in an incorect format, string in it will be formatted into a "safe text", for example `My amazing TEAM!` will be formatted into `my-amazing-team`.
 
@@ -460,7 +460,7 @@ For updates, team identifier needs to be unique for the whole platform. If sent 
 
 
 + Parameters
-    + id (required, number) - Id of the team
+    + teamId (required, number) - Id of the team
 
 + Request
     
@@ -494,14 +494,14 @@ For updates, team identifier needs to be unique for the whole platform. If sent 
 
 
 + Parameters
-    + id (required, number) - Id of the team
+    + teamId (required, number) - Id of the team
 
 + Request
     
     + Headers
 
             Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
-            ContentType: application/json
+            Content-Type: application/json
             
     + Body
 
@@ -541,14 +541,14 @@ For updates, team identifier needs to be unique for the whole platform. If sent 
 
 
 + Parameters
-    + id (required, number) - Id of the team
+    + teamId (required, number) - Id of the team
 
 + Request
     
     + Headers
 
             Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
-            ContentType: application/json
+            Content-Type: application/json
             
     + Body
 
@@ -583,7 +583,7 @@ For updates, team identifier needs to be unique for the whole platform. If sent 
         }
 
 
-## List team users [/teams/{id}/users]
+## List team users [/teams/{teamId}/users]
 
 List active users of a team.
 
@@ -628,7 +628,7 @@ List active users of a team.
         }
         
         
-## Link user to a team [/teams/{id}/link]
+## Link user to a team [/teams/{teamId}/link]
 
 Link an existing user to a team.
 
@@ -639,7 +639,7 @@ Link an existing user to a team.
     + Headers
 
             Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
-            ContentType: application/json
+            Content-Type: application/json
             
     + Body
 
@@ -673,7 +673,7 @@ Link an existing user to a team.
         }
 
 
-## Remove user from a team [/teams/{id}/unlink]
+## Remove user from a team [/teams/{teamId}/unlink]
 
 Reverse the effect of an invitation. User will be removed from the team but won't be completely deleted.
 
@@ -684,7 +684,7 @@ Reverse the effect of an invitation. User will be removed from the team but won'
     + Headers
 
             Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
-            ContentType: application/json
+            Content-Type: application/json
             
     + Body
 
@@ -718,104 +718,24 @@ Reverse the effect of an invitation. User will be removed from the team but won'
         }
 
 
+## App JWT authenticated upload [/teams/{teamId}/apps?tags={tagsArray}]
 
+Standard JWT token is used to authenticate.
 
-## Overview [/overview{?sort,filter,platform}]
+### Upload new app [POST]
 
-JWT token is used to authenticate.
-
-+ Parameters
-    + sort (optional, string) - Sort<br>
-        + Members
-            + name
-            + platform
-            + identifier
-        + Default: name
-    + filter (optional, array[String]) - Array of tag identifiers<br>Example: [lib_version_1.2.3|another-tag]<br>
-    + platform (optional, string) - Filter apps for a specific platform
-        + Members
-            + ios
-            + android
-
-### List [GET]
-
-Used to list all available apps grouped by platform and bundle id, mainly to be displayed on a "home page" of a client
-
-Results are sorted by app name by default.
+- When uploading new apps submit `.ipa` or `.apk` file as a full POST request payload. 
+- Multiple tags should be separated by `|`, for example `/upload?tags=tag1|library_version_1.2.3|some%20Other%20tag`
+- Mime types (Content-Type)
+   - iOS app is <b><i>application/octet-stream</i></b>
+   - Android app is <b><i>application/vnd.android.package-archive</i></b>
 
 + Request
     
     + Headers
 
             Authorization: Bearer eyJhbGciOiJIUzUxMiIsInVzZXIiOjEsInRva2VuIjoiRTk3OTYzMjItOURBNy00RTAwLTlCNTItOEI4RThBRjkwRDAxIiwidHlwIjoiSldUIn0
-
-
-+ Response 200 (application/json; charset=utf-8)
-
-        [
-            {
-                "build": "123",
-                "basic": false,
-                "id": 1,
-                "platform": 1,
-                "team_id": 1,
-                "version": "1.2.3",
-                "identifier": "com.boost.super-app1",
-                "created": 535044877,
-                "name": "Super app 1",
-                "modified": 535044877
-            },
-            {
-                "build": "123",
-                "basic": false,
-                "id": 2,
-                "platform": 2,
-                "team_id": 1,
-                "version": "1.2.3",
-                "identifier": "com.boost.super-app1",
-                "created": 535044877,
-                "name": "Super app2",
-                "modified": 535044877
-            },
-            {
-                "build": "123",
-                "basic": false,
-                "id": 3,
-                "platform": 2,
-                "team_id": 1,
-                "version": "1.2.3",
-                "identifier": "com.boost.super-app1",
-                "created": 535044877,
-                "name": "Super app3",
-                "modified": 535044877
-            }
-        ]
-
-+ Response 401 (application/json; charset=utf-8)
-
-        {
-            "code": "auth_failed",
-            "error": "authentication failed"
-        }
-
-## App web upload [/apps?tags={tagsArray}]
-
-Upload token (headers) is used to authenticate. It can be created using `/keys` endpoint.
-
-### Upload new app [POST]
-
-- When uploading new apps submit `.ipa` or `.apk` file as a full POST request payload. 
-- Multiple tags should be separated by `|`, for example `/upload?tags=tag1|library_version_1.2.3|some%20Other%20tag`
-- Mime types (ContentType)
-   - iOS app is <b><i>application/octet-stream</i></b>
-   - Android app is <b><i>application/vnd.android.package-archive</i></b>
-
-+ Request (multipart/form-data)
-    
-    + Headers
-
-            Authorization: Bearer eyJhbGciOiJIUzUxMiIsInVzZXIiOjEsInRva2VuIjoiRTk3OTYzMjItOURBNy00RTAwLTlCNTItOEI4RThBRjkwRDAxIiwidHlwIjoiSldUIn0
-            ContentType: application/octet-stream
+            Content-Type: application/octet-stream
 
 
 
@@ -835,8 +755,65 @@ Upload token (headers) is used to authenticate. It can be created using `/keys` 
                 "name": "Super app3",
                 "modified": 535044877
             }
+
+    + Attributes (App)
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed",
+            "error": "authentication failed"
+        }
+    
+ 
+## App CI upload [/apps?token={token}&tags={tagsArray}]
+
+Upload token (in the url) is used to authenticate. It can be created using `/keys` endpoint.
+
+### Upload new app [POST]
+
+- When uploading new apps submit `.ipa` or `.apk` file as a full POST request payload. 
+- Multiple tags should be separated by `|`, for example `/upload?tags=tag1|library_version_1.2.3|some%20Other%20tag`
+- Mime types (Content-Type)
+   - iOS app is <b><i>application/octet-stream</i></b>
+   - Android app is <b><i>application/vnd.android.package-archive</i></b>
+
++ Request
+    
+    + Headers
+
+            Content-Type: application/octet-stream
+
+
+
++ Response 201 (application/json; charset=utf-8)
+
+    + Body
+
+            {
+                "build": "123",
+                "basic": false,
+                "id": 3,
+                "platform": 2,
+                "team_id": 1,
+                "version": "1.2.3",
+                "identifier": "com.boost.super-app1",
+                "created": 535044877,
+                "name": "Super app3",
+                "modified": 535044877
+            }
+    
             
     + Attributes (App)
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed",
+            "error": "authentication failed"
+        }
+
+        
             
 ## Apps [/apps/{platform}/{identifier}]
 
@@ -1155,7 +1132,7 @@ Download token will stay valid for 30 minutes to initialise a new connection. Ex
         }
   
   
-## Upload API keys [/teams/{id}/keys]
+## Upload API keys [/teams/{teamId}/keys]
 
 In order to upload an app you need an upload API key. Keys are bound to teams so any app uploaded using an upload key will be assigned to the selected team.
 
@@ -1164,7 +1141,7 @@ In order to upload an app you need an upload API key. Keys are bound to teams so
 
 
 + Parameters
-    + id (required, number) - Id of the team
+    + teamId (required, number) - Id of the team
 
 + Request
     
@@ -1198,14 +1175,14 @@ In order to upload an app you need an upload API key. Keys are bound to teams so
 
 
 + Parameters
-    + id (required, number) - Id of the team
+    + teamId (required, number) - Id of the team
 
 + Request
     
     + Headers
 
             Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
-            ContentType: application/json
+            Content-Type: application/json
             
     + Body
 
@@ -1523,6 +1500,8 @@ No authentication is needed
             }
 
 
+
+
 # Data Structures
 
 ## AppPut (object)
@@ -1533,9 +1512,9 @@ No authentication is needed
 - name: My app name (string, required) - Application name as displayed on the device
 
 ## App (object)
-- id: 11 (number, required) - ID
-- platform: 1 (number, required) - Platform (1-iOS, 2-Android)
-- team_id: 42 (number, required) - Team id
+- id: XXXXX (string, required) - ID
+- platform: ios (string, required) - Platform (ios, android)
+- team_id: XXXXX (string, required) - Team id
 - created: 535044877 (number, required) - Date created (timestamp)
 - modified: 535044877 (number, required) - Date last modified (timestamp)
 - Include AppPut
@@ -1544,7 +1523,7 @@ No authentication is needed
 - (array[App])
 
 ## Tag (object)
-- id: 123 (number) - ID
+- id: XXXXX (string) - ID
 - name: my_custom_tag_123 (string, required) - Tag value
 
 
