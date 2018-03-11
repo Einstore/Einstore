@@ -433,15 +433,21 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [
 					{
 						"key": "Content-Type",
 						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
 				"body": {
@@ -491,16 +497,50 @@
 		},
 		{
 			"name": "Teams (teams/:id)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "81cd4170-4a0e-4db5-90b4-fd3cf82170a1",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"if (responseCode.code === 200) {",
+							"    // Token check",
+							"    tests[\"Team has an id\"] = (jsonData[\"id\"].length > 0)",
+							"    tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
+							"    tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						]
+					}
+				}
+			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [
 					{
 						"key": "Content-Type",
 						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
 				"body": {
@@ -792,13 +832,18 @@
 		{
 			"name": "Apps (apps)",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
-					}
-				],
+				"header": [],
 				"body": {},
 				"url": {
 					"raw": "{{SERVER}}apps",
@@ -811,7 +856,7 @@
 			"response": []
 		},
 		{
-			"name": "Apps (teams/:id/apps/upload)",
+			"name": "Apps (teams/:id/apps)",
 			"event": [
 				{
 					"listen": "test",
@@ -857,14 +902,13 @@
 					"file": {}
 				},
 				"url": {
-					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/apps/upload?tags=tag5|tag6|tag7",
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/apps?tags=tag5|tag6|tag7",
 					"host": [
 						"{{SERVER}}teams"
 					],
 					"path": [
 						"{{TEST_TEAM_ID}}",
-						"apps",
-						"upload"
+						"apps"
 					],
 					"query": [
 						{
@@ -879,7 +923,7 @@
 			"response": []
 		},
 		{
-			"name": "Apps (apps/upload)",
+			"name": "Apps (apps)",
 			"event": [
 				{
 					"listen": "test",
@@ -908,26 +952,26 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "POST",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Token XXXXXX-XXXXXX-XXXXX-XXXX-XXXXXX"
-					}
-				],
+				"header": [],
 				"body": {
 					"mode": "file",
 					"file": {}
 				},
 				"url": {
-					"raw": "{{SERVER}}apps/upload?tags=tag1|tag2|tag3|tag4",
+					"raw": "{{SERVER}}apps?token={{TEST_UPLOAD_KEY}}&tags=tag1|tag2|tag3|tag4",
 					"host": [
 						"{{SERVER}}apps"
 					],
-					"path": [
-						"upload"
-					],
 					"query": [
+						{
+							"key": "token",
+							"value": "{{TEST_UPLOAD_KEY}}",
+							"equals": true
+						},
 						{
 							"key": "tags",
 							"value": "tag1|tag2|tag3|tag4",
@@ -1163,7 +1207,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "59050043-3791-4cd9-a687-2991cff02a0e",
+						"id": "55b9bfee-fdd1-4edd-b389-fe357848166b",
 						"type": "text/javascript",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
@@ -1178,6 +1222,7 @@
 							"tests[\"Key has a correct team_id\"] = (jsonData[\"team_id\"] == postman.getEnvironmentVariable(\"TEST_TEAM_ID\"))",
 							"",
 							"postman.setEnvironmentVariable(\"TEST_UPLOAD_KEY_ID\", jsonData[\"id\"]);",
+							"postman.setEnvironmentVariable(\"TEST_UPLOAD_KEY\", jsonData[\"token\"]);",
 							"",
 							"",
 							"// Content type",
@@ -1188,12 +1233,18 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
-					},
 					{
 						"key": "Content-Type",
 						"value": "application/json"
