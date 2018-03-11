@@ -815,7 +815,7 @@ Upload token (in the url) is used to authenticate. It can be created using `/key
 
         
             
-## Apps [/apps/{platform}/{identifier}]
+## Apps [/apps]
 
 JWT token is used to authenticate.
 
@@ -885,14 +885,12 @@ form of choices.
         }
         
 
-## App [/apps/{id}{?depth}]
+## App [/apps/{id}]
 
 JWT token is used to authenticate.
 
 + Parameters
     + id (required, number) - Application ID
-    + depth (optional, number) - Returns tags related to the app if `depth > 0`<br>discarded on delete<br>
-        + Default: 0
 
 ### App detail [GET]
 
@@ -1025,9 +1023,10 @@ JWT token is used to authenticate.
 
             {
                 "download_token": "A40AD800-416E-462C-AFEE-9943410984F7",
-                "file": "https://api.yourstore.com/app/A40AD800-416E-462C-AFEE-9943410984F7/file?download=A40AD800-416E-462C-AFEE-9943410984F7",
-                "plist": "https://api.yourstore.com/app/A40AD800-416E-462C-AFEE-9943410984F7/plist?download=A40AD800-416E-462C-AFEE-9943410984F7",
-                "ios": "itms-services://?action=download-manifest&url=://api.yourstore.com/app/A40AD800-416E-462C-AFEE-9943410984F7/plist?download=A40AD800-416E-462C-AFEE-9943410984F7"
+                "file": "https://api.yourstore.com/app/file?token=A40AD800-416E-462C-AFEE-9943410984F7",
+                "plist": "https://api.yourstore.com/app/plist?token=A40AD800-416E-462C-AFEE-9943410984F7",
+                "ios": "itms-services://?action=download-manifest&url=://api.yourstore.com/app/plist?token=A40AD800-416E-462C-AFEE-9943410984F7",
+                "app_id": "A40AD800-416E-462C-AFEE-9943410984F7"
             }
                 
             
@@ -1040,20 +1039,19 @@ JWT token is used to authenticate.
         }
   
 
-## iOS app info plist [/apps/{id}/plist{?download}]
+## iOS app info plist [/apps/plist{?token}]
 
 iOS applications require a special xml that needs to be referenced from the download link.
 
 The plist link (as well as the download token) will be returned by an app download generator and should have a following format:
 ```
-<a href="itms-services://?action=download-manifest&url=https://api.yourstore.com/app/{APP_ID}/plist?download={DOWNLOAD_TOKEN}">Amazing App</a>
+<a href="itms-services://?action=download-manifest&url=https://api.yourstore.com/app/plist?token={DOWNLOAD_TOKEN}">Amazing App</a>
 ```
 
-Download token will stay valid for 30 minutes
+Download token will stay valid for 15 minutes
 
 + Parameters
-    + id (required, number) - Application ID
-    + download (string) - Authentication token created using app auth generator
+    + token (string) - Authentication token created using app download auth generator
 
 ### PropertyList file [GET]
 
@@ -1100,16 +1098,15 @@ Download token will stay valid for 30 minutes
             "error": "authentication failed"
         }
         
-   
-## Download app [/apps/{id}/file{?download}]
+
+## Download app [/apps/file{?token}]
 
 The actual download link will be returned by an app download generator. For iOS apps, link is automatically included in the enterprise distribution Property List file.
 
-Download token will stay valid for 30 minutes to initialise a new connection. Existing connection won't get interrupted.
+Download token will stay valid for 15 minutes to initialise a new connection. Existing connection won't get interrupted.
 
 + Parameters
-    + id (required, number) - Application ID
-    + download (string) - Authentication token created using app auth generator
+    + token (string) - Authentication token created using app auth generator
     
     
 ### Binary file (app) [GET]
@@ -1121,6 +1118,7 @@ Download token will stay valid for 30 minutes to initialise a new connection. Ex
     
     + Headers
 
+            Content-Length: 63474
             Content-Length: 63474
 
             
