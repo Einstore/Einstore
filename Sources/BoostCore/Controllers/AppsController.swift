@@ -106,9 +106,11 @@ class AppsController: Controller {
         
         router.get("apps", "plist") { (req) -> Future<Response> in
             let token = try req.query.decode(DownloadKey.Token.self)
-            return DownloadKey.query(on: req).filter(\DownloadKey.token == token.token).first().flatMap(to: Response.self) { key in
+            return try DownloadKey.query(on: req).filter(\DownloadKey.token == token.token).filter(\DownloadKey.added >= Date().addMinute(n: -15)).first().flatMap(to: Response.self) { key in
                 guard let key = key else {
-                    throw ErrorsCore.HTTPError.notAuthorized
+                    return DownloadKey.query(on: req).filter(\DownloadKey.added < Date().addMinute(n: -15)).delete().map(to: Response.self) { _ in
+                        throw ErrorsCore.HTTPError.notAuthorized
+                    }
                 }
                 return App.query(on: req).filter(\App.id == key.appId).first().map(to: Response.self) { app in
                     guard let app = app else {
@@ -127,9 +129,11 @@ class AppsController: Controller {
         
         router.get("apps", "file") { (req) -> Future<Response> in
             let token = try req.query.decode(DownloadKey.Token.self)
-            return DownloadKey.query(on: req).filter(\DownloadKey.token == token.token).first().flatMap(to: Response.self) { key in
+            return try DownloadKey.query(on: req).filter(\DownloadKey.token == token.token).filter(\DownloadKey.added >= Date().addMinute(n: -15)).first().flatMap(to: Response.self) { key in
                 guard let key = key else {
-                    throw ErrorsCore.HTTPError.notAuthorized
+                    return DownloadKey.query(on: req).filter(\DownloadKey.added < Date().addMinute(n: -15)).delete().map(to: Response.self) { _ in
+                        throw ErrorsCore.HTTPError.notAuthorized
+                    }
                 }
                 return App.query(on: req).filter(\App.id == key.appId).first().map(to: Response.self) { app in
                     guard let app = app else {
