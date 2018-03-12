@@ -24,9 +24,10 @@ public final class ErrorLog: DbCoreModel {
     public var method: String
     public var error: String
     
-    public init(id: DbCoreIdentifier? = nil, uri: String, method: HTTPMethod, error: Error) {
-        self.uri = uri
-        self.method = method.string
+    public init(id: DbCoreIdentifier? = nil, request req: Request, error: Error) {
+        let query = req.http.uri.query != nil ? "?\(req.http.uri.query!)" : ""
+        self.uri = "\(req.http.uri.path)\(query)"
+        self.method = req.http.method.string
         self.added = Date()
         
         if let e = error as? FrontendError {

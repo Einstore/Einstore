@@ -29,7 +29,8 @@ public class ApiCore {
         InstallController.self,
         AuthController.self,
         UsersController.self,
-        TeamsController.self
+        TeamsController.self,
+        LogsController.self
     ]
     
     public static func configure(databaseConfig: DatabaseConfig,_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
@@ -41,6 +42,9 @@ public class ApiCore {
         User.Display.defaultDatabase = .db
         FluentDesign.defaultDatabase = .db
         
+        // TODO: Make optional!
+        ApiCore.middlewareConfig.use(ErrorLoggingMiddleware.self)
+        
         ApiCore.middlewareConfig.use(ApiAuthMiddleware.self)
         ApiCore.middlewareConfig.use(ErrorsCoreMiddleware.self)
         ApiCore.middlewareConfig.use(DateMiddleware.self)
@@ -48,6 +52,9 @@ public class ApiCore {
         services.register { container -> MiddlewareConfig in
             middlewareConfig
         }
+        
+        // TODO: Make optional!
+        services.register(ErrorLoggingMiddleware())
         
         let logger = PrintLogger()
         services.register(ErrorsCoreMiddleware(environment: env, log: logger))

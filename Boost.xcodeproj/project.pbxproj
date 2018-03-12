@@ -27,6 +27,7 @@
 /* Begin PBXBuildFile section */
 		154E45E72055EA8300AAB528 /* ErrorLoggingMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154E45E62055EA8300AAB528 /* ErrorLoggingMiddleware.swift */; };
 		1594EFA62055E7F600F0F253 /* ErrorLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1594EFA52055E7F600F0F253 /* ErrorLog.swift */; };
+		15C78A8D2055F3800043BF0A /* LogsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C78A8C2055F3800043BF0A /* LogsController.swift */; };
 		OBJ_1002 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_230 /* Package.swift */; };
 		OBJ_1008 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_248 /* Package.swift */; };
 		OBJ_1014 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_306 /* Package.swift */; };
@@ -6430,6 +6431,7 @@
 /* Begin PBXFileReference section */
 		154E45E62055EA8300AAB528 /* ErrorLoggingMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorLoggingMiddleware.swift; sourceTree = "<group>"; };
 		1594EFA52055E7F600F0F253 /* ErrorLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorLog.swift; sourceTree = "<group>"; };
+		15C78A8C2055F3800043BF0A /* LogsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsController.swift; sourceTree = "<group>"; };
 		"Async::Async::Product" /* Async.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Async.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCore::Product" /* ApiCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCoreTestTools::Product" /* ApiCoreTestTools.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCoreTestTools.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -9304,6 +9306,7 @@
 				OBJ_46 /* InstallController.swift */,
 				OBJ_47 /* TeamsController.swift */,
 				OBJ_48 /* UsersController.swift */,
+				15C78A8C2055F3800043BF0A /* LogsController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -12948,6 +12951,7 @@
 				1594EFA62055E7F600F0F253 /* ErrorLog.swift in Sources */,
 				OBJ_2198 /* TeamUser.swift in Sources */,
 				OBJ_2199 /* Token.swift in Sources */,
+				15C78A8D2055F3800043BF0A /* LogsController.swift in Sources */,
 				OBJ_2200 /* User.swift in Sources */,
 				OBJ_2201 /* Controller.swift in Sources */,
 			);

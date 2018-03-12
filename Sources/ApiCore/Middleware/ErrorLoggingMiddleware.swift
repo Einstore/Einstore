@@ -30,7 +30,7 @@ public final class ErrorLoggingMiddleware: Middleware, ServiceFactory {
     
     public func respond(to req: Request, chainingTo next: Responder) throws -> Future<Response> {
         return try next.respond(to: req).catchFlatMap({ (error) -> (Future<Response>) in
-            return ErrorLog(uri: req.http.uri.path, method: req.http.method, error: error).save(on: req).flatMap(to: Response.self) { log in
+            return ErrorLog(request: req, error: error).save(on: req).flatMap(to: Response.self) { log in
                 return try next.respond(to: req)
             }
         })
