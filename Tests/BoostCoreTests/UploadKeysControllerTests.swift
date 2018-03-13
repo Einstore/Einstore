@@ -127,7 +127,7 @@ class UploadKeysControllerTests: XCTestCase, UploadKeyTestCaseSetup, LinuxTests 
     }
     
     func testChangeUploadKeyName() {
-        let expiryDate = Date()
+        let expiryDate = Date(timeIntervalSince1970: 213412342342)
         let post = UploadKey.New(name: "updated key", expires: expiryDate)
         let postData = try! post.asJson()
         let req = try! HTTPRequest.testable.put(uri: "/keys/\(key1.id!.uuidString)".makeURI(), data: postData, headers: [

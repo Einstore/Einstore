@@ -24,6 +24,13 @@ public protocol AppTestCaseSetup: UploadKeyTestCaseSetup {
 
 extension AppTestCaseSetup {
     
+    var demoUrl: URL {
+        let config = DirectoryConfig.detect()
+        var url: URL = URL(fileURLWithPath: config.workDir).appendingPathComponent("Resources")
+        url.appendPathComponent("Demo")
+        return url
+    }
+    
     public func setupApps() {
         app.testable.delete(allFor: App.self)
         
@@ -32,6 +39,9 @@ extension AppTestCaseSetup {
         app1 = App.testable.create(team: team1, name: "App 1", version: "1.2.3", build: "123456", platform: .ios, on: app)
         app1.testable.addTag(name: "common tag", identifier: "common-tag", on: app)
         app1.testable.addTag(name: "tag for app 1", identifier: "tag-for-app-1", on: app)
+        
+        try! Boost.storageFileHandler.createFolderStructure(url: app1.targetFolderPath!)
+        try! Boost.storageFileHandler.copy(from:demoUrl.appendingPathComponent("app.ipa") , to: app1.appPath!)
         
         app2 = App.testable.create(team: team2, name: "App 2", identifier: "app2", version: "3.2.1", build: "654321", platform: .android, on: app)
         app2.testable.addTag(name: "common tag", identifier: "common-tag", on: app)
@@ -53,7 +63,8 @@ extension AppTestCaseSetup {
     }
     
     public func deleteAllFiles() {
-        // TODO: Clean test files!!!!!!!
+        try! Boost.storageFileHandler.delete(path: Boost.config.storageFileConfig.mainFolderPath)
+        try! Boost.storageFileHandler.delete(path: Boost.config.tempFileConfig.mainFolderPath)
     }
     
 }

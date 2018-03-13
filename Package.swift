@@ -4,11 +4,11 @@ import PackageDescription
 let package = Package(
     name: "Boost",
     dependencies: [
-        .package(url: "https://github.com/vapor/vapor.git", .exact("3.0.0-beta.3.1.3")),
-        .package(url: "https://github.com/vapor/fluent-postgresql.git", .exact("1.0.0-beta.3")),
-        .package(url: "https://github.com/vapor/fluent.git", .exact("3.0.0-beta.3")),
-        .package(url: "https://github.com/vapor/jwt.git", .exact("3.0.0-beta.1.1")),
-        .package(url: "https://github.com/kareman/SwiftShell.git", .exact("4.0.2")),
+        .package(url: "https://github.com/vapor/vapor.git", from: "3.0.0-beta.3.1.3"),
+        .package(url: "https://github.com/vapor/fluent-postgresql.git", from: "1.0.0-beta.3"),
+        .package(url: "https://github.com/vapor/fluent.git", from: "3.0.0-beta.3"),
+        .package(url: "https://github.com/vapor/jwt.git", from: "3.0.0-beta.1.1"),
+        .package(url: "https://github.com/kareman/SwiftShell.git", from: "4.0.2"),
         .package(url: "https://github.com/LiveUI/VaporTestTools.git", .branch("master"))
     ],
     targets: [

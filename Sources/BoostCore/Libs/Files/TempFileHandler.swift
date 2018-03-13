@@ -26,14 +26,17 @@ public protocol FileHandler {
     func createFolderStructure(path: String) throws
     func createFolderStructure(url: URL) throws
     
-    @discardableResult func delete(path: String) throws -> Future<Void>
-    @discardableResult func delete(url: URL) throws -> Future<Void>
+    func delete(path: String) throws -> Future<Void>
+    func delete(url: URL) throws -> Future<Void>
     
-    @discardableResult func save(data: Data, to: String) throws -> Future<Void>
+    func save(data: Data, to: String) throws -> Future<Void>
     func save(data: Data, to: URL) throws -> Future<Void>
     
     func move(from: String, to: String) throws -> Future<Void>
     func move(from: URL, to: URL) throws -> Future<Void>
+    
+    func copy(from: String, to: String) throws -> Future<Void>
+    func copy(from: URL, to: URL) throws -> Future<Void>
 }
 
 
@@ -47,6 +50,20 @@ public class LocalFileHandler: FileHandler {
     
     public func createFolderStructure(url: URL) throws {
         try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+    }
+    
+    public func delete(path: String) throws -> Future<Void> {
+        if FileManager.default.fileExists(atPath: path) {
+            try FileManager.default.removeItem(atPath: path)
+        }
+        return Future(Void())
+    }
+    
+    public func delete(url: URL) throws -> Future<Void> {
+        if FileManager.default.fileExists(atPath: url.path) {
+            try FileManager.default.removeItem(at: url)
+        }
+        return Future(Void())
     }
     
     public func save(data: Data, to path: String) throws -> Future<Void> {
@@ -69,17 +86,13 @@ public class LocalFileHandler: FileHandler {
         return Future(Void())
     }
     
-    public func delete(path: String) throws -> Future<Void> {
-        if FileManager.default.fileExists(atPath: path) {
-            try FileManager.default.removeItem(atPath: path)
-        }
+    public func copy(from: String, to: String) throws -> Future<Void> {
+        try FileManager.default.copyItem(atPath: from, toPath: to)
         return Future(Void())
     }
     
-    public func delete(url: URL) throws -> Future<Void> {
-        if FileManager.default.fileExists(atPath: url.path) {
-            try FileManager.default.removeItem(at: url)
-        }
+    public func copy(from: URL, to: URL) throws -> Future<Void> {
+        try FileManager.default.copyItem(at: from, to: to)
         return Future(Void())
     }
     

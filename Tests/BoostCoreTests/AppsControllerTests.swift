@@ -121,8 +121,8 @@ class AppsControllerTests: XCTestCase, AppTestCaseSetup, LinuxTests {
         
         r.response.testable.debug()
         
-        let object = app.testable.one(for: App.self, id: app2!.id!)!
-        let tagsCount = try! object.tags.query(on: r.request).count().await(on: r.request)
+        let object = app.testable.one(for: App.self, id: app2!.id!)
+        let tagsCount = try! object!.tags.query(on: r.request).count().await(on: r.request)
         XCTAssertEqual(tagsCount, 2)
         
         // TODO: Test files are still there!!!

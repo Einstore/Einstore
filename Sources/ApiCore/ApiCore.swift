@@ -16,6 +16,8 @@ public class ApiCore {
     
     public static var configuration: Configuration = Configuration.basic()
     
+    public static var debugRequests: Bool = true
+    
     public typealias DeleteTeamWarning = (_ team: Team) -> Future<Error?>
     public typealias DeleteUserWarning = (_ user: User) -> Future<Error?>
     
@@ -41,24 +43,23 @@ public class ApiCore {
         
         User.Display.defaultDatabase = .db
         FluentDesign.defaultDatabase = .db
+        ErrorLog.defaultDatabase = .db
         
-        // TODO: Make optional!
-        ApiCore.middlewareConfig.use(ErrorLoggingMiddleware.self)
-        
-        ApiCore.middlewareConfig.use(ApiAuthMiddleware.self)
+        // TODO: Make some optional!
         ApiCore.middlewareConfig.use(ErrorsCoreMiddleware.self)
+        ApiCore.middlewareConfig.use(ErrorLoggingMiddleware.self)
+        ApiCore.middlewareConfig.use(ApiAuthMiddleware.self)
         ApiCore.middlewareConfig.use(DateMiddleware.self)
         
         services.register { container -> MiddlewareConfig in
             middlewareConfig
         }
         
-        // TODO: Make optional!
+        // TODO: Make some optional!
+        services.register(ErrorsCoreMiddleware(environment: env, log: PrintLogger()))
         services.register(ErrorLoggingMiddleware())
-        
-        let logger = PrintLogger()
-        services.register(ErrorsCoreMiddleware(environment: env, log: logger))
         services.register(ApiAuthMiddleware())
+        services.register(DateMiddleware())
         
         // Authentication
         let jwtSecret = ProcessInfo.processInfo.environment["JWT_SECRET"] ?? "secret"
