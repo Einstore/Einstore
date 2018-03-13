@@ -33,6 +33,7 @@ public enum HTTPError: FrontendError {
     case notAuthorized
     case missingRequestData
     case missingAuthorizationData
+    case missingAvailable
     
     public var code: String {
         return "http_error"
@@ -48,6 +49,8 @@ public enum HTTPError: FrontendError {
             return "Some request data are missing"
         case .missingAuthorizationData:
             return "Some authorization data are missing"
+        case .missingAvailable:
+            return "Not available"
         }
     }
     
@@ -58,8 +61,10 @@ public enum HTTPError: FrontendError {
         case .notAuthorized:
             return .unauthorized
         case .missingRequestData:
-            return .preconditionRequired
+            fallthrough
         case .missingAuthorizationData:
+            fallthrough
+        case .missingAvailable:
             return .preconditionRequired
         }
     }

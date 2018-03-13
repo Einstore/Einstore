@@ -16,7 +16,7 @@ public class ApiCore {
     
     public static var configuration: Configuration = Configuration.basic()
     
-    public static var debugRequests: Bool = true
+    public static var debugRequests: Bool = false
     
     public typealias DeleteTeamWarning = (_ team: Team) -> Future<Error?>
     public typealias DeleteUserWarning = (_ user: User) -> Future<Error?>
