@@ -42,6 +42,18 @@ let package = Package(
             ]
         ),
         .target(
+            name: "SettingsCore",
+            dependencies: [
+                "Vapor",
+                "DbCore",
+                "ApiCore",
+                "Fluent",
+                "FluentPostgreSQL",
+                "FileCore",
+                "ErrorsCore"
+            ]
+        ),
+        .target(
             name: "BoostCore",
             dependencies: [
                 "Vapor",
@@ -109,6 +121,14 @@ let package = Package(
             ]
         ),
         .testTarget(name: "ApiCoreTests", dependencies: [
+            "ApiCore",
+            "VaporTestTools",
+            "FluentTestTools",
+            "ApiCoreTestTools"
+            ]
+        ),
+        .testTarget(name: "SettingsCoreTests", dependencies: [
+            "SettingsCore",
             "ApiCore",
             "VaporTestTools",
             "FluentTestTools",

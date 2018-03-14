@@ -14,8 +14,10 @@ public func configure(_ config: inout Config, _ env: inout Vapor.Environment, _ 
     print("Starting Boost")
     Env.print()
     
-    // TODO: Make this come from an ENV var
-//    let fileHandler = try Filesystem(config: Filesystem.Config(homeDir: "/tmp/Boost"))
+    // register routes
+    let router = EngineRouter.default()
+    try routes(router)
+    services.register(router, as: Router.self)
     
     var boostConfig = BoostConfig()
     boostConfig.database = DbCore.envConfig(defaultDatabase: "boost")

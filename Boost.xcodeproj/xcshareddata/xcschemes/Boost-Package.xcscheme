@@ -42,6 +42,20 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Boost::SettingsCore"
+               BuildableName = "SettingsCore.framework"
+               BlueprintName = "SettingsCore"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "Boost::BoostTestTools"
                BuildableName = "BoostTestTools.framework"
                BlueprintName = "BoostTestTools"
@@ -639,6 +653,16 @@
                BlueprintIdentifier = "Boost::DbCoreTests"
                BuildableName = "DbCoreTests.xctest"
                BlueprintName = "DbCoreTests"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Boost::SettingsCoreTests"
+               BuildableName = "SettingsCoreTests.xctest"
+               BlueprintName = "SettingsCoreTests"
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </TestableReference>
