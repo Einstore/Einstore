@@ -39,7 +39,7 @@ extension Setting: Migration {
     public static func prepare(on connection: DbCoreConnection) -> Future<Void> {
         return Database.create(self, on: connection) { (schema) in
             schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.id.stringValue, isIdentifier: true)
-            schema.addField(type: DbCoreColumnType.varChar(140), name: CodingKeys.name.stringValue, isIdentifier: true)
+            schema.addField(type: DbCoreColumnType.varChar(140), name: CodingKeys.name.stringValue)
             schema.addField(type: DbCoreColumnType.text(), name: CodingKeys.config.stringValue)
         }
     }

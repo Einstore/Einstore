@@ -90,8 +90,8 @@ public class Boost {
         
         UploadKey.Display.defaultDatabase = .db
         
-        try ApiCore.configure(databaseConfig: database, &config, &env, &services)
         try SettingsCore.configure(&config, &env, &services)
+        try ApiCore.configure(databaseConfig: database, &config, &env, &services)
     }
     
 }

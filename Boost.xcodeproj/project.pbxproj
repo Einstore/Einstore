@@ -29,6 +29,7 @@
 		1588AEF4205ACC2B0011E216 /* Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1588AEF3205ACC2B0011E216 /* Setting.swift */; };
 		1588AEF6205ACF000011E216 /* SettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1588AEF5205ACF000011E216 /* SettingsController.swift */; };
 		1588AEF9205AEE110011E216 /* BasicQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1588AEF8205AEE110011E216 /* BasicQuery.swift */; };
+		1588AEFB205AF80F0011E216 /* Data+Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1588AEFA205AF80F0011E216 /* Data+Response.swift */; };
 		OBJ_1002 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_211 /* Package.swift */; };
 		OBJ_1008 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_225 /* Package.swift */; };
 		OBJ_1014 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_237 /* Package.swift */; };
@@ -6779,6 +6780,7 @@
 		1588AEF3205ACC2B0011E216 /* Setting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Setting.swift; sourceTree = "<group>"; };
 		1588AEF5205ACF000011E216 /* SettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsController.swift; sourceTree = "<group>"; };
 		1588AEF8205AEE110011E216 /* BasicQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicQuery.swift; sourceTree = "<group>"; };
+		1588AEFA205AF80F0011E216 /* Data+Response.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Response.swift"; sourceTree = "<group>"; };
 		"Async::Async::Product" /* Async.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Async.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCore::Product" /* ApiCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCoreTestTools::Product" /* ApiCoreTestTools.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCoreTestTools.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -9944,6 +9946,7 @@
 				OBJ_59 /* Request+URI.swift */,
 				OBJ_60 /* String+Crypto.swift */,
 				OBJ_61 /* String+Manipulation.swift */,
+				1588AEFA205AF80F0011E216 /* Data+Response.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -13506,6 +13509,7 @@
 				OBJ_2345 /* ApiAuthMiddleware.swift in Sources */,
 				OBJ_2346 /* ErrorLoggingMiddleware.swift in Sources */,
 				OBJ_2347 /* ErrorLog.swift in Sources */,
+				1588AEFB205AF80F0011E216 /* Data+Response.swift in Sources */,
 				OBJ_2348 /* FluentDesign.swift in Sources */,
 				OBJ_2349 /* Team.swift in Sources */,
 				OBJ_2350 /* TeamUser.swift in Sources */,

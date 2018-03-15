@@ -21,7 +21,8 @@ public struct BasicQuery: Codable {
 extension QueryContainer {
     
     public var basic: BasicQuery? {
-        return try? decode(BasicQuery.self)
+        let decoded = try? decode(BasicQuery.self)
+        return decoded
     }
     
     public var plain: Bool? {

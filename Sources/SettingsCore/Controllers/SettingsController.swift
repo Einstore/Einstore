@@ -16,8 +16,18 @@ import FluentPostgreSQL
 public class SettingsController: Controller {
     
     public static func boot(router: Router) throws {
-        router.get("settings") { (req) -> Future<Settings> in
-            return Setting.query(on: req).all()
+        router.get("settings") { (req) -> Future<Response> in
+            return Setting.query(on: req).all().flatMap(to: Response.self) { settings in
+                if req.query.plain == true  {
+                    var dic: [String: String] = [:]
+                    settings.forEach({ setting in
+                        dic[setting.name] = setting.config
+                    })
+                    return try dic.asJson().asResponse(.ok, to: req)
+                } else {
+                    return try settings.asResponse(.ok, to: req)
+                }
+            }
         }
         
         router.get("settings", DbCoreIdentifier.parameter) { (req) -> Future<Response> in
