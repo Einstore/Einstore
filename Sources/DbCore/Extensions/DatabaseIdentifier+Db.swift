@@ -13,7 +13,7 @@ import FluentPostgreSQL
 extension DatabaseIdentifier {
     
     public static var db: DatabaseIdentifier<DbCoreDatabase> {
-        return .init("db")
+        return .init("psql")
     }
     
 }

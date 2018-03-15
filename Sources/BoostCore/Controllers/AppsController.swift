@@ -25,8 +25,8 @@ extension QueryBuilder where Model == App {
         return s
     }
     
-    func safeApp(appId: DbCoreIdentifier, teamIds: [DbCoreIdentifier]) -> Self {
-        return group(.and) { and in
+    func safeApp(appId: DbCoreIdentifier, teamIds: [DbCoreIdentifier]) throws -> Self {
+        return try group(.and) { and in
             try and.filter(\App.id == appId)
             try and.filter(\App.teamId, in: teamIds)
         }
@@ -75,7 +75,7 @@ class AppsController: Controller {
         router.get("apps", DbCoreIdentifier.parameter) { (req) -> Future<App> in
             let appId = try req.parameter(DbCoreIdentifier.self)
             return try req.me.teams().flatMap(to: App.self) { teams in
-                return App.query(on: req).safeApp(appId: appId, teamIds: teams.ids).first().map(to: App.self) { app in
+                return try App.query(on: req).safeApp(appId: appId, teamIds: teams.ids).first().map(to: App.self) { app in
                     guard let app = app else {
                         throw ErrorsCore.HTTPError.notFound
                     }
@@ -87,7 +87,7 @@ class AppsController: Controller {
         router.get("apps", DbCoreIdentifier.parameter, "auth") { (req) -> Future<Response> in
             let appId = try req.parameter(DbCoreIdentifier.self)
             return try req.me.teams().flatMap(to: Response.self) { teams in
-                return App.query(on: req).safeApp(appId: appId, teamIds: teams.ids).first().flatMap(to: Response.self) { app in
+                return try App.query(on: req).safeApp(appId: appId, teamIds: teams.ids).first().flatMap(to: Response.self) { app in
                     guard let app = app, let appId = app.id else {
                         throw ErrorsCore.HTTPError.notFound
                     }
@@ -95,7 +95,7 @@ class AppsController: Controller {
                     let originalToken: String = key.token
                     key.token = try key.token.passwordHash(req)
                     return key.save(on: req).flatMap(to: Response.self) { key in
-                        return DownloadKey.query(on: req).filter(\DownloadKey.added < Date().addMinute(n: -15)).delete().flatMap(to: Response.self) { _ in
+                        return try DownloadKey.query(on: req).filter(\DownloadKey.added < Date().addMinute(n: -15)).delete().flatMap(to: Response.self) { _ in
                             key.token = originalToken
                             return try DownloadKey.Public(downloadKey: key, request: req).asResponse(.ok, to: req)
                         }
@@ -120,7 +120,7 @@ class AppsController: Controller {
                         throw AppsError.invalidPlatform
                     }
                     let response = try req.response.basic(status: .ok)
-                    response.http.headers = HTTPHeaders([(HTTPHeaderName.contentType, "application/xml; charset=utf-8")])
+                    response.http.headers = HTTPHeaders([("Content-Type", "application/xml; charset=utf-8")])
                     response.http.body = try HTTPBody(data: AppPlist(app: app, request: req).asPropertyList())
                     return response
                 }
@@ -144,7 +144,7 @@ class AppsController: Controller {
                     }
 //                    let response = try req.streamFile(at: app.appPath!.path)
                     let response = try req.response.basic(status: .ok)
-                    response.http.headers = HTTPHeaders([(HTTPHeaderName.contentType, "\(app.platform.mime)"), (HTTPHeaderName.contentDisposition, "attachment; filename=\"\(app.name.safeText).\(app.platform.fileExtension)\"")])
+                    response.http.headers = HTTPHeaders([("Content-Type", "\(app.platform.mime)"), ("Content-Disposition", "attachment; filename=\"\(app.name.safeText).\(app.platform.fileExtension)\"")])
                     let appData = try Data(contentsOf: app.appPath!, options: [])
                     response.http.body = HTTPBody(data: appData)
                     return response
@@ -155,7 +155,7 @@ class AppsController: Controller {
         router.get("apps", DbCoreIdentifier.parameter, "tags") { (req) -> Future<Tags> in
             let appId = try req.parameter(DbCoreIdentifier.self)
             return try req.me.teams().flatMap(to: Tags.self) { teams in
-                return App.query(on: req).safeApp(appId: appId, teamIds: teams.ids).first().flatMap(to: Tags.self) { app in
+                return try App.query(on: req).safeApp(appId: appId, teamIds: teams.ids).first().flatMap(to: Tags.self) { app in
                     guard let app = app else {
                         throw ErrorsCore.HTTPError.notFound
                     }
@@ -167,7 +167,7 @@ class AppsController: Controller {
         router.delete("apps", DbCoreIdentifier.parameter) { (req) -> Future<Response> in
             let appId = try req.parameter(DbCoreIdentifier.self)
             return try req.me.teams().flatMap(to: Response.self) { teams in
-                return App.query(on: req).safeApp(appId: appId, teamIds: teams.ids).first().flatMap(to: Response.self) { app in
+                return try App.query(on: req).safeApp(appId: appId, teamIds: teams.ids).first().flatMap(to: Response.self) { app in
                     guard let app = app else {
                         throw ErrorsCore.HTTPError.notFound
                     }
@@ -192,9 +192,9 @@ class AppsController: Controller {
                         
                         // Delete all files
                         guard let path = app.targetFolderPath else {
-                            return Future(try req.response.internalServerError(message: "Unable to delete files"))
+                            return try req.eventLoop.newSucceededFuture(result: req.response.internalServerError(message: "Unable to delete files"))
                         }
-                        let deleteFuture = try Boost.storageFileHandler.delete(url: path)
+                        let deleteFuture = try Boost.storageFileHandler.delete(url: path, on: req)
                         futures.append(deleteFuture)
                         
                         return try futures.flatten(on: req).asResponse(to: req)
@@ -264,10 +264,10 @@ extension AppsController {
                 let extractor: Extractor = try BaseExtractor.decoder(file: tempFilePath.path, platform: platform, on: req)
                 do {
                     let promise: Promise<App> = try extractor.process(teamId: teamId)
-                    return promise.future.flatMap(to: Response.self) { (app) -> Future<Response> in
+                    return promise.futureResult.flatMap(to: Response.self) { (app) -> Future<Response> in
                         return app.save(on: req).flatMap(to: Response.self) { (app) -> Future<Response> in
                             return try extractor.save(app, request: req, Boost.storageFileHandler).flatMap(to: Response.self) { (_) -> Future<Response> in
-                                return handleTags(on: req, app: app).flatMap(to: Response.self) { (_) -> Future<Response> in
+                                return try handleTags(on: req, app: app).flatMap(to: Response.self) { (_) -> Future<Response> in
                                     return try app.asResponse(.created, to: req)
                                 }
                             }
@@ -281,11 +281,11 @@ extension AppsController {
         }
     }
     
-    static func handleTags(on req: Request, app: App) -> Future<Void> {
+    static func handleTags(on req: Request, app: App) throws -> Future<Void> {
         if let query = try? req.query.decode([String: String].self) {
             if let tags = query["tags"]?.split(separator: "|") {
                 var futures: [Future<Void>] = []
-                tags.forEach { (tagSubstring) in
+                try tags.forEach { (tagSubstring) in
                     let tag = String(tagSubstring)
                     let future = try Tag.query(on: req).filter(\Tag.identifier == tag).first().flatMap(to: Void.self) { (tagObject) -> Future<Void> in
                         guard let tagObject = tagObject else {
@@ -298,10 +298,11 @@ extension AppsController {
                     }
                     futures.append(future)
                 }
-                return try futures.flatten()
+                return futures.flatten(on: req)
             }
         }
-        return Future(Void())
+        let future: Future<Void> =  req.eventLoop.newSucceededFuture(result: Void())
+        return future
     }
     
 }

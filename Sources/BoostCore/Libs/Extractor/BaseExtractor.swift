@@ -11,6 +11,8 @@ import Vapor
 
 class BaseExtractor {
     
+    var request: Request
+    
     var iconData: Data?
     var appName: String?
     var appIdentifier: String?
@@ -25,6 +27,7 @@ class BaseExtractor {
     // MARK: Initialization
     
     required init(file: URL, request req: Request) throws {
+        self.request = req
         self.file = file
         self.archive = App.tempAppFolder(on: req)
         try Boost.tempFileHandler.createFolderStructure(url: self.archive)

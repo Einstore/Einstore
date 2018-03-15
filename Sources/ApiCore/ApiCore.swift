@@ -52,7 +52,7 @@ public class ApiCore {
         ApiCore.middlewareConfig.use(ErrorsCoreMiddleware.self)
         ApiCore.middlewareConfig.use(ErrorLoggingMiddleware.self)
         ApiCore.middlewareConfig.use(ApiAuthMiddleware.self)
-        ApiCore.middlewareConfig.use(DateMiddleware.self)
+//        ApiCore.middlewareConfig.use(DateMiddleware.self)
         
         services.register { container -> MiddlewareConfig in
             middlewareConfig
@@ -62,7 +62,7 @@ public class ApiCore {
         services.register(ErrorsCoreMiddleware(environment: env, log: PrintLogger()))
         services.register(ErrorLoggingMiddleware())
         services.register(ApiAuthMiddleware())
-        services.register(DateMiddleware())
+//        services.register(DateMiddleware())
         
         // Authentication
         let jwtSecret = ProcessInfo.processInfo.environment["JWT_SECRET"] ?? "secret"

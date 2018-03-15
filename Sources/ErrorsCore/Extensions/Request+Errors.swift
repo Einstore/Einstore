@@ -35,7 +35,7 @@ public struct RequestResponse {
         let response = Response(using: request)
         response.http.status = status
         
-        let headers = HTTPHeaders([(HTTPHeaderName.contentType, "application/json; charset=utf-8")])
+        let headers = HTTPHeaders([("Content-Type", "application/json; charset=utf-8")])
         response.http.headers = headers
         
         return response
