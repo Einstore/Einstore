@@ -44,13 +44,13 @@ public class SettingsController: Controller {
             }
         }
         
-        router.post("settings") { (req) -> Future<Setting> in
-            return try req.me.isAdmin().flatMap(to: Setting.self) { admin in
+        router.post("settings") { (req) -> Future<Response> in
+            return try req.me.isAdmin().flatMap(to: Response.self) { admin in
                 guard admin else {
                     throw ErrorsCore.HTTPError.notAuthorizedAsAdmin
                 }
-                return try req.content.decode(Setting.self).flatMap(to: Setting.self) { updatedSetting in
-                    return updatedSetting.save(on: req)
+                return try req.content.decode(Setting.self).flatMap(to: Response.self) { updatedSetting in
+                    return try updatedSetting.save(on: req).asResponse(.created, to: req)
                 }
             }
         }

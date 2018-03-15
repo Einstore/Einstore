@@ -1460,6 +1460,186 @@
 			"response": []
 		},
 		{
+			"name": "Settings (settings)",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{SERVER}}settings",
+					"host": [
+						"{{SERVER}}settings"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Settings (settings?plain)",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{SERVER}}settings?plain=true",
+					"host": [
+						"{{SERVER}}settings"
+					],
+					"query": [
+						{
+							"key": "plain",
+							"value": "true",
+							"equals": true
+						}
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Settings (settings)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a5091550-b98b-464b-bb6f-abfc9a340a46",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 201\"] = responseCode.code === 201;",
+							"",
+							"// Token check",
+							"tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
+							"tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
+							"tests[\"Key has a token\"] = (jsonData[\"config\"].length > 0)",
+							"",
+							"postman.setEnvironmentVariable(\"TEST_SETTING_ID\", jsonData[\"id\"]);",
+							"",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"test_url2\",\n\t\"config\": \"https://www.boostappstore.com\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}settings",
+					"host": [
+						"{{SERVER}}settings"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Settings (settings/:id)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"test_url3\",\n\t\"config\": \"https://www.boostappstore.com :)\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}settings/{{TEST_SETTING_ID}}",
+					"host": [
+						"{{SERVER}}settings"
+					],
+					"path": [
+						"{{TEST_SETTING_ID}}"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Settings (settings/:id)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"test_url3\",\n\t\"config\": \"https://www.boostappstore.com :)\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}settings/{{TEST_SETTING_ID}}",
+					"host": [
+						"{{SERVER}}settings"
+					],
+					"path": [
+						"{{TEST_SETTING_ID}}"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
 			"name": "Teapot",
 			"request": {
 				"auth": {
@@ -1491,6 +1671,32 @@
 					"raw": "{{SERVER}}ping",
 					"host": [
 						"{{SERVER}}ping"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Errors",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{SERVER}}errors",
+					"host": [
+						"{{SERVER}}errors"
 					]
 				},
 				"description": null
