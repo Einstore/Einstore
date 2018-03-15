@@ -31,6 +31,7 @@ public enum GenericError: FrontendError {
 public enum HTTPError: FrontendError {
     case notFound
     case notAuthorized
+    case notAuthorizedAsAdmin
     case missingRequestData
     case missingAuthorizationData
     case missingAvailable
@@ -45,6 +46,8 @@ public enum HTTPError: FrontendError {
             return "Not found"
         case .notAuthorized:
             return "You shall not pass!"
+        case .notAuthorizedAsAdmin:
+            return "Only a member of an admin team is able to access this functionality"
         case .missingRequestData:
             return "Some request data are missing"
         case .missingAuthorizationData:
@@ -59,6 +62,8 @@ public enum HTTPError: FrontendError {
         case .notFound:
             return .notFound
         case .notAuthorized:
+            fallthrough
+        case .notAuthorizedAsAdmin:
             return .unauthorized
         case .missingRequestData:
             fallthrough

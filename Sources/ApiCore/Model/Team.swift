@@ -41,10 +41,12 @@ public final class Team: DbCoreModel {
     public var id: DbCoreIdentifier?
     public var name: String
     public var identifier: String
+    public var admin: Bool
     
-    public init(id: DbCoreIdentifier? = nil, name: String, identifier: String) {
+    public init(id: DbCoreIdentifier? = nil, name: String, identifier: String, admin: Bool = false) {
         self.name = name
         self.identifier = identifier
+        self.admin = admin
     }
     
 }
@@ -81,6 +83,7 @@ extension Team: Migration {
             schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.id.stringValue, isIdentifier: true)
             schema.addField(type: DbCoreColumnType.varChar(40), name: CodingKeys.name.stringValue)
             schema.addField(type: DbCoreColumnType.varChar(40), name: CodingKeys.identifier.stringValue)
+            schema.addField(type: DbCoreColumnType.bool(), name: CodingKeys.admin.stringValue)
         }
     }
     
@@ -136,6 +139,14 @@ extension Array where Element == Team {
     
     public func contains(_ teamId: DbCoreIdentifier) -> Bool {
         return ids.contains(teamId)
+    }
+    
+    public func contains(admin: Bool) -> Bool {
+        return compactMap({ $0.admin == admin }).count > 0
+    }
+    
+    public var containsAdmin: Bool {
+        return contains(admin: true)
     }
     
 }

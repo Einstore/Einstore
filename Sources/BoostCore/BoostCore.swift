@@ -13,6 +13,7 @@ import Fluent
 import FluentPostgreSQL
 import DbCore
 import FileCore
+import SettingsCore
 
 
 public class Boost {
@@ -29,6 +30,7 @@ public class Boost {
     
     public static func boot(router: Router) throws {
         try ApiCore.boot(router: router)
+        try SettingsCore.boot(router: router)
         
         for c in controllers {
             try c.boot(router: router)
@@ -89,6 +91,7 @@ public class Boost {
         UploadKey.Display.defaultDatabase = .db
         
         try ApiCore.configure(databaseConfig: database, &config, &env, &services)
+        try SettingsCore.configure(&config, &env, &services)
     }
     
 }

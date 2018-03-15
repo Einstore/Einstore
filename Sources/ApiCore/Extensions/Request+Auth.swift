@@ -34,6 +34,13 @@ public struct Me {
         return try me.teams.query(on: self.request).all()
     }
     
+    public func isAdmin() throws -> Future<Bool> {
+        let me = try user()
+        return try me.teams.query(on: self.request).all().map(to: Bool.self) { teams in
+            return teams.containsAdmin
+        }
+    }
+    
     public func verifiedTeam(id teamId: DbCoreIdentifier) throws -> Future<Team> {
         return try teams().map(to: Team.self) { teams in
             guard let team = teams.filter({ $0.id == teamId }).first else {
@@ -53,3 +60,4 @@ extension Request {
     }
     
 }
+
