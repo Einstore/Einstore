@@ -34,16 +34,16 @@ public class InstallController: Controller {
             return install(on: req)
         }
         
-        router.get("demo") { req in
-            return uninstall(on: req).flatMap(to: Response.self) { (_) -> Future<Response> in
-                let objects = [
-                    su.save(on: req)
-                ]
-                return objects.map(to: Response.self) { (Void) -> Response in
-                    return try req.response.maintenanceFinished(message: "Demo install finished")
-                }
-            }
-        }
+//        router.get("demo") { req in
+//            return uninstall(on: req).flatMap(to: Response.self) { (_) -> Future<Response> in
+//                let objects = [
+//                    su.save(on: req)
+//                ]
+//                return objects.map(to: Response.self, on: req) { (Void) -> Response in
+//                    return try req.response.maintenanceFinished(message: "Demo install finished")
+//                }
+//            }
+//        }
         
 //        router.get("uninstall") { (req)->Future<Response> in
 //            return req.withPooledConnection(to: .db) { (db) -> Future<Response> in
@@ -59,16 +59,16 @@ public class InstallController: Controller {
 //            }
 //        }
         
-        router.get("reinstall") { (req)->Future<Response> in
-            return uninstall(on: req).flatMap(to: Response.self) { (_) -> Future<Response> in
-                let objects = [
-                    install(on: req)
-                ]
-                return objects.map(to: Response.self, { (_)  -> Response in
-                    return try req.response.maintenanceFinished(message: "Re-install finished")
-                })
-            }
-        }
+//        router.get("reinstall") { (req)->Future<Response> in
+//            return uninstall(on: req).flatMap(to: Response.self) { (_) -> Future<Response> in
+//                let objects = [
+//                    install(on: req)
+//                ]
+//                return objects.map(to: Response.self, on: req) { (_)  -> Response in
+//                    return try req.response.maintenanceFinished(message: "Re-install finished")
+//                }
+//            }
+//        }
         
         router.get("tables") { req in
             // TODO: Show table names and other info
@@ -89,9 +89,9 @@ extension InstallController {
         return Team(name: "Admin team", identifier: "admin-team")
     }
     
-    private static func uninstall(on req: Request) -> Future<Void> {
-        return Future(Void())
-    }
+//    private static func uninstall(on req: Request) -> Future<Void> {
+//        return Future(Void())
+//    }
     
     private static func install(on req: Request) -> Future<Response> {
         return User.query(on: req).count().flatMap(to: Response.self) { count in

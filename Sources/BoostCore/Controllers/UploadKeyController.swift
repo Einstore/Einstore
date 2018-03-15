@@ -19,7 +19,7 @@ class UploadKeyController: Controller {
     static func boot(router: Router) throws {
         router.get("keys") { (req) -> Future<[UploadKey.Display]> in
             return try req.me.teams().flatMap(to: [UploadKey.Display].self) { teams in
-                return UploadKey.Display.query(on: req).filter(\UploadKey.Display.teamId, in: teams.ids).all()
+                return try UploadKey.Display.query(on: req).filter(\UploadKey.Display.teamId, in: teams.ids).all()
             }
         }
         
@@ -29,13 +29,13 @@ class UploadKeyController: Controller {
                 guard let teamId = team.id else {
                     throw ErrorsCore.HTTPError.notFound
                 }
-                return UploadKey.Display.query(on: req).filter(\UploadKey.Display.teamId == teamId).all()
+                return try UploadKey.Display.query(on: req).filter(\UploadKey.Display.teamId == teamId).all()
             }
         }
         
         router.get("keys", DbCoreIdentifier.parameter) { (req) -> Future<UploadKey.Display> in
             let keyId = try req.parameter(DbCoreIdentifier.self)
-            return UploadKey.Display.find(keyId, on: req).flatMap(to: UploadKey.Display.self) { key in
+            return try UploadKey.Display.find(keyId, on: req).flatMap(to: UploadKey.Display.self) { key in
                 guard let key = key else {
                     throw ErrorsCore.HTTPError.notFound
                 }
@@ -65,7 +65,7 @@ class UploadKeyController: Controller {
         
         router.put("keys", DbCoreIdentifier.parameter) { (req) -> Future<UploadKey.Display> in
             let keyId = try req.parameter(DbCoreIdentifier.self)
-            return UploadKey.find(keyId, on: req).flatMap(to: UploadKey.Display.self) { key in
+            return try UploadKey.find(keyId, on: req).flatMap(to: UploadKey.Display.self) { key in
                 guard let key = key else {
                     throw ErrorsCore.HTTPError.notFound
                 }

@@ -12,7 +12,7 @@ import Vapor
 extension HTTPHeaders {
     
     public var authorizationToken: String? {
-        guard let token = self[HTTPHeaderName.authorization] else {
+        guard let token = self[HTTPHeaderName.authorization].first else {
             return nil
         }
         let parts = token.split(separator: " ")

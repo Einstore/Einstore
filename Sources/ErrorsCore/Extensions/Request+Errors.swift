@@ -35,7 +35,7 @@ public struct RequestResponse {
         let response = Response(using: request)
         response.http.status = status
         
-        let headers = HTTPHeaders(dictionaryLiteral: (.contentType, "application/json; charset=utf-8"))
+        let headers = HTTPHeaders([(HTTPHeaderName.contentType, "application/json; charset=utf-8")])
         response.http.headers = headers
         
         return response
@@ -46,7 +46,7 @@ public struct RequestResponse {
         
         let responseObject = ErrorResponse(error: error, description: description)
         let encoder = JSONEncoder()
-        response.http.body = try HTTPBody(encoder.encode(responseObject))
+        response.http.body = try HTTPBody(data: encoder.encode(responseObject))
         
         return response
     }
@@ -56,7 +56,7 @@ public struct RequestResponse {
         
         let responseObject = SuccessResponse(code: code, description: description)
         let encoder = JSONEncoder()
-        response.http.body = try HTTPBody(encoder.encode(responseObject))
+        response.http.body = try HTTPBody(data: encoder.encode(responseObject))
         
         return response
     }
@@ -89,7 +89,6 @@ public struct RequestResponse {
     
     public func deleted() throws -> Response {
         let res = try noContent()
-        res.http.status.message = "Deleted"
         return res
     }
     
@@ -104,7 +103,7 @@ public struct RequestResponse {
     }
     
     public func teapot() throws -> Response {
-        let response = try success(status: .imATeapot, code: "teapot", description: """
+        let response = try success(status: .custom(code: 418, reasonPhrase: "I am teapot"), code: "teapot", description: """
             I'm a little teapot
             Short and stouts
             Here is my handle

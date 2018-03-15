@@ -25,11 +25,12 @@ extension String {
     }
     
     public var base64Decoded: String? {
-        guard let data = try? Base64Decoder().decode(string: self) else {
-            return nil
-        }
-        let string = String(data: data, encoding: .utf8)
-        return string
+        return nil
+//        guard let data = try? Base64Decoder().decode(string: self) else {
+//            return nil
+//        }
+//        let string = String(data: data, encoding: .utf8)
+//        return string
     }
     
     public var md5: String? {

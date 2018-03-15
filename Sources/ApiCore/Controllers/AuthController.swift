@@ -61,13 +61,13 @@ extension AuthController {
             guard let token = token else {
                 throw AuthError.authenticationFailed
             }
-            return User.with(id: token.userId, on: req).flatMap(to: Response.self) { user in
+            return try User.with(id: token.userId, on: req).flatMap(to: Response.self) { user in
                 guard let user = user else {
                     throw AuthError.authenticationFailed
                 }
                 return try Token.Public(token: token, user: user).asResponse(.ok, to: req).map(to: Response.self) { response in
                     let jwtService = try req.make(JWTService.self)
-                    response.http.headers["Authorization"] = try "Bearer \(jwtService.signUserToToken(user: user))"
+                    try response.http.headers.replaceOrAdd(name: "Authorization", value: "Bearer \(jwtService.signUserToToken(user: user))")
                     return response
                 }
             }
@@ -92,7 +92,7 @@ extension AuthController {
                     let publicToken = Token.PublicFull(token: tokenBackup, user: user)
                     return try publicToken.asResponse(.ok, to: req).map(to: Response.self) { response in
                         let jwtService = try req.make(JWTService.self)
-                        response.http.headers["Authorization"] = try "Bearer \(jwtService.signUserToToken(user: user))"
+                        try response.http.headers.replaceOrAdd(name: "Authorization", value: "Bearer \(jwtService.signUserToToken(user: user))")
                         return response
                     }
                 }

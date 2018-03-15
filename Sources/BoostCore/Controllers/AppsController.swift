@@ -27,8 +27,8 @@ extension QueryBuilder where Model == App {
     
     func safeApp(appId: DbCoreIdentifier, teamIds: [DbCoreIdentifier]) -> Self {
         return group(.and) { and in
-            and.filter(\App.id == appId)
-            and.filter(\App.teamId, in: teamIds)
+            try and.filter(\App.id == appId)
+            try and.filter(\App.teamId, in: teamIds)
         }
     }
     
@@ -58,7 +58,7 @@ class AppsController: Controller {
         // Overview
         router.get("apps") { (req) -> Future<Apps> in
             return try req.me.teams().flatMap(to: Apps.self) { teams in
-                return App.query(on: req).filter(\App.teamId, in: teams.ids).appFilters().all()
+                return try App.query(on: req).filter(\App.teamId, in: teams.ids).appFilters().all()
             }
         }
         
@@ -68,7 +68,7 @@ class AppsController: Controller {
                 guard teams.contains(teamId) else {
                     throw ErrorsCore.HTTPError.notFound
                 }
-                return App.query(on: req).filter(\App.teamId, in: teams.ids).appFilters().all()
+                return try App.query(on: req).filter(\App.teamId, in: teams.ids).appFilters().all()
             }
         }
         
@@ -108,11 +108,11 @@ class AppsController: Controller {
             let token = try req.query.decode(DownloadKey.Token.self)
             return try DownloadKey.query(on: req).filter(\DownloadKey.token == token.token).filter(\DownloadKey.added >= Date().addMinute(n: -15)).first().flatMap(to: Response.self) { key in
                 guard let key = key else {
-                    return DownloadKey.query(on: req).filter(\DownloadKey.added < Date().addMinute(n: -15)).delete().map(to: Response.self) { _ in
+                    return try DownloadKey.query(on: req).filter(\DownloadKey.added < Date().addMinute(n: -15)).delete().map(to: Response.self) { _ in
                         throw ErrorsCore.HTTPError.notAuthorized
                     }
                 }
-                return App.query(on: req).filter(\App.id == key.appId).first().map(to: Response.self) { app in
+                return try App.query(on: req).filter(\App.id == key.appId).first().map(to: Response.self) { app in
                     guard let app = app else {
                         throw ErrorsCore.HTTPError.notFound
                     }
@@ -120,8 +120,8 @@ class AppsController: Controller {
                         throw AppsError.invalidPlatform
                     }
                     let response = try req.response.basic(status: .ok)
-                    response.http.headers = HTTPHeaders(dictionaryLiteral: (.contentType, "application/xml; charset=utf-8"))
-                    response.http.body = try HTTPBody(AppPlist(app: app, request: req).asPropertyList())
+                    response.http.headers = HTTPHeaders([(HTTPHeaderName.contentType, "application/xml; charset=utf-8")])
+                    response.http.body = try HTTPBody(data: AppPlist(app: app, request: req).asPropertyList())
                     return response
                 }
             }
@@ -131,11 +131,11 @@ class AppsController: Controller {
             let token = try req.query.decode(DownloadKey.Token.self)
             return try DownloadKey.query(on: req).filter(\DownloadKey.token == token.token).filter(\DownloadKey.added >= Date().addMinute(n: -15)).first().flatMap(to: Response.self) { key in
                 guard let key = key else {
-                    return DownloadKey.query(on: req).filter(\DownloadKey.added < Date().addMinute(n: -15)).delete().map(to: Response.self) { _ in
+                    return try DownloadKey.query(on: req).filter(\DownloadKey.added < Date().addMinute(n: -15)).delete().map(to: Response.self) { _ in
                         throw ErrorsCore.HTTPError.notAuthorized
                     }
                 }
-                return App.query(on: req).filter(\App.id == key.appId).first().map(to: Response.self) { app in
+                return try App.query(on: req).filter(\App.id == key.appId).first().map(to: Response.self) { app in
                     guard let app = app else {
                         throw ErrorsCore.HTTPError.notFound
                     }
@@ -144,9 +144,9 @@ class AppsController: Controller {
                     }
 //                    let response = try req.streamFile(at: app.appPath!.path)
                     let response = try req.response.basic(status: .ok)
-                    response.http.headers = HTTPHeaders(dictionaryLiteral: (.contentType, "\(app.platform.mime)"), (.contentDisposition, "attachment; filename=\"\(app.name.safeText).\(app.platform.fileExtension)\""))
+                    response.http.headers = HTTPHeaders([(HTTPHeaderName.contentType, "\(app.platform.mime)"), (HTTPHeaderName.contentDisposition, "attachment; filename=\"\(app.name.safeText).\(app.platform.fileExtension)\"")])
                     let appData = try Data(contentsOf: app.appPath!, options: [])
-                    response.http.body = HTTPBody.init(appData)
+                    response.http.body = HTTPBody(data: appData)
                     return response
                 }
             }
@@ -197,7 +197,7 @@ class AppsController: Controller {
                         let deleteFuture = try Boost.storageFileHandler.delete(url: path)
                         futures.append(deleteFuture)
                         
-                        return try futures.flatten().asResponse(to: req)
+                        return try futures.flatten(on: req).asResponse(to: req)
                     }
                 }
             }
@@ -207,7 +207,7 @@ class AppsController: Controller {
             guard let token = try? req.query.decode(UploadKey.Token.self) else {
                 throw ErrorsCore.HTTPError.missingAuthorizationData
             }
-            return UploadKey.query(on: req).filter(\.token == token.token).first().flatMap(to: Response.self) { (uploadToken) -> Future<Response> in
+            return try UploadKey.query(on: req).filter(\.token == token.token).first().flatMap(to: Response.self) { (uploadToken) -> Future<Response> in
                 guard let uploadToken = uploadToken else {
                     throw AuthError.authenticationFailed
                 }
@@ -287,7 +287,7 @@ extension AppsController {
                 var futures: [Future<Void>] = []
                 tags.forEach { (tagSubstring) in
                     let tag = String(tagSubstring)
-                    let future = Tag.query(on: req).filter(\Tag.identifier == tag).first().flatMap(to: Void.self) { (tagObject) -> Future<Void> in
+                    let future = try Tag.query(on: req).filter(\Tag.identifier == tag).first().flatMap(to: Void.self) { (tagObject) -> Future<Void> in
                         guard let tagObject = tagObject else {
                             let t = Tag(id: nil, name: tag, identifier: tag.safeText)
                             return t.save(on: req).flatMap(to: Void.self, { (tag) -> Future<Void> in
@@ -298,7 +298,7 @@ extension AppsController {
                     }
                     futures.append(future)
                 }
-                return futures.flatten()
+                return try futures.flatten()
             }
         }
         return Future(Void())

@@ -90,7 +90,7 @@ extension Extractor {
         if let iconData = iconData, let path = app.iconPath?.path {
             saves.append(try fileHandler.save(data: iconData, to: path))
         }
-        return saves.flatten().map(to: Void.self) { _ in
+        return saves.flatten(on: req).map(to: Void.self) { _ in
             try self.cleanUp()
         }
     }
@@ -98,7 +98,7 @@ extension Extractor {
     // MARK: Cleaning
     
     func cleanUp() throws {
-        try Boost.tempFileHandler.delete(url: archive)
+        _ = try Boost.tempFileHandler.delete(url: archive)
     }
     
 }

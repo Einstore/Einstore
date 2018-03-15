@@ -14,7 +14,7 @@ public class LogsController: Controller {
     
     public static func boot(router: Router) throws {
         router.get("errors") { (req) -> Future<[ErrorLog]> in
-            return ErrorLog.query(on: req).sort(\ErrorLog.added, .descending).all()
+            return try ErrorLog.query(on: req).sort(\ErrorLog.added, .descending).all()
         }
     }
 }
