@@ -64,7 +64,8 @@ let package = Package(
                 "DbCore",
                 "SwiftShell",
                 "FileCore",
-                "Mailgun"
+                "Mailgun",
+                "SettingsCore"
             ]
         ),
         .target(
