@@ -13,17 +13,6 @@ ADD Sources ./Sources
 ADD Tests ./Tests
 ADD Package.swift Package.resolved ./
 
-RUN \
-    apt-get update && \
-    apt-get install -y python python-dev python-pip python-virtualenv && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN \
-    apt-get update && \
-    apt-get install -y openjdk-8-jdk && \
-    rm -rf /var/lib/apt/lists/*
-ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
-
 RUN swift build --configuration debug
 RUN ln -s .build/x86_64-unknown-linux/debug/Run ./boost
 
