@@ -1,4 +1,4 @@
-FROM mangoweb/swift:4.1-alpha
+FROM liveui/boost-base:1.0
 
 WORKDIR /boost
 
