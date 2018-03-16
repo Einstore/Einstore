@@ -9,3 +9,7 @@ publish: build
 	docker tag $(REPO)/$(IMAGE):$(TAG) $(REPO)/$(IMAGE):latest
 	docker push $(REPO)/$(IMAGE):$(TAG)
 	docker push $(REPO)/$(IMAGE):latest
+
+test:
+	chmod a+x test.sh
+	docker run --rm -v $(CURDIR):/src -w /src $(REPO)/$(IMAGE):$(TAG) ./test.sh
