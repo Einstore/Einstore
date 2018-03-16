@@ -12,8 +12,12 @@ services:
             DB_USER: boost
             DB_PASSWORD: aaaaaa
             DB_NAME: boost
+            DB_PORT: 5432
             TMP_FOLDER: /tmp/Boost
             PERSISTENT_FOLDER: /home/Boost
+        depends_on:
+            - "db"
+        command: ["./wait-for-it.sh", "db:5432", "--", "./boost", "serve", "--hostname", "0.0.0.0", "--port", "8080"]
     db:
         image: postgres
         restart: always
@@ -26,3 +30,5 @@ services:
         restart: always
         ports:
             - 8081:8080
+        depends_on:
+            - "db"

@@ -16,5 +16,7 @@ ADD Package.swift Package.resolved ./
 RUN swift build --configuration debug
 RUN ln -s .build/x86_64-unknown-linux/debug/Run ./boost
 
+COPY wait-for-it.sh .
+
 EXPOSE 8080
 CMD ./boost serve --hostname 0.0.0.0
