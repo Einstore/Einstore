@@ -49,6 +49,7 @@ public class ApiCore {
         ErrorLog.defaultDatabase = .db
         
         // TODO: Make some optional!
+//        ApiCore.middlewareConfig.use(ErrorMiddleware.self) // Vapor original middleware
         ApiCore.middlewareConfig.use(ErrorsCoreMiddleware.self)
         ApiCore.middlewareConfig.use(ErrorLoggingMiddleware.self)
         ApiCore.middlewareConfig.use(ApiAuthMiddleware.self)
@@ -59,7 +60,9 @@ public class ApiCore {
         }
         
         // TODO: Make some optional!
-        services.register(ErrorsCoreMiddleware(environment: env, log: PrintLogger()))
+        let logger = PrintLogger()
+//        services.register(ErrorMiddleware(environment: env, log: logger)) // Vapor original middleware
+        services.register(ErrorsCoreMiddleware(environment: env, log: logger))
         services.register(ErrorLoggingMiddleware())
         services.register(ApiAuthMiddleware())
 //        services.register(DateMiddleware())
