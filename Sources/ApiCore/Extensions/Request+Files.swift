@@ -12,7 +12,8 @@ import Vapor
 extension Request {
     
     public var fileData: Future<Data> {
-        return self.http.body.makeData(max: Int(ApiCore.configuration.maxUploadSize.value))
+        return http.body.consumeData(max: Int(ApiCore.configuration.maxUploadSize.value), on: self)
     }
     
 }
+

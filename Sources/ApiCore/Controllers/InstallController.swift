@@ -106,7 +106,7 @@ extension InstallController {
                     try ApiCore.installFutures.forEach({ closure in
                         futures.append(try closure(req))
                     })
-                    return futures.map(to: Response.self) { join in
+                    return futures.map(to: Response.self, on: req) { join in
                         return try req.response.maintenanceFinished(message: "Installation finished, login as admin@liveui.io/admin")
                     }
                 }
