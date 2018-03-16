@@ -20,7 +20,7 @@ public struct DbCoreColumnType {
         return PostgreSQLColumn(type: .int8)
     }
     
-    public static func varChar(_ length: Int16) -> PostgreSQLColumn {
+    public static func varChar(_ length: Int16 = 255) -> PostgreSQLColumn {
         return PostgreSQLColumn(type: .varchar, size: length)
     }
     

@@ -30,6 +30,7 @@
 		1588AEF6205ACF000011E216 /* SettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1588AEF5205ACF000011E216 /* SettingsController.swift */; };
 		1588AEF9205AEE110011E216 /* BasicQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1588AEF8205AEE110011E216 /* BasicQuery.swift */; };
 		1588AEFB205AF80F0011E216 /* Data+Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1588AEFA205AF80F0011E216 /* Data+Response.swift */; };
+		1588AEFF205B283B0011E216 /* Install.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1588AEFD205B19650011E216 /* Install.swift */; };
 		OBJ_1002 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_211 /* Package.swift */; };
 		OBJ_1008 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_225 /* Package.swift */; };
 		OBJ_1014 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_237 /* Package.swift */; };
@@ -6781,6 +6782,7 @@
 		1588AEF5205ACF000011E216 /* SettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsController.swift; sourceTree = "<group>"; };
 		1588AEF8205AEE110011E216 /* BasicQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicQuery.swift; sourceTree = "<group>"; };
 		1588AEFA205AF80F0011E216 /* Data+Response.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Response.swift"; sourceTree = "<group>"; };
+		1588AEFD205B19650011E216 /* Install.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Install.swift; sourceTree = "<group>"; };
 		"Async::Async::Product" /* Async.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Async.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCore::Product" /* ApiCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCoreTestTools::Product" /* ApiCoreTestTools.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCoreTestTools.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -8675,6 +8677,14 @@
 			path = Query;
 			sourceTree = "<group>";
 		};
+		1588AEFC205B18D50011E216 /* Install */ = {
+			isa = PBXGroup;
+			children = (
+				1588AEFD205B19650011E216 /* Install.swift */,
+			);
+			path = Install;
+			sourceTree = "<group>";
+		};
 		OBJ_10 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -8747,6 +8757,7 @@
 		OBJ_118 /* Libs */ = {
 			isa = PBXGroup;
 			children = (
+				1588AEFC205B18D50011E216 /* Install */,
 				OBJ_119 /* BoostConfig.swift */,
 				OBJ_120 /* Extractor */,
 				OBJ_131 /* Files */,
@@ -9913,7 +9924,7 @@
 			name = "TemplateKit 1.0.0-rc.1.1";
 			sourceTree = SOURCE_ROOT;
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -9929,7 +9940,6 @@
 				OBJ_185 /* Dependencies */,
 				OBJ_941 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_50 /* Extensions */ = {
@@ -13044,7 +13054,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_941 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -13377,6 +13387,7 @@
 				OBJ_1873 /* BaseExtractor.swift in Sources */,
 				OBJ_1874 /* Ipa.swift in Sources */,
 				OBJ_1875 /* Extractor.swift in Sources */,
+				1588AEFF205B283B0011E216 /* Install.swift in Sources */,
 				OBJ_1876 /* TempFileHandler.swift in Sources */,
 				OBJ_1877 /* App.swift in Sources */,
 				OBJ_1878 /* AppPlist.swift in Sources */,

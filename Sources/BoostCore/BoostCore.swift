@@ -92,6 +92,10 @@ public class Boost {
         
         try SettingsCore.configure(&config, &env, &services)
         try ApiCore.configure(databaseConfig: database, &config, &env, &services)
+        
+        ApiCore.installFutures.append({ req in
+            return try Install.make(on: req)
+        })
     }
     
 }

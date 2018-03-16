@@ -100,7 +100,13 @@ extension InstallController {
             }
             return su.save(on: req).flatMap(to: Response.self) { user in
                 return adminTeam.save(on: req).flatMap(to: Response.self) { team in
-                    return team.users.attach(user, on: req).map(to: Response.self) { join in
+                    var futures = [
+                        team.users.attach(user, on: req).flatten()
+                    ]
+                    try ApiCore.installFutures.forEach({ closure in
+                        futures.append(try closure(req))
+                    })
+                    return futures.map(to: Response.self) { join in
                         return try req.response.maintenanceFinished(message: "Installation finished, login as admin@liveui.io/admin")
                     }
                 }

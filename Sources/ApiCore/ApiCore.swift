@@ -26,6 +26,9 @@ public class ApiCore {
     
     public static var middlewareConfig = MiddlewareConfig()
     
+    public typealias InstallFutureClosure = (_ req: Request) throws -> Future<Void>
+    public static var installFutures: [InstallFutureClosure] = []
+    
     static var controllers: [Controller.Type] = [
         GenericController.self,
         InstallController.self,
