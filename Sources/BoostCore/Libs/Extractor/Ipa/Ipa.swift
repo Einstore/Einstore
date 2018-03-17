@@ -27,7 +27,7 @@ class Ipa: BaseExtractor, Extractor {
     // MARK: Processing
     
     func process(teamId: DbCoreIdentifier) throws -> Promise<App> {
-        let promise = Promise<App>()
+        let promise = request.eventLoop.newPromise(App.self)
         
         // TODO: Make async
 //        runloop.zeromilisecondsTimer {
@@ -36,9 +36,9 @@ class Ipa: BaseExtractor, Extractor {
                 try self.parse()
                 
                 let a = try app(platform: .ios, teamId: teamId)
-                promise.complete(a)
+                promise.succeed(result: a)
             } catch {
-                promise.fail(error)
+                promise.fail(error: error)
             }
 //        }
         

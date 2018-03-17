@@ -35,7 +35,7 @@ public struct RequestResponse {
         let response = Response(using: request)
         response.http.status = status
         
-        let headers = HTTPHeaders(dictionaryLiteral: (.contentType, "application/json; charset=utf-8"))
+        let headers = HTTPHeaders([("Content-Type", "application/json; charset=utf-8")])
         response.http.headers = headers
         
         return response
@@ -46,7 +46,7 @@ public struct RequestResponse {
         
         let responseObject = ErrorResponse(error: error, description: description)
         let encoder = JSONEncoder()
-        response.http.body = try HTTPBody(encoder.encode(responseObject))
+        response.http.body = try HTTPBody(data: encoder.encode(responseObject))
         
         return response
     }
@@ -56,7 +56,7 @@ public struct RequestResponse {
         
         let responseObject = SuccessResponse(code: code, description: description)
         let encoder = JSONEncoder()
-        response.http.body = try HTTPBody(encoder.encode(responseObject))
+        response.http.body = try HTTPBody(data: encoder.encode(responseObject))
         
         return response
     }
@@ -89,7 +89,6 @@ public struct RequestResponse {
     
     public func deleted() throws -> Response {
         let res = try noContent()
-        res.http.status.message = "Deleted"
         return res
     }
     
@@ -104,7 +103,7 @@ public struct RequestResponse {
     }
     
     public func teapot() throws -> Response {
-        let response = try success(status: .imATeapot, code: "teapot", description: """
+        let response = try success(status: .custom(code: 418, reasonPhrase: "I am teapot"), code: "teapot", description: """
             I'm a little teapot
             Short and stouts
             Here is my handle
@@ -124,6 +123,34 @@ public struct RequestResponse {
     
     public func internalServerError(message: String) throws -> Response {
         let response = try error(status: .internalServerError, error: "server_err", description: message)
+        return response
+    }
+    
+    public func cors() throws -> Response {
+        let response = try noContent()
+        response.http.headers.replaceOrAdd(name: "Content-Type", value: "application/json")
+        response.http.headers.replaceOrAdd(name: "Access-Control-Allow-Methods", value: "GET,POST,PUT,DELETE,OPTIONS")
+        if let origin: String = request.http.headers["Origin"].first {
+            response.http.headers.replaceOrAdd(name: "Access-Control-Allow-Origin", value: origin)
+            response.http.headers.replaceOrAdd(name: "Access-Control-Expose-Headers", value: "Authorization")
+        }
+        var headers: [String] = []
+        var isContentType: Bool = false
+        for header in request.http.headers {
+            if (header.name.lowercased() == "content-type") {
+                isContentType = true
+            }
+            headers.append(header.name)
+        }
+        if !isContentType {
+            headers.append("Content-Type")
+        }
+        headers.append("*")
+        if !headers.contains("Authorization") {
+            headers.append("Authorization")
+        }
+        response.http.headers.replaceOrAdd(name: "Access-Control-Allow-Headers", value: headers.joined(separator: ","))
+        response.http.headers.replaceOrAdd(name: "Access-Control-Max-Age", value: "400")
         return response
     }
     

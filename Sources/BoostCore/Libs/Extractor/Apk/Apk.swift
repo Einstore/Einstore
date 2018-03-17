@@ -148,7 +148,7 @@ class Apk: BaseExtractor, Extractor {
     }
     
     func process(teamId: DbCoreIdentifier) throws -> Promise<App> {
-        let promise = Promise<App>()
+        let promise = request.eventLoop.newPromise(App.self)
         
         do {
             // Extract archive
@@ -163,9 +163,9 @@ class Apk: BaseExtractor, Extractor {
             try getApplicationIcon()
             
             let a = try app(platform: .android, teamId: teamId)
-            promise.complete(a)
+            promise.succeed(result: a)
         } catch {
-            promise.fail(error)
+            promise.fail(error: error)
         }
         
         return promise

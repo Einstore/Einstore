@@ -167,8 +167,8 @@ extension User {
 
 extension User {
     
-    public static func with(id: DbCoreIdentifier, on connectable: DatabaseConnectable) -> Future<User?> {
-        return User.query(on: connectable).filter(\User.id == id).first()
+    public static func with(id: DbCoreIdentifier, on connectable: DatabaseConnectable) throws -> Future<User?> {
+        return try User.query(on: connectable).filter(\User.id == id).first()
     }
     
 }

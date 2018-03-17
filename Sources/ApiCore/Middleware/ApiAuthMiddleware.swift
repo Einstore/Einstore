@@ -61,7 +61,7 @@ public final class ApiAuthMiddleware: Middleware, ServiceFactory {
         debug(request: req)
         
         // Maintenance URI
-        if ApiAuthMiddleware.debugUri.contains(req.http.uri.path) {
+        if ApiAuthMiddleware.debugUri.contains(req.http.url.path) {
             self.printUrl(req: req, type: .maintenance)
             
             if req.environment == .production {
@@ -82,7 +82,7 @@ public final class ApiAuthMiddleware: Middleware, ServiceFactory {
         self.printUrl(req: req, type: .secured)
         
         let userPayload = try jwtPayload(request: req)
-        return User.find(userPayload.userId, on: req).flatMap(to: Response.self) { user in
+        return try User.find(userPayload.userId, on: req).flatMap(to: Response.self) { user in
             guard let user = user else {
                 throw ErrorsCore.HTTPError.notAuthorized
             }
@@ -110,38 +110,35 @@ public final class ApiAuthMiddleware: Middleware, ServiceFactory {
     
     private func debug(request req: Request) {
         if ApiCore.debugRequests {
-            var contentString: String? {
-                guard let data = try? req.http.body.makeData(max: 500).await(on: req) else {
-                    return nil
+            req.http.body.consumeData(max: 500, on: req).addAwaiter { (d) in
+                print("Debugging response:")
+                print("HTTP [\(req.http.version.major).\(req.http.version.minor)] with status code [\(req.http)]")
+                print("Headers:")
+                for header in req.http.headers {
+                    print("\t\(header.name.description) = \(header.value)")
                 }
-                return String(data: data, encoding: .utf8)
-            }
-            
-            print("Debugging response:")
-            print("HTTP [\(req.http.version.major).\(req.http.version.minor)] with status code [\(req.http)]")
-            print("Headers:")
-            for header in req.http.headers {
-                print("\t\(header.name.description) = \(header.value)")
-            }
-            print("Content:")
-            if let s = contentString {
-                print("\tContent:\n\(s)")
+                print("Content:")
+                if let data = d.result, let s = String(data: data, encoding: .utf8) {
+                    print("\tContent:\n\(s)")
+                }
             }
         }
     }
     
     private func allowed(request req: Request) -> Bool {
-        if req.http.method == .get {
-            return ApiAuthMiddleware.allowedGetUri.contains(req.http.uri.path)
-        } else if req.http.method == .post {
-            return ApiAuthMiddleware.allowedPostUri.contains(req.http.uri.path)
+        if req.http.method == .GET {
+            return ApiAuthMiddleware.allowedGetUri.contains(req.http.url.path)
+        } else if req.http.method == .POST {
+            return ApiAuthMiddleware.allowedPostUri.contains(req.http.url.path)
+        } else if req.http.method == .OPTIONS {
+            return true
         }
         return false
     }
     
     private func printUrl(req: Request, type: Security) {
         if req.environment != .production {
-            print("\(type.rawValue): [\(req.http.method.string)] \(req.http.uri.path)")
+            print("\(type.rawValue): [\(req.http.method)] \(req.http.url.path)")
         }
     }
     

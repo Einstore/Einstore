@@ -44,6 +44,8 @@ enum ExtractorError: FrontendError {
 
 protocol Extractor {
     
+    var request: Request { get }
+    
     var file: URL { get }
     var archive: URL { get }
     
@@ -86,11 +88,11 @@ extension Extractor {
         try Boost.storageFileHandler.createFolderStructure(url: folder)
         
         let tempFile = App.tempAppFile(on: req)
-        saves.append(try fileHandler.move(from: tempFile, to: path))
+        saves.append(try fileHandler.move(from: tempFile, to: path, on: request))
         if let iconData = iconData, let path = app.iconPath?.path {
-            saves.append(try fileHandler.save(data: iconData, to: path))
+            saves.append(try fileHandler.save(data: iconData, to: path, on: request))
         }
-        return saves.flatten().map(to: Void.self) { _ in
+        return saves.flatten(on: req).map(to: Void.self) { _ in
             try self.cleanUp()
         }
     }
@@ -98,7 +100,7 @@ extension Extractor {
     // MARK: Cleaning
     
     func cleanUp() throws {
-        try Boost.tempFileHandler.delete(url: archive)
+        _ = try Boost.tempFileHandler.delete(url: archive, on: request)
     }
     
 }

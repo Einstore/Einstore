@@ -75,7 +75,7 @@ class TeamsController: Controller {
         
         router.post("teams") { (req) -> Future<Response> in
             return try req.content.decode(Team.New.self).flatMap(to: Response.self) { newTeam in
-                return Team.exists(identifier: newTeam.identifier, on: req).flatMap(to: Response.self) { identifierExists in
+                return try Team.exists(identifier: newTeam.identifier, on: req).flatMap(to: Response.self) { identifierExists in
                     if identifierExists {
                         throw Team.TeamError.identifierAlreadyExists
                     }
@@ -94,7 +94,7 @@ class TeamsController: Controller {
         
         router.post("teams", "check") { (req) -> Future<Response> in
             return try req.content.decode(Team.Identifier.self).flatMap(to: Response.self) { identifierObject in
-                return Team.exists(identifier: identifierObject.identifier, on: req).map(to: Response.self) { identifierExists in
+                return try Team.exists(identifier: identifierObject.identifier, on: req).map(to: Response.self) { identifierExists in
                     if identifierExists {
                         throw Team.TeamError.identifierAlreadyExists
                     }
@@ -119,7 +119,7 @@ class TeamsController: Controller {
                         return save()
                     }
                     
-                    return Team.exists(identifier: newTeam.identifier, on: req).flatMap(to: Team.self) { identifierExists in
+                    return try Team.exists(identifier: newTeam.identifier, on: req).flatMap(to: Team.self) { identifierExists in
                         if identifierExists {
                             throw Team.TeamError.identifierAlreadyExists
                         }
@@ -193,7 +193,7 @@ extension TeamsController {
         return try req.me.verifiedTeam(id: teamId).flatMap(to: Response.self) { team in
             return try team.users.query(on: req).all().flatMap(to: Response.self) { teamUsers in
                 return try req.content.decode(User.Id.self).flatMap(to: Response.self) { userId in
-                    return User.query(on: req).filter(\User.id == userId.id).first().flatMap(to: Response.self) { user in
+                    return try User.query(on: req).filter(\User.id == userId.id).first().flatMap(to: Response.self) { user in
                         let me = try req.me.user()
                         guard let user = user else {
                             throw TeamError.userNotFound

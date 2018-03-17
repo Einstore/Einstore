@@ -12,9 +12,9 @@ import Vapor
 extension Future {
     
     public func flatten() -> Future<Void> {
-        return map(to: Void.self, { (_) -> Void in
+        return map(to: Void.self) { (_) -> Void in
             return Void()
-        })
+        }
     }
     
 }

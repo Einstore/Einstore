@@ -61,13 +61,13 @@ extension AuthController {
             guard let token = token else {
                 throw AuthError.authenticationFailed
             }
-            return User.with(id: token.userId, on: req).flatMap(to: Response.self) { user in
+            return try User.with(id: token.userId, on: req).flatMap(to: Response.self) { user in
                 guard let user = user else {
                     throw AuthError.authenticationFailed
                 }
                 return try Token.Public(token: token, user: user).asResponse(.ok, to: req).map(to: Response.self) { response in
                     let jwtService = try req.make(JWTService.self)
-                    response.http.headers["Authorization"] = try "Bearer \(jwtService.signUserToToken(user: user))"
+                    try response.http.headers.replaceOrAdd(name: "Authorization", value: "Bearer \(jwtService.signUserToToken(user: user))")
                     return response
                 }
             }
@@ -78,23 +78,21 @@ extension AuthController {
         guard !login.email.isEmpty, !login.password.isEmpty else {
             throw AuthError.authenticationFailed
         }
-        return req.withPooledConnection(to: .db) { db in
-            return try User.query(on: db).filter(\User.email == login.email).filter(\User.password == login.password.passwordHash(req)).first().flatMap(to: Response.self) { user in
-                guard let user = user else {
-                    throw AuthError.authenticationFailed
-                }
-                let token = try Token(user: user)
-                let tokenBackup = token
-                token.token = try token.token.passwordHash(req)
-                return token.save(on: db).flatMap(to: Response.self) { token in
-                    tokenBackup.id = token.id
-                    
-                    let publicToken = Token.PublicFull(token: tokenBackup, user: user)
-                    return try publicToken.asResponse(.ok, to: req).map(to: Response.self) { response in
-                        let jwtService = try req.make(JWTService.self)
-                        response.http.headers["Authorization"] = try "Bearer \(jwtService.signUserToToken(user: user))"
-                        return response
-                    }
+        return try User.query(on: req).filter(\User.email == login.email).filter(\User.password == login.password.passwordHash(req)).first().flatMap(to: Response.self) { user in
+            guard let user = user else {
+                throw AuthError.authenticationFailed
+            }
+            let token = try Token(user: user)
+            let tokenBackup = token
+            token.token = try token.token.passwordHash(req)
+            return token.save(on: req).flatMap(to: Response.self) { token in
+                tokenBackup.id = token.id
+                
+                let publicToken = Token.PublicFull(token: tokenBackup, user: user)
+                return try publicToken.asResponse(.ok, to: req).map(to: Response.self) { response in
+                    let jwtService = try req.make(JWTService.self)
+                    try response.http.headers.replaceOrAdd(name: "Authorization", value: "Bearer \(jwtService.signUserToToken(user: user))")
+                    return response
                 }
             }
         }

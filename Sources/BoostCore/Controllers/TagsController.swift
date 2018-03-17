@@ -28,7 +28,7 @@ class TagsController: Controller {
 
 extension TagsController {
     
-    static func tagsQuery(on db: DbCoreDatabase.Connection, apps: Apps? = nil) -> QueryBuilder<Tag> {
+    static func tagsQuery(on db: DbCoreDatabase.Connection, apps: Apps? = nil) -> QueryBuilder<Tag, Tag> {
         return Tag.query(on: db)
     }
     

@@ -18,7 +18,7 @@ class Install {
             Setting(name: "style_header_background_color", config: "color").save(on: req).flatten(),
             Setting(name: "style_primary_action_color", config: "color").save(on: req).flatten(),
             Setting(name: "style_primary_action_background_color", config: "color").save(on: req).flatten()
-        ].flatten()
+            ].flatten(on: req)
     }
     
 }

@@ -21,13 +21,13 @@ public final class ErrorLog: DbCoreModel {
     public var id: DbCoreIdentifier?
     public var added: Date
     public var uri: String
-    public var method: String
+//    public var method: String
     public var error: String
     
     public init(id: DbCoreIdentifier? = nil, request req: Request, error: Error) {
-        let query = req.http.uri.query != nil ? "?\(req.http.uri.query!)" : ""
-        self.uri = "\(req.http.uri.path)\(query)"
-        self.method = req.http.method.string
+        let query = req.http.url.query != nil ? "?\(req.http.url.query!)" : ""
+        self.uri = "\(req.http.url.path)\(query)"
+//        self.method = req.http.method
         self.added = Date()
         
         if let e = error as? FrontendError {
@@ -51,7 +51,7 @@ extension ErrorLog: Migration {
             schema.addField(type: DbCoreColumnType.id(), name: CodingKeys.id.stringValue, isIdentifier: true)
             schema.addField(type: DbCoreColumnType.datetime(), name: CodingKeys.added.stringValue)
             schema.addField(type: DbCoreColumnType.varChar(250), name: CodingKeys.uri.stringValue)
-            schema.addField(type: DbCoreColumnType.varChar(8), name: CodingKeys.method.stringValue)
+//            schema.addField(type: DbCoreColumnType.varChar(8), name: CodingKeys.method.stringValue)
             schema.addField(type: DbCoreColumnType.text(), name: CodingKeys.error.stringValue)
         }
     }

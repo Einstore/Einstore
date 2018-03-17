@@ -13,7 +13,7 @@ import FluentPostgreSQL
 public typealias DbCoreDatabase = PostgreSQLDatabase
 public typealias DbCoreConnection = PostgreSQLConnection
 public typealias DbCoreIdentifier = UUID
-public let DbCoreDefaultPort: UInt16 = 5432
+public let DbCoreDefaultPort: Int = 5432
 
 
 public class DbCore {
@@ -21,7 +21,7 @@ public class DbCore {
     public static var migrationConfig = MigrationConfig()
     public static var databaseConfig: DatabaseConfig?
     
-    public static func config(hostname: String, user: String, password: String?, database: String, port: UInt16 = DbCoreDefaultPort) -> DatabaseConfig {
+    public static func config(hostname: String, user: String, password: String?, database: String, port: Int = DbCoreDefaultPort) -> DatabaseConfig {
         var databaseConfig = DatabaseConfig()
         let config = PostgreSQLDatabaseConfig(hostname: hostname, port: port, username: user, database: database, password: password)
         let database = DbCoreDatabase(config: config)
@@ -36,10 +36,10 @@ public class DbCore {
         return databaseConfig
     }
     
-    public static func envConfig(defaultHostname: String = "localhost", defaultUser: String = "root", defaultPassword: String? = nil, defaultDatabase: String, defaultPort: UInt16 = 5432) -> DatabaseConfig {
+    public static func envConfig(defaultHostname: String = "localhost", defaultUser: String = "root", defaultPassword: String? = nil, defaultDatabase: String, defaultPort: Int = 5432) -> DatabaseConfig {
         let env = ProcessInfo.processInfo.environment as [String: String]
         let host = env["DB_HOST"] ?? defaultHostname
-        let port = UInt16(env["DB_PORT"] ?? "n/a") ?? defaultPort
+        let port = Int(env["DB_PORT"] ?? "n/a") ?? defaultPort
         let user = env["DB_USER"] ?? defaultUser
         let pass = env["DB_PASSWORD"] ?? defaultPassword
         let dtbs = env["DB_NAME"] ?? defaultDatabase
