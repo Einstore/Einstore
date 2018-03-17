@@ -22,7 +22,7 @@ extension TestableProperty where TestableType == Team {
     
     @discardableResult public static func create(team: Team, on app: Application) -> Team {
         let req = app.testable.fakeRequest()
-        return try! team.save(on: req).await(on: req)
+        return try! team.save(on: req).wait()
     }
     
 }

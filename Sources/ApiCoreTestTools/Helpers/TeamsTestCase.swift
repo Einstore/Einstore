@@ -26,10 +26,10 @@ extension TeamsTestCase {
         let req = app.testable.fakeRequest()
         
         team1 = Team.testable.create("team 1", on: app)
-        _ = try! team1.users.attach(user1, on: req).await(on: req)
+        _ = try! team1.users.attach(user1, on: req).wait()
         
         team2 = Team.testable.create("team 2", on: app)
-        _ = try! team2.users.attach(user2, on: req).await(on: req)
+        _ = try! team2.users.attach(user2, on: req).wait()
     }
     
 }

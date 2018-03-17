@@ -126,6 +126,34 @@ public struct RequestResponse {
         return response
     }
     
+    public func cors() throws -> Response {
+        let response = try noContent()
+        response.http.headers.replaceOrAdd(name: "Content-Type", value: "application/json")
+        response.http.headers.replaceOrAdd(name: "Access-Control-Allow-Methods", value: "GET,POST,PUT,DELETE,OPTIONS")
+        if let origin: String = request.http.headers["Origin"].first {
+            response.http.headers.replaceOrAdd(name: "Access-Control-Allow-Origin", value: origin)
+            response.http.headers.replaceOrAdd(name: "Access-Control-Expose-Headers", value: "Authorization")
+        }
+        var headers: [String] = []
+        var isContentType: Bool = false
+        for header in request.http.headers {
+            if (header.name.lowercased() == "content-type") {
+                isContentType = true
+            }
+            headers.append(header.name)
+        }
+        if !isContentType {
+            headers.append("Content-Type")
+        }
+        headers.append("*")
+        if !headers.contains("Authorization") {
+            headers.append("Authorization")
+        }
+        response.http.headers.replaceOrAdd(name: "Access-Control-Allow-Headers", value: headers.joined(separator: ","))
+        response.http.headers.replaceOrAdd(name: "Access-Control-Max-Age", value: "400")
+        return response
+    }
+    
 }
 
 

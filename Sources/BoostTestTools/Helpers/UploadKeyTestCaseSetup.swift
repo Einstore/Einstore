@@ -39,7 +39,7 @@ extension UploadKeyTestCaseSetup {
         
         let req = app.testable.fakeRequest()
         team4 = Team.testable.create("team 4", on: app)
-        _ = try! team4.users.attach(user1, on: req).await(on: req)
+        _ = try! team4.users.attach(user1, on: req).wait()
         
         key4 = UploadKey.testable.create(name: "key4", team: team4, on: app)
         

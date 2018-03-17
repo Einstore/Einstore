@@ -130,6 +130,8 @@ public final class ApiAuthMiddleware: Middleware, ServiceFactory {
             return ApiAuthMiddleware.allowedGetUri.contains(req.http.url.path)
         } else if req.http.method == .POST {
             return ApiAuthMiddleware.allowedPostUri.contains(req.http.url.path)
+        } else if req.http.method == .OPTIONS {
+            return true
         }
         return false
     }

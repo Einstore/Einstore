@@ -13,25 +13,29 @@ import ErrorsCore
 public class GenericController: Controller {
     
     public static func boot(router: Router) throws {
-//        router.get(PathComponent.anything) { req in
-//            return try req.response.badUrl()
-//        }
-//        
-//        router.post(PathComponent.anything) { req in
-//            return try req.response.badUrl()
-//        }
-//        
-//        router.put(PathComponent.anything) { req in
-//            return try req.response.badUrl()
-//        }
-//        
-//        router.patch(PathComponent.anything) { req in
-//            return try req.response.badUrl()
-//        }
-//        
-//        router.delete(PathComponent.anything) { req in
-//            return try req.response.badUrl()
-//        }
+        router.options(DynamicPathComponent.anything) { req in
+            return try req.response.cors()
+        }
+        
+        router.get(DynamicPathComponent.anything) { req in
+            return try req.response.badUrl()
+        }
+        
+        router.post(DynamicPathComponent.anything) { req in
+            return try req.response.badUrl()
+        }
+        
+        router.put(DynamicPathComponent.anything) { req in
+            return try req.response.badUrl()
+        }
+        
+        router.patch(DynamicPathComponent.anything) { req in
+            return try req.response.badUrl()
+        }
+        
+        router.delete(DynamicPathComponent.anything) { req in
+            return try req.response.badUrl()
+        }
         
         router.get("teapot") { req in
             return try req.response.teapot()

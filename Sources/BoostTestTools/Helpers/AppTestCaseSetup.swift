@@ -14,6 +14,7 @@ import FluentTestTools
 import ApiCoreTestTools
 @testable import ApiCore
 @testable import BoostCore
+import NIO
 
 
 public protocol AppTestCaseSetup: UploadKeyTestCaseSetup {
@@ -41,7 +42,7 @@ extension AppTestCaseSetup {
         app1.testable.addTag(name: "tag for app 1", identifier: "tag-for-app-1", on: app)
         
         try! Boost.storageFileHandler.createFolderStructure(url: app1.targetFolderPath!)
-        try! Boost.storageFileHandler.copy(from:demoUrl.appendingPathComponent("app.ipa") , to: app1.appPath!)
+//        try! Boost.storageFileHandler.copy(from:demoUrl.appendingPathComponent("app.ipa").path, to: app1.appPath!)
         
         app2 = App.testable.create(team: team2, name: "App 2", identifier: "app2", version: "3.2.1", build: "654321", platform: .android, on: app)
         app2.testable.addTag(name: "common tag", identifier: "common-tag", on: app)
@@ -63,8 +64,8 @@ extension AppTestCaseSetup {
     }
     
     public func deleteAllFiles() {
-        try! Boost.storageFileHandler.delete(path: Boost.config.storageFileConfig.mainFolderPath)
-        try! Boost.storageFileHandler.delete(path: Boost.config.tempFileConfig.mainFolderPath)
+//        try! Boost.storageFileHandler.delete(path: Boost.config.storageFileConfig.mainFolderPath)
+//        try! Boost.storageFileHandler.delete(path: Boost.config.tempFileConfig.mainFolderPath)
     }
     
 }

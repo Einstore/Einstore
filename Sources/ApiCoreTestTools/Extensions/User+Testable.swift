@@ -29,7 +29,7 @@ extension TestableProperty where TestableType == User {
     
     @discardableResult public static func create(user: User, on app: Application) -> User {
         let req = app.testable.fakeRequest()
-        return try! user.save(on: req).await(on: req)
+        return try! user.save(on: req).wait()
     }
     
 }
