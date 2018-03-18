@@ -11973,7 +11973,7 @@
 			path = Validators;
 			sourceTree = "<group>";
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -11989,7 +11989,6 @@
 				OBJ_194 /* Dependencies */,
 				OBJ_936 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_50 /* Extensions */ = {
@@ -15376,7 +15375,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_936 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";

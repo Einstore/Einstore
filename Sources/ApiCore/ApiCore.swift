@@ -54,7 +54,8 @@ public class ApiCore {
         ApiCore.middlewareConfig.use(ErrorLoggingMiddleware.self)
         ApiCore.middlewareConfig.use(ApiAuthMiddleware.self)
 //        ApiCore.middlewareConfig.use(DateMiddleware.self)
-        
+        ApiCore.middlewareConfig.use(FileMiddleware.self)
+
         services.register { container -> MiddlewareConfig in
             middlewareConfig
         }
@@ -66,9 +67,13 @@ public class ApiCore {
         services.register(ErrorLoggingMiddleware())
         services.register(ApiAuthMiddleware())
 //        services.register(DateMiddleware())
-        
+        services.register(FileMiddleware(publicDirectory: "/Projects/Web/Boost/Public/build/"))
+
         // Authentication
         let jwtSecret = ProcessInfo.processInfo.environment["JWT_SECRET"] ?? "secret"
+        if env.isRelease && jwtSecret == "secret" {
+            fatalError("You can't run in production mode with JWT_SECRET set to \"secret\"")
+        }
         let jwtService = JWTService(secret: jwtSecret)
         services.register(jwtService)
         services.register(AuthenticationCache())

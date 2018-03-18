@@ -13,6 +13,10 @@
 		"appstore"
 	],
     "env": {
+        "JWT_SECRET": {
+            "description": "Your secret to authenticate JWT tokens, can be a set of random characters.",
+            "required": true
+        },
         "DB_HOST": {
             "description": "PostgreSQL database host.",
             "value": "localhost",

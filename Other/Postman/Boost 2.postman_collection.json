@@ -7,6 +7,28 @@
 	},
 	"item": [
 		{
+			"name": "CORS",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "OPTIONS",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}ping",
+					"host": [
+						"{{SERVER}}ping"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
 			"name": "Install",
 			"request": {
 				"auth": {
@@ -1251,7 +1273,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "55b9bfee-fdd1-4edd-b389-fe357848166b",
+						"id": "710a0a32-3cbc-4cb2-a3d1-aaa38465ab17",
 						"type": "text/javascript",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",

@@ -50,6 +50,9 @@
    <Group
       location = "container:scripts"
       name = "Scripts">
+      <FileRef
+         location = "group:macOS">
+      </FileRef>
       <Group
          location = "group:docker-shortcuts"
          name = "docker-shortcuts">
