@@ -52,7 +52,15 @@ public class ApiCore {
         let corsConfig = CORSMiddleware.Configuration(
             allowedOrigin: .originBased,
             allowedMethods: [.GET, .POST, .PUT, .OPTIONS, .DELETE, .PATCH],
-            allowedHeaders: [.accept, .authorization, .contentType, .origin, .xRequestedWith, .userAgent]
+            allowedHeaders: [.accept, .authorization, .contentType, .origin, .xRequestedWith, .userAgent],
+            exposedHeaders: [
+                HTTPHeaderName.authorization.description,
+                HTTPHeaderName.contentLength.description,
+                HTTPHeaderName.contentType.description,
+                HTTPHeaderName.contentDisposition.description,
+                HTTPHeaderName.cacheControl.description,
+                HTTPHeaderName.expires.description
+            ]
         )
         ApiCore.middlewareConfig.use(CORSMiddleware(configuration: corsConfig))
 //        ApiCore.middlewareConfig.use(ErrorMiddleware.self) // Vapor original middleware
