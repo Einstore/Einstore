@@ -168,9 +168,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "JWT::JWT"
-               BuildableName = "JWT.framework"
-               BlueprintName = "JWT"
+               BlueprintIdentifier = "Mailgun::Mailgun"
+               BuildableName = "Mailgun.framework"
+               BlueprintName = "Mailgun"
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -182,9 +182,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Boost::Mailgun"
-               BuildableName = "Mailgun.framework"
-               BlueprintName = "Mailgun"
+               BlueprintIdentifier = "JWT::JWT"
+               BuildableName = "JWT.framework"
+               BlueprintName = "JWT"
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>

@@ -13,14 +13,6 @@ import ErrorsCore
 public class GenericController: Controller {
     
     public static func boot(router: Router) throws {
-        router.options("/") { req in
-            return try req.response.cors()
-        }
-        
-        router.options(DynamicPathComponent.anything) { req in
-            return try req.response.cors()
-        }
-        
         router.get(DynamicPathComponent.anything) { req in
             return try req.response.badUrl()
         }

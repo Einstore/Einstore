@@ -74,6 +74,15 @@
         }
       },
       {
+        "package": "Mailgun",
+        "repositoryURL": "https://github.com/rafiki270/VaporMailgunService.git",
+        "state": {
+          "branch": "nio",
+          "revision": "6280856e90e19ca1cd882f7e9a967280d5e4dd79",
+          "version": null
+        }
+      },
+      {
         "package": "PostgreSQL",
         "repositoryURL": "https://github.com/vapor/postgresql.git",
         "state": {

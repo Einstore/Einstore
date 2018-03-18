@@ -49,6 +49,12 @@ public class ApiCore {
         ErrorLog.defaultDatabase = .db
         
         // TODO: Make some optional!
+        let corsConfig = CORSMiddleware.Configuration(
+            allowedOrigin: .originBased,
+            allowedMethods: [.GET, .POST, .PUT, .OPTIONS, .DELETE, .PATCH],
+            allowedHeaders: [.accept, .authorization, .contentType, .origin, .xRequestedWith, .userAgent]
+        )
+        ApiCore.middlewareConfig.use(CORSMiddleware(configuration: corsConfig))
 //        ApiCore.middlewareConfig.use(ErrorMiddleware.self) // Vapor original middleware
         ApiCore.middlewareConfig.use(ErrorsCoreMiddleware.self)
         ApiCore.middlewareConfig.use(ErrorLoggingMiddleware.self)
@@ -56,9 +62,7 @@ public class ApiCore {
 //        ApiCore.middlewareConfig.use(DateMiddleware.self)
         ApiCore.middlewareConfig.use(FileMiddleware.self)
 
-        services.register { container -> MiddlewareConfig in
-            middlewareConfig
-        }
+        services.register(middlewareConfig)
         
         // TODO: Make some optional!
         let logger = PrintLogger()
