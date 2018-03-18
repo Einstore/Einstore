@@ -128,12 +128,20 @@ public struct RequestResponse {
     
     public func cors() throws -> Response {
         let response = try noContent()
-        response.http.headers.replaceOrAdd(name: "Content-Type", value: "application/json")
-        response.http.headers.replaceOrAdd(name: "Access-Control-Allow-Methods", value: "GET,POST,PUT,DELETE,OPTIONS")
-        if let origin: String = request.http.headers["Origin"].first {
-            response.http.headers.replaceOrAdd(name: "Access-Control-Allow-Origin", value: origin)
-            response.http.headers.replaceOrAdd(name: "Access-Control-Expose-Headers", value: "Authorization")
-        }
+        response.http.headers.replaceOrAdd(name: HTTPHeaderName.contentType, value: "application/json")
+        response.http.headers.replaceOrAdd(name: HTTPHeaderName.accessControlAllowMethods, value: "GET,POST,PUT,PATCH,DELETE")
+        let origin = request.http.headers["Origin"].first ?? "*"
+        response.http.headers.replaceOrAdd(name: HTTPHeaderName.accessControlAllowOrigin, value: origin)
+        response.http.headers.replaceOrAdd(name: HTTPHeaderName.accessControlExpose, value: [
+            HTTPHeaderName.authorization.description,
+            HTTPHeaderName.contentType.description,
+            HTTPHeaderName.cacheControl.description,
+            HTTPHeaderName.contentDisposition.description,
+            HTTPHeaderName.contentLength.description,
+            HTTPHeaderName.userAgent.description,
+            HTTPHeaderName.expires.description
+            ].joined(separator: ", ")
+        ) // Headers to be exposed to the client
         var headers: [String] = []
         var isContentType: Bool = false
         for header in request.http.headers {
@@ -145,12 +153,12 @@ public struct RequestResponse {
         if !isContentType {
             headers.append("Content-Type")
         }
-        headers.append("*")
+        //headers.append("*")
         if !headers.contains("Authorization") {
             headers.append("Authorization")
         }
-        response.http.headers.replaceOrAdd(name: "Access-Control-Allow-Headers", value: headers.joined(separator: ","))
-        response.http.headers.replaceOrAdd(name: "Access-Control-Max-Age", value: "400")
+        response.http.headers.replaceOrAdd(name: HTTPHeaderName.accessControlAllowHeaders, value: headers.joined(separator: ","))
+        response.http.headers.replaceOrAdd(name: HTTPHeaderName.accessControlMaxAge, value: "5")
         return response
     }
     
