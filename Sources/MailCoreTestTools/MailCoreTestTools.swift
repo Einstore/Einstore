@@ -21,9 +21,7 @@ public class MailerMock: MailerService {
     // MARK: Initialization
     
     @discardableResult public init(services: inout Services) {
-        print(services.factories)
         services.remove(type: Mailer.self)
-        print(services.factories)
         services.register(self, as: MailerService.self)
     }
     

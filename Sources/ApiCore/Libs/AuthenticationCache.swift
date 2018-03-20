@@ -51,10 +51,6 @@ final class JWTService: Service {
     }
     
     func signUserToToken(user: User) throws -> String {
-//        var jwt = JWT(payload: UserPayload(user.id!))
-//        let data = try signer.sign(&jwt)
-//        return String(data: data, encoding: .utf8) ?? ""
-        
         let exp = ExpirationClaim(value: Date(timeIntervalSinceNow: (60 * 15))) // 15 minutes
         var jwt = JWT(payload: JWTAuthPayload(exp: exp, userId: user.id!))
         

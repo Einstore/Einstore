@@ -89,6 +89,8 @@ class UsersControllerTests: XCTestCase, UsersTestCase, LinuxTests {
         XCTAssertEqual(user.disabled, false, "Disabled should be false")
         XCTAssertEqual(user.su, false, "SU should be false")
         
+        // TODO: Check email has been set properly!
+        
         XCTAssertTrue(r.response.testable.has(statusCode: .created), "Wrong status code")
         XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
     }
