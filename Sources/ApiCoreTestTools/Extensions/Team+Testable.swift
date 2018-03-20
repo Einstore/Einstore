@@ -15,8 +15,8 @@ import VaporTestTools
 
 extension TestableProperty where TestableType == Team {
     
-    @discardableResult public static func create(_ name: String, on app: Application) -> Team {
-        let team = Team(name: name, identifier: name.safeText)
+    @discardableResult public static func create(_ name: String, admin: Bool = false, on app: Application) -> Team {
+        let team = Team(name: name, identifier: name.safeText, admin: admin)
         return create(team: team, on: app)
     }
     

@@ -126,6 +126,20 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Boost::MailCoreTestTools"
+               BuildableName = "MailCoreTestTools.framework"
+               BlueprintName = "MailCoreTestTools"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "Boost::FluentTestTools"
                BuildableName = "FluentTestTools.framework"
                BlueprintName = "FluentTestTools"
@@ -168,9 +182,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Mailgun::Mailgun"
-               BuildableName = "Mailgun.framework"
-               BlueprintName = "Mailgun"
+               BlueprintIdentifier = "JWT::JWT"
+               BuildableName = "JWT.framework"
+               BlueprintName = "JWT"
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -182,9 +196,23 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "JWT::JWT"
-               BuildableName = "JWT.framework"
-               BlueprintName = "JWT"
+               BlueprintIdentifier = "Boost::MailCore"
+               BuildableName = "MailCore.framework"
+               BlueprintName = "MailCore"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Mailgun::Mailgun"
+               BuildableName = "Mailgun.framework"
+               BlueprintName = "Mailgun"
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>

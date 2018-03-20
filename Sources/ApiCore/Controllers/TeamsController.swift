@@ -65,7 +65,9 @@ class TeamsController: Controller {
     static func boot(router: Router) throws {
         router.get("teams") { (req) -> Future<[Team]> in
             let me = try req.me.user()
-            return try me.teams.query(on: req).all()
+            return try me.teams.query(on: req).all().map({ teams in
+                return teams
+            })
         }
         
         router.get("teams", DbCoreIdentifier.parameter) { (req) -> Future<Team> in

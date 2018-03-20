@@ -15,7 +15,7 @@ import ApiCoreTestTools
 import ErrorsCore
 
 
-class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests {
+class TeamsControllerTests: XCTestCase, TeamsTestCase, LinuxTests {
     
     var app: Application!
     
@@ -73,6 +73,9 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
         XCTAssertTrue(r.response.testable.has(statusCode: .ok), "Wrong status code")
         XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
         
+        let realTeams = app.testable.all(for: Team.self)
+        print(realTeams)
+        
         let teams = r.response.testable.content(as: [Team].self)!
         XCTAssertEqual(teams.count, 2, "There should be two teams in the database")
         XCTAssertTrue(teams.contains(where: { (team) -> Bool in
@@ -91,7 +94,7 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
         // Test current status of the ME user
         let fakeReq = app.testable.fakeRequest()
         let me = try! fakeReq.me.user()
-        count = try! me.teams.query(on: fakeReq).count().await(on: fakeReq)
+        count = try! me.teams.query(on: fakeReq).count().wait()
         XCTAssertEqual(count, 2, "User should not have 1 team attached")
         
         // Execute request
@@ -107,7 +110,7 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
         
         if let team = testTeam(res: r.response, originalTeam: post) {
             // Test team has been attached to the ME user
-            let allUsers = try! team.users.query(on: fakeReq).all().await(on: fakeReq)
+            let allUsers = try! team.users.query(on: fakeReq).all().wait()
             XCTAssertEqual(allUsers.count, 1, "Team should have 1 user attached")
             XCTAssertEqual(allUsers[0].id, me.id, "Team should have ME user attached")
             
@@ -157,14 +160,14 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
     
     func testLinkUser() {
         let fakeReq = app.testable.fakeRequest()
-        var count = try! team1.users.query(on: fakeReq).count().await(on: fakeReq)
+        var count = try! team1.users.query(on: fakeReq).count().wait()
         XCTAssertEqual(count, 1, "Team should have two user at the beginning")
         
         var user = User(firstname: "Test", lastname: "User", email: "test.user1@liveui.io")
         user = User.testable.create(user: user, on: app)
         
         let postData = try! User.Id(id: user.id!).asJson()
-        let req = try! HTTPRequest.testable.post(uri: "/teams/\(team1.id!.uuidString)/link".makeURI(), data: postData, headers: [
+        let req = HTTPRequest.testable.post(uri: "/teams/\(team1.id!.uuidString)/link", data: postData, headers: [
             "Content-Type": "application/json; charset=utf-8"
             ], authorizedUser: user1, on: app
         )
@@ -179,17 +182,17 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
         XCTAssertTrue(r.response.testable.has(statusCode: .ok), "Wrong status code")
         XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
         
-        count = try! team1.users.query(on: fakeReq).count().await(on: fakeReq)
+        count = try! team1.users.query(on: fakeReq).count().wait()
         XCTAssertEqual(count, 2, "Team should have two users at the end")
     }
     
     func testTryLinkUserWhereHeIs() {
         let fakeReq = app.testable.fakeRequest()
-        var count = try! team1.users.query(on: fakeReq).count().await(on: fakeReq)
+        var count = try! team1.users.query(on: fakeReq).count().wait()
         XCTAssertEqual(count, 1, "Team should have two user at the beginning")
         
         let postData = try! User.Id(id: user1.id!).asJson()
-        let req = try! HTTPRequest.testable.post(uri: "/teams/\(team1.id!.uuidString)/link".makeURI(), data: postData, headers: [
+        let req = HTTPRequest.testable.post(uri: "/teams/\(team1.id!.uuidString)/link", data: postData, headers: [
             "Content-Type": "application/json; charset=utf-8"
             ], authorizedUser: user1, on: app
         )
@@ -204,17 +207,17 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
         XCTAssertTrue(r.response.testable.has(statusCode: .conflict), "Wrong status code")
         XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
         
-        count = try! team1.users.query(on: fakeReq).count().await(on: fakeReq)
+        count = try! team1.users.query(on: fakeReq).count().wait()
         XCTAssertEqual(count, 1, "Team should have two users at the end")
     }
     
     func testLinkUserThatDoesntExist() {
         let fakeReq = app.testable.fakeRequest()
-        var count = try! team1.users.query(on: fakeReq).count().await(on: fakeReq)
+        var count = try! team1.users.query(on: fakeReq).count().wait()
         XCTAssertEqual(count, 1, "Team should have two user at the beginning")
         
         let postData = try! User.Id(id: UUID()).asJson()
-        let req = try! HTTPRequest.testable.post(uri: "/teams/\(team1.id!.uuidString)/link".makeURI(), data: postData, headers: [
+        let req = HTTPRequest.testable.post(uri: "/teams/\(team1.id!.uuidString)/link", data: postData, headers: [
             "Content-Type": "application/json; charset=utf-8"
             ], authorizedUser: user1, on: app
         )
@@ -229,7 +232,7 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
         XCTAssertTrue(r.response.testable.has(statusCode: .notFound), "Wrong status code")
         XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
         
-        count = try! team1.users.query(on: fakeReq).count().await(on: fakeReq)
+        count = try! team1.users.query(on: fakeReq).count().wait()
         XCTAssertEqual(count, 1, "Team should have two users at the end")
     }
     
@@ -237,13 +240,13 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
         var user = User(firstname: "Test", lastname: "User", email: "test.user1@liveui.io")
         user = User.testable.create(user: user, on: app)
         let fakeReq = app.testable.fakeRequest()
-        _ = try! team1.users.attach(user, on: fakeReq).await(on: fakeReq)
+        _ = try! team1.users.attach(user, on: fakeReq).wait()
         
-        var count = try! team1.users.query(on: fakeReq).count().await(on: fakeReq)
+        var count = try! team1.users.query(on: fakeReq).count().wait()
         XCTAssertEqual(count, 2, "Team should have two user at the beginning")
         
         let postData = try! User.Id(id: user1.id!).asJson()
-        let req = try! HTTPRequest.testable.post(uri: "/teams/\(team1.id!.uuidString)/unlink".makeURI(), data: postData, headers: [
+        let req = HTTPRequest.testable.post(uri: "/teams/\(team1.id!.uuidString)/unlink", data: postData, headers: [
             "Content-Type": "application/json; charset=utf-8"
             ], authorizedUser: user1, on: app
         )
@@ -258,17 +261,17 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
         XCTAssertTrue(r.response.testable.has(statusCode: .ok), "Wrong status code")
         XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
         
-        count = try! team1.users.query(on: fakeReq).count().await(on: fakeReq)
+        count = try! team1.users.query(on: fakeReq).count().wait()
         XCTAssertEqual(count, 1, "Team should have two users at the end")
     }
     
     func testUnlinkYourselfWhenLastUser() {
         let fakeReq = app.testable.fakeRequest()
-        var count = try! team1.users.query(on: fakeReq).count().await(on: fakeReq)
+        var count = try! team1.users.query(on: fakeReq).count().wait()
         XCTAssertEqual(count, 1, "Team should have two user at the beginning")
         
         let postData = try! User.Id(id: user1.id!).asJson()
-        let req = try! HTTPRequest.testable.post(uri: "/teams/\(team1.id!.uuidString)/unlink".makeURI(), data: postData, headers: [
+        let req = HTTPRequest.testable.post(uri: "/teams/\(team1.id!.uuidString)/unlink", data: postData, headers: [
             "Content-Type": "application/json; charset=utf-8"
             ], authorizedUser: user1, on: app
         )
@@ -283,17 +286,17 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
         XCTAssertTrue(r.response.testable.has(statusCode: .conflict), "Wrong status code")
         XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
         
-        count = try! team1.users.query(on: fakeReq).count().await(on: fakeReq)
+        count = try! team1.users.query(on: fakeReq).count().wait()
         XCTAssertEqual(count, 1, "Team should have two users at the end")
     }
     
     func testUnlinkUserThatDoesntExist() {
         let fakeReq = app.testable.fakeRequest()
-        var count = try! team1.users.query(on: fakeReq).count().await(on: fakeReq)
+        var count = try! team1.users.query(on: fakeReq).count().wait()
         XCTAssertEqual(count, 1, "Team should have two user at the beginning")
         
         let postData = try! User.Id(id: UUID()).asJson()
-        let req = try! HTTPRequest.testable.post(uri: "/teams/\(team1.id!.uuidString)/unlink".makeURI(), data: postData, headers: [
+        let req = HTTPRequest.testable.post(uri: "/teams/\(team1.id!.uuidString)/unlink", data: postData, headers: [
             "Content-Type": "application/json; charset=utf-8"
             ], authorizedUser: user1, on: app
         )
@@ -308,17 +311,17 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
         XCTAssertTrue(r.response.testable.has(statusCode: .notFound), "Wrong status code")
         XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
         
-        count = try! team1.users.query(on: fakeReq).count().await(on: fakeReq)
+        count = try! team1.users.query(on: fakeReq).count().wait()
         XCTAssertEqual(count, 1, "Team should have two users at the end")
     }
     
     func testTryUnlinkUserWhereHeIsNot() {
         let fakeReq = app.testable.fakeRequest()
-        var count = try! team1.users.query(on: fakeReq).count().await(on: fakeReq)
+        var count = try! team1.users.query(on: fakeReq).count().wait()
         XCTAssertEqual(count, 1, "Team should have two user at the beginning")
         
         let postData = try! User.Id(id: user2.id!).asJson()
-        let req = try! HTTPRequest.testable.post(uri: "/teams/\(team1.id!.uuidString)/unlink".makeURI(), data: postData, headers: [
+        let req = HTTPRequest.testable.post(uri: "/teams/\(team1.id!.uuidString)/unlink", data: postData, headers: [
             "Content-Type": "application/json; charset=utf-8"
             ], authorizedUser: user1, on: app
         )
@@ -333,12 +336,12 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
         XCTAssertTrue(r.response.testable.has(statusCode: .conflict), "Wrong status code")
         XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
         
-        count = try! team1.users.query(on: fakeReq).count().await(on: fakeReq)
+        count = try! team1.users.query(on: fakeReq).count().wait()
         XCTAssertEqual(count, 1, "Team should have two users at the end")
     }
     
     func testGetSingleTeam() {
-        let req = try! HTTPRequest.testable.get(uri: "/teams/\(team1.id!.uuidString)".makeURI(), authorizedUser: user1, on: app)
+        let req = HTTPRequest.testable.get(uri: "/teams/\(team1.id!.uuidString)", authorizedUser: user1, on: app)
         let r = app.testable.response(to: req)
         
         r.response.testable.debug()
@@ -349,7 +352,7 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
     }
     
     func testGetTeamUsers() {
-        let req = try! HTTPRequest.testable.get(uri: "/teams/\(team1.id!.uuidString)/users".makeURI(), authorizedUser: user1, on: app)
+        let req = HTTPRequest.testable.get(uri: "/teams/\(team1.id!.uuidString)/users", authorizedUser: user1, on: app)
         let r = app.testable.response(to: req)
         
         r.response.testable.debug()
@@ -368,7 +371,7 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
         team1.identifier = team1.name.safeText
         
         let postData = try! team1.asJson()
-        let req = try! HTTPRequest.testable.put(uri: "/teams/\(team1.id!.uuidString)".makeURI(), data: postData, headers: [
+        let req = HTTPRequest.testable.put(uri: "/teams/\(team1.id!.uuidString)", data: postData, headers: [
             "Content-Type": "application/json; charset=utf-8"
             ], authorizedUser: user1, on: app
         )
@@ -387,7 +390,7 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
     func testPatchSingleTeam() {
         let testName = "team 1"
         let postData = try! team1.asJson()
-        let req = HTTPRequest.testable.patch(uri: URI(rawValue: "/teams/\(team1.id!.uuidString)")!, data: postData, headers: [
+        let req = HTTPRequest.testable.patch(uri: "/teams/\(team1.id!.uuidString)", data: postData, headers: [
             "Content-Type": "application/json; charset=utf-8"
             ], authorizedUser: user1, on: app
         )
@@ -406,7 +409,7 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
         let count = app.testable.count(allFor: Team.self)
         XCTAssertEqual(count, 3)
         
-        let req = try! HTTPRequest.testable.delete(uri: "/teams/\(team1.id!.uuidString)".makeURI(), authorizedUser: user1, on: app)
+        let req = HTTPRequest.testable.delete(uri: "/teams/\(team1.id!.uuidString)", authorizedUser: user1, on: app)
         let r = app.testable.response(to: req)
         
         r.response.testable.debug()
@@ -424,7 +427,7 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, UsersTestCase, LinuxTests
         let count = app.testable.count(allFor: Team.self)
         XCTAssertEqual(count, 3)
         
-        let req = try! HTTPRequest.testable.delete(uri: "/teams/\(team2.id!.uuidString)".makeURI(), authorizedUser: user1, on: app)
+        let req = HTTPRequest.testable.delete(uri: "/teams/\(team2.id!.uuidString)", authorizedUser: user1, on: app)
         let r = app.testable.response(to: req)
         
         r.response.testable.debug()

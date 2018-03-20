@@ -78,7 +78,7 @@ class UploadKeysControllerTests: XCTestCase, UploadKeyTestCaseSetup, LinuxTests 
     }
     
     func testGetUploadKeysForTeam() {
-        let req = try! HTTPRequest.testable.get(uri: "/teams/\(team1.id!.uuidString)/keys".makeURI(), authorizedUser: user1, on: app)
+        let req = HTTPRequest.testable.get(uri: "/teams/\(team1.id!.uuidString)/keys", authorizedUser: user1, on: app)
         let r = app.testable.response(to: req)
         
         r.response.testable.debug()
@@ -104,7 +104,7 @@ class UploadKeysControllerTests: XCTestCase, UploadKeyTestCaseSetup, LinuxTests 
         let expiryDate = Date()
         let post = UploadKey.New(name: "new key", expires: expiryDate)
         let postData = try! post.asJson()
-        let req = try! HTTPRequest.testable.post(uri: "/teams/\(team1.id!.uuidString)/keys".makeURI(), data: postData, headers: [
+        let req = HTTPRequest.testable.post(uri: "/teams/\(team1.id!.uuidString)/keys", data: postData, headers: [
             "Content-Type": "application/json; charset=utf-8"
             ] , authorizedUser: user1, on: app
         )
@@ -130,7 +130,7 @@ class UploadKeysControllerTests: XCTestCase, UploadKeyTestCaseSetup, LinuxTests 
         let expiryDate = Date(timeIntervalSince1970: 213412342342)
         let post = UploadKey.New(name: "updated key", expires: expiryDate)
         let postData = try! post.asJson()
-        let req = try! HTTPRequest.testable.put(uri: "/keys/\(key1.id!.uuidString)".makeURI(), data: postData, headers: [
+        let req = HTTPRequest.testable.put(uri: "/keys/\(key1.id!.uuidString)", data: postData, headers: [
             "Content-Type": "application/json; charset=utf-8"
             ] , authorizedUser: user1, on: app
         )
@@ -154,7 +154,7 @@ class UploadKeysControllerTests: XCTestCase, UploadKeyTestCaseSetup, LinuxTests 
         var count = app.testable.count(allFor: UploadKey.self)
         XCTAssertEqual(count, 4, "There should be two team entries in the db at the beginning")
         
-        let req = try! HTTPRequest.testable.delete(uri: "/keys/\(key2.id!.uuidString)".makeURI(), authorizedUser: user1, on: app)
+        let req = HTTPRequest.testable.delete(uri: "/keys/\(key2.id!.uuidString)", authorizedUser: user1, on: app)
         let r = app.testable.response(to: req)
         
         r.response.testable.debug()
@@ -170,7 +170,7 @@ class UploadKeysControllerTests: XCTestCase, UploadKeyTestCaseSetup, LinuxTests 
     }
     
     func testGetOneUploadKey() {
-        let req = try! HTTPRequest.testable.get(uri: "/keys/\(key4.id!.uuidString)".makeURI(), authorizedUser: user1, on: app)
+        let req = HTTPRequest.testable.get(uri: "/keys/\(key4.id!.uuidString)", authorizedUser: user1, on: app)
         let r = app.testable.response(to: req)
         
         r.response.testable.debug()

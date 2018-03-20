@@ -112,7 +112,7 @@ class GenericControllerTests: XCTestCase, UsersTestCase, LinuxTests {
         
         r.response.testable.debug()
         
-        XCTAssertTrue(r.response.testable.has(statusCode: 418), "Wrong status code")
+        XCTAssertTrue(r.response.testable.has(statusCode: .custom(code: 418, reasonPhrase: "I am teampot")), "Wrong status code")
         XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
         XCTAssertTrue(r.response.testable.has(contentLength: 178), "Wrong content length")
     }

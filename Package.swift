@@ -10,7 +10,7 @@ let package = Package(
         .package(url: "https://github.com/vapor/jwt.git", .branch("nio")),
         .package(url: "https://github.com/kareman/SwiftShell.git", from: "4.0.2"),
         .package(url: "https://github.com/LiveUI/VaporTestTools.git", .branch("master")),
-        .package(url: "https://github.com/rafiki270/VaporMailgunService.git", .branch("nio"))
+        .package(url: "https://github.com/twof/VaporMailgunService.git", .branch("nio"))
     ],
     targets: [
         .target(
@@ -24,6 +24,21 @@ let package = Package(
             name: "ErrorsCore",
             dependencies: [
                 "Vapor"
+            ]
+        ),
+        .target(
+            name: "MailCore",
+            dependencies: [
+                "Vapor",
+                "Mailgun"
+            ]
+        ),
+        .target(
+            name: "MailCoreTestTools",
+            dependencies: [
+                "Vapor",
+                "VaporTestTools",
+                "MailCore"
             ]
         ),
         .target(
@@ -65,7 +80,7 @@ let package = Package(
                 "DbCore",
                 "SwiftShell",
                 "FileCore",
-                "Mailgun",
+                "MailCore",
                 "SettingsCore"
             ]
         ),
@@ -78,7 +93,7 @@ let package = Package(
                 "ErrorsCore",
                 "DbCore",
                 "JWT",
-                "Mailgun"
+                "MailCore"
             ]
         ),
         .target(
@@ -87,7 +102,8 @@ let package = Package(
                 "Vapor",
                 "ApiCore",
                 "VaporTestTools",
-                "FluentTestTools"
+                "FluentTestTools",
+                "MailCoreTestTools"
             ]
         ),
         .target(
@@ -104,7 +120,8 @@ let package = Package(
                 "ApiCore",
                 "BoostCore",
                 "VaporTestTools",
-                "ApiCoreTestTools"
+                "ApiCoreTestTools",
+                "MailCoreTestTools"
             ]
         ),
         .target(name: "Run", dependencies: [

@@ -10,6 +10,7 @@ import Vapor
 import FluentPostgreSQL
 import DbCore
 import ErrorsCore
+import MailCore
 
 
 public class ApiCore {
@@ -48,6 +49,9 @@ public class ApiCore {
         FluentDesign.defaultDatabase = .db
         ErrorLog.defaultDatabase = .db
         
+        let mailgun = Mailer.Config.mailgun(key: "key-80df33a2d50d01a31a275cdc9368afda", domain: "liveui.io")
+        Mailer(config: mailgun, registerOn: &services)
+        
         // TODO: Make some optional!
         let corsConfig = CORSMiddleware.Configuration(
             allowedOrigin: .originBased,
@@ -80,6 +84,8 @@ public class ApiCore {
         services.register(ApiAuthMiddleware())
 //        services.register(DateMiddleware())
         services.register(FileMiddleware(publicDirectory: "/Projects/Web/Boost/Public/build/"))
+        
+        
 
         // Authentication
         let jwtSecret = ProcessInfo.processInfo.environment["JWT_SECRET"] ?? "secret"

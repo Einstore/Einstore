@@ -11,6 +11,8 @@ import DbCore
 import Vapor
 import Fluent
 import VaporTestTools
+import MailCore
+import MailCoreTestTools
 
 
 public struct Paths {
@@ -48,6 +50,10 @@ extension TestableProperty where TestableType: Application {
             ApiCore.middlewareConfig = MiddlewareConfig()
             
             try! ApiCore.configure(databaseConfig: db, &config, &env, &services)
+            
+            // Set mailer mock
+            MailerMock(services: &services)
+            
             configClosure?(&config, &env, &services)
         }) { (router) in
             routerClosure?(router)

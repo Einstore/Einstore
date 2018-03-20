@@ -8,6 +8,7 @@
 import Foundation
 import Vapor
 import FluentPostgreSQL
+import MailCore
 
 
 public class UsersController: Controller {
@@ -19,8 +20,13 @@ public class UsersController: Controller {
         
         router.post("users") { (req) -> Future<Response> in
             return try req.content.decode(User.Registration.self).flatMap(to: Response.self) { user in
-                return try user.newUser(on: req).save(on: req).flatMap(to: Response.self) { user in
-                    return try user.asDisplay().asResponse(.created, to: req)
+                let newUser = try user.newUser(on: req)
+                let verification = newUser.verification!
+                return try req.mail.send(from: "ondrej.rafaj@gmail.com", to: "rafaj@mangoweb.cz", subject: "polip si", text: verification).flatMap(to: Response.self) { result in
+                    newUser.verification = try newUser.verification?.passwordHash(req)
+                    return newUser.save(on: req).flatMap(to: Response.self) { user in
+                        return try user.asDisplay().asResponse(.created, to: req)
+                    }
                 }
             }
         }

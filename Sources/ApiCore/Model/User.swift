@@ -24,7 +24,7 @@ public final class User: DbCoreModel {
         public var password: String
         
         public func newUser(on req: Request) throws -> User {
-            let user = try User(firstname: firstname, lastname: lastname, email: email, password: password.passwordHash(req), token: nil, expires: nil, disabled: false, su: false)
+            let user = try User(firstname: firstname, lastname: lastname, email: email, verification: UUID().uuidString, password: password.passwordHash(req), token: nil, expires: nil, disabled: false, su: false)
             return user
         }
     }
@@ -125,6 +125,7 @@ public final class User: DbCoreModel {
     public var firstname: String
     public var lastname: String
     public var email: String
+    public var verification: String?
     public var password: String?
     public var token: String?
     public var expires: Date?
@@ -132,10 +133,11 @@ public final class User: DbCoreModel {
     public var disabled: Bool
     public var su: Bool
     
-    public init(firstname: String, lastname: String, email: String, password: String? = nil, token: String? = nil, expires: Date? = nil, disabled: Bool = true, su: Bool = false) {
+    public init(firstname: String, lastname: String, email: String, verification: String? = nil, password: String? = nil, token: String? = nil, expires: Date? = nil, disabled: Bool = true, su: Bool = false) {
         self.firstname = firstname
         self.lastname = lastname
         self.email = email
+        self.verification = verification
         self.password = password
         self.token = token
         self.expires = expires
@@ -185,6 +187,7 @@ extension User: Migration {
             schema.addField(type: DbCoreColumnType.varChar(80), name: CodingKeys.firstname.stringValue)
             schema.addField(type: DbCoreColumnType.varChar(80), name: CodingKeys.lastname.stringValue)
             schema.addField(type: DbCoreColumnType.varChar(141), name: CodingKeys.email.stringValue)
+            schema.addField(type: DbCoreColumnType.varChar(64), name: CodingKeys.verification.stringValue, isOptional: true)
             schema.addField(type: DbCoreColumnType.varChar(64), name: CodingKeys.password.stringValue, isOptional: true)
             schema.addField(type: DbCoreColumnType.varChar(64), name: CodingKeys.token.stringValue, isOptional: true)
             schema.addField(type: DbCoreColumnType.datetime(), name: CodingKeys.expires.stringValue, isOptional: true)

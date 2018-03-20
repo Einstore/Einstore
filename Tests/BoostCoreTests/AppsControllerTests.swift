@@ -98,7 +98,7 @@ class AppsControllerTests: XCTestCase, AppTestCaseSetup, LinuxTests {
         var count = app.testable.count(allFor: App.self)
         XCTAssertEqual(count, 107, "There should be right amount of apps to begin with")
         
-        let req = try! HTTPRequest.testable.delete(uri: "/apps/\(app1.id!.uuidString)".makeURI(), authorizedUser: user1, on: app)
+        let req = HTTPRequest.testable.delete(uri: "/apps/\(app1.id!.uuidString)", authorizedUser: user1, on: app)
         let r = app.testable.response(to: req)
         
         r.response.testable.debug()
@@ -118,13 +118,13 @@ class AppsControllerTests: XCTestCase, AppTestCaseSetup, LinuxTests {
         var count = app.testable.count(allFor: App.self)
         XCTAssertEqual(count, 107, "There should be right amount of apps to begin with")
         
-        let req = try! HTTPRequest.testable.delete(uri: "/apps/\(app2.id!.uuidString)".makeURI(), authorizedUser: user1, on: app)
+        let req = HTTPRequest.testable.delete(uri: "/apps/\(app2.id!.uuidString)", authorizedUser: user1, on: app)
         let r = app.testable.response(to: req)
         
         r.response.testable.debug()
         
         let object = app.testable.one(for: App.self, id: app2!.id!)
-        let tagsCount = try! object!.tags.query(on: r.request).count().await(on: r.request)
+        let tagsCount = try! object!.tags.query(on: r.request).count().wait()
         XCTAssertEqual(tagsCount, 2)
         
         // TODO: Test files are still there!!!
@@ -147,7 +147,7 @@ class AppsControllerTests: XCTestCase, AppTestCaseSetup, LinuxTests {
     func testBadTokenUpload() {
         let appUrl = Application.testable.paths.resourcesUrl.appendingPathComponent("Demo").appendingPathComponent("app.ipa")
         let postData = try! Data(contentsOf: appUrl)
-        let req = try! HTTPRequest.testable.post(uri: "/apps?token=bad_token_yo".makeURI(), data: postData, headers: [
+        let req = HTTPRequest.testable.post(uri: "/apps?token=bad_token_yo", data: postData, headers: [
             "Content-Type": "application/octet-stream"
             ]
         )
@@ -181,7 +181,7 @@ extension AppsControllerTests {
         let appUrl = Application.testable.paths.resourcesUrl.appendingPathComponent("Demo").appendingPathComponent(fileName)
         let postData = try! Data(contentsOf: appUrl)
         let encodedTags: String = tags.joined(separator: "|").addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
-        let req = try! HTTPRequest.testable.post(uri: "/apps?tags=\(encodedTags)&token=\(key1.token)".makeURI(), data: postData, headers: [
+        let req = HTTPRequest.testable.post(uri: "/apps?tags=\(encodedTags)&token=\(key1.token)", data: postData, headers: [
             "Content-Type": (platform == .ios ? "application/octet-stream" : "application/vnd.android.package-archive")
             ]
         )
@@ -193,7 +193,7 @@ extension AppsControllerTests {
         let appUrl = Application.testable.paths.resourcesUrl.appendingPathComponent("Demo").appendingPathComponent(fileName)
         let postData = try! Data(contentsOf: appUrl)
         let encodedTags: String = tags.joined(separator: "|").addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
-        let req = try! HTTPRequest.testable.post(uri: "/teams/\(team1.id!.uuidString)/apps?tags=\(encodedTags)".makeURI(), data: postData, headers: [
+        let req = HTTPRequest.testable.post(uri: "/teams/\(team1.id!.uuidString)/apps?tags=\(encodedTags)", data: postData, headers: [
             "Content-Type": (platform == .ios ? "application/octet-stream" : "application/vnd.android.package-archive")
             ], authorizedUser: user1, on: app
         )
@@ -240,7 +240,7 @@ extension AppsControllerTests {
         
         // Check all created tags
         let fakeReq = app.testable.fakeRequest()
-        let allTags = try! object.tags.query(on: fakeReq).all().await(on: fakeReq)
+        let allTags = try! object.tags.query(on: fakeReq).all().wait()
         for tag in tags {
             XCTAssertTrue(allTags.contains(name: tag), "Tag needs to be present")
             XCTAssertTrue(allTags.contains(identifier: tag.safeText), "Tag needs to be present")

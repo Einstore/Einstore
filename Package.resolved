@@ -75,10 +75,10 @@
       },
       {
         "package": "Mailgun",
-        "repositoryURL": "https://github.com/rafiki270/VaporMailgunService.git",
+        "repositoryURL": "https://github.com/twof/VaporMailgunService.git",
         "state": {
           "branch": "nio",
-          "revision": "6280856e90e19ca1cd882f7e9a967280d5e4dd79",
+          "revision": "bca4c99de61c905f9fa1f5bd1221e0d9a09fffa6",
           "version": null
         }
       },
@@ -150,7 +150,7 @@
         "repositoryURL": "https://github.com/LiveUI/VaporTestTools.git",
         "state": {
           "branch": "master",
-          "revision": "fbb4d99dae33b80234b08688a02a69b845d8a037",
+          "revision": "cafcb00f3edce258e017e53b2b89ce231fc22b9b",
           "version": null
         }
       },
