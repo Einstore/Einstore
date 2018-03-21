@@ -13,6 +13,8 @@
 
 ##
 
+> **Warning! - *Project is not yet completely finished. We are going to release an alpha version in April, contact us on Slack for ETA or follow the status below***
+
 Boost is an enterprise mobile app distribution platform. Boost has been made originally to help us distribute mobile apps to our clients on our own platform but eventually we have decided to share our baby with the world. Let’s see what it will grow into!
 
 ## Documentation
@@ -39,8 +41,6 @@ To install on Heroku please press the button and follow the instructions:
 [![Deploy Boost enterprise appstore to Heroku](https://camo.githubusercontent.com/c0824806f5221ebb7d25e559568582dd39dd1170/68747470733a2f2f7777772e6865726f6b7563646e2e636f6d2f6465706c6f792f627574746f6e2e706e67)](https://heroku.com/deploy?template=https://github.com/LiveUI/Boost)
 
 ## Features
-
-> **Warning! - *Project is not finished, contact us on Slack for ETA or follow the status below***
 
 #### MVP (current)
 - [x] Build basic framework
