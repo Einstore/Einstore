@@ -5,108 +5,135 @@
         "package": "Console",
         "repositoryURL": "https://github.com/vapor/console.git",
         "state": {
-          "branch": "nio",
-          "revision": "0a82071dc4172c78918a7db23b4aaaef40068783",
-          "version": null
+          "branch": null,
+          "revision": "9b219b46ce0248924ed014c23bf8d4df05f2ad80",
+          "version": "3.0.0-rc.2.0.1"
         }
       },
       {
         "package": "Core",
         "repositoryURL": "https://github.com/vapor/core.git",
         "state": {
-          "branch": "nio",
-          "revision": "25acb283699ca7d2b59aac2875107c6b7b95b66d",
-          "version": null
+          "branch": null,
+          "revision": "b1aef578cc7b55e5eefdb05ed19dfc8ca2452b12",
+          "version": "3.0.0-rc.2.1"
         }
       },
       {
         "package": "Crypto",
         "repositoryURL": "https://github.com/vapor/crypto.git",
         "state": {
-          "branch": "nio",
-          "revision": "d23c37472d778179eb0ea370d4bf4bd8e995b5ef",
-          "version": null
+          "branch": null,
+          "revision": "5ea23edc6d3122655daf71756bc769c987a20b29",
+          "version": "3.0.0-rc.2"
         }
       },
       {
         "package": "DatabaseKit",
         "repositoryURL": "https://github.com/vapor/database-kit.git",
         "state": {
-          "branch": "nio",
-          "revision": "4fb466b622ea07737faa69476ca8aa54876cb2b3",
-          "version": null
+          "branch": null,
+          "revision": "6565711cc781f4351cade86ab61edd55ecdd8d53",
+          "version": "1.0.0-rc.2.1"
         }
       },
       {
         "package": "Engine",
         "repositoryURL": "https://github.com/vapor/engine.git",
         "state": {
-          "branch": "nio",
-          "revision": "a54ef9c9d61dbcad8e6296bcd2afc7a41b950f71",
-          "version": null
+          "branch": null,
+          "revision": "6a7ca70b6858a0ac8a5c48359c80a3c37f46b47e",
+          "version": "3.0.0-rc.2"
         }
       },
       {
         "package": "Fluent",
         "repositoryURL": "https://github.com/vapor/fluent.git",
         "state": {
-          "branch": "nio",
-          "revision": "7d4e061d5a2bab09804cb20f03bd58f903db9d92",
-          "version": null
+          "branch": null,
+          "revision": "2db8aec4d90bc4d81abcbdcbc32801dbcaab8f36",
+          "version": "3.0.0-rc.2.1"
         }
       },
       {
         "package": "FluentPostgreSQL",
         "repositoryURL": "https://github.com/vapor/fluent-postgresql.git",
         "state": {
-          "branch": "nio",
-          "revision": "2814c629858c83317c73e5d489eb808a163d8a4c",
-          "version": null
+          "branch": null,
+          "revision": "41832e0963296e4d234f3b2b19b7ed457dfa46dd",
+          "version": "1.0.0-rc.2"
         }
       },
       {
         "package": "JWT",
         "repositoryURL": "https://github.com/vapor/jwt.git",
         "state": {
-          "branch": "nio",
-          "revision": "4a5fc7689ffb15af2e08a9da6762c769cff4d5df",
-          "version": null
-        }
-      },
-      {
-        "package": "Mailgun",
-        "repositoryURL": "https://github.com/twof/VaporMailgunService.git",
-        "state": {
-          "branch": "nio",
-          "revision": "bca4c99de61c905f9fa1f5bd1221e0d9a09fffa6",
-          "version": null
+          "branch": null,
+          "revision": "d3695c51ec1b30bed0c7c9d94060378eb179c767",
+          "version": "3.0.0-rc.2"
         }
       },
       {
         "package": "PostgreSQL",
         "repositoryURL": "https://github.com/vapor/postgresql.git",
         "state": {
-          "branch": "nio",
-          "revision": "c2b4be0a7c3d2d0794b73b1d212a5e819fe02cf1",
-          "version": null
+          "branch": null,
+          "revision": "387cf9ea6e9079b62c6108ef7ee1f651e4ee2b19",
+          "version": "1.0.0-rc.2.0.1"
         }
       },
       {
         "package": "Routing",
         "repositoryURL": "https://github.com/vapor/routing.git",
         "state": {
-          "branch": "nio",
-          "revision": "ab302896c51dabeecad2f1a297a943df321ae2b1",
-          "version": null
+          "branch": null,
+          "revision": "2fc1d4de22a54848b35ad17b3e7f7816f19ebf90",
+          "version": "3.0.0-rc.2"
         }
       },
       {
         "package": "Service",
         "repositoryURL": "https://github.com/vapor/service.git",
         "state": {
-          "branch": "nio",
-          "revision": "d51d6d00c77e1032ba6ae425f3330da9455852d8",
-          "version": null
+          "branch": null,
+          "revision": "d2b233ba721b6ed09ae6ba300a1a4e22255f01ae",
+          "version": "1.0.0-rc.2.1"
+        }
+      },
+      {
+        "package": "swift-nio",
+        "repositoryURL": "https://github.com/apple/swift-nio.git",
+        "state": {
+          "branch": null,
+          "revision": "320561f4371d32c74a12158d2e18f220703fe32c",
+          "version": "1.2.1"
+        }
+      },
+      {
+        "package": "swift-nio-ssl",
+        "repositoryURL": "https://github.com/apple/swift-nio-ssl.git",
+        "state": {
+          "branch": null,
+          "revision": "85a55f91bf80afa96889426962f0e0369fae9187",
+          "version": "1.0.0"
+        }
+      },
+      {
+        "package": "swift-nio-ssl-support",
+        "repositoryURL": "https://github.com/apple/swift-nio-ssl-support.git",
+        "state": {
+          "branch": null,
+          "revision": "c02eec4e0e6d351cd092938cf44195a8e669f555",
+          "version": "1.0.0"
+        }
+      },
+      {
+        "package": "swift-nio-zlib-support",
+        "repositoryURL": "https://github.com/apple/swift-nio-zlib-support.git",
+        "state": {
+          "branch": null,
+          "revision": "37760e9a52030bb9011972c5213c3350fa9d41fd",
+          "version": "1.0.0"
         }
       },
       {
@@ -122,27 +149,36 @@
         "package": "TemplateKit",
         "repositoryURL": "https://github.com/vapor/template-kit.git",
         "state": {
-          "branch": "nio",
-          "revision": "e53e7abad486e6cc38877ecd35b7177ab3a19e12",
-          "version": null
+          "branch": null,
+          "revision": "ef940383716d05ac6e1b0dcb0ba672c7c0f8a718",
+          "version": "1.0.0-rc.2.0.1"
         }
       },
       {
         "package": "Validation",
         "repositoryURL": "https://github.com/vapor/validation.git",
         "state": {
-          "branch": "nio",
-          "revision": "9c29d7571501233d74464e996f2c81f3c5ea0b88",
-          "version": null
+          "branch": null,
+          "revision": "361140562d87385df49fdb36e96841c0a92d59ae",
+          "version": "2.0.0-rc.2"
         }
       },
       {
         "package": "Vapor",
         "repositoryURL": "https://github.com/vapor/vapor.git",
         "state": {
-          "branch": "nio",
-          "revision": "dd293b7054b0f4a44d2f41c6c625eab3da331500",
-          "version": null
+          "branch": null,
+          "revision": "5f757a9a47c494af030d1ab7f82911e140682f9d",
+          "version": "3.0.0-rc.2"
+        }
+      },
+      {
+        "package": "Mailgun",
+        "repositoryURL": "https://github.com/twof/VaporMailgunService.git",
+        "state": {
+          "branch": null,
+          "revision": "16032dc460900d44583dd834e14e286c8f5a9cca",
+          "version": "0.3.0"
         }
       },
       {
@@ -150,26 +186,8 @@
         "repositoryURL": "https://github.com/LiveUI/VaporTestTools.git",
         "state": {
           "branch": "master",
-          "revision": "7b133ffaba571b838a29c1abb5efc26e992afb0f",
+          "revision": "efb7e8648d643970504b705629e2b264b3197dae",
           "version": null
-        }
-      },
-      {
-        "package": "swift-nio",
-        "repositoryURL": "https://github.com/apple/swift-nio.git",
-        "state": {
-          "branch": null,
-          "revision": "320561f4371d32c74a12158d2e18f220703fe32c",
-          "version": "1.2.1"
-        }
-      },
-      {
-        "package": "swift-nio-zlib-support",
-        "repositoryURL": "https://github.com/apple/swift-nio-zlib-support.git",
-        "state": {
-          "branch": null,
-          "revision": "37760e9a52030bb9011972c5213c3350fa9d41fd",
-          "version": "1.0.0"
         }
       }
     ]

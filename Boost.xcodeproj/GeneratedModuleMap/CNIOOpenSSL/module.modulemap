@@ -1,0 +1,4 @@
+module CNIOOpenSSL {
+    umbrella "/Projects/Web/Boost/.build/checkouts/swift-nio-ssl.git-1370587408992578247/Sources/CNIOOpenSSL/include"
+    export *
+}

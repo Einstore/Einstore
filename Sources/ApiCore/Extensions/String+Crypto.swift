@@ -8,7 +8,6 @@
 import Foundation
 import Vapor
 import Crypto
-import Bits
 
 
 extension String {
@@ -26,12 +25,10 @@ extension String {
     }
     
     public var base64Decoded: String? {
-        guard let data = data(using: .utf8) else {
+        guard let decodedData = Data(base64Encoded: self), let decodedString = String(data: decodedData, encoding: .utf8) else {
             return nil
         }
-        let decoded = Base64.url.decode(data: data)
-        let string = String(data: decoded, encoding: .utf8)
-        return string
+        return decodedString
     }
     
     public var md5: String? {
