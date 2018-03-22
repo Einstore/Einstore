@@ -101,7 +101,7 @@ class UploadKeysControllerTests: XCTestCase, UploadKeyTestCaseSetup, LinuxTests 
         XCTAssertEqual(count, 4, "There should be two team entries in the db at the beginning")
         
         // Execute request
-        let expiryDate = Date()
+        let expiryDate = Date(timeIntervalSince1970: 23412342342)
         let post = UploadKey.New(name: "new key", expires: expiryDate)
         let postData = try! post.asJson()
         let req = HTTPRequest.testable.post(uri: "/teams/\(team1.id!.uuidString)/keys", data: postData, headers: [
@@ -117,7 +117,7 @@ class UploadKeysControllerTests: XCTestCase, UploadKeyTestCaseSetup, LinuxTests 
         
         XCTAssertNotNil(privateKey, "Token should have been created properly")
         XCTAssertEqual(key.teamId, team1.id!, "Team ID doesn't match")
-        XCTAssertEqual(key.expires, expiryDate, "Team ID doesn't match")
+        XCTAssertEqual(key.expires, expiryDate, "Team Expity doesn't match")
         
         XCTAssertTrue(r.response.testable.has(statusCode: .created), "Wrong status code")
         XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")
@@ -127,7 +127,7 @@ class UploadKeysControllerTests: XCTestCase, UploadKeyTestCaseSetup, LinuxTests 
     }
     
     func testChangeUploadKeyName() {
-        let expiryDate = Date(timeIntervalSince1970: 213412342342)
+        let expiryDate = Date(timeIntervalSince1970: 20000042342)
         let post = UploadKey.New(name: "updated key", expires: expiryDate)
         let postData = try! post.asJson()
         let req = HTTPRequest.testable.put(uri: "/keys/\(key1.id!.uuidString)", data: postData, headers: [
@@ -138,7 +138,7 @@ class UploadKeysControllerTests: XCTestCase, UploadKeyTestCaseSetup, LinuxTests 
         
         r.response.testable.debug()
         
-        let key = app.testable.one(for: UploadKey.Display.self, id: key1.id!)!
+        let key = app.testable.one(for: UploadKey.self, id: key1.id!)!
         
         XCTAssertEqual(key.name, post.name, "Name hasn't been updated")
         

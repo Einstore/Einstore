@@ -22,7 +22,7 @@ final class RequestIdService: Service, ServiceType {
 extension Request {
     
     public var sessionId: UUID {
-        return try! self.privateContainer.make(RequestIdService.self, for: Request.self).uuid
+        return try! self.privateContainer.make(RequestIdService.self).uuid
     }
     
 }

@@ -81,7 +81,7 @@ class TeamsController: Controller {
                     if identifierExists {
                         throw Team.TeamError.identifierAlreadyExists
                     }
-                    return newTeam.insertable.save(on: req).flatMap(to: Response.self) { team in
+                    return newTeam.asTeam().save(on: req).flatMap(to: Response.self) { team in
                         guard team.id != nil else {
                             throw DbError.insertFailed
                         }

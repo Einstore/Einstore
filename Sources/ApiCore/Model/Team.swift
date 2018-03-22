@@ -58,6 +58,10 @@ extension Team: Migration {
     public struct New: Content {
         public var name: String
         public var identifier: String
+        
+        public func asTeam() -> Team {
+            return Team(name: name, identifier: identifier)
+        }
     }
     
     public struct Name: Content {
@@ -89,17 +93,6 @@ extension Team: Migration {
     
     public static func revert(on connection: DbCoreConnection) -> Future<Void> {
         return Database.delete(Team.self, on: connection)
-    }
-    
-}
-
-
-extension Team.New: Insertable {
-
-    public typealias T = Team
-    
-    public var insertable: T {
-        return Team(name: name, identifier: identifier.safeText)
     }
     
 }

@@ -45,12 +45,11 @@ public class ApiCore {
         DbCore.migrationConfig.add(model: User.self, database: .db)
         DbCore.migrationConfig.add(model: TeamUser.self, database: .db)
         
-        User.Display.defaultDatabase = .db
         FluentDesign.defaultDatabase = .db
         ErrorLog.defaultDatabase = .db
         
-        let mailgun = Mailer.Config.mailgun(key: "key-80df33a2d50d01a31a275cdc9368afda", domain: "liveui.io")
-        Mailer(config: mailgun, registerOn: &services)
+//        ApiCore.middlewareConfig.use(ErrorMiddleware.self) // Vapor original middleware
+        ApiCore.middlewareConfig.use(ErrorsCoreMiddleware.self)
         
         // TODO: Make some optional!
         let corsConfig = CORSMiddleware.Configuration(
@@ -67,12 +66,13 @@ public class ApiCore {
             ]
         )
         ApiCore.middlewareConfig.use(CORSMiddleware(configuration: corsConfig))
-//        ApiCore.middlewareConfig.use(ErrorMiddleware.self) // Vapor original middleware
-        ApiCore.middlewareConfig.use(ErrorsCoreMiddleware.self)
         ApiCore.middlewareConfig.use(ErrorLoggingMiddleware.self)
         ApiCore.middlewareConfig.use(ApiAuthMiddleware.self)
-//        ApiCore.middlewareConfig.use(DateMiddleware.self)
+        ApiCore.middlewareConfig.use(DateMiddleware.self)
         ApiCore.middlewareConfig.use(FileMiddleware.self)
+        
+        let mailgun = Mailer.Config.mailgun(key: "key-80df33a2d50d01a31a275cdc9368afda", domain: "liveui.io")
+        Mailer(config: mailgun, registerOn: &services)
 
         services.register(middlewareConfig)
         
@@ -82,10 +82,8 @@ public class ApiCore {
         services.register(ErrorsCoreMiddleware(environment: env, log: logger))
         services.register(ErrorLoggingMiddleware())
         services.register(ApiAuthMiddleware())
-//        services.register(DateMiddleware())
+        services.register(DateMiddleware())
         services.register(FileMiddleware(publicDirectory: "/Projects/Web/Boost/Public/build/"))
-        
-        
 
         // Authentication
         let jwtSecret = ProcessInfo.processInfo.environment["JWT_SECRET"] ?? "secret"

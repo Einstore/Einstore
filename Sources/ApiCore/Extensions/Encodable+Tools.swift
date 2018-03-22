@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Vapor
 
 
 extension Encodable {
@@ -18,8 +19,26 @@ extension Encodable {
     }
     
     public func asJson() throws -> Data {
-        let jsonData = try JSONEncoder().encode(self)
+        let encoder = JSONEncoder()
+        if #available(macOS 10.12, *) {
+            encoder.dateEncodingStrategy = .iso8601
+        } else {
+            fatalError("macOS SDK < 10.12 detected, no ISO-8601 JSON support")
+        }
+        let jsonData = try encoder.encode(self)
+        let jsonString = String(data: jsonData, encoding: .utf8)
+        print(jsonString ?? ":(")
         return jsonData
     }
+    
+}
+
+
+extension Content {
+    
+//    public func asJson(on req: Request) throws -> Data {
+//        let jsonData = try encode(for: req)
+//        return jsonData
+//    }
     
 }

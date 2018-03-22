@@ -15,7 +15,7 @@ public class UsersController: Controller {
     
     public static func boot(router: Router) throws {
         router.get("users") { (req) -> Future<[User.Display]> in
-            return User.Display.query(on: req).all()
+            return User.query(on: req).decode(User.Display.self).all()
         }
         
         router.post("users") { (req) -> Future<Response> in

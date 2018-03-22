@@ -2,6 +2,11 @@ FROM mangoweb/swift:4.1-alpha
 
 RUN \
     apt-get update && \
+    apt-get install -y openssl && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN \
+    apt-get update && \
     apt-get install -y python python-dev python-pip python-virtualenv && \
     rm -rf /var/lib/apt/lists/*
 

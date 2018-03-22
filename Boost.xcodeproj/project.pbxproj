@@ -26,6 +26,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		15A230E02064558E0082DF0E /* EventLoop+Future.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A230DF2064558E0082DF0E /* EventLoop+Future.swift */; };
 		OBJ_1054 /* ApiCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_84 /* ApiCore.swift */; };
 		OBJ_1055 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_86 /* Configuration.swift */; };
 		OBJ_1056 /* AuthController.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_88 /* AuthController.swift */; };
@@ -788,7 +789,6 @@
 		OBJ_2566 /* String+Tools.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_169 /* String+Tools.swift */; };
 		OBJ_2567 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_171 /* Helpers.swift */; };
 		OBJ_2568 /* CoreDbModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_173 /* CoreDbModel.swift */; };
-		OBJ_2569 /* Insertable.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_174 /* Insertable.swift */; };
 		OBJ_2571 /* FluentPostgreSQL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "FluentPostgreSQL::FluentPostgreSQL::Product" /* FluentPostgreSQL.framework */; };
 		OBJ_2572 /* PostgreSQL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "PostgreSQL::PostgreSQL::Product" /* PostgreSQL.framework */; };
 		OBJ_2573 /* FluentSQL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Fluent::FluentSQL::Product" /* FluentSQL.framework */; };
@@ -11473,6 +11473,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		15A230DF2064558E0082DF0E /* EventLoop+Future.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EventLoop+Future.swift"; sourceTree = "<group>"; };
 		"Boost::ApiCore::Product" /* ApiCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCoreTestTools::Product" /* ApiCoreTestTools.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ApiCoreTestTools.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Boost::ApiCoreTests::Product" /* ApiCoreTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = ApiCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -11572,7 +11573,6 @@
 		OBJ_17 /* Tag+Equatable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Tag+Equatable.swift"; sourceTree = "<group>"; };
 		OBJ_171 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		OBJ_173 /* CoreDbModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDbModel.swift; sourceTree = "<group>"; };
-		OBJ_174 /* Insertable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Insertable.swift; sourceTree = "<group>"; };
 		OBJ_177 /* AppsControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppsControllerTests.swift; sourceTree = "<group>"; };
 		OBJ_178 /* UploadKeysControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadKeysControllerTests.swift; sourceTree = "<group>"; };
 		OBJ_18 /* Team+UploadKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Team+UploadKeys.swift"; sourceTree = "<group>"; };
@@ -14320,7 +14320,6 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_173 /* CoreDbModel.swift */,
-				OBJ_174 /* Insertable.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -15310,7 +15309,7 @@
 			path = WebSocket;
 			sourceTree = "<group>";
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -15325,7 +15324,6 @@
 				OBJ_202 /* Dependencies */,
 				OBJ_984 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_50 /* Extensions */ = {
@@ -16636,6 +16634,7 @@
 				OBJ_105 /* Router+Extended.swift */,
 				OBJ_106 /* String+Crypto.swift */,
 				OBJ_107 /* String+Manipulation.swift */,
+				15A230DF2064558E0082DF0E /* EventLoop+Future.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -19426,7 +19425,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_984 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -19531,6 +19530,7 @@
 				OBJ_1057 /* GenericController.swift in Sources */,
 				OBJ_1058 /* InstallController.swift in Sources */,
 				OBJ_1059 /* LogsController.swift in Sources */,
+				15A230E02064558E0082DF0E /* EventLoop+Future.swift in Sources */,
 				OBJ_1060 /* TeamsController.swift in Sources */,
 				OBJ_1061 /* UsersController.swift in Sources */,
 				OBJ_1062 /* Content+Response.swift in Sources */,
@@ -19966,7 +19966,6 @@
 				OBJ_2566 /* String+Tools.swift in Sources */,
 				OBJ_2567 /* Helpers.swift in Sources */,
 				OBJ_2568 /* CoreDbModel.swift in Sources */,
-				OBJ_2569 /* Insertable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

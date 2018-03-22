@@ -22,7 +22,7 @@ public struct Me {
     }
     
     public func user() throws -> User {
-        let authenticationCache = try request.make(AuthenticationCache.self, for: Request.self)
+        let authenticationCache = try request.make(AuthenticationCache.self)
         guard let user = authenticationCache[User.self] else {
             throw ErrorsCore.HTTPError.notAuthorized
         }

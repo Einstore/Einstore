@@ -48,13 +48,9 @@ public final class User: DbCoreModel {
             public let token: String
         }
         
-        public let twt: String
-        public let user: User.Display
     }
     
-    public final class Display: DbCoreModel {
-        
-        public static let entity: String = "users"
+    public final class Display: Content {
         
         public var id: DbCoreIdentifier?
         public var firstname: String

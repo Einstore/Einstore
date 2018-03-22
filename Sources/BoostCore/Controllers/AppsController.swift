@@ -216,7 +216,7 @@ class AppsController: Controller {
             }
         }
         
-        router.post("teams", DbCoreIdentifier.parameter, "apps") { (req) -> Future<Response> in
+        router.post("teams", UUID.parameter, "apps") { (req) -> Future<Response> in
             let teamId = try req.parameter(DbCoreIdentifier.self)
             return try req.me.verifiedTeam(id: teamId).flatMap(to: Response.self) { (team) -> Future<Response> in
                 return upload(teamId: teamId, on: req)
@@ -282,7 +282,7 @@ extension AppsController {
     }
     
     static func handleTags(on req: Request, app: App) throws -> Future<Void> {
-        if let query = try? req.query.decode([String: String].self) {
+        if req.http.url.query != nil, let query = try? req.query.decode([String: String].self) {
             if let tags = query["tags"]?.split(separator: "|") {
                 var futures: [Future<Void>] = []
                 try tags.forEach { (tagSubstring) in
@@ -301,8 +301,7 @@ extension AppsController {
                 return futures.flatten(on: req)
             }
         }
-        let future: Future<Void> =  req.eventLoop.newSucceededFuture(result: Void())
-        return future
+        return req.eventLoop.newSucceededVoidFuture()
     }
     
 }

@@ -86,7 +86,7 @@ public final class ApiAuthMiddleware: Middleware, ServiceFactory {
             guard let user = user else {
                 throw ErrorsCore.HTTPError.notAuthorized
             }
-            let authenticationCache = try req.make(AuthenticationCache.self, for: Request.self)
+            let authenticationCache = try req.make(AuthenticationCache.self)
             authenticationCache[User.self] = user
             
             return try next.respond(to: req)

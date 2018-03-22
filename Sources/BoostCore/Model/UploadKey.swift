@@ -27,10 +27,7 @@ final public class UploadKey: DbCoreModel {
         public var expires: Date?
     }
     
-    public struct Display: DbCoreModel {
-        
-        public static let entity: String = "uploadkeys"
-//        public static let name: String = "uploadkeys"
+    public struct Display: Content {
         
         public var id: DbCoreIdentifier?
         public var teamId: DbCoreIdentifier
@@ -57,6 +54,7 @@ final public class UploadKey: DbCoreModel {
             self.name = key.name
             self.expires = key.expires
         }
+        
     }
     
     public static var idKey: WritableKeyPath<UploadKey, DbCoreIdentifier?> = \UploadKey.id

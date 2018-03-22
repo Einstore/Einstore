@@ -92,14 +92,14 @@ extension Request {
     
     /// Authenticates the supplied instance for this request.
     public func authenticate<A>(_ instance: A) throws {
-        let cache = try privateContainer.make(AuthenticationCache.self, for: Request.self)
+        let cache = try privateContainer.make(AuthenticationCache.self)
         cache[A.self] = instance
     }
     
     /// Returns the authenticated instance of the supplied type.
     /// note: nil if no type has been authed, throws if there is a problem.
     public func authenticated<A>(_ type: A.Type) throws -> A? {
-        let cache = try privateContainer.make(AuthenticationCache.self, for: Request.self)
+        let cache = try privateContainer.make(AuthenticationCache.self)
         return cache[A.self]
     }
     
