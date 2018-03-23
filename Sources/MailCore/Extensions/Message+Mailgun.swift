@@ -12,8 +12,8 @@ import Mailgun
 
 extension Mailer.Message {
     
-    func asMailgunContent() -> MailgunEngine.FormData {
-        return MailgunEngine.FormData(from: from, to: to, subject: subject, text: text)
+    func asMailgunContent() -> Mailgun.Message {
+        return Mailgun.Message(from: from, to: to, subject: subject, text: text, html: html)
     }
     
 }

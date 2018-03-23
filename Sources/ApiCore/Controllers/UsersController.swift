@@ -13,6 +13,10 @@ import MailCore
 
 public class UsersController: Controller {
     
+    enum Problem: Error {
+        case verificationCodeMissing
+    }
+    
     public static func boot(router: Router) throws {
         router.get("users") { (req) -> Future<[User.Display]> in
             return User.query(on: req).decode(User.Display.self).all()
@@ -21,11 +25,24 @@ public class UsersController: Controller {
         router.post("users") { (req) -> Future<Response> in
             return try req.content.decode(User.Registration.self).flatMap(to: Response.self) { user in
                 let newUser = try user.newUser(on: req)
-                let verification = newUser.verification!
-                return try req.mail.send(from: "ondrej.rafaj@gmail.com", to: "rafaj@mangoweb.cz", subject: "polip si", text: verification).flatMap(to: Response.self) { result in
-                    newUser.verification = try newUser.verification?.passwordHash(req)
-                    return newUser.save(on: req).flatMap(to: Response.self) { user in
-                        return try user.asDisplay().asResponse(.created, to: req)
+                guard let verification = newUser.verification else {
+                    throw Problem.verificationCodeMissing
+                }
+                let templateModel = User.Registration.Template(
+                    verification: verification,
+                    serverLink: "http://www.liveui.io/fake_url",
+                    user: user
+                )
+                return try RegistrationTemplate.parsed(model: templateModel, on: req).flatMap(to: Response.self) { double in
+                    let from = "ondrej.rafaj@gmail.com"
+                    let subject = "polip si"
+                    let mail = Mailer.Message(from: from, to: user.email, subject: subject, text: double.string, html: double.html)
+                    return try req.mail.send(mail).flatMap(to: Response.self) { mailResult in
+                        print(mailResult)
+                        newUser.verification = try newUser.verification?.passwordHash(req)
+                        return newUser.save(on: req).flatMap(to: Response.self) { user in
+                            return try user.asDisplay().asResponse(.created, to: req)
+                        }
                     }
                 }
             }

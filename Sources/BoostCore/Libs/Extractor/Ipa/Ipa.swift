@@ -29,18 +29,17 @@ class Ipa: BaseExtractor, Extractor {
     func process(teamId: DbCoreIdentifier) throws -> Promise<App> {
         let promise = request.eventLoop.newPromise(App.self)
         
-        // TODO: Make async
-//        runloop.zeromilisecondsTimer {
+        DispatchQueue.global().async {
             do {
                 try runAndPrint("unzip", "-o", self.file.path, "-d", self.archive.path)
                 try self.parse()
                 
-                let a = try app(platform: .ios, teamId: teamId)
+                let a = try self.app(platform: .ios, teamId: teamId)
                 promise.succeed(result: a)
             } catch {
                 promise.fail(error: error)
             }
-//        }
+        }
         
         return promise
     }

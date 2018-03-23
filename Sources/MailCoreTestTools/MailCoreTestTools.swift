@@ -27,7 +27,7 @@ public class MailerMock: MailerService {
     
     // MARK: Public interface
     
-    public func send(message: Mailer.Message, on req: Request) throws -> Future<Mailer.Result> {
+    public func send(_ message: Mailer.Message, on req: Request) throws -> Future<Mailer.Result> {
         receivedMessage = message
         receivedRequest = req
         return req.eventLoop.newSucceededFuture(result: result)

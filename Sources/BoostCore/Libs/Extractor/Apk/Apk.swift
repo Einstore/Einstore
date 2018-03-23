@@ -150,22 +150,24 @@ class Apk: BaseExtractor, Extractor {
     func process(teamId: DbCoreIdentifier) throws -> Promise<App> {
         let promise = request.eventLoop.newPromise(App.self)
         
-        do {
-            // Extract archive
-            try runAndPrint("java", "-jar", apktoolUrl.path, "d", "-sf", file.path, "-o", extractedApkFolder.path)
-            
-            // Parse manifest file
-            try parseManifest()
-            
-            // Get info
-            try getApplicationName()
-            try getOtherApplicationInfo()
-            try getApplicationIcon()
-            
-            let a = try app(platform: .android, teamId: teamId)
-            promise.succeed(result: a)
-        } catch {
-            promise.fail(error: error)
+        DispatchQueue.global().async {
+            do {
+                // Extract archive
+                try runAndPrint("java", "-jar", self.apktoolUrl.path, "d", "-sf", self.file.path, "-o", self.extractedApkFolder.path)
+                
+                // Parse manifest file
+                try self.parseManifest()
+                
+                // Get info
+                try self.getApplicationName()
+                try self.getOtherApplicationInfo()
+                try self.getApplicationIcon()
+                
+                let a = try self.app(platform: .android, teamId: teamId)
+                promise.succeed(result: a)
+            } catch {
+                promise.fail(error: error)
+            }
         }
         
         return promise

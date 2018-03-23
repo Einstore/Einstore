@@ -209,7 +209,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "14b7eed6-43ce-4209-a4fb-ae3f9587c6f9",
+						"id": "fb96d006-ff14-4369-ab66-b908f5816ac3",
 						"type": "text/javascript",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
@@ -221,7 +221,7 @@
 							"tests[\"Token has an id\"] = (jsonData[\"id\"].length > 10)",
 							"tests[\"Token has a user\"] = (jsonData[\"user\"][\"id\"].length > 10)",
 							"tests[\"Token has a token\"] = (jsonData[\"token\"].length > 10)",
-							"tests[\"Token has expires\"] = (jsonData[\"expires\"] > 543533823)",
+							"tests[\"Token has expires\"] = (jsonData[\"expires\"].length > 10)",
 							"",
 							"postman.setEnvironmentVariable(\"AUTH_TOKEN\", jsonData[\"token\"]);",
 							"",
@@ -712,15 +712,21 @@
 		{
 			"name": "Teams (teams/:id)",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PUT",
 				"header": [
 					{
 						"key": "Content-Type",
 						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
 				"body": {
@@ -743,15 +749,21 @@
 		{
 			"name": "Teams (teams/:id)",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "DELETE",
 				"header": [
 					{
 						"key": "Content-Type",
 						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
 				"body": {
@@ -808,7 +820,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "    {\n        \"email\": \"rafaj@liveui.io\",\n        \"lastname\": \"Ondrej\",\n        \"firstname\": \"Rafaj\",\n        \"password\": \"aaaaaa\"\n    }"
+					"raw": "    {\n        \"email\": \"rafaj@mangoweb.cz\",\n        \"lastname\": \"Ondrej\",\n        \"firstname\": \"Rafaj\",\n        \"password\": \"aaaaaa\"\n    }"
 				},
 				"url": {
 					"raw": "{{SERVER}}users",
@@ -924,20 +936,13 @@
 					"file": {}
 				},
 				"url": {
-					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/apps?tags=tag5|tag6|tag7",
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/apps",
 					"host": [
 						"{{SERVER}}teams"
 					],
 					"path": [
 						"{{TEST_TEAM_ID}}",
 						"apps"
-					],
-					"query": [
-						{
-							"key": "tags",
-							"value": "tag5|tag6|tag7",
-							"equals": true
-						}
 					]
 				},
 				"description": null
@@ -1001,7 +1006,7 @@
 						}
 					]
 				},
-				"description": null
+				"description": ""
 			},
 			"response": []
 		},
@@ -1268,6 +1273,33 @@
 			"response": []
 		},
 		{
+			"name": "Upload keys (keys/:id)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}keys/{{TEST_UPLOAD_KEY_ID}}",
+					"host": [
+						"{{SERVER}}keys"
+					],
+					"path": [
+						"{{TEST_UPLOAD_KEY_ID}}"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
 			"name": "Upload keys (apps/:id/keys)",
 			"event": [
 				{
@@ -1318,7 +1350,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Upload key yo!\"\n}"
+					"raw": "{\n  \"name\": \"Upload key yo!\"\n}"
 				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/keys",
@@ -1328,33 +1360,6 @@
 					"path": [
 						"{{TEST_TEAM_ID}}",
 						"keys"
-					]
-				},
-				"description": null
-			},
-			"response": []
-		},
-		{
-			"name": "Upload keys (keys/:id)",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{SERVER}}keys/{{TEST_UPLOAD_KEY_ID}}",
-					"host": [
-						"{{SERVER}}keys"
-					],
-					"path": [
-						"{{TEST_UPLOAD_KEY_ID}}"
 					]
 				},
 				"description": null
@@ -1413,33 +1418,6 @@
 					],
 					"path": [
 						"{{TEST_UPLOAD_KEY_ID}}"
-					]
-				},
-				"description": null
-			},
-			"response": []
-		},
-		{
-			"name": "Register",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"firstname\": \"Ondrej\",\n  \"lastname\": \"Rafaj\",\n  \"email\": \"ondrej.rafaj@gmail.com\",\n  \"password\": \"exploited3330\"\n}"
-				},
-				"url": {
-					"raw": "{{SERVER}}register",
-					"host": [
-						"{{SERVER}}register"
 					]
 				},
 				"description": null

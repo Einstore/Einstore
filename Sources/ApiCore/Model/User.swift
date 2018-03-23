@@ -18,6 +18,13 @@ public typealias Users = [User]
 public final class User: DbCoreModel {
     
     public struct Registration: Content {
+        
+        public struct Template: Codable {
+            public var verification: String
+            public var serverLink: String
+            public var user: Registration
+        }
+        
         public var firstname: String
         public var lastname: String
         public var email: String

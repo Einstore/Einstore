@@ -8,9 +8,10 @@ let package = Package(
         .package(url: "https://github.com/vapor/fluent.git", from: "3.0.0-rc.2"),
         .package(url: "https://github.com/vapor/fluent-postgresql.git", from: "1.0.0-rc.2"),
         .package(url: "https://github.com/vapor/jwt.git", from: "3.0.0-rc.2"),
+        .package(url: "https://github.com/vapor/leaf.git", from: "3.0.0-rc.2"),
         .package(url: "https://github.com/kareman/SwiftShell.git", from: "4.0.2"),
         .package(url: "https://github.com/LiveUI/VaporTestTools.git", .branch("master")),
-        .package(url: "https://github.com/twof/VaporMailgunService.git", from: "0.3.0")
+        .package(url: "https://github.com/rafiki270/VaporMailgunService.git", .branch("master"))
     ],
     targets: [
         .target(
@@ -102,7 +103,8 @@ let package = Package(
                 "ErrorsCore",
                 "DbCore",
                 "JWT",
-                "MailCore"
+                "MailCore",
+                "Leaf"
             ]
         ),
         .target(

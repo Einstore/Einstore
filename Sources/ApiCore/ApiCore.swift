@@ -11,6 +11,7 @@ import FluentPostgreSQL
 import DbCore
 import ErrorsCore
 import MailCore
+import Leaf
 
 
 public class ApiCore {
@@ -79,6 +80,7 @@ public class ApiCore {
         services.register(ErrorsCoreMiddleware(environment: env, log: logger))
         services.register(ErrorLoggingMiddleware())
         services.register(ApiAuthMiddleware())
+        try services.register(LeafProvider())
         services.register(DateMiddleware())
         services.register(FileMiddleware(publicDirectory: "/Projects/Web/Boost/Public/build/"))
 
@@ -95,6 +97,9 @@ public class ApiCore {
         services.register(RequestIdService.self)
         
         try DbCore.configure(databaseConfig: databaseConfig, &config, &env, &services)
+        
+        // Install default templates
+        Templates.installMissing()
     }
     
     public static func boot(router: Router) throws {
