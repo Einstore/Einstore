@@ -72,6 +72,12 @@ final public class App: DbCoreModel {
         
     }
     
+    public struct Overview: Content {
+        public var id: DbCoreIdentifier
+        public var identifier: String
+        public var count: Int
+    }
+    
     public static var idKey: WritableKeyPath<App, DbCoreIdentifier?> = \App.id
     
     public var id: DbCoreIdentifier?

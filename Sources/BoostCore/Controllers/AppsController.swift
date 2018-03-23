@@ -20,6 +20,7 @@ extension QueryBuilder where Model == App {
     
     func appFilters() -> Self {
         var s = self
+        // TODO: Do pagination!!!!!!
         s = s.range(lower: 0, upper: 1000)
 //        s = s.filter(\App.platform == App.Platform.ios.rawValue)
         return s
@@ -62,13 +63,27 @@ class AppsController: Controller {
             }
         }
         
-        router.get("teams", DbCoreIdentifier.parameter, "apps") { (req) -> Future<Apps> in
+        router.get("teams", DbCoreIdentifier.parameter, "apps") { (req) -> Future<[App.Overview]> in
+            let teamId = try req.parameter(DbCoreIdentifier.self)
+            return try req.me.teams().flatMap(to: [App.Overview].self) { teams in
+                guard teams.contains(teamId) else {
+                    throw ErrorsCore.HTTPError.notFound
+                }
+                // TODO: Add group by!!!!
+                return try App.query(on: req).group(.and) { and in
+                    try and.filter(\App.teamId, in: teams.ids)
+                    try and.filter(\App.teamId == teamId)
+                }.decode(App.Overview.self).all()
+            }
+        }
+        
+        router.get("teams", DbCoreIdentifier.parameter, "overview") { (req) -> Future<Apps> in
             let teamId = try req.parameter(DbCoreIdentifier.self)
             return try req.me.teams().flatMap(to: Apps.self) { teams in
                 guard teams.contains(teamId) else {
                     throw ErrorsCore.HTTPError.notFound
                 }
-                return try App.query(on: req).filter(\App.teamId, in: teams.ids).appFilters().all()
+                return try App.query(on: req).filter(\App.teamId, in: teams.ids).all()
             }
         }
         
