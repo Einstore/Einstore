@@ -9,6 +9,7 @@ import Foundation
 import DbCore
 import Fluent
 import FileCore
+import MailCore
 
 
 public struct BoostConfig {
@@ -19,6 +20,8 @@ public struct BoostConfig {
     
     public var tempFileConfig = TempFileConfig()
     public var storageFileConfig = StorageFileConfig()
+    
+    public var mail: Mailer.Config = .none
     
     public init() {
         

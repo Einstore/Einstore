@@ -14,6 +14,7 @@ import FluentPostgreSQL
 import DbCore
 import FileCore
 import SettingsCore
+import MailCore
 
 
 public class Boost {
@@ -89,6 +90,8 @@ public class Boost {
         DbCore.migrationConfig.add(model: ErrorLog.self, database: .db)
         
         try SettingsCore.configure(&config, &env, &services)
+        
+        Mailer(config: boostConfig.mail, registerOn: &services)
         try ApiCore.configure(databaseConfig: database, &config, &env, &services)
         
         ApiCore.installFutures.append({ req in

@@ -70,9 +70,6 @@ public class ApiCore {
         ApiCore.middlewareConfig.use(ApiAuthMiddleware.self)
         ApiCore.middlewareConfig.use(DateMiddleware.self)
         ApiCore.middlewareConfig.use(FileMiddleware.self)
-        
-        let mailgun = Mailer.Config.mailgun(key: "key-80df33a2d50d01a31a275cdc9368afda", domain: "liveui.io")
-        Mailer(config: mailgun, registerOn: &services)
 
         services.register(middlewareConfig)
         
