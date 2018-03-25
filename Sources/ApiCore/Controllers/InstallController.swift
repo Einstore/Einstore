@@ -82,7 +82,7 @@ public class InstallController: Controller {
 extension InstallController {
     
     private static var su: User {
-        return User(firstname: "Super", lastname: "Admin", email: "admin@liveui.io", password: "admin", disabled: false, su: true)
+        return User(username: "admin", firstname: "Super", lastname: "Admin", email: "admin@liveui.io", password: "admin", disabled: false, su: true)
     }
     
     private static var adminTeam: Team {

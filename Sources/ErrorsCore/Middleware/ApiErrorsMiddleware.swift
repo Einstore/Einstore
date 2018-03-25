@@ -13,19 +13,7 @@ import Service
 import Vapor
 
 
-public final class ErrorsCoreMiddleware: Middleware, ServiceFactory {
-    
-    public var serviceType: Any.Type = ErrorsCoreMiddleware.self
-    
-    public var serviceSupports: [Any.Type] = []
-    
-    public var serviceTag: String?
-    
-    public var serviceIsSingleton: Bool = true
-    
-    public func makeService(for worker: Container) throws -> Any {
-        return self
-    }
+public final class ErrorsCoreMiddleware: Middleware, Service {
     
     /// The environment to respect when presenting errors.
     let environment: Environment

@@ -20,10 +20,10 @@ Boost team
 """
     
     public static  var html: String? = """
-    <h1>Hi #(user.firstname) #(user.lastname)</h1>
-    <p>Please confirm your email #(user.email) by clicking on this <a href="http://www.example.com/#what-the-fuck">link</a></p>
-    <p>HTML - huhuhu woe :)</p>
-    <p>Boost team</p>
-    """
+<h1>Hi #(user.firstname) #(user.lastname)</h1>
+<p>Please confirm your email #(user.email) by clicking on this <a href="http://www.example.com/#what-the-fuck">link</a></p>
+<p>HTML - huhuhu woe :)</p>
+<p>Boost team</p>
+"""
     
 }

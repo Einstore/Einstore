@@ -32,7 +32,8 @@ extension String {
     }
     
     public var md5: String? {
-        return MD5.hash(self).hexString
+        guard let data = data(using: .utf8) else { return nil }
+        return try? MD5.digest(data).hexEncodedString()
     }
     
 }

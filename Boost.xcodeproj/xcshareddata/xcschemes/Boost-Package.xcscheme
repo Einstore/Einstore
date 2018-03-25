@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Mailgun::Mailgun"
-               BuildableName = "Mailgun.framework"
-               BlueprintName = "Mailgun"
+               BlueprintIdentifier = "swift-nio::NIOConcurrencyHelpers"
+               BuildableName = "NIOConcurrencyHelpers.framework"
+               BlueprintName = "NIOConcurrencyHelpers"
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,163 +28,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Validation::Validation"
-               BuildableName = "Validation.framework"
-               BlueprintName = "Validation"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "swift-nio::NIO"
-               BuildableName = "NIO.framework"
-               BlueprintName = "NIO"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "TemplateKit::TemplateKit"
-               BuildableName = "TemplateKit.framework"
-               BlueprintName = "TemplateKit"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Core::COperatingSystem"
-               BuildableName = "COperatingSystem.framework"
-               BlueprintName = "COperatingSystem"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "VaporTestTools::VaporTestTools"
-               BuildableName = "VaporTestTools.framework"
-               BlueprintName = "VaporTestTools"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Boost::BumpUpCore"
-               BuildableName = "BumpUpCore.framework"
-               BlueprintName = "BumpUpCore"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Boost::BoostTestTools"
-               BuildableName = "BoostTestTools.framework"
-               BlueprintName = "BoostTestTools"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Boost::SettingsCore"
-               BuildableName = "SettingsCore.framework"
-               BlueprintName = "SettingsCore"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SwiftShell::SwiftShell"
-               BuildableName = "SwiftShell.framework"
-               BlueprintName = "SwiftShell"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Boost::App"
-               BuildableName = "App.framework"
-               BlueprintName = "App"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "swift-nio::NIOHTTP1"
-               BuildableName = "NIOHTTP1.framework"
-               BlueprintName = "NIOHTTP1"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "swift-nio::NIOTLS"
-               BuildableName = "NIOTLS.framework"
-               BlueprintName = "NIOTLS"
+               BlueprintIdentifier = "DatabaseKit::SQL"
+               BuildableName = "SQL.framework"
+               BlueprintName = "SQL"
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -210,34 +56,6 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Boost::MailCore"
-               BuildableName = "MailCore.framework"
-               BlueprintName = "MailCore"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Routing::Routing"
-               BuildableName = "Routing.framework"
-               BlueprintName = "Routing"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "Boost::DbCore"
                BuildableName = "DbCore.framework"
                BlueprintName = "DbCore"
@@ -252,37 +70,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Core::CodableKit"
-               BuildableName = "CodableKit.framework"
-               BlueprintName = "CodableKit"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Core::Core"
-               BuildableName = "Core.framework"
-               BlueprintName = "Core"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "swift-nio::CNIOSHA1"
-               BuildableName = "CNIOSHA1.framework"
-               BlueprintName = "CNIOSHA1"
+               BlueprintIdentifier = "Console::Command"
+               BuildableName = "Command.framework"
+               BlueprintName = "Command"
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -308,9 +98,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Boost::Run"
-               BuildableName = "Run"
-               BlueprintName = "Run"
+               BlueprintIdentifier = "Engine::Multipart"
+               BuildableName = "Multipart.framework"
+               BlueprintName = "Multipart"
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -322,9 +112,135 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Boost::BoostCore"
-               BuildableName = "BoostCore.framework"
-               BlueprintName = "BoostCore"
+               BlueprintIdentifier = "swift-nio::NIOWebSocket"
+               BuildableName = "NIOWebSocket.framework"
+               BlueprintName = "NIOWebSocket"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Boost::ApiCore"
+               BuildableName = "ApiCore.framework"
+               BlueprintName = "ApiCore"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Boost::App"
+               BuildableName = "App.framework"
+               BlueprintName = "App"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Console::Logging"
+               BuildableName = "Logging.framework"
+               BlueprintName = "Logging"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Vapor::Vapor"
+               BuildableName = "Vapor.framework"
+               BlueprintName = "Vapor"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Validation::Validation"
+               BuildableName = "Validation.framework"
+               BlueprintName = "Validation"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Boost::ErrorsCore"
+               BuildableName = "ErrorsCore.framework"
+               BlueprintName = "ErrorsCore"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Engine::FormURLEncoded"
+               BuildableName = "FormURLEncoded.framework"
+               BlueprintName = "FormURLEncoded"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Boost::BoostTestTools"
+               BuildableName = "BoostTestTools.framework"
+               BlueprintName = "BoostTestTools"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Crypto::Crypto"
+               BuildableName = "Crypto.framework"
+               BlueprintName = "Crypto"
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -364,300 +280,6 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Engine::HTTP"
-               BuildableName = "HTTP.framework"
-               BlueprintName = "HTTP"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Console::Command"
-               BuildableName = "Command.framework"
-               BlueprintName = "Command"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Boost::FileCore"
-               BuildableName = "FileCore.framework"
-               BlueprintName = "FileCore"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Fluent::Fluent"
-               BuildableName = "Fluent.framework"
-               BlueprintName = "Fluent"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Vapor::Vapor"
-               BuildableName = "Vapor.framework"
-               BlueprintName = "Vapor"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Console::Logging"
-               BuildableName = "Logging.framework"
-               BlueprintName = "Logging"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "swift-nio::CNIOAtomics"
-               BuildableName = "CNIOAtomics.framework"
-               BlueprintName = "CNIOAtomics"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Boost::ErrorsCore"
-               BuildableName = "ErrorsCore.framework"
-               BlueprintName = "ErrorsCore"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "JWT::JWT"
-               BuildableName = "JWT.framework"
-               BlueprintName = "JWT"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "swift-nio::CNIOHTTPParser"
-               BuildableName = "CNIOHTTPParser.framework"
-               BlueprintName = "CNIOHTTPParser"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Crypto::Random"
-               BuildableName = "Random.framework"
-               BlueprintName = "Random"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "swift-nio-ssl::CNIOOpenSSL"
-               BuildableName = "CNIOOpenSSL.framework"
-               BlueprintName = "CNIOOpenSSL"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Core::Debugging"
-               BuildableName = "Debugging.framework"
-               BlueprintName = "Debugging"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Core::Bits"
-               BuildableName = "Bits.framework"
-               BlueprintName = "Bits"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Console::Console"
-               BuildableName = "Console.framework"
-               BlueprintName = "Console"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Crypto::Crypto"
-               BuildableName = "Crypto.framework"
-               BlueprintName = "Crypto"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Fluent::FluentSQL"
-               BuildableName = "FluentSQL.framework"
-               BlueprintName = "FluentSQL"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "DatabaseKit::SQL"
-               BuildableName = "SQL.framework"
-               BlueprintName = "SQL"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "swift-nio::NIOConcurrencyHelpers"
-               BuildableName = "NIOConcurrencyHelpers.framework"
-               BlueprintName = "NIOConcurrencyHelpers"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Core::Async"
-               BuildableName = "Async.framework"
-               BlueprintName = "Async"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "PostgreSQL::PostgreSQL"
-               BuildableName = "PostgreSQL.framework"
-               BlueprintName = "PostgreSQL"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "swift-nio::NIOPriorityQueue"
                BuildableName = "NIOPriorityQueue.framework"
                BlueprintName = "NIOPriorityQueue"
@@ -672,93 +294,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FluentPostgreSQL::FluentPostgreSQL"
-               BuildableName = "FluentPostgreSQL.framework"
-               BlueprintName = "FluentPostgreSQL"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Leaf::Leaf"
-               BuildableName = "Leaf.framework"
-               BlueprintName = "Leaf"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "swift-nio::NIOWebSocket"
-               BuildableName = "NIOWebSocket.framework"
-               BlueprintName = "NIOWebSocket"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Engine::FormURLEncoded"
-               BuildableName = "FormURLEncoded.framework"
-               BlueprintName = "FormURLEncoded"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "swift-nio::CNIOLinux"
-               BuildableName = "CNIOLinux.framework"
-               BlueprintName = "CNIOLinux"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Boost::ApiCoreTestTools"
-               BuildableName = "ApiCoreTestTools.framework"
-               BlueprintName = "ApiCoreTestTools"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Engine::Multipart"
-               BuildableName = "Multipart.framework"
-               BlueprintName = "Multipart"
+               BlueprintIdentifier = "Crypto::Random"
+               BuildableName = "Random.framework"
+               BlueprintName = "Random"
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -798,9 +336,289 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "DatabaseKit::DatabaseKit"
-               BuildableName = "DatabaseKit.framework"
-               BlueprintName = "DatabaseKit"
+               BlueprintIdentifier = "Boost::Run"
+               BuildableName = "Run"
+               BlueprintName = "Run"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Boost::FileCore"
+               BuildableName = "FileCore.framework"
+               BlueprintName = "FileCore"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "SwiftShell::SwiftShell"
+               BuildableName = "SwiftShell.framework"
+               BlueprintName = "SwiftShell"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "swift-nio::NIOTLS"
+               BuildableName = "NIOTLS.framework"
+               BlueprintName = "NIOTLS"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "swift-nio-ssl::CNIOOpenSSL"
+               BuildableName = "CNIOOpenSSL.framework"
+               BlueprintName = "CNIOOpenSSL"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Core::Async"
+               BuildableName = "Async.framework"
+               BlueprintName = "Async"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "FluentPostgreSQL::FluentPostgreSQL"
+               BuildableName = "FluentPostgreSQL.framework"
+               BlueprintName = "FluentPostgreSQL"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Boost::BumpUpCore"
+               BuildableName = "BumpUpCore.framework"
+               BlueprintName = "BumpUpCore"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "swift-nio::CNIOAtomics"
+               BuildableName = "CNIOAtomics.framework"
+               BlueprintName = "CNIOAtomics"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Routing::Routing"
+               BuildableName = "Routing.framework"
+               BlueprintName = "Routing"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Core::Core"
+               BuildableName = "Core.framework"
+               BlueprintName = "Core"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Core::COperatingSystem"
+               BuildableName = "COperatingSystem.framework"
+               BlueprintName = "COperatingSystem"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "JWT::JWT"
+               BuildableName = "JWT.framework"
+               BlueprintName = "JWT"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Core::Debugging"
+               BuildableName = "Debugging.framework"
+               BlueprintName = "Debugging"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Engine::HTTP"
+               BuildableName = "HTTP.framework"
+               BlueprintName = "HTTP"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Leaf::Leaf"
+               BuildableName = "Leaf.framework"
+               BlueprintName = "Leaf"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "PostgreSQL::PostgreSQL"
+               BuildableName = "PostgreSQL.framework"
+               BlueprintName = "PostgreSQL"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Mailgun::Mailgun"
+               BuildableName = "Mailgun.framework"
+               BlueprintName = "Mailgun"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "TemplateKit::TemplateKit"
+               BuildableName = "TemplateKit.framework"
+               BlueprintName = "TemplateKit"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Boost::BoostCore"
+               BuildableName = "BoostCore.framework"
+               BlueprintName = "BoostCore"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "VaporTestTools::VaporTestTools"
+               BuildableName = "VaporTestTools.framework"
+               BlueprintName = "VaporTestTools"
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -826,9 +644,191 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Boost::ApiCore"
-               BuildableName = "ApiCore.framework"
-               BlueprintName = "ApiCore"
+               BlueprintIdentifier = "Core::Bits"
+               BuildableName = "Bits.framework"
+               BlueprintName = "Bits"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Boost::ApiCoreTestTools"
+               BuildableName = "ApiCoreTestTools.framework"
+               BlueprintName = "ApiCoreTestTools"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Fluent::FluentSQL"
+               BuildableName = "FluentSQL.framework"
+               BlueprintName = "FluentSQL"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "swift-nio::CNIOHTTPParser"
+               BuildableName = "CNIOHTTPParser.framework"
+               BlueprintName = "CNIOHTTPParser"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "swift-nio::NIO"
+               BuildableName = "NIO.framework"
+               BlueprintName = "NIO"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "swift-nio::CNIOSHA1"
+               BuildableName = "CNIOSHA1.framework"
+               BlueprintName = "CNIOSHA1"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "DatabaseKit::DatabaseKit"
+               BuildableName = "DatabaseKit.framework"
+               BlueprintName = "DatabaseKit"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "swift-nio::NIOHTTP1"
+               BuildableName = "NIOHTTP1.framework"
+               BlueprintName = "NIOHTTP1"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "swift-nio::CNIOLinux"
+               BuildableName = "CNIOLinux.framework"
+               BlueprintName = "CNIOLinux"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Fluent::Fluent"
+               BuildableName = "Fluent.framework"
+               BlueprintName = "Fluent"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Boost::SettingsCore"
+               BuildableName = "SettingsCore.framework"
+               BlueprintName = "SettingsCore"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Boost::MailCore"
+               BuildableName = "MailCore.framework"
+               BlueprintName = "MailCore"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Console::Console"
+               BuildableName = "Console.framework"
+               BlueprintName = "Console"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Core::CodableKit"
+               BuildableName = "CodableKit.framework"
+               BlueprintName = "CodableKit"
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -844,6 +844,16 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Boost::BoostCoreTests"
+               BuildableName = "BoostCoreTests.xctest"
+               BlueprintName = "BoostCoreTests"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "Boost::ErrorsCoreTests"
                BuildableName = "ErrorsCoreTests.xctest"
                BlueprintName = "ErrorsCoreTests"
@@ -854,29 +864,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Boost::DbCoreTests"
-               BuildableName = "DbCoreTests.xctest"
-               BlueprintName = "DbCoreTests"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "Boost::SettingsCoreTests"
                BuildableName = "SettingsCoreTests.xctest"
                BlueprintName = "SettingsCoreTests"
-               ReferencedContainer = "container:Boost.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Boost::BoostCoreTests"
-               BuildableName = "BoostCoreTests.xctest"
-               BlueprintName = "BoostCoreTests"
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -900,6 +890,16 @@
                ReferencedContainer = "container:Boost.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Boost::DbCoreTests"
+               BuildableName = "DbCoreTests.xctest"
+               BlueprintName = "DbCoreTests"
+               ReferencedContainer = "container:Boost.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <AdditionalOptions>
       </AdditionalOptions>
@@ -917,9 +917,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "Mailgun::Mailgun"
-            BuildableName = "Mailgun.framework"
-            BlueprintName = "Mailgun"
+            BlueprintIdentifier = "swift-nio::NIOConcurrencyHelpers"
+            BuildableName = "NIOConcurrencyHelpers.framework"
+            BlueprintName = "NIOConcurrencyHelpers"
             ReferencedContainer = "container:Boost.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

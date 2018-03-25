@@ -13,23 +13,19 @@ import Service
 import Vapor
 
 
-public final class UrlDebugMiddleware: Middleware, ServiceFactory {
-    
-    public var serviceType: Any.Type = UrlDebugMiddleware.self
-    
-    public var serviceSupports: [Any.Type] = []
-    
-    public var serviceTag: String?
-    
-    public var serviceIsSingleton: Bool = false
-    
-    public func makeService(for worker: Container) throws -> Any {
-        return self
-    }
+public final class UrlDebugMiddleware: Middleware, Service {
     
     public func respond(to req: Request, chainingTo next: Responder) throws -> Future<Response> {
         if req.environment != .production {
-            print("[\(req.http.method)] \(req.http.url)")
+            let logger = try req.make(Logger.self)
+            let method = req.http.method
+            let path = req.http.url.path
+            let query = req.http.url.query
+            var reqString = "\(method) \(path)"
+            if let q = query {
+                reqString += "?\(q)"
+            }
+            logger.debug(reqString)
         }
         return try next.respond(to: req)
     }

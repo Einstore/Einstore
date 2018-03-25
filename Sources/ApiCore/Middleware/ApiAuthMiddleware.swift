@@ -15,24 +15,12 @@ import ErrorsCore
 import JWT
 
 
-public final class ApiAuthMiddleware: Middleware, ServiceFactory {
+public final class ApiAuthMiddleware: Middleware, Service {
     
     enum Security: String {
         case unsecured = "Unsecured"
         case secured = "Secured"
         case maintenance = "Maintenance"
-    }
-    
-    public var serviceType: Any.Type = ApiAuthMiddleware.self
-    
-    public var serviceSupports: [Any.Type] = []
-    
-    public var serviceTag: String?
-    
-    public var serviceIsSingleton: Bool = true
-    
-    public func makeService(for worker: Container) throws -> Any {
-        return self
     }
     
     public static var allowedGetUri: [String] = [
@@ -81,7 +69,9 @@ public final class ApiAuthMiddleware: Middleware, ServiceFactory {
         // Secured
         self.printUrl(req: req, type: .secured)
         
-        let userPayload = try jwtPayload(request: req)
+        guard let userPayload = try? jwtPayload(request: req) else {
+            throw ErrorsCore.HTTPError.notAuthorized
+        }
         return try User.find(userPayload.userId, on: req).flatMap(to: Response.self) { user in
             guard let user = user else {
                 throw ErrorsCore.HTTPError.notAuthorized

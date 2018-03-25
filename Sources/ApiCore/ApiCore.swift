@@ -49,40 +49,22 @@ public class ApiCore {
         FluentDesign.defaultDatabase = .db
         ErrorLog.defaultDatabase = .db
         
-//        ApiCore.middlewareConfig.use(ErrorMiddleware.self) // Vapor original middleware
-        ApiCore.middlewareConfig.use(ErrorsCoreMiddleware.self)
         
-        // TODO: Make some optional!
-        let corsConfig = CORSMiddleware.Configuration(
-            allowedOrigin: .originBased,
-            allowedMethods: [.GET, .POST, .PUT, .OPTIONS, .DELETE, .PATCH],
-            allowedHeaders: [.accept, .authorization, .contentType, .origin, .xRequestedWith, .userAgent],
-            exposedHeaders: [
-                HTTPHeaderName.authorization.description,
-                HTTPHeaderName.contentLength.description,
-                HTTPHeaderName.contentType.description,
-                HTTPHeaderName.contentDisposition.description,
-                HTTPHeaderName.cacheControl.description,
-                HTTPHeaderName.expires.description
-            ]
-        )
-        ApiCore.middlewareConfig.use(CORSMiddleware(configuration: corsConfig))
-        ApiCore.middlewareConfig.use(ErrorLoggingMiddleware.self)
-        ApiCore.middlewareConfig.use(ApiAuthMiddleware.self)
-        ApiCore.middlewareConfig.use(DateMiddleware.self)
-        ApiCore.middlewareConfig.use(FileMiddleware.self)
+        
+        
+        // Auth
+        middlewareConfig.use(ApiAuthMiddleware.self)
+        services.register(ApiAuthMiddleware())
+        
+        // System
+        middlewareConfig.use(DateMiddleware.self)
+        services.register(DateMiddleware())
+        middlewareConfig.use(FileMiddleware.self)
+        services.register(FileMiddleware(publicDirectory: "/Projects/Web/Boost/Public/build/"))
+        try services.register(LeafProvider())
 
         services.register(middlewareConfig)
         
-        // TODO: Make some optional!
-        let logger = PrintLogger()
-//        services.register(ErrorMiddleware(environment: env, log: logger)) // Vapor original middleware
-        services.register(ErrorsCoreMiddleware(environment: env, log: logger))
-        services.register(ErrorLoggingMiddleware())
-        services.register(ApiAuthMiddleware())
-        try services.register(LeafProvider())
-        services.register(DateMiddleware())
-        services.register(FileMiddleware(publicDirectory: "/Projects/Web/Boost/Public/build/"))
 
         // Authentication
         let jwtSecret = ProcessInfo.processInfo.environment["JWT_SECRET"] ?? "secret"
@@ -97,6 +79,28 @@ public class ApiCore {
         services.register(RequestIdService.self)
         
         try DbCore.configure(databaseConfig: databaseConfig, &config, &env, &services)
+        
+        // Errors
+        middlewareConfig.use(ErrorsCoreMiddleware.self)
+        services.register(ErrorsCoreMiddleware(environment: env, log: PrintLogger()))
+        middlewareConfig.use(ErrorLoggingMiddleware.self)
+        services.register(ErrorLoggingMiddleware())
+        
+        // CORS
+        let corsConfig = CORSMiddleware.Configuration(
+            allowedOrigin: .originBased,
+            allowedMethods: [.GET, .POST, .PUT, .OPTIONS, .DELETE, .PATCH],
+            allowedHeaders: [.accept, .authorization, .contentType, .origin, .xRequestedWith, .userAgent],
+            exposedHeaders: [
+                HTTPHeaderName.authorization.description,
+                HTTPHeaderName.contentLength.description,
+                HTTPHeaderName.contentType.description,
+                HTTPHeaderName.contentDisposition.description,
+                HTTPHeaderName.cacheControl.description,
+                HTTPHeaderName.expires.description
+            ]
+        )
+        middlewareConfig.use(CORSMiddleware(configuration: corsConfig))
         
         // Install default templates
         Templates.installMissing()

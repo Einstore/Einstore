@@ -163,7 +163,7 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, LinuxTests {
         var count = try! team1.users.query(on: fakeReq).count().wait()
         XCTAssertEqual(count, 1, "Team should have two user at the beginning")
         
-        var user = User(firstname: "Test", lastname: "User", email: "test.user1@liveui.io")
+        var user = User(username: "test", firstname: "Test", lastname: "User", email: "test.user1@liveui.io")
         user = User.testable.create(user: user, on: app)
         
         let postData = try! User.Id(id: user.id!).asJson()
@@ -237,7 +237,7 @@ class TeamsControllerTests: XCTestCase, TeamsTestCase, LinuxTests {
     }
     
     func testUnlinkUser() {
-        var user = User(firstname: "Test", lastname: "User", email: "test.user1@liveui.io")
+        var user = User(username: "luv", firstname: "Test", lastname: "User", email: "test.user1@liveui.io")
         user = User.testable.create(user: user, on: app)
         let fakeReq = app.testable.fakeRequest()
         _ = try! team1.users.attach(user, on: fakeReq).wait()

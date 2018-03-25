@@ -68,7 +68,7 @@ class UsersControllerTests: XCTestCase, UsersTestCase, LinuxTests {
     }
     
     func testRegisterUser() {
-        let post = User.Registration(firstname: "Lemmy", lastname: "Kilmister", email: "lemmy@liveui.io", password: "passw0rd")
+        let post = User.Registration(username: "lemmy", firstname: "Lemmy", lastname: "Kilmister", email: "lemmy@liveui.io", password: "passw0rd")
         let req = try! HTTPRequest.testable.post(uri: "/users", data: post.asJson(), headers: [
             "Content-Type": "application/json; charset=utf-8"
             ]
@@ -92,7 +92,23 @@ class UsersControllerTests: XCTestCase, UsersTestCase, LinuxTests {
         XCTAssertEqual(user.disabled, false, "Disabled should be false")
         XCTAssertEqual(user.su, false, "SU should be false")
         
-        // TODO: Test sending email!!!!!!!!
+        // Test email has been sent (on a mock email client ... obviously)
+        let mailer = try! r.request.make(MailerService.self) as! MailerMock
+        XCTAssertEqual(mailer.receivedMessage!.from, "ondrej.rafaj@gmail.com", "Email has a wrong sender")
+        XCTAssertEqual(mailer.receivedMessage!.to, "lemmy@liveui.io", "Email has a wrong recipient")
+        XCTAssertEqual(mailer.receivedMessage!.subject, "polip si", "Email has a wrong subject")
+        XCTAssertEqual(mailer.receivedMessage!.text, """
+Hi Lemmy Kilmister
+Please confirm your email lemmy@liveui.io by clicking on this link http://www.example.com/#what-the-fuck
+HTML - huhuhu woe :)
+Boost team
+""", "Email has a wrong text")
+        XCTAssertEqual(mailer.receivedMessage!.html, """
+<h1>Hi Lemmy Kilmister</h1>
+<p>Please confirm your email lemmy@liveui.io by clicking on this <a href="http://www.example.com/#what-the-fuck">link</a></p>
+<p>HTML - huhuhu woe :)</p>
+<p>Boost team</p>
+""", "Email has a wrong html")
         
         XCTAssertTrue(r.response.testable.has(statusCode: .created), "Wrong status code")
         XCTAssertTrue(r.response.testable.has(contentType: "application/json; charset=utf-8"), "Missing content type")

@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/vapor/console.git",
         "state": {
           "branch": null,
-          "revision": "9b219b46ce0248924ed014c23bf8d4df05f2ad80",
-          "version": "3.0.0-rc.2.0.1"
+          "revision": "e37e02c86ded07678ebf22517fdb8d070c5447f5",
+          "version": "3.0.0-rc.2.1"
         }
       },
       {
@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/vapor/core.git",
         "state": {
           "branch": null,
-          "revision": "b1aef578cc7b55e5eefdb05ed19dfc8ca2452b12",
-          "version": "3.0.0-rc.2.1"
+          "revision": "9238f270cdd40349fd1e047dab21f4dea1999ec6",
+          "version": "3.0.0-rc.2.3"
         }
       },
       {
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/vapor/crypto.git",
         "state": {
           "branch": null,
-          "revision": "5ea23edc6d3122655daf71756bc769c987a20b29",
-          "version": "3.0.0-rc.2"
+          "revision": "4c7acb4fbf1720682275f0ef543474c951d84a09",
+          "version": "3.0.0-rc.3"
         }
       },
       {
@@ -42,8 +42,8 @@
         "repositoryURL": "https://github.com/vapor/engine.git",
         "state": {
           "branch": null,
-          "revision": "6a7ca70b6858a0ac8a5c48359c80a3c37f46b47e",
-          "version": "3.0.0-rc.2"
+          "revision": "cd6756a971caba5f14a861b446fe682a15d2ae28",
+          "version": "3.0.0-rc.2.1"
         }
       },
       {
@@ -51,8 +51,8 @@
         "repositoryURL": "https://github.com/vapor/fluent.git",
         "state": {
           "branch": null,
-          "revision": "0307bdaee347ccb95411b11f0630959fef83c962",
-          "version": "3.0.0-rc.2.1.2"
+          "revision": "ff1d9a9e0bc13f46eb834744d50bea8183fbc47c",
+          "version": "3.0.0-rc.2.2"
         }
       },
       {
@@ -69,8 +69,8 @@
         "repositoryURL": "https://github.com/vapor/jwt.git",
         "state": {
           "branch": null,
-          "revision": "d3695c51ec1b30bed0c7c9d94060378eb179c767",
-          "version": "3.0.0-rc.2"
+          "revision": "0179c5f213c55dcaf91976502ccc4f3df8884800",
+          "version": "3.0.0-rc.2.1"
         }
       },
       {
@@ -87,8 +87,8 @@
         "repositoryURL": "https://github.com/vapor/postgresql.git",
         "state": {
           "branch": null,
-          "revision": "387cf9ea6e9079b62c6108ef7ee1f651e4ee2b19",
-          "version": "1.0.0-rc.2.0.1"
+          "revision": "64f9c20cae08113a022341dee27c5bbfc2607c2c",
+          "version": "1.0.0-rc.2.0.2"
         }
       },
       {
@@ -105,8 +105,8 @@
         "repositoryURL": "https://github.com/vapor/service.git",
         "state": {
           "branch": null,
-          "revision": "d2b233ba721b6ed09ae6ba300a1a4e22255f01ae",
-          "version": "1.0.0-rc.2.1"
+          "revision": "02205a16a3f4714a08836529f5a868c2ce256719",
+          "version": "1.0.0-rc.2.2"
         }
       },
       {
@@ -114,8 +114,8 @@
         "repositoryURL": "https://github.com/apple/swift-nio.git",
         "state": {
           "branch": null,
-          "revision": "1bcf85dd243cd51c5e9c1e164748c804af88e657",
-          "version": "1.3.0"
+          "revision": "a0b7f646fba61402da384b3202f54c27debb5e13",
+          "version": "1.3.1"
         }
       },
       {
@@ -177,17 +177,17 @@
         "repositoryURL": "https://github.com/vapor/vapor.git",
         "state": {
           "branch": null,
-          "revision": "6eeb2f6a2b19ff8b90f1a50c1961a177f2dd2cef",
-          "version": "3.0.0-rc.2.0.2"
+          "revision": "72424e773c26eaece83819d1a067ae77b4f68cc6",
+          "version": "3.0.0-rc.2.2"
         }
       },
       {
         "package": "Mailgun",
-        "repositoryURL": "https://github.com/rafiki270/VaporMailgunService.git",
+        "repositoryURL": "https://github.com/twof/VaporMailgunService.git",
         "state": {
-          "branch": "master",
-          "revision": "e1c37a081a67a06302c617ac97aa2e1d20a68fbd",
-          "version": null
+          "branch": null,
+          "revision": "018685b24cc9e31a02ca549c491bc6978e473648",
+          "version": "0.4.0"
         }
       },
       {
