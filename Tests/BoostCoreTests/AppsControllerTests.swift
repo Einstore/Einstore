@@ -42,7 +42,8 @@ class AppsControllerTests: XCTestCase, AppTestCaseSetup, LinuxTests {
     
     static let allTests: [(String, Any)] = [
         ("testGetAppsOverview", testGetAppsOverview),
-//        ("testDeleteApp", testDeleteApp),
+        ("testDeleteApp", testDeleteApp),
+        ("testAppTags", testAppTags),
         ("testCantDeleteOtherPeoplesApp", testCantDeleteOtherPeoplesApp),
         ("testOldIosApp", testOldIosApp),
         ("testOldIosAppTokenUpload", testOldIosAppTokenUpload),
