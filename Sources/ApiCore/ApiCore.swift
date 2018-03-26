@@ -49,21 +49,12 @@ public class ApiCore {
         FluentDesign.defaultDatabase = .db
         ErrorLog.defaultDatabase = .db
         
-        
-        
-        
-        // Auth
-        middlewareConfig.use(ApiAuthMiddleware.self)
-        services.register(ApiAuthMiddleware())
-        
         // System
         middlewareConfig.use(DateMiddleware.self)
         services.register(DateMiddleware())
         middlewareConfig.use(FileMiddleware.self)
         services.register(FileMiddleware(publicDirectory: "/Projects/Web/Boost/Public/build/"))
         try services.register(LeafProvider())
-
-        services.register(middlewareConfig)
         
 
         // Authentication
@@ -81,10 +72,14 @@ public class ApiCore {
         try DbCore.configure(databaseConfig: databaseConfig, &config, &env, &services)
         
         // Errors
-        middlewareConfig.use(ErrorsCoreMiddleware.self)
-        services.register(ErrorsCoreMiddleware(environment: env, log: PrintLogger()))
         middlewareConfig.use(ErrorLoggingMiddleware.self)
         services.register(ErrorLoggingMiddleware())
+        middlewareConfig.use(ErrorsCoreMiddleware.self)
+        services.register(ErrorsCoreMiddleware(environment: env, log: PrintLogger()))
+        
+        // Auth
+        middlewareConfig.use(ApiAuthMiddleware.self)
+        services.register(ApiAuthMiddleware())
         
         // CORS
         let corsConfig = CORSMiddleware.Configuration(
@@ -101,6 +96,9 @@ public class ApiCore {
             ]
         )
         middlewareConfig.use(CORSMiddleware(configuration: corsConfig))
+        
+        // Register middlewares
+        services.register(middlewareConfig)
         
         // Install default templates
         Templates.installMissing()
