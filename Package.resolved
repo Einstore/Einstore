@@ -6,7 +6,7 @@
         "repositoryURL": "https://github.com/LiveUI/ApiCore.git",
         "state": {
           "branch": "master",
-          "revision": "422df88488618ce23444ce4a9b3f6eaa346a126d",
+          "revision": "98d73a6f1ee5d16424e304761257b3bac9ff63d5",
           "version": null
         }
       },
@@ -15,7 +15,7 @@
         "repositoryURL": "https://github.com/LiveUI/BoostCore.git",
         "state": {
           "branch": "master",
-          "revision": "e9ea453481458a8868f786499bcded8174ef7bec",
+          "revision": "32ac3c7f186ddc86e0d1ac3e2a4185f131969dc0",
           "version": null
         }
       },
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/vapor/console.git",
         "state": {
           "branch": null,
-          "revision": "e37e02c86ded07678ebf22517fdb8d070c5447f5",
-          "version": "3.0.0-rc.2.1"
+          "revision": "273cf2ed1f4daba88a452494c342020171d8c7b8",
+          "version": "3.0.0-rc.2.2"
         }
       },
       {
@@ -51,8 +51,8 @@
         "repositoryURL": "https://github.com/vapor/database-kit.git",
         "state": {
           "branch": null,
-          "revision": "ce82abe73051388dcadbf34873b29a75df58cabc",
-          "version": "1.0.0-rc.2.1.1"
+          "revision": "9e77b5b95e3f1f141abdf75d6123f591971162cd",
+          "version": "1.0.0-rc.2.2.1"
         }
       },
       {
@@ -69,8 +69,8 @@
         "repositoryURL": "https://github.com/vapor/engine.git",
         "state": {
           "branch": null,
-          "revision": "cd6756a971caba5f14a861b446fe682a15d2ae28",
-          "version": "3.0.0-rc.2.1"
+          "revision": "4846ea9abeb04863f82f618ee8cb22650a82ae3c",
+          "version": "3.0.0-rc.2.1.1"
         }
       },
       {
@@ -87,8 +87,8 @@
         "repositoryURL": "https://github.com/vapor/fluent.git",
         "state": {
           "branch": null,
-          "revision": "ff1d9a9e0bc13f46eb834744d50bea8183fbc47c",
-          "version": "3.0.0-rc.2.2"
+          "revision": "eb63485dfd6fbd0773a25e1b94830fbcedaa8266",
+          "version": "3.0.0-rc.2.3.1"
         }
       },
       {
@@ -96,8 +96,8 @@
         "repositoryURL": "https://github.com/vapor/fluent-postgresql.git",
         "state": {
           "branch": null,
-          "revision": "41832e0963296e4d234f3b2b19b7ed457dfa46dd",
-          "version": "1.0.0-rc.2"
+          "revision": "495db9b9113cfbdf80377801c0f1cf7a95ebf05e",
+          "version": "1.0.0-rc.2.1"
         }
       },
       {
@@ -123,8 +123,8 @@
         "repositoryURL": "https://github.com/vapor/leaf.git",
         "state": {
           "branch": null,
-          "revision": "e0c8bb646556aefdaed907e48a8435655c59bab3",
-          "version": "3.0.0-rc.2"
+          "revision": "198212bb2618bca661fed698632c182825899a39",
+          "version": "3.0.0-rc.2.1"
         }
       },
       {
@@ -222,8 +222,8 @@
         "repositoryURL": "https://github.com/vapor/template-kit.git",
         "state": {
           "branch": null,
-          "revision": "ef940383716d05ac6e1b0dcb0ba672c7c0f8a718",
-          "version": "1.0.0-rc.2.0.1"
+          "revision": "61ed3d3b0df4c181d6b88e06b418f425978ac2af",
+          "version": "1.0.0-rc.2.0.3"
         }
       },
       {
@@ -231,8 +231,8 @@
         "repositoryURL": "https://github.com/vapor/validation.git",
         "state": {
           "branch": null,
-          "revision": "aa12fbde809392ef39ddf046252c94a9fd67c420",
-          "version": "2.0.0-rc.2.1"
+          "revision": "1ce87fc2d18a8f15a491805825063c8db493a51e",
+          "version": "2.0.0-rc.2.1.1"
         }
       },
       {
@@ -240,8 +240,8 @@
         "repositoryURL": "https://github.com/vapor/vapor.git",
         "state": {
           "branch": null,
-          "revision": "72424e773c26eaece83819d1a067ae77b4f68cc6",
-          "version": "3.0.0-rc.2.2"
+          "revision": "5e59691ef575597aa640da76ccb9fc5ee638f2c1",
+          "version": "3.0.0-rc.2.2.1"
         }
       },
       {
@@ -249,8 +249,8 @@
         "repositoryURL": "https://github.com/twof/VaporMailgunService.git",
         "state": {
           "branch": null,
-          "revision": "018685b24cc9e31a02ca549c491bc6978e473648",
-          "version": "0.4.0"
+          "revision": "e661e24415f3600755ba62e8e549c126a08aec6e",
+          "version": "0.4.1"
         }
       },
       {
