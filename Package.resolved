@@ -2,6 +2,24 @@
   "object": {
     "pins": [
       {
+        "package": "ApiCore",
+        "repositoryURL": "https://github.com/LiveUI/ApiCore.git",
+        "state": {
+          "branch": "master",
+          "revision": "422df88488618ce23444ce4a9b3f6eaa346a126d",
+          "version": null
+        }
+      },
+      {
+        "package": "BoostCore",
+        "repositoryURL": "https://github.com/LiveUI/BoostCore.git",
+        "state": {
+          "branch": "master",
+          "revision": "e9ea453481458a8868f786499bcded8174ef7bec",
+          "version": null
+        }
+      },
+      {
         "package": "Console",
         "repositoryURL": "https://github.com/vapor/console.git",
         "state": {
@@ -33,8 +51,17 @@
         "repositoryURL": "https://github.com/vapor/database-kit.git",
         "state": {
           "branch": null,
-          "revision": "6565711cc781f4351cade86ab61edd55ecdd8d53",
-          "version": "1.0.0-rc.2.1"
+          "revision": "ce82abe73051388dcadbf34873b29a75df58cabc",
+          "version": "1.0.0-rc.2.1.1"
+        }
+      },
+      {
+        "package": "DbCore",
+        "repositoryURL": "https://github.com/LiveUI/DbCore.git",
+        "state": {
+          "branch": "master",
+          "revision": "7831686099fbdb379298d778021013043e1dac48",
+          "version": null
         }
       },
       {
@@ -44,6 +71,15 @@
           "branch": null,
           "revision": "cd6756a971caba5f14a861b446fe682a15d2ae28",
           "version": "3.0.0-rc.2.1"
+        }
+      },
+      {
+        "package": "ErrorsCore",
+        "repositoryURL": "https://github.com/LiveUI/ErrorsCore.git",
+        "state": {
+          "branch": "master",
+          "revision": "89c79697282c3d5543f20861f4e9cf941e991c50",
+          "version": null
         }
       },
       {
@@ -65,6 +101,15 @@
         }
       },
       {
+        "package": "FluentTestTools",
+        "repositoryURL": "https://github.com/LiveUI/FluentTestTools.git",
+        "state": {
+          "branch": "master",
+          "revision": "f3f538c3850331942ffca669ac875e6a35035077",
+          "version": null
+        }
+      },
+      {
         "package": "JWT",
         "repositoryURL": "https://github.com/vapor/jwt.git",
         "state": {
@@ -80,6 +125,15 @@
           "branch": null,
           "revision": "e0c8bb646556aefdaed907e48a8435655c59bab3",
           "version": "3.0.0-rc.2"
+        }
+      },
+      {
+        "package": "MailCore",
+        "repositoryURL": "https://github.com/LiveUI/MailCore.git",
+        "state": {
+          "branch": "master",
+          "revision": "024106445bfc7a9461ea356af21a6ecba0026fb3",
+          "version": null
         }
       },
       {
@@ -110,6 +164,15 @@
         }
       },
       {
+        "package": "SettingsCore",
+        "repositoryURL": "https://github.com/LiveUI/SettingsCore.git",
+        "state": {
+          "branch": "master",
+          "revision": "802b3b7f11b5f85f1c98558c792efb333b5b3769",
+          "version": null
+        }
+      },
+      {
         "package": "swift-nio",
         "repositoryURL": "https://github.com/apple/swift-nio.git",
         "state": {
@@ -123,8 +186,8 @@
         "repositoryURL": "https://github.com/apple/swift-nio-ssl.git",
         "state": {
           "branch": null,
-          "revision": "85a55f91bf80afa96889426962f0e0369fae9187",
-          "version": "1.0.0"
+          "revision": "ea006b6368dbd9dbfd297deb6ddb3f070b72d043",
+          "version": "1.0.1"
         }
       },
       {
@@ -195,7 +258,7 @@
         "repositoryURL": "https://github.com/LiveUI/VaporTestTools.git",
         "state": {
           "branch": "master",
-          "revision": "efb7e8648d643970504b705629e2b264b3197dae",
+          "revision": "723ab62c1f8fccb0f246e02ebc854edd4eab0a60",
           "version": null
         }
       }
