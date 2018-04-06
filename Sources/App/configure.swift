@@ -3,7 +3,6 @@ import Vapor
 import BoostCore
 import DbCore
 import ApiCore
-import FileCore
 import MailCore
 
 
@@ -27,6 +26,8 @@ public func configure(_ config: inout Config, _ env: inout Vapor.Environment, _ 
         fatalError("Mailgun API key or domain is missing")
     }
     boostConfig.mail = Mailer.Config.mailgun(key: mailGunApi, domain: mailGunDomain)
+    
+    // Settings
     
     // Go!
     try Boost.configure(boostConfig: &boostConfig, &config, &env, &services)

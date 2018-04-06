@@ -11,7 +11,7 @@ import DbCore
 import Vapor
 
 
-public class SettingsCore {
+public class BumpUpCore {
     
     static var controllers: [Controller.Type] = [
         SettingsController.self
