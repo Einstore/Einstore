@@ -1,8 +1,7 @@
 {
 	"info": {
-		"name": "Boost 2",
 		"_postman_id": "8fa44547-1ad4-e1fb-53c1-9f93fe4a89b2",
-		"description": "",
+		"name": "Boost 2",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -23,8 +22,7 @@
 					"host": [
 						"{{SERVER}}ping"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -45,8 +43,7 @@
 					"host": [
 						"{{SERVER}}install"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -72,8 +69,7 @@
 					"host": [
 						"{{SERVER}}demo"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -99,8 +95,7 @@
 					"host": [
 						"{{SERVER}}reinstall"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -126,8 +121,7 @@
 					"host": [
 						"{{SERVER}}uninstall"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -169,6 +163,30 @@
 							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
 						]
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0d43ff69-0ee0-44f2-b2f1-f0a273c92a0b",
+						"type": "text/javascript",
+						"exec": [
+							"var authorize = 'var server = pm.environment.get(\"SERVER\");\\",
+							"var token = pm.environment.get(\"AUTH_TOKEN\");\\",
+							"pm.sendRequest({\\",
+							"    url: server + \"token\",\\",
+							"    method: \"GET\",\\",
+							"    header: \"Authorization:Token \" + token\\",
+							"}, function (err, response) {\\",
+							"    console.log(response.headers);\\",
+							"    if (response) {\\",
+							"        var a = response.headers.get(\"authorization\").substring(7);\\",
+							"        pm.environment.set(\"JWT_AUTH\", a);\\",
+							"    }\\",
+							"});';",
+							"",
+							"pm.environment.set(\"func:authorize\", authorize);"
+						]
+					}
 				}
 			],
 			"request": {
@@ -198,8 +216,7 @@
 					"host": [
 						"{{SERVER}}auth"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -241,6 +258,30 @@
 							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
 						]
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "bfe6c598-e7ad-4ae4-b73b-7aa7e15e77b5",
+						"type": "text/javascript",
+						"exec": [
+							"var authorize = 'var server = pm.environment.get(\"SERVER\");\\",
+							"var token = pm.environment.get(\"AUTH_TOKEN\");\\",
+							"pm.sendRequest({\\",
+							"    url: server + \"token\",\\",
+							"    method: \"GET\",\\",
+							"    header: \"Authorization:Token \" + token\\",
+							"}, function (err, response) {\\",
+							"    console.log(response.headers);\\",
+							"    if (response) {\\",
+							"        var a = response.headers.get(\"authorization\").substring(7);\\",
+							"        pm.environment.set(\"JWT_AUTH\", a);\\",
+							"    }\\",
+							"});';",
+							"",
+							"pm.environment.set(\"func:authorize\", authorize);"
+						]
+					}
 				}
 			],
 			"request": {
@@ -263,8 +304,7 @@
 					"host": [
 						"{{SERVER}}auth"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -274,7 +314,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9d95079a-2a8b-4522-a62f-c96a98cfb2ba",
+						"id": "0c9fe589-fee6-417f-9105-96a38bbe8b6e",
 						"type": "text/javascript",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
@@ -303,6 +343,16 @@
 							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
 						]
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "90616aa4-124c-423d-bf50-1cdbe31f8fe6",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
 				}
 			],
 			"request": {
@@ -325,8 +375,7 @@
 					"host": [
 						"{{SERVER}}token"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -387,8 +436,7 @@
 					"host": [
 						"{{SERVER}}token"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -411,8 +459,7 @@
 					"host": [
 						"{{SERVER}}teams"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -481,8 +528,7 @@
 					"host": [
 						"{{SERVER}}teams"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -512,8 +558,7 @@
 					"path": [
 						"check"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -577,8 +622,7 @@
 					"path": [
 						"{{TEST_TEAM_ID}}"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -609,8 +653,7 @@
 						"{{TEST_TEAM_ID}}",
 						"link"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -641,8 +684,7 @@
 						"{{TEST_TEAM_ID}}",
 						"unlink"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -673,8 +715,7 @@
 						"{{TEST_TEAM_ID}}",
 						"users"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -704,8 +745,7 @@
 					"path": [
 						"{{TEST_TEAM_ID}}"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -741,8 +781,7 @@
 					"path": [
 						"{{TEST_TEAM_ID}}"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -778,8 +817,7 @@
 					"path": [
 						"{{TEST_TEAM_ID}}"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -799,8 +837,7 @@
 					"host": [
 						"{{SERVER}}users"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -820,15 +857,14 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "    {\n        \"email\": \"rafaj@mangoweb.cz\",\n        \"lastname\": \"Ondrej\",\n        \"firstname\": \"Rafaj\",\n        \"password\": \"aaaaaa\"\n    }"
+					"raw": "    {\n        \"email\": \"rafaj@mangoweb.cz\",\n        \"username\": \"rafiki270\",\n        \"lastname\": \"Ondrej\",\n        \"firstname\": \"Rafaj\",\n        \"password\": \"aaaaaa\"\n    }"
 				},
 				"url": {
 					"raw": "{{SERVER}}users",
 					"host": [
 						"{{SERVER}}users"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -854,17 +890,27 @@
 					"query": [
 						{
 							"key": "q",
-							"value": "raf",
-							"equals": true
+							"value": "raf"
 						}
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
 		{
 			"name": "Apps (apps)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "b5bd4386-09e9-47ac-9eab-c0b25836a986",
+						"type": "text/javascript",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						]
+					}
+				}
+			],
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -884,8 +930,105 @@
 					"host": [
 						"{{SERVER}}apps"
 					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apps (apps/overview)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "907d20e7-ebe8-4157-8c1d-3aedcf87224c",
+						"type": "text/javascript",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
 				},
-				"description": null
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{SERVER}}apps/overview",
+					"host": [
+						"{{SERVER}}apps"
+					],
+					"path": [
+						"overview"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apps (teams/:id/apps/overview)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7cdb43e8-605a-4109-b4d9-2018354f7e6b",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"// Token check",
+							"tests[\"App has an id\"] = (jsonData[\"id\"].length > 0)",
+							"tests[\"App has a name\"] = (jsonData[\"name\"].length > 0)",
+							"tests[\"App has an identifier\"] = (jsonData[\"identifier\"].length > 2)",
+							"",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/apps/overview",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}",
+						"apps",
+						"overview"
+					]
+				}
 			},
 			"response": []
 		},
@@ -944,8 +1087,7 @@
 						"{{TEST_TEAM_ID}}",
 						"apps"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -996,17 +1138,14 @@
 					"query": [
 						{
 							"key": "token",
-							"value": "{{TEST_UPLOAD_KEY}}",
-							"equals": true
+							"value": "{{TEST_UPLOAD_KEY}}"
 						},
 						{
 							"key": "tags",
-							"value": "tag1|tag2|tag3|tag4",
-							"equals": true
+							"value": "tag1|tag2|tag3|tag4"
 						}
 					]
-				},
-				"description": ""
+				}
 			},
 			"response": []
 		},
@@ -1032,8 +1171,7 @@
 					"path": [
 						"{{APP_ID}}"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -1092,8 +1230,7 @@
 						"{{APP_ID}}",
 						"auth"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -1122,12 +1259,10 @@
 					"query": [
 						{
 							"key": "token",
-							"value": "{{DOWNLOAD_TOKEN}}",
-							"equals": true
+							"value": "{{DOWNLOAD_TOKEN}}"
 						}
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -1156,12 +1291,10 @@
 					"query": [
 						{
 							"key": "token",
-							"value": "{{DOWNLOAD_TOKEN}}",
-							"equals": true
+							"value": "{{DOWNLOAD_TOKEN}}"
 						}
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -1188,8 +1321,7 @@
 						"{{APP_ID}}",
 						"tags"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -1215,8 +1347,7 @@
 					"path": [
 						"{{APP_ID}}"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -1239,8 +1370,7 @@
 					"host": [
 						"{{SERVER}}keys"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -1267,8 +1397,7 @@
 						"{{TEST_TEAM_ID}}",
 						"keys"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -1294,8 +1423,7 @@
 					"path": [
 						"{{TEST_UPLOAD_KEY_ID}}"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -1361,8 +1489,7 @@
 						"{{TEST_TEAM_ID}}",
 						"keys"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -1392,8 +1519,7 @@
 					"path": [
 						"{{TEST_UPLOAD_KEY_ID}}"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -1419,8 +1545,7 @@
 					"path": [
 						"{{TEST_UPLOAD_KEY_ID}}"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -1435,8 +1560,7 @@
 					"host": [
 						"{{SERVER}}unknown"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -1454,8 +1578,7 @@
 					"host": [
 						"{{SERVER}}tables"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -1473,8 +1596,7 @@
 					"host": [
 						"{{SERVER}}settings"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -1495,12 +1617,10 @@
 					"query": [
 						{
 							"key": "plain",
-							"value": "true",
-							"equals": true
+							"value": "true"
 						}
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -1560,8 +1680,7 @@
 					"host": [
 						"{{SERVER}}settings"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -1597,8 +1716,7 @@
 					"path": [
 						"{{TEST_SETTING_ID}}"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -1634,8 +1752,7 @@
 					"path": [
 						"{{TEST_SETTING_ID}}"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -1653,8 +1770,7 @@
 					"host": [
 						"{{SERVER}}teapot"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -1672,8 +1788,7 @@
 					"host": [
 						"{{SERVER}}ping"
 					]
-				},
-				"description": null
+				}
 			},
 			"response": []
 		},
@@ -1698,8 +1813,32 @@
 					"host": [
 						"{{SERVER}}errors"
 					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Info",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
 				},
-				"description": null
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{SERVER}}info",
+					"host": [
+						"{{SERVER}}info"
+					]
+				}
 			},
 			"response": []
 		}

@@ -1,4 +1,4 @@
-FROM mangoweb/swift:4.1-alpha
+FROM mangoweb/swift:4.1
 
 RUN \
     apt-get update && \
