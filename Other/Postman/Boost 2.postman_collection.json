@@ -935,6 +935,57 @@
 			"response": []
 		},
 		{
+			"name": "Apps (apps?filters)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "b5bd4386-09e9-47ac-9eab-c0b25836a986",
+						"type": "text/javascript",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{SERVER}}apps?limit=2&page=0&platform=android",
+					"host": [
+						"{{SERVER}}apps"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "2"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "platform",
+							"value": "android"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Apps (apps/overview)",
 			"event": [
 				{
