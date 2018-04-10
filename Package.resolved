@@ -6,7 +6,7 @@
         "repositoryURL": "https://github.com/LiveUI/ApiCore.git",
         "state": {
           "branch": "master",
-          "revision": "a71f2e720d2bcd0fdf91bbc338838c1d9a5243c9",
+          "revision": "09578223f52b93ca9b1934823148fe992e49fbd7",
           "version": null
         }
       },
@@ -15,7 +15,7 @@
         "repositoryURL": "https://github.com/LiveUI/BoostCore.git",
         "state": {
           "branch": "master",
-          "revision": "3566b25b96d54c6d19c172122f69b81b2283416e",
+          "revision": "5abfdd774e57fe9ef199bfe42d00d4f303a97665",
           "version": null
         }
       },
@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/vapor/core.git",
         "state": {
           "branch": null,
-          "revision": "5383e40f19d71da99e496afa9972c085abc2379d",
-          "version": "3.0.2"
+          "revision": "2ad95efabedc228ddbadee1974f6bbaac6c89abd",
+          "version": "3.0.3"
         }
       },
       {
@@ -123,8 +123,8 @@
         "repositoryURL": "https://github.com/vapor/leaf.git",
         "state": {
           "branch": null,
-          "revision": "3e6027371aeaf780e447d2100eae173f1a6ae30f",
-          "version": "3.0.0-rc.2.1.1"
+          "revision": "8cc35dcfcd8f9ed142a954f70431a05e866ca040",
+          "version": "3.0.0-rc.2.1.2"
         }
       },
       {
@@ -222,8 +222,8 @@
         "repositoryURL": "https://github.com/vapor/template-kit.git",
         "state": {
           "branch": null,
-          "revision": "61ed3d3b0df4c181d6b88e06b418f425978ac2af",
-          "version": "1.0.0-rc.2.0.3"
+          "revision": "497b987a79291c3743fe4ba6f17eadcdf20c1728",
+          "version": "1.0.0"
         }
       },
       {
