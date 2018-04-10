@@ -136,7 +136,7 @@
          <EnvironmentVariable
             key = "DB_LOGGING"
             value = "1"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </EnvironmentVariable>
          <EnvironmentVariable
             key = "DB_NAME"

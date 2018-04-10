@@ -442,6 +442,18 @@
 		},
 		{
 			"name": "Teams (teams)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "116dcf70-2c69-453a-a623-ab4762e9962b",
+						"type": "text/javascript",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						]
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [
@@ -499,6 +511,16 @@
 							""
 						]
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "56d344a5-51cb-4ee9-8641-250a8cfc94dd",
+						"type": "text/javascript",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						]
+					}
 				}
 			],
 			"request": {
@@ -534,16 +556,34 @@
 		},
 		{
 			"name": "Teams (teams/check)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "dec41314-4b28-4144-b0ff-84ece146d04d",
+						"type": "text/javascript",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						]
+					}
+				}
+			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [
 					{
 						"key": "Content-Type",
 						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
 				"body": {
@@ -590,6 +630,16 @@
 							""
 						]
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "19a1abfc-56ea-4447-8d56-05b2b7906765",
+						"type": "text/javascript",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						]
+					}
 				}
 			],
 			"request": {
@@ -628,16 +678,34 @@
 		},
 		{
 			"name": "Teams (teams/:id/link)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "bacdfa30-78f2-4948-86d6-9eee95a80e1f",
+						"type": "text/javascript",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						]
+					}
+				}
+			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [
 					{
 						"key": "Content-Type",
 						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
 				"body": {
@@ -659,16 +727,34 @@
 		},
 		{
 			"name": "Teams (teams/:id/unlink)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "d01d357f-0e41-41de-8bf0-49ff320a6c93",
+						"type": "text/javascript",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						]
+					}
+				}
+			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [
 					{
 						"key": "Content-Type",
 						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
 				"body": {
@@ -690,16 +776,34 @@
 		},
 		{
 			"name": "Teams (teams/:id/users)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "9755c07f-4230-4701-a491-d2b7c1aa5370",
+						"type": "text/javascript",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						]
+					}
+				}
+			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [
 					{
 						"key": "Content-Type",
 						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
 				"body": {
@@ -721,36 +825,18 @@
 		},
 		{
 			"name": "Teams (teams/:id)",
-			"request": {
-				"method": "PATCH",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "16192de3-a019-427d-8562-ddf0bb2baec4",
+						"type": "text/javascript",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						]
 					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
-				},
-				"url": {
-					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}",
-					"host": [
-						"{{SERVER}}teams"
-					],
-					"path": [
-						"{{TEST_TEAM_ID}}"
-					]
 				}
-			},
-			"response": []
-		},
-		{
-			"name": "Teams (teams/:id)",
+			],
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -787,6 +873,18 @@
 		},
 		{
 			"name": "Teams (teams/:id)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "dc69f392-b674-49ed-aad7-1d6f885713a8",
+						"type": "text/javascript",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						]
+					}
+				}
+			],
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -823,6 +921,18 @@
 		},
 		{
 			"name": "Users (users)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "2b3a94fc-0f44-4971-8556-8632f530e47e",
+						"type": "text/javascript",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						]
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [
@@ -842,7 +952,65 @@
 			"response": []
 		},
 		{
+			"name": "Users (users/global)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "692d2e1a-e43e-4587-b518-85fbe7ec8598",
+						"type": "text/javascript",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{SERVER}}users/global?search=raf",
+					"host": [
+						"{{SERVER}}users"
+					],
+					"path": [
+						"global"
+					],
+					"query": [
+						{
+							"key": "search",
+							"value": "raf"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Users (users)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "245c9eb5-1349-4660-8e3f-8a2e2ece34a5",
+						"type": "text/javascript",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						]
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -863,35 +1031,6 @@
 					"raw": "{{SERVER}}users",
 					"host": [
 						"{{SERVER}}users"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Users (users/search)",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
-					}
-				],
-				"body": {},
-				"url": {
-					"raw": "{{SERVER}}users/search?q=raf",
-					"host": [
-						"{{SERVER}}users"
-					],
-					"path": [
-						"search"
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "raf"
-						}
 					]
 				}
 			},

@@ -6,7 +6,7 @@
         "repositoryURL": "https://github.com/LiveUI/ApiCore.git",
         "state": {
           "branch": "master",
-          "revision": "fea5a8983429246b8c31100d715ba8b707323fe1",
+          "revision": "a71f2e720d2bcd0fdf91bbc338838c1d9a5243c9",
           "version": null
         }
       },
@@ -15,7 +15,7 @@
         "repositoryURL": "https://github.com/LiveUI/BoostCore.git",
         "state": {
           "branch": "master",
-          "revision": "64a1bb8faa3b5a41e290469049dea9579a101fb7",
+          "revision": "3566b25b96d54c6d19c172122f69b81b2283416e",
           "version": null
         }
       },
