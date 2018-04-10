@@ -180,8 +180,18 @@ JWT token needs to be refreshed after 30 seconds from the last request made. Wit
     + Body
 
             {
-                "last_used": "2018-01-10T18:38:35.762Z",
-                "user_id": 1
+                "id": "205E4B37-E57E-4474-A681-602BF49D56A3",
+                "user": {
+                    "id": "8E6EFF51-8773-48DF-A1F5-D0A8C25BF9EF",
+                    "lastname": "Admin",
+                    "registered": "2018-03-26T17:06:22Z",
+                    "firstname": "Super",
+                    "username": "admin",
+                    "email": "admin@liveui.io",
+                    "su": true,
+                    "disabled": false
+                },
+                "expires": "2018-05-08T16:23:22Z"
             }
 
 + Response 401 (application/json; charset=utf-8)
@@ -217,8 +227,18 @@ JWT token needs to be refreshed after 30 seconds from the last request made. Wit
     + Body
 
             {
-                "last_used": "2018-01-10T18:38:35.762Z",
-                "user_id": 1
+                "id": "205E4B37-E57E-4474-A681-602BF49D56A3",
+                "user": {
+                    "id": "8E6EFF51-8773-48DF-A1F5-D0A8C25BF9EF",
+                    "lastname": "Admin",
+                    "registered": "2018-03-26T17:06:22Z",
+                    "firstname": "Super",
+                    "username": "admin",
+                    "email": "admin@liveui.io",
+                    "su": true,
+                    "disabled": false
+                },
+                "expires": "2018-05-08T16:23:22Z"
             }
 
 + Response 401 (application/json; charset=utf-8)
@@ -252,11 +272,13 @@ JWT token needs to be refreshed after 30 seconds from the last request made. Wit
             [
                 {
                     "id": "630C97E6-AC56-4213-882B-3BEBAE50BF6D",
+                    "admin": true,
                     "name": "Admin team",
                     "identifier": "admin-team"
                 },
                 {
                     "id": "620C97E6-AC56-4413-882B-3BEBAE50DAFD",
+                    "admin": false,
                     "name": "Client",
                     "identifier": "client"
                 }
@@ -298,6 +320,7 @@ Team identifier needs to be unique for the whole platform. If sent in an incorec
 
             {
                 "id": "630C97E6-AC56-4213-882B-3BEBAE50BF6D",
+                "admin": false,
                 "name": "My new team",
                 "identifier": "my-new-team"
             }
@@ -391,6 +414,7 @@ For updates, team identifier needs to be unique for the whole platform. If sent 
 
             {
                 "id": "630C97E6-AC56-4213-882B-3BEBAE50BF6D",
+                "admin": false,
                 "name": "My team",
                 "identifier": "my-team"
             }
@@ -433,6 +457,7 @@ For updates, team identifier needs to be unique for the whole platform. If sent 
 
             {
                 "id": "630C97E6-AC56-4213-882B-3BEBAE50BF6D",
+                "admin": false,
                 "name": "My updated team!",
                 "identifier": "my-updated-team"
             }
@@ -450,53 +475,7 @@ For updates, team identifier needs to be unique for the whole platform. If sent 
             "code": "auth_failed",
             "error": "Unable to verify authorization token"
         }
-
-
-### Partially update team [PATCH]
-
-
-+ Parameters
-    + teamId (required, UUID) - Id of the team
-
-+ Request
-    
-    + Headers
-
-            Authorization: Token EA58FE6F-E2A0-404D-A252-1BBFB286A072
-            Content-Type: application/json
-            
-    + Body
-
-            {
-                "name": "My updated team!"
-            }
-
-
-
-+ Response 200 (application/json; charset=utf-8)
-
-    + Body
-
-            {
-                "id": "630C97E6-AC56-4213-882B-3BEBAE50BF6D",
-                "name": "My updated team!",
-                "identifier": "my-team"
-            }
         
-+ Response 408 (application/json; charset=utf-8)
-
-        {
-            "code": "app_error",
-            "error": "Identifier already exists"
-        }
-
-+ Response 401 (application/json; charset=utf-8)
-
-        {
-            "code": "auth_failed",
-            "error": "Unable to verify authorization token"
-        }
-
 
 ## List team users [/teams/{teamId}/users]
 
@@ -524,6 +503,7 @@ List active users of a team.
                 "lastname": "Admin",
                 "registered": 541114427,
                 "su": true,
+                "username": "admin",
                 "email": "admin@liveui.io",
                 "firstname": "Super",
                 "disabled": false
@@ -533,6 +513,7 @@ List active users of a team.
                 "lastname": "Rafaj",
                 "registered": 541550120,
                 "su": false,
+                "username": "rafiki2000",
                 "email": "dev@liveui.io",
                 "firstname": "Ondrej",
                 "disabled": false
@@ -705,6 +686,7 @@ Register endpoint is not secured and should be used for new registrations by use
     + Body
 
             {
+                "username": "aceofspades",
                 "firstname": "Lemmy",
                 "lastname": "Kilmister",
                 "email": "lemmy@liveui.io",
@@ -718,8 +700,10 @@ Register endpoint is not secured and should be used for new registrations by use
     + Body
 
             {
+                "id": "8E6EFF51-8773-48DF-A1F5-D0A8C25BF9EF",
                 "email": "lemmy@liveui.io",
                 "lastname": "Kilmister",
+                "username": "admin",
                 "registered": 542296870.67299497,
                 "disabled": true,
                 "su": false,
@@ -736,7 +720,7 @@ Register endpoint is not secured and should be used for new registrations by use
 
         
 
-## All users [/users/global?search={search_term}]
+## Global users [/users/global?search={search_term}]
 
 
 ### List and/or search [GET]
