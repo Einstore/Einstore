@@ -6,7 +6,7 @@
 [![Jenkins](https://ci.liveui.io/job/LiveUI/job/Boost/job/master/badge/icon)](https://ci.liveui.io/job/LiveUI/job/Boost/)
 [![Apiary.io API documentation for Boost](https://img.shields.io/badge/docs-API-02BFF4.svg?style=flat)](https://boost.docs.apiary.io)
 [![Platforms](https://img.shields.io/badge/platforms-macOS%2010.13%20|%20Ubuntu%2016.04%20LTS-ff0000.svg?style=flat)](https://github.com/LiveUI/Boost)
-[![Swift 4](https://img.shields.io/badge/swift-4.0-orange.svg?style=flat)](http://swift.org)
+[![Swift 4](https://img.shields.io/badge/swift-4.1-orange.svg?style=flat)](http://swift.org)
 [![Vapor 3](https://img.shields.io/badge/vapor-3.0-blue.svg?style=flat)](https://vapor.codes)
 [![iOS app](https://img.shields.io/badge/app-iOS-blue.svg?style=flat)](https://github.com/LiveUI/Boost-iOS/)
 [![Android app](https://img.shields.io/badge/app-Android-green.svg?style=flat)](https://github.com/LiveUI/Boost-Android/)
