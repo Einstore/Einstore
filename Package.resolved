@@ -42,7 +42,7 @@
         "repositoryURL": "https://github.com/LiveUI/BoostCore.git",
         "state": {
           "branch": "master",
-          "revision": "661159badfbc473fb95f11ba9f922feedd6a17d2",
+          "revision": "94da956779a7c83bd6db62eb2e83599da4321ed1",
           "version": null
         }
       },
@@ -231,8 +231,8 @@
         "repositoryURL": "https://github.com/apple/swift-nio.git",
         "state": {
           "branch": null,
-          "revision": "241aed70c8fcaa26f2b1c86300e05ca102faf594",
-          "version": "1.4.1"
+          "revision": "3275ff7c9c791a628631c2c51b39fd94346b2492",
+          "version": "1.4.2"
         }
       },
       {
