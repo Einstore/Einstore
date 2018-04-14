@@ -6,7 +6,7 @@
         "repositoryURL": "https://github.com/LiveUI/ApiCore.git",
         "state": {
           "branch": "master",
-          "revision": "b8b1077100cc896fdb5d7a6550e8fa7940ca5d23",
+          "revision": "f6d101f57662462a78a23709bc9c7161fe343427",
           "version": null
         }
       },
@@ -42,7 +42,7 @@
         "repositoryURL": "https://github.com/LiveUI/BoostCore.git",
         "state": {
           "branch": "master",
-          "revision": "94da956779a7c83bd6db62eb2e83599da4321ed1",
+          "revision": "e28b8b6533239c9e6891c092ad7600cf1ea91168",
           "version": null
         }
       },
@@ -69,8 +69,8 @@
         "repositoryURL": "https://github.com/vapor/core.git",
         "state": {
           "branch": null,
-          "revision": "2ad95efabedc228ddbadee1974f6bbaac6c89abd",
-          "version": "3.0.3"
+          "revision": "ce64e70a48adf54835d040ba4c4dab431e2cd020",
+          "version": "3.1.1"
         }
       },
       {
@@ -78,8 +78,8 @@
         "repositoryURL": "https://github.com/vapor/crypto.git",
         "state": {
           "branch": null,
-          "revision": "e77aa181580b466fb26865918b62973d9fbfaed6",
-          "version": "3.0.0"
+          "revision": "a5598aba7a118c29b224122c16598a1919b9e67d",
+          "version": "3.0.1"
         }
       },
       {
@@ -105,8 +105,8 @@
         "repositoryURL": "https://github.com/vapor/engine.git",
         "state": {
           "branch": null,
-          "revision": "4846ea9abeb04863f82f618ee8cb22650a82ae3c",
-          "version": "3.0.0-rc.2.1.1"
+          "revision": "bfd14fe1d757f0cb16aae8a1638a91b2674d5a26",
+          "version": "3.0.0-rc.2.3"
         }
       },
       {
@@ -182,6 +182,15 @@
         }
       },
       {
+        "package": "Multipart",
+        "repositoryURL": "https://github.com/vapor/multipart.git",
+        "state": {
+          "branch": null,
+          "revision": "d7b641af117910e66781022c1c82638216cad62c",
+          "version": "3.0.0"
+        }
+      },
+      {
         "package": "PostgreSQL",
         "repositoryURL": "https://github.com/vapor/postgresql.git",
         "state": {
@@ -204,8 +213,8 @@
         "repositoryURL": "https://github.com/vapor-community/sendgrid-provider.git",
         "state": {
           "branch": null,
-          "revision": "400914c4c54b34240cf7c99ce0464b1771f969c2",
-          "version": "3.0.1"
+          "revision": "f8228592e6f74acf78105b67d58e9650b5d289f7",
+          "version": "3.0.2"
         }
       },
       {
@@ -303,8 +312,8 @@
         "repositoryURL": "https://github.com/vapor/vapor.git",
         "state": {
           "branch": null,
-          "revision": "c045b8d02e6a135f055e879a9fa789026a0b4e9d",
-          "version": "3.0.0-rc.2.2.4"
+          "revision": "e25c71d920100d5a78bc77ef94cdc6f0ef7f9374",
+          "version": "3.0.0-rc.2.4"
         }
       },
       {

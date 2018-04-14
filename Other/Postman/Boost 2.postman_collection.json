@@ -920,6 +920,145 @@
 			"response": []
 		},
 		{
+			"name": "Teams (teams/:id/config)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "600477c9-54af-41a9-8258-5bcdc511e5a2",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"if (responseCode.code === 200) {",
+							"    tests[\"Config has a team_id\"] = (jsonData[\"team_id\"].length > 0)",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "97f737f8-dcd1-41b6-8577-1d136c72ef2d",
+						"type": "text/javascript",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/config",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}",
+						"config"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Teams (teams/:id/config)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a72c6134-9233-4932-8191-c9eacbd1659f",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"if (responseCode.code === 200) {",
+							"    tests[\"Config has a team_id\"] = (jsonData[\"team_id\"].length > 0)",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "19a1abfc-56ea-4447-8d56-05b2b7906765",
+						"type": "text/javascript",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"theme\": {\n        \"primary_color\": \"000000\",\n        \"primary_background_color\": \"FFFFFF\",\n        \"primary_button_color\": \"FFFFFF\",\n        \"primary_button_background_color\": \"E94F92\"\n    },\n    \"apps\": {\n    \t\"ios\": \"https://itunes.apple.com/gb/app/rekola/id888759232?mt=8\",\n    \t\"android\": \"https://play.google.com/store/apps/details?id=cz.rekola.app\"\n    }\n}\t"
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/config",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}",
+						"config"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Users (users)",
 			"event": [
 				{
@@ -980,7 +1119,7 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "{{SERVER}}users/global?search=raf",
+					"raw": "{{SERVER}}users/global?search=ad",
 					"host": [
 						"{{SERVER}}users"
 					],
@@ -990,7 +1129,7 @@
 					"query": [
 						{
 							"key": "search",
-							"value": "raf"
+							"value": "ad"
 						}
 					]
 				}
@@ -1102,22 +1241,22 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "{{SERVER}}apps?limit=2&page=0&platform=android",
+					"raw": "{{SERVER}}apps?limit=200&page=40&platform=ios",
 					"host": [
 						"{{SERVER}}apps"
 					],
 					"query": [
 						{
 							"key": "limit",
-							"value": "2"
+							"value": "200"
 						},
 						{
 							"key": "page",
-							"value": "0"
+							"value": "40"
 						},
 						{
 							"key": "platform",
-							"value": "android"
+							"value": "ios"
 						}
 					]
 				}
