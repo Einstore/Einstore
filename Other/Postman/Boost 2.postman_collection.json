@@ -481,15 +481,9 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "ec85a8e6-d175-41af-81ea-3b0942b49fa1",
+						"id": "50c4544a-37b5-4294-9dbe-c06e3fe7e21b",
 						"type": "text/javascript",
 						"exec": [
-							"var no = postman.getEnvironmentVariable(\"NEXT_TEST_TEAM_IDENTIFIER_NO\");",
-							"if (no === null) {",
-							"    no = 0",
-							"}",
-							"postman.setEnvironmentVariable(\"NEXT_TEST_TEAM_IDENTIFIER_NO\", (parseInt(no) + 1));",
-							"",
 							"var jsonData = JSON.parse(responseBody);",
 							"",
 							"// Status code",
@@ -543,7 +537,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin-{{NEXT_TEST_TEAM_IDENTIFIER_NO}}\"\n}"
+					"raw": "{\n    \"name\": \"Admin Yo!\",\n    \"identifier\": \"admin-yo\"\n}"
 				},
 				"url": {
 					"raw": "{{SERVER}}teams",
@@ -1292,12 +1286,18 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "{{SERVER}}apps/overview",
+					"raw": "{{SERVER}}apps/overview?limit=2000",
 					"host": [
 						"{{SERVER}}apps"
 					],
 					"path": [
 						"overview"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "2000"
+						}
 					]
 				}
 			},

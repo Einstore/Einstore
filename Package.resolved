@@ -6,7 +6,7 @@
         "repositoryURL": "https://github.com/LiveUI/ApiCore.git",
         "state": {
           "branch": "master",
-          "revision": "f6d101f57662462a78a23709bc9c7161fe343427",
+          "revision": "a9a4aea3181901ac3d73eb97b2e0503212e05d02",
           "version": null
         }
       },
@@ -42,7 +42,7 @@
         "repositoryURL": "https://github.com/LiveUI/BoostCore.git",
         "state": {
           "branch": "master",
-          "revision": "e28b8b6533239c9e6891c092ad7600cf1ea91168",
+          "revision": "1986df0a23fe5d7ebcf3aecb67a9de55dbff1876",
           "version": null
         }
       },
@@ -105,8 +105,8 @@
         "repositoryURL": "https://github.com/vapor/engine.git",
         "state": {
           "branch": null,
-          "revision": "bfd14fe1d757f0cb16aae8a1638a91b2674d5a26",
-          "version": "3.0.0-rc.2.3"
+          "revision": "2419e37d689b78c9197b2f38cd8f2901cd7dcf9e",
+          "version": "3.0.0-rc.2.3.1"
         }
       },
       {
@@ -312,8 +312,8 @@
         "repositoryURL": "https://github.com/vapor/vapor.git",
         "state": {
           "branch": null,
-          "revision": "e25c71d920100d5a78bc77ef94cdc6f0ef7f9374",
-          "version": "3.0.0-rc.2.4"
+          "revision": "26b5c4032f236cc78e6fd3a51ac6d8aceb5a3a4f",
+          "version": "3.0.0-rc.2.4.1"
         }
       },
       {
