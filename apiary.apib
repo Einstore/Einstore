@@ -271,16 +271,20 @@ JWT token needs to be refreshed after 30 seconds from the last request made. Wit
 
             [
                 {
-                    "id": "630C97E6-AC56-4213-882B-3BEBAE50BF6D",
+                    "initials": "AT",
+                    "id": "FF6E32DC-4F23-4F75-ADBA-B50864763386",
                     "admin": true,
-                    "name": "Admin team",
-                    "identifier": "admin-team"
+                    "name": "Admin Team",
+                    "identifier": "admin-team",
+                    "color": "06DBAB"
                 },
                 {
-                    "id": "620C97E6-AC56-4413-882B-3BEBAE50DAFD",
+                    "initials": "AY",
+                    "id": "2F25DF0A-6B4E-4E14-A693-CFB6A5A26519",
                     "admin": false,
-                    "name": "Client",
-                    "identifier": "client"
+                    "name": "admin Yo!",
+                    "identifier": "admin-yo",
+                    "color": "65B14B"
                 }
             ]
 
@@ -321,8 +325,10 @@ Team identifier needs to be unique for the whole platform. If sent in an incorec
             {
                 "id": "630C97E6-AC56-4213-882B-3BEBAE50BF6D",
                 "admin": false,
-                "name": "My new team",
-                "identifier": "my-new-team"
+                "name": "My NEW team",
+                "identifier": "my-new-team",
+                "initials": "MN",
+                "color": "06DBAB"
             }
 
 + Response 409 (application/json; charset=utf-8)
@@ -415,8 +421,10 @@ For updates, team identifier needs to be unique for the whole platform. If sent 
             {
                 "id": "630C97E6-AC56-4213-882B-3BEBAE50BF6D",
                 "admin": false,
-                "name": "My team",
-                "identifier": "my-team"
+                "name": "MY team",
+                "identifier": "my-team",
+                "initials": "MY",
+                "color": "06DBAB"
             }
         
 
@@ -458,8 +466,10 @@ For updates, team identifier needs to be unique for the whole platform. If sent 
             {
                 "id": "630C97E6-AC56-4213-882B-3BEBAE50BF6D",
                 "admin": false,
-                "name": "My updated team!",
-                "identifier": "my-updated-team"
+                "name": "My Updated Team!",
+                "identifier": "my-updated-team",
+                "initials": "MU",
+                "color": "06DBAB"
             }
         
 + Response 408 (application/json; charset=utf-8)
