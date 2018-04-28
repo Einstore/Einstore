@@ -38,6 +38,56 @@ Installs default admin user. Login `admin@liveui.io`, password `admin`.
         }
         
         
+## Un-Install [/uninstall]
+
+Removes all database tables and data, this operation is irreversible. 
+
+*Endpoint doesn't work in a `production` environment.*
+
+### Un-Install [GET]
+
++ Response 200 (application/json; charset=utf-8)
+            
+    + Body
+
+            {
+                "code": "maintenance_ok",
+                "description": "Uninstall finished, there are no data nor tables in the database; Please run `/install` before you continue"
+            }
+
++ Response 412 (application/json; charset=utf-8)
+
+        {
+            "error": "not_available",
+            "description": "Endpoint is not available in production mode"
+        }
+        
+        
+## Re-Install [/reinstall]
+
+Combination of `/uninstall` and then `/install` endpoints.
+
+*Endpoint doesn't work in a `production` environment.*
+
+### Re-Install [GET]
+
++ Response 200 (application/json; charset=utf-8)
+            
+    + Body
+
+            {
+                "code": "maintenance_ok",
+                "description": "Install finished"
+            }
+
++ Response 412 (application/json; charset=utf-8)
+
+        {
+            "error": "not_available",
+            "description": "Endpoint is not available in production mode"
+        }
+        
+        
 ## Demo [/demo]
 
 Installs default admin user. Login `admin@liveui.io`, password `admin` plus a set of demo data for testing.
@@ -1003,13 +1053,14 @@ JWT token is used to authenticate.
 
 ## Overview for teams [/teams/{id}/apps/overview]
 
-List available app identifiers per platform for a specific team. 
 JWT token is used to authenticate.
 
 + Parameters
     + id (required, number) - Application ID
 
 ### Get overview [GET]
+
+List available app identifiers per platform for a specific team.
 
 + Request
     
@@ -1039,6 +1090,44 @@ JWT token is used to authenticate.
                     "identifier": "com.example.app-id"
                 }
             ]
+            
+    + Attributes (Apps)
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed",
+            "error": "authentication failed"
+        }
+        
+        
+## Info for teams [/teams/{id}/apps/info]
+
+JWT token is used to authenticate.
+
++ Parameters
+    + id (required, number) - Application ID
+
+### Get info [GET]
+
+General stats about a given team
+
++ Request
+    
+    + Headers
+
+            Authorization: Bearer eyJhbGciOiJIUzUxMiIsInVzZXIiOjEsInRva2VuIjoiRTk3OTYzMjItOURBNy00RTAwLTlCNTItOEI4RThBRjkwRDAxIiwidHlwIjoiSldUIn0
+
+
++ Response 200 (application/json; charset=utf-8)
+
+    + Body
+
+            {
+                "teamId": "2F25DF0A-6B4E-4E14-A693-CFB6A5A26519",
+                "apps": 6,
+                "builds": 1280
+            }
             
     + Attributes (Apps)
 
@@ -1551,58 +1640,7 @@ In order to upload an app you need an upload API key. Keys are bound to teams so
             "code": "auth_failed",
             "error": "Unable to verify authorization token"
         }
-        
 
-
-## Un-Install [/uninstall]
-
-Removes all database tables and data, this operation is irreversible. 
-
-*Endpoint doesn't work in a `production` environment.*
-
-### Un-Install [GET]
-
-+ Response 200 (application/json; charset=utf-8)
-            
-    + Body
-
-            {
-                "code": "maintenance_ok",
-                "description": "Install finished"
-            }
-
-+ Response 412 (application/json; charset=utf-8)
-
-        {
-            "error": "not_available",
-            "description": "Endpoint is not available in production mode"
-        }
-        
-        
-## Re-Install [/reinstall]
-
-Combination of **Un-Install** and #Install, loss of the original data is irreversible.
-
-*Endpoint doesn't work in a `production` environment.*
-
-### Re-Install [GET]
-
-+ Response 200 (application/json; charset=utf-8)
-            
-    + Body
-
-            {
-                "code": "maintenance_ok",
-                "description": "Install finished"
-            }
-
-+ Response 412 (application/json; charset=utf-8)
-
-        {
-            "error": "not_available",
-            "description": "Endpoint is not available in production mode"
-        }
-        
 
 ## Show tables [/tables]
 
