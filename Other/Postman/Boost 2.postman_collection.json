@@ -1198,9 +1198,15 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "{{SERVER}}apps",
+					"raw": "{{SERVER}}apps?limit=20",
 					"host": [
 						"{{SERVER}}apps"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "20"
+						}
 					]
 				}
 			},
@@ -1235,14 +1241,14 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "{{SERVER}}apps?limit=200&page=40&platform=ios",
+					"raw": "{{SERVER}}apps?limit=20&page=40&platform=ios",
 					"host": [
 						"{{SERVER}}apps"
 					],
 					"query": [
 						{
 							"key": "limit",
-							"value": "200"
+							"value": "20"
 						},
 						{
 							"key": "page",
@@ -1286,7 +1292,7 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "{{SERVER}}apps/overview?limit=2000",
+					"raw": "{{SERVER}}apps/overview?limit=1000",
 					"host": [
 						"{{SERVER}}apps"
 					],
@@ -1296,7 +1302,7 @@
 					"query": [
 						{
 							"key": "limit",
-							"value": "2000"
+							"value": "1000"
 						}
 					]
 				}
@@ -1328,6 +1334,16 @@
 							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
 						]
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "51d1f430-a5a1-45d2-9272-014852176c70",
+						"type": "text/javascript",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						]
+					}
 				}
 			],
 			"request": {
@@ -1356,6 +1372,74 @@
 						"{{TEST_TEAM_ID}}",
 						"apps",
 						"overview"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apps (teams/:id/apps/info)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7cdb43e8-605a-4109-b4d9-2018354f7e6b",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"// Token check",
+							"tests[\"App has an id\"] = (jsonData[\"id\"].length > 0)",
+							"tests[\"App has a name\"] = (jsonData[\"name\"].length > 0)",
+							"tests[\"App has an identifier\"] = (jsonData[\"identifier\"].length > 2)",
+							"",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "27f558bf-debf-40ba-8557-3583791ac25b",
+						"type": "text/javascript",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/apps/info",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}",
+						"apps",
+						"info"
 					]
 				}
 			},
@@ -1421,7 +1505,7 @@
 			"response": []
 		},
 		{
-			"name": "Apps (apps)",
+			"name": "Apps (apps?token)",
 			"event": [
 				{
 					"listen": "test",
@@ -1894,7 +1978,7 @@
 			"response": []
 		},
 		{
-			"name": "Show tables",
+			"name": "Database info",
 			"request": {
 				"auth": {
 					"type": "noauth"
