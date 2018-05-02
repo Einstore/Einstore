@@ -1,21 +1,23 @@
 pipeline {
-    agent any
+  agent any
+  options {
+    timeout(time: 15, unit: 'MINUTES')
+  }
 
-    stages {
-        stage('Build') {
-            steps {
-                echo 'Building..'
-            }
+  stages {
+    stage('Build') {
+      when {
+        anyOf {
+          branch 'master'
         }
-        stage('Test') {
-            steps {
-                echo 'Testing..'
-            }
+      }
+      steps {
+        script {
+          mgw.inDocker('liveui/boost-base:1.0') {
+            sh 'swift build --configuration debug'
+          }
         }
-        stage('Deploy') {
-            steps {
-                echo 'Deploying....'
-            }
-        }
+      }
     }
+  }
 }
