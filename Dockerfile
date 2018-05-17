@@ -1,4 +1,4 @@
-FROM liveui/boost-base:1.0
+FROM liveui/boost-base:1.1
 
 WORKDIR /boost
 

@@ -1,4 +1,4 @@
-FROM mangoweb/swift:4.1
+FROM swift:4.1
 
 RUN \
     apt-get update && \
@@ -17,5 +17,10 @@ RUN \
     apt-get update && \
     apt-get install -y openjdk-7-jdk && \
     rm -rf /var/lib/apt/lists/*
-ENV JAVA_HOME /usr/lib/jvm/java-7-openjdk-amd64
 
+RUN \
+    apt-get update && \
+    apt-get install -y libgd-dev &&\
+    rm -rf /var/lib/apt/lists/*
+
+ENV JAVA_HOME /usr/lib/jvm/java-7-openjdk-amd64
