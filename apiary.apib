@@ -112,7 +112,46 @@ Installs default admin user. Login `admin@liveui.io`, password `admin` plus a se
             "description": "Endpoint is not available in production mode"
         }
         
-        
+
+## Server info [/info]
+
+
+### Info [GET]
+
+
++ Response 200 (application/json; charset=utf-8)
+       
+    + Body
+
+
+            {
+                "name": "Booster!",
+                "url": "https://www.example.com",
+                "icons": [
+                    {
+                        "url": "https://www.example.com/server/image/64",
+                        "size": 64
+                    },
+                    {
+                        "url": "https://www.example.com/server/image/128",
+                        "size": 128
+                    },
+                    {
+                        "url": "https://www.example.com/server/image/192",
+                        "size": 192
+                    },
+                    {
+                        "url": "https://www.example.com/server/image/256",
+                        "size": 256
+                    },
+                    {
+                        "url": "https://www.example.com/server/image/512",
+                        "size": 512
+                    }
+                ]
+            }
+
+      
         
 ## Authentication [/auth]
 
@@ -1026,17 +1065,29 @@ JWT token is used to authenticate.
             [
                 {
                     "platform": "android",
-                    "count": 1,
+                    "latest_app_name": "Goodlok",
+                    "latest_app_version": "1.0",
+                    "latest_app_build": "1.0",
+                    "latest_app_added": "2018-05-04T21:31:56Z",
+                    "app_count": 3,
                     "identifier": "cz.mangoweb.goodlok"
                 },
                 {
                     "platform": "ios",
-                    "count": 3,
+                    "latest_app_name": "Boost",
+                    "latest_app_version": "2.0",
+                    "latest_app_build": "1.0",
+                    "latest_app_added": "2018-05-04T21:35:22Z",
+                    "app_count": 3,
                     "identifier": "com.liveui.boost-app"
                 },
                 {
                     "platform": "android",
-                    "count": 1,
+                    "latest_app_name": "iDeviant",
+                    "latest_app_version": "4.0",
+                    "latest_app_build": "1.0",
+                    "latest_app_added": "2018-05-04T21:39:34Z",
+                    "app_count": 3,
                     "identifier": "com.example.app-id"
                 }
             ]
@@ -1076,17 +1127,29 @@ List available app identifiers per platform for a specific team.
             [
                 {
                     "platform": "android",
-                    "count": 1,
+                    "latest_app_name": "Goodlok",
+                    "latest_app_version": "1.0",
+                    "latest_app_build": "1.0",
+                    "latest_app_added": "2018-05-04T21:31:56Z",
+                    "app_count": 3,
                     "identifier": "cz.mangoweb.goodlok"
                 },
                 {
                     "platform": "ios",
-                    "count": 3,
+                    "latest_app_name": "Boost",
+                    "latest_app_version": "2.0",
+                    "latest_app_build": "1.0",
+                    "latest_app_added": "2018-05-04T21:35:22Z",
+                    "app_count": 3,
                     "identifier": "com.liveui.boost-app"
                 },
                 {
                     "platform": "android",
-                    "count": 1,
+                    "latest_app_name": "iDeviant",
+                    "latest_app_version": "4.0",
+                    "latest_app_build": "1.0",
+                    "latest_app_added": "2018-05-04T21:39:34Z",
+                    "app_count": 3,
                     "identifier": "com.example.app-id"
                 }
             ]
