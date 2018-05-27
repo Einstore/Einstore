@@ -115,8 +115,13 @@ Installs default admin user. Login `admin@liveui.io`, password `admin` plus a se
 
 ## Server info [/info]
 
+    
+    *Doesn't require authentication*
+
 
 ### Info [GET]
+
+Information about the server itself, also contains links to the server icons.
 
 
 + Response 200 (application/json; charset=utf-8)
@@ -129,23 +134,23 @@ Installs default admin user. Login `admin@liveui.io`, password `admin` plus a se
                 "url": "https://www.example.com",
                 "icons": [
                     {
-                        "url": "https://www.example.com/server/image/64",
+                        "url": "https://image-store.example.com/server/image/64",
                         "size": 64
                     },
                     {
-                        "url": "https://www.example.com/server/image/128",
+                        "url": "https://image-store.example.com/server/image/128",
                         "size": 128
                     },
                     {
-                        "url": "https://www.example.com/server/image/192",
+                        "url": "https://image-store.example.com/server/image/192",
                         "size": 192
                     },
                     {
-                        "url": "https://www.example.com/server/image/256",
+                        "url": "https://image-store.example.com/server/image/256",
                         "size": 256
                     },
                     {
-                        "url": "https://www.example.com/server/image/512",
+                        "url": "https://image-store.example.com/server/image/512",
                         "size": 512
                     }
                 ]
