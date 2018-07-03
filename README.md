@@ -61,10 +61,10 @@ To install on Heroku please press the button and follow the instructions:
 
 
 #### Phase 2
-- [ ] Support for S3 (and others through protocol) to store files
+- [x] Support for S3 (and others through protocol) to store files
 - [ ] Authenticate in enterprise environment (`ActiveDirectory`, etc ...)
 - [ ] Create client accounts
-- [ ] Native iOS client
+- [x] Native iOS client
 - [ ] Native Android client
 - [ ] Email notifications (new builds, clents, etc)
 
