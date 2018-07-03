@@ -2170,6 +2170,418 @@
 			"response": []
 		},
 		{
+			"name": "Server (server/image)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d36c4ce3-9694-467e-a8c5-b334c61820df",
+						"type": "text/javascript",
+						"exec": [
+							"// var jsonData = JSON.parse(responseBody);",
+							"",
+							"// // Status code",
+							"// tests[\"Status code is 201\"] = responseCode.code === 201;",
+							"",
+							"// // Token check",
+							"// tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
+							"// tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
+							"// tests[\"Key has a token\"] = (jsonData[\"config\"].length > 0)",
+							"",
+							"// postman.setEnvironmentVariable(\"TEST_SETTING_ID\", jsonData[\"id\"]);",
+							"",
+							"",
+							"// // Content type",
+							"// tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"// tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "{{SERVER}}server/image/",
+					"host": [
+						"{{SERVER}}server"
+					],
+					"path": [
+						"image",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Server (server/image/64)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d36c4ce3-9694-467e-a8c5-b334c61820df",
+						"type": "text/javascript",
+						"exec": [
+							"// var jsonData = JSON.parse(responseBody);",
+							"",
+							"// // Status code",
+							"// tests[\"Status code is 201\"] = responseCode.code === 201;",
+							"",
+							"// // Token check",
+							"// tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
+							"// tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
+							"// tests[\"Key has a token\"] = (jsonData[\"config\"].length > 0)",
+							"",
+							"// postman.setEnvironmentVariable(\"TEST_SETTING_ID\", jsonData[\"id\"]);",
+							"",
+							"",
+							"// // Content type",
+							"// tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"// tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "{{SERVER}}server/image/64",
+					"host": [
+						"{{SERVER}}server"
+					],
+					"path": [
+						"image",
+						"64"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Server (server/image/128)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d36c4ce3-9694-467e-a8c5-b334c61820df",
+						"type": "text/javascript",
+						"exec": [
+							"// var jsonData = JSON.parse(responseBody);",
+							"",
+							"// // Status code",
+							"// tests[\"Status code is 201\"] = responseCode.code === 201;",
+							"",
+							"// // Token check",
+							"// tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
+							"// tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
+							"// tests[\"Key has a token\"] = (jsonData[\"config\"].length > 0)",
+							"",
+							"// postman.setEnvironmentVariable(\"TEST_SETTING_ID\", jsonData[\"id\"]);",
+							"",
+							"",
+							"// // Content type",
+							"// tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"// tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "{{SERVER}}server/image/128",
+					"host": [
+						"{{SERVER}}server"
+					],
+					"path": [
+						"image",
+						"128"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Server (server/image/192)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d36c4ce3-9694-467e-a8c5-b334c61820df",
+						"type": "text/javascript",
+						"exec": [
+							"// var jsonData = JSON.parse(responseBody);",
+							"",
+							"// // Status code",
+							"// tests[\"Status code is 201\"] = responseCode.code === 201;",
+							"",
+							"// // Token check",
+							"// tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
+							"// tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
+							"// tests[\"Key has a token\"] = (jsonData[\"config\"].length > 0)",
+							"",
+							"// postman.setEnvironmentVariable(\"TEST_SETTING_ID\", jsonData[\"id\"]);",
+							"",
+							"",
+							"// // Content type",
+							"// tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"// tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "{{SERVER}}server/image/192",
+					"host": [
+						"{{SERVER}}server"
+					],
+					"path": [
+						"image",
+						"192"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Server (server/image/256)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d36c4ce3-9694-467e-a8c5-b334c61820df",
+						"type": "text/javascript",
+						"exec": [
+							"// var jsonData = JSON.parse(responseBody);",
+							"",
+							"// // Status code",
+							"// tests[\"Status code is 201\"] = responseCode.code === 201;",
+							"",
+							"// // Token check",
+							"// tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
+							"// tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
+							"// tests[\"Key has a token\"] = (jsonData[\"config\"].length > 0)",
+							"",
+							"// postman.setEnvironmentVariable(\"TEST_SETTING_ID\", jsonData[\"id\"]);",
+							"",
+							"",
+							"// // Content type",
+							"// tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"// tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "{{SERVER}}server/image/256",
+					"host": [
+						"{{SERVER}}server"
+					],
+					"path": [
+						"image",
+						"256"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Server (server/image/512)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d36c4ce3-9694-467e-a8c5-b334c61820df",
+						"type": "text/javascript",
+						"exec": [
+							"// var jsonData = JSON.parse(responseBody);",
+							"",
+							"// // Status code",
+							"// tests[\"Status code is 201\"] = responseCode.code === 201;",
+							"",
+							"// // Token check",
+							"// tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
+							"// tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
+							"// tests[\"Key has a token\"] = (jsonData[\"config\"].length > 0)",
+							"",
+							"// postman.setEnvironmentVariable(\"TEST_SETTING_ID\", jsonData[\"id\"]);",
+							"",
+							"",
+							"// // Content type",
+							"// tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"// tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "{{SERVER}}server/image/512",
+					"host": [
+						"{{SERVER}}server"
+					],
+					"path": [
+						"image",
+						"512"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Server (server/image)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d36c4ce3-9694-467e-a8c5-b334c61820df",
+						"type": "text/javascript",
+						"exec": [
+							"// var jsonData = JSON.parse(responseBody);",
+							"",
+							"// // Status code",
+							"// tests[\"Status code is 201\"] = responseCode.code === 201;",
+							"",
+							"// // Token check",
+							"// tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
+							"// tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
+							"// tests[\"Key has a token\"] = (jsonData[\"config\"].length > 0)",
+							"",
+							"// postman.setEnvironmentVariable(\"TEST_SETTING_ID\", jsonData[\"id\"]);",
+							"",
+							"",
+							"// // Content type",
+							"// tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"// tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "{{SERVER}}server/image",
+					"host": [
+						"{{SERVER}}server"
+					],
+					"path": [
+						"image"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Teapot",
 			"request": {
 				"auth": {
