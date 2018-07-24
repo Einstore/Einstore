@@ -1,4 +1,4 @@
 module CNIODarwin {
-    umbrella "/Projects/Web/LiveUI/Boost/.build/checkouts/swift-nio.git-8743330801067103652/Sources/CNIODarwin/include"
+    umbrella "/Projects/Web/LiveUI/Boost/.build/checkouts/swift-nio.git-1804149251656695211/Sources/CNIODarwin/include"
     export *
 }

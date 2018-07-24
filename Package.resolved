@@ -6,7 +6,7 @@
         "repositoryURL": "https://github.com/LiveUI/ApiCore.git",
         "state": {
           "branch": "master",
-          "revision": "47a3ffe964557bc03f8ca49d938e3ba4f528251b",
+          "revision": "e6cdfcdc9fb42bca97f996eb28979b0056e529d1",
           "version": null
         }
       },
@@ -42,7 +42,7 @@
         "repositoryURL": "https://github.com/LiveUI/BoostCore.git",
         "state": {
           "branch": "master",
-          "revision": "1e328da0cf85705eebabfc06be7c44df17a9624b",
+          "revision": "9137e8def43048ca7635e86c02fa1e1856201343",
           "version": null
         }
       },
@@ -348,8 +348,8 @@
         "repositoryURL": "https://github.com/vapor/url-encoded-form.git",
         "state": {
           "branch": null,
-          "revision": "57cf7fb9c1a1014c50bc05123684a9139ad44127",
-          "version": "1.0.3"
+          "revision": "cbfe7ef6301557d3f2d0807a98165232ae06e1c6",
+          "version": "1.0.4"
         }
       },
       {
@@ -375,8 +375,8 @@
         "repositoryURL": "https://github.com/twof/VaporMailgunService.git",
         "state": {
           "branch": null,
-          "revision": "135f522866cc2e45734a0ad9b78dcfb85450e4fc",
-          "version": "1.2.0"
+          "revision": "e5a5dc86406b388e589f04657eaa782761d4a80f",
+          "version": "1.3.0"
         }
       },
       {
