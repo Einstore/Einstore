@@ -9,7 +9,7 @@ ADD Resources ./Resources
 ADD Sources ./Sources
 ADD Tests ./Tests
 ADD Package.swift ./
-#ADD Package.resolved ./
+ADD Package.resolved ./
 
 RUN swift build --configuration debug
 RUN ln -s .build/x86_64-unknown-linux/debug/Run ./boost

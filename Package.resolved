@@ -6,7 +6,7 @@
         "repositoryURL": "https://github.com/LiveUI/ApiCore.git",
         "state": {
           "branch": "master",
-          "revision": "0499b82ddc3edafd2a885c14c29e427ff4898241",
+          "revision": "47a3ffe964557bc03f8ca49d938e3ba4f528251b",
           "version": null
         }
       },
@@ -42,7 +42,7 @@
         "repositoryURL": "https://github.com/LiveUI/BoostCore.git",
         "state": {
           "branch": "master",
-          "revision": "9408020930776c03d67ed93529da57828ac1c382",
+          "revision": "1e328da0cf85705eebabfc06be7c44df17a9624b",
           "version": null
         }
       },
@@ -150,7 +150,7 @@
         "repositoryURL": "https://github.com/LiveUI/FluentTestTools.git",
         "state": {
           "branch": "master",
-          "revision": "d1d3f43900813558c4c34a6c71df3535d9e694d2",
+          "revision": "d2e2adcc1d0c375328383cf5d89bc76778f5e78d",
           "version": null
         }
       },
@@ -258,7 +258,7 @@
         "repositoryURL": "https://github.com/LiveUI/SettingsCore.git",
         "state": {
           "branch": "master",
-          "revision": "6cc87f175bc4f4157e077d0b69c4977599100fb6",
+          "revision": "af40b48f70a5e2c7148502736db9f8ec57e82e50",
           "version": null
         }
       },
@@ -383,9 +383,9 @@
         "package": "VaporTestTools",
         "repositoryURL": "https://github.com/LiveUI/VaporTestTools.git",
         "state": {
-          "branch": "master",
-          "revision": "05d574735cbfa29508f8b3dfbac942d303e1ab93",
-          "version": null
+          "branch": null,
+          "revision": "e07ce263257463f2f2af9e640f81eb95a72760e4",
+          "version": "0.1.5"
         }
       },
       {
