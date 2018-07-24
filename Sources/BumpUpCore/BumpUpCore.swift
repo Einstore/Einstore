@@ -26,7 +26,7 @@ public class BumpUpCore {
     public static func configure(_ config: inout Config, _ env: inout Vapor.Environment, _ services: inout Services) throws {
         ApiAuthMiddleware.allowedGetUri.append("/settings")
         
-        DbCore.migrationConfig.add(model: Setting.self, database: .db)
+        DbCore.add(model: Setting.self, database: .db)
     }
     
 }
