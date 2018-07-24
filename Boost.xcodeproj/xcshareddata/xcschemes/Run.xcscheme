@@ -119,48 +119,8 @@
       </CommandLineArguments>
       <EnvironmentVariables>
          <EnvironmentVariable
-            key = "JWT_SECRET"
-            value = "secret"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-         <EnvironmentVariable
-            key = "DB_USER"
-            value = "boost"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-         <EnvironmentVariable
-            key = "DB_HOST"
-            value = "localhost"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-         <EnvironmentVariable
-            key = "DB_LOGGING"
-            value = "1"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-         <EnvironmentVariable
-            key = "DB_NAME"
-            value = "boost"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-         <EnvironmentVariable
-            key = "DB_PASSWORD"
-            value = "aaaaaa"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-         <EnvironmentVariable
-            key = "DB_PORT"
-            value = "5432"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-         <EnvironmentVariable
-            key = "MAILGUN_DOMAIN"
-            value = "sandboxb700706566dd40999d86b8e6d1cd20ef.mailgun.org"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-         <EnvironmentVariable
-            key = "MAILGUN_API"
-            value = "80df33a2d50d01a31a275cdc9368afda"
+            key = "CONFIG_PATH"
+            value = "/Projects/Web/config.boost.common.json"
             isEnabled = "YES">
          </EnvironmentVariable>
       </EnvironmentVariables>

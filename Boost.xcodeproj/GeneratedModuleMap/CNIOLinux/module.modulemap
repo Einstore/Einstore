@@ -1,4 +1,4 @@
 module CNIOLinux {
-    umbrella "/Projects/Web/Boost/.build/checkouts/swift-nio.git-3108475404973543938/Sources/CNIOLinux/include"
+    umbrella "/Projects/Web/Boost/.build/checkouts/swift-nio.git--5070640183805173649/Sources/CNIOLinux/include"
     export *
 }
