@@ -8,13 +8,15 @@ services:
         volumes:
             - .:/tmp
         environment:
-            DB_HOST: db
-            DB_USER: boost
-            DB_PASSWORD: aaaaaa
-            DB_NAME: boost
-            DB_PORT: 5432
-            TMP_FOLDER: /tmp/Boost
-            PERSISTENT_FOLDER: /home/Boost
+            apicore.server.name: Booster
+            apicore.database.host: db
+            apicore.database.user: boost
+            apicore.database.password: aaaaaa
+            apicore.database.database: boost
+            apicore.database.port: 5432
+            apicore.jwt_secret: secret
+            apicore.storage.s3.enabled: 0
+            apicore.storage.local.root: /home/Boost
         depends_on:
             - "db"
         command: ["./wait-for-it.sh", "db:5432", "--", "./boost", "serve", "--hostname", "0.0.0.0", "--port", "8080"]

@@ -1,4 +1,4 @@
 module CNIOSHA1 {
-    umbrella "/Projects/Web/Boost/.build/checkouts/swift-nio.git--5070640183805173649/Sources/CNIOSHA1/include"
+    umbrella "/Projects/Web/LiveUI/Boost/.build/checkouts/swift-nio.git--6343642331134380707/Sources/CNIOSHA1/include"
     export *
 }

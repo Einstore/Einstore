@@ -3,15 +3,13 @@ FROM liveui/boost-base:1.1
 WORKDIR /boost
 
 ADD Public ./Public
-ADD Boost.xcodeproj ./Boost.xcodeproj
-ADD Boost.xcworkspace ./Boost.xcworkspace
-ADD Other ./Other
-ADD Public ./Public
+#ADD Boost.xcodeproj ./Boost.xcodeproj
+#ADD Boost.xcworkspace ./Boost.xcworkspace
 ADD Resources ./Resources
-ADD scripts ./scripts
 ADD Sources ./Sources
 ADD Tests ./Tests
-ADD Package.swift Package.resolved ./
+ADD Package.swift ./
+#ADD Package.resolved ./
 
 RUN swift build --configuration debug
 RUN ln -s .build/x86_64-unknown-linux/debug/Run ./boost
