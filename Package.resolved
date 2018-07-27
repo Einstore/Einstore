@@ -6,7 +6,7 @@
         "repositoryURL": "https://github.com/LiveUI/ApiCore.git",
         "state": {
           "branch": "master",
-          "revision": "8a0fb3dac7546f677923abee42689d415f80f3e1",
+          "revision": "871b2fe6cde0f1a5c363e8d8d93df5eb8d98aef5",
           "version": null
         }
       },
@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/IBM-Swift/BlueCryptor.git",
         "state": {
           "branch": null,
-          "revision": "7865ad2f864633eb945dc77c43213fb34688bb3e",
-          "version": "1.0.5"
+          "revision": "a10caaefceb5efbb325776a2a72f19b524d8fb20",
+          "version": "1.0.7"
         }
       },
       {
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/IBM-Swift/BlueSocket.git",
         "state": {
           "branch": null,
-          "revision": "e2f6aee81b9e316f61e173e8350cb69d7714ead8",
-          "version": "1.0.10"
+          "revision": "7061bd13ed7bf2292283e542287cdcb2cb71ad01",
+          "version": "1.0.11"
         }
       },
       {
@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/IBM-Swift/BlueSSLService.git",
         "state": {
           "branch": null,
-          "revision": "f4c012b783f8809d4e6597b304357c5324ff459b",
-          "version": "1.0.10"
+          "revision": "0ff23bc75305724665500549ecc361f596ff56f3",
+          "version": "1.0.11"
         }
       },
       {
@@ -42,7 +42,7 @@
         "repositoryURL": "https://github.com/LiveUI/BoostCore.git",
         "state": {
           "branch": "master",
-          "revision": "c410a32f9605899bb19df598d3edaf27f1888740",
+          "revision": "768032269456b1fddf8800694dcbc2020c6ce429",
           "version": null
         }
       },
@@ -105,8 +105,8 @@
         "repositoryURL": "https://github.com/vapor/database-kit.git",
         "state": {
           "branch": null,
-          "revision": "acdd4d3384ec0122dcfcca8d23d9054a2860ffba",
-          "version": "1.2.0"
+          "revision": "7a01659316b9f033fa2150d5cd5e9d3c3e46c2e3",
+          "version": "1.3.0"
         }
       },
       {
@@ -141,8 +141,8 @@
         "repositoryURL": "https://github.com/vapor/fluent-postgresql.git",
         "state": {
           "branch": null,
-          "revision": "b5da9d5ba48314092c1f401cc50b0f0263288181",
-          "version": "1.0.0-rc.4.1"
+          "revision": "8e3eb9d24d54ac58c8d04c194ad6b24f0b1b667e",
+          "version": "1.0.0"
         }
       },
       {
@@ -213,8 +213,8 @@
         "repositoryURL": "https://github.com/vapor/postgresql.git",
         "state": {
           "branch": null,
-          "revision": "7659f62f951dba3527fc9179f4e30301fc47d3c2",
-          "version": "1.0.0-rc.4.4"
+          "revision": "3fcc6263f94e836dd9b3722a37bfc61308c0b5f0",
+          "version": "1.0.1"
         }
       },
       {
@@ -366,8 +366,8 @@
         "repositoryURL": "https://github.com/vapor/vapor.git",
         "state": {
           "branch": null,
-          "revision": "6b07105a3899fbbae194ee3eb82f54debe502221",
-          "version": "3.0.6"
+          "revision": "54632a6c1e7ecd9923c0d00b612de936de1c4745",
+          "version": "3.0.8"
         }
       },
       {
