@@ -1,0 +1,35 @@
+{
+	"server": {
+		"name": "Booster!",
+		"url": "http://localhost:8080",
+		"max_upload": 50
+	},
+	"jwt_secret": "secret",
+	"database": {
+		"host": "localhost",
+		"port": 5432,
+		"user": "boost",
+		"password": "aaaaaa",
+		"database": "boost",
+		"logging": true
+	},
+	"mail": {
+		"mailgun": {
+			"domain": "sandbox-domain.mailgun.org",
+			"key": "secret-key"
+		}
+	},
+	"storage": {
+		"local": {
+			"root": "/tmp/Boost"
+		},
+		"s3": {
+			"enabled": false,
+			"bucket": "",
+			"access_key": "",
+			"secret_key": "",
+			"region": "eu-west-2",
+			"security_token": null
+		}
+	}
+}
