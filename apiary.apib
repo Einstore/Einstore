@@ -20,7 +20,7 @@ Open source code licensed under Apache 2 license can be found on github.com: [![
 
 Installs default admin user. Login `admin@liveui.io`, password `admin` plus a set of demo data for testing.
 
-*Endpoint doesn't work in a `production` environment.*
+> *Endpoint doesn't work in a `production` environment.*
 
 ### Demo [GET]
 
@@ -50,7 +50,7 @@ Standard JWT token is used to authenticate.
 
 - When uploading new apps submit `.ipa` or `.apk` file as a full POST request payload. 
 - Multiple tags should be separated by `|`, for example `/upload?tags=tag1|library_version_1.2.3|some%20Other%20tag`
-- Mime types (Content-Type)
+- Mime types (Content-Type, optional)
    - iOS app is <b><i>application/octet-stream</i></b>
    - Android app is <b><i>application/vnd.android.package-archive</i></b>
 
@@ -68,16 +68,17 @@ Standard JWT token is used to authenticate.
     + Body
 
             {
-                "build": "123",
-                "basic": false,
-                "id": 3,
-                "platform": 2,
-                "team_id": 1,
-                "version": "1.2.3",
-                "identifier": "com.boost.super-app1",
-                "created": 535044877,
-                "name": "Super app3",
-                "modified": 535044877
+                "build": "1.0",
+                "cluster_id": "9DE06520-82C6-4D79-93D5-F11B0752DE0D",
+                "id": "5BCA6F48-A111-48E1-82E9-72998D19ABE0",
+                "platform": "ios",
+                "size": 1059411,
+                "team_id": "817AF533-96D6-490D-A008-CD2C199B43ED",
+                "version": "4.0",
+                "identifier": "com.example.iDeviant",
+                "created": "2018-07-31T10:27:10Z",
+                "name": "iDeviant",
+                "icon": true
             }
 
     + Attributes (App)
@@ -85,8 +86,8 @@ Standard JWT token is used to authenticate.
 + Response 401 (application/json; charset=utf-8)
 
         {
-            "code": "auth_failed",
-            "error": "authentication failed"
+            "error": "not_authorized",
+            "description": "Not authorized"
         }
     
  
@@ -98,7 +99,7 @@ Upload token (in the url) is used to authenticate. It can be created using `/key
 
 - When uploading new apps submit `.ipa` or `.apk` file as a full POST request payload. 
 - Multiple tags should be separated by `|`, for example `/upload?tags=tag1|library_version_1.2.3|some%20Other%20tag`
-- Mime types (Content-Type)
+- Mime types (Content-Type, optional)
    - iOS app is <b><i>application/octet-stream</i></b>
    - Android app is <b><i>application/vnd.android.package-archive</i></b>
 
@@ -115,16 +116,17 @@ Upload token (in the url) is used to authenticate. It can be created using `/key
     + Body
 
             {
-                "build": "123",
-                "basic": false,
-                "id": 3,
-                "platform": 2,
-                "team_id": 1,
-                "version": "1.2.3",
-                "identifier": "com.boost.super-app1",
-                "created": 535044877,
-                "name": "Super app3",
-                "modified": 535044877
+                "build": "1.0",
+                "cluster_id": "9DE06520-82C6-4D79-93D5-F11B0752DE0D",
+                "id": "9C2300BF-2ED2-48CE-B313-BE23A404CD5B",
+                "platform": "ios",
+                "size": 1059411,
+                "team_id": "817AF533-96D6-490D-A008-CD2C199B43ED",
+                "version": "4.0",
+                "identifier": "com.example.iDeviant",
+                "created": "2018-07-31T10:24:31Z",
+                "name": "iDeviant",
+                "icon": true
             }
     
             
@@ -133,12 +135,82 @@ Upload token (in the url) is used to authenticate. It can be created using `/key
 + Response 401 (application/json; charset=utf-8)
 
         {
-            "code": "auth_failed",
-            "error": "authentication failed"
+            "error": "not_authorized",
+            "description": "Not authorized"
         }
 
-        
+## Overview [/apps/overview?limit=20&page1&platform=ios]
+
+Returns overview of apps clustered (grouped) together by their `platform` and `identifier` (bundle id).
+
+### Apps overview [GET]
+
++ Request
+    
+    + Headers
+
+            Authorization: Bearer eyJhbGciOiJIUzUxMiIsInVzZXIiOjEsInRva2VuIjoiRTk3OTYzMjItOURBNy00RTAwLTlCNTItOEI4RThBRjkwRDAxIiwidHlwIjoiSldUIn0
+
+
+
++ Response 201 (application/json; charset=utf-8)
+
+    + Body
+
+            [
+                {
+                    "latest_app_build": "1508",
+                    "platform": "ios",
+                    "latest_app_id": "67799026-48ED-475B-86ED-7333F071F3A2",
+                    "identifier": "io.liveui.reflect",
+                    "latest_app_version": "1.0.0",
+                    "latest_app_name": "Reflect",
+                    "latest_app_added": "2018-07-30T22:01:51Z",
+                    "build_count": 12
+                },
+                {
+                    "latest_app_build": "1093",
+                    "platform": "ios",
+                    "latest_app_id": "3528957F-BAD2-4A91-BDDC-C86B5508085A",
+                    "identifier": "io.liveui.goodlok",
+                    "latest_app_version": "1.0.0",
+                    "latest_app_name": "Goodlok",
+                    "latest_app_added": "2018-07-30T22:01:51Z",
+                    "build_count": 2
+                },
+                {
+                    "latest_app_build": "3012",
+                    "platform": "ios",
+                    "latest_app_id": "F32B7AA0-B19F-4E24-B8B0-99A8ABF4272C",
+                    "identifier": "io.liveui.team",
+                    "latest_app_version": "1.0.0",
+                    "latest_app_name": "Team",
+                    "latest_app_added": "2018-07-30T22:01:51Z",
+                    "build_count": 36
+                },
+                {
+                    "latest_app_build": "2792",
+                    "platform": "android",
+                    "latest_app_id": "1C86E6F2-ECC2-47F1-AD6D-445D4C3EB6A2",
+                    "identifier": "io.liveui.metro",
+                    "latest_app_version": "1.0.0",
+                    "latest_app_name": "Metro",
+                    "latest_app_added": "2018-07-30T22:01:51Z",
+                    "build_count": 608
+                }
+            ]
+    
             
+    + Attributes (App)
+
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "error": "not_authorized",
+            "description": "Not authorized"
+        }
+
+
 ## Apps [/apps?limit=20&page1&platform=ios&identifier=io.liveui.admin-app]
 
 You can also search by `?search={search_term}` which searches in name, info, identifier, version, build number.
