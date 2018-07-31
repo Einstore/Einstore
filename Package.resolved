@@ -6,7 +6,7 @@
         "repositoryURL": "https://github.com/LiveUI/ApiCore.git",
         "state": {
           "branch": "master",
-          "revision": "4dcfa49832839c9201bdbe591b720344762859db",
+          "revision": "6c7f4a1dc8fbe58822aa4b7dd6752ca858772d11",
           "version": null
         }
       },
@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/IBM-Swift/BlueCryptor.git",
         "state": {
           "branch": null,
-          "revision": "a10caaefceb5efbb325776a2a72f19b524d8fb20",
-          "version": "1.0.7"
+          "revision": "4b10b2c97cb55d1f90b9f3a027419e71c3cef79b",
+          "version": "1.0.8"
         }
       },
       {
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/IBM-Swift/BlueSocket.git",
         "state": {
           "branch": null,
-          "revision": "7061bd13ed7bf2292283e542287cdcb2cb71ad01",
-          "version": "1.0.11"
+          "revision": "85cfafa00baa149aa8b4ca1c57459d03d94940a9",
+          "version": "1.0.12"
         }
       },
       {
@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/IBM-Swift/BlueSSLService.git",
         "state": {
           "branch": null,
-          "revision": "0ff23bc75305724665500549ecc361f596ff56f3",
-          "version": "1.0.11"
+          "revision": "cfb35c421338d696ebfa600690073eeaf00e54ce",
+          "version": "1.0.12"
         }
       },
       {
@@ -42,7 +42,7 @@
         "repositoryURL": "https://github.com/LiveUI/BoostCore.git",
         "state": {
           "branch": "master",
-          "revision": "11eb8b3a1b511de604e35ea76bbcdabd5f085c6e",
+          "revision": "01ef8742e75978ee2cb21c0c3cac6c1f237c5e42",
           "version": null
         }
       },
