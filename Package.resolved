@@ -6,7 +6,7 @@
         "repositoryURL": "https://github.com/LiveUI/ApiCore.git",
         "state": {
           "branch": "master",
-          "revision": "6c7f4a1dc8fbe58822aa4b7dd6752ca858772d11",
+          "revision": "995342761769745895e1b92a1a2f912a1236f560",
           "version": null
         }
       },
@@ -42,7 +42,7 @@
         "repositoryURL": "https://github.com/LiveUI/BoostCore.git",
         "state": {
           "branch": "master",
-          "revision": "01ef8742e75978ee2cb21c0c3cac6c1f237c5e42",
+          "revision": "8e3422329a50ecefff264f934eee791551df4d91",
           "version": null
         }
       },
@@ -330,8 +330,8 @@
         "repositoryURL": "https://github.com/kareman/SwiftShell.git",
         "state": {
           "branch": null,
-          "revision": "aebc06a6492a3d7c6d08005b6396ae2a80521773",
-          "version": "4.1.0"
+          "revision": "02c8ae6a5d829d28aaa9683129fc71f899beca3a",
+          "version": "4.1.1"
         }
       },
       {
