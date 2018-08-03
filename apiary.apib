@@ -555,6 +555,35 @@ Deletes an app, returns a `204` ok but no response needed on success.
         }
 
 
+## Single app icon [/apps/{id}/icon]
+
+JWT token is used to authenticate.
+
++ Parameters
+    + id (required, UUID) - Application ID
+
+### App icon [GET]
+
+Returns an icon of an app
+
+> **A 301 redirect might happen in certain cases so please make sure your client is ready to get data from another location if neccessary!**
+
++ Request
+    
+    + Headers
+
+            Authorization: Bearer eyJhbGciOiJIUzUxMiIsInVzZXIiOjEsInRva2VuIjoiRTk3OTYzMjItOURBNy00RTAwLTlCNTItOEI4RThBRjkwRDAxIiwidHlwIjoiSldUIn0
+
+
++ Response 200 (image/png)
+            
++ Response 401 (application/json; charset=utf-8)
+
+        {
+            "code": "auth_failed",
+            "error": "authentication failed"
+        }
+
 ## App download authenticator [/apps/{id}/auth]
 
 Use this endpoint to generate download authentication token for `plist` and `file` endpoints. These are neccessary in order to gain access to the binaries.
