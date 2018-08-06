@@ -6,7 +6,7 @@
         "repositoryURL": "https://github.com/LiveUI/ApiCore.git",
         "state": {
           "branch": "master",
-          "revision": "995342761769745895e1b92a1a2f912a1236f560",
+          "revision": "52e1d390b96603023048dc186835f5ed8840e241",
           "version": null
         }
       },
@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/IBM-Swift/BlueCryptor.git",
         "state": {
           "branch": null,
-          "revision": "4b10b2c97cb55d1f90b9f3a027419e71c3cef79b",
-          "version": "1.0.8"
+          "revision": "30b6cf38322838d1e973e0626c6abf9602b03cf5",
+          "version": "1.0.9"
         }
       },
       {
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/IBM-Swift/BlueSocket.git",
         "state": {
           "branch": null,
-          "revision": "85cfafa00baa149aa8b4ca1c57459d03d94940a9",
-          "version": "1.0.12"
+          "revision": "a75d816e175eb6094295e17bb6ad81f99189a398",
+          "version": "1.0.14"
         }
       },
       {
@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/IBM-Swift/BlueSSLService.git",
         "state": {
           "branch": null,
-          "revision": "cfb35c421338d696ebfa600690073eeaf00e54ce",
-          "version": "1.0.12"
+          "revision": "8844622f67490f28dff8c34d136f8ed84a2a4664",
+          "version": "1.0.14"
         }
       },
       {
@@ -42,7 +42,7 @@
         "repositoryURL": "https://github.com/LiveUI/BoostCore.git",
         "state": {
           "branch": "master",
-          "revision": "8e3422329a50ecefff264f934eee791551df4d91",
+          "revision": "ea4d9dfacbfe3622d90666d73a08273b0df8baa2",
           "version": null
         }
       },
@@ -276,8 +276,8 @@
         "repositoryURL": "https://github.com/apple/swift-nio.git",
         "state": {
           "branch": null,
-          "revision": "695afc5205aaa49fca092b94b479ff71c43d9d3c",
-          "version": "1.8.0"
+          "revision": "c6acf77fc9a310c0ebf8d5f73f285d1639801d2f",
+          "version": "1.9.0"
         }
       },
       {
@@ -402,8 +402,8 @@
         "repositoryURL": "https://github.com/LiveUI/XMLCoding.git",
         "state": {
           "branch": null,
-          "revision": "344c27d8f5c5fef2fae27e1f046847776afaaf77",
-          "version": "0.1.1"
+          "revision": "a4475f1f686396715a2e7883f224b892e8816401",
+          "version": "0.1.2"
         }
       }
     ]

@@ -7,7 +7,7 @@ RUN \
 
 RUN \
     apt-get update && \
-    apt-get install -y python python-dev python-pip python-virtualenv && \
+    apt-get install -y python python-dev python-pip python-virtualenv unzip libplist-utils && \
     rm -rf /var/lib/apt/lists/*
 
 RUN \

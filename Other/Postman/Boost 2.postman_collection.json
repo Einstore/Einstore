@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"_postman_id": "1dba24e7-188d-4ca6-aba0-30e8d1230b5b",
+			"_postman_id": "2e30d565-3a78-4894-b380-f3eceea709f3",
 			"name": "CORS",
 			"request": {
 				"auth": {
@@ -28,7 +28,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "23fb4440-3e63-4083-bcc5-367c38b14637",
+			"_postman_id": "79b6d727-480c-47c5-8d56-dbd470c79e0e",
 			"name": "Install",
 			"request": {
 				"auth": {
@@ -50,7 +50,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "47bd3566-5f69-4c88-837c-0981d55c5114",
+			"_postman_id": "edc34cf6-0389-42a1-9451-6de1d86331ff",
 			"name": "Demo",
 			"request": {
 				"auth": {
@@ -77,7 +77,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "0c5b8809-4df0-4e82-a34e-4b56eb5a9e9c",
+			"_postman_id": "80bb904a-2553-4860-ba81-75122e3aaf2c",
 			"name": "Re-Install",
 			"request": {
 				"auth": {
@@ -104,7 +104,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "c3b6d01d-9bd1-4d0f-b87a-28db94b23939",
+			"_postman_id": "a2d4a6cc-3db0-41a1-ab9e-214000a94cf2",
 			"name": "Un-Install",
 			"request": {
 				"auth": {
@@ -131,7 +131,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "c691e47f-9a09-4ecd-b2e6-5bd779ade04f",
+			"_postman_id": "71f5d03c-78bd-4751-9091-8dccf43903f5",
 			"name": "Auth (BASIC)",
 			"event": [
 				{
@@ -227,7 +227,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "e560d30c-4930-4cdf-906d-d66aec4ba967",
+			"_postman_id": "2d39ce07-81d5-47fc-a62d-e60a20fe2392",
 			"name": "Auth",
 			"event": [
 				{
@@ -316,7 +316,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "665693a8-a35f-42ab-87cc-7cafc7557e6e",
+			"_postman_id": "8739e167-ccb0-4fe1-98f6-b56ad4141c63",
 			"name": "JWT refresh",
 			"event": [
 				{
@@ -388,7 +388,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "f6cc9e7c-434d-4236-961a-2bd3e8e14cce",
+			"_postman_id": "aa250781-a2f0-497f-8e34-2e7a817e1ed7",
 			"name": "JWT refresh",
 			"event": [
 				{
@@ -450,7 +450,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "fb26b3cf-73a5-4383-a7ad-424f57f47e4e",
+			"_postman_id": "1ffe6971-7a52-4c38-b6ff-8236216d3332",
 			"name": "Teams (teams)",
 			"event": [
 				{
@@ -486,7 +486,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "fd6b5d40-19fb-4a3d-8970-50dd13c06c9e",
+			"_postman_id": "e9e346a6-1237-45b7-8ac0-b9fe0125465a",
 			"name": "Teams (teams)",
 			"event": [
 				{
@@ -560,7 +560,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "938db2b2-425f-403e-9dfb-c290bd4c978e",
+			"_postman_id": "f876106b-8d22-4ae4-ae44-f7d49aef628f",
 			"name": "Teams (teams/check)",
 			"event": [
 				{
@@ -609,7 +609,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "14ca6afd-3e27-4c8b-a039-6dd8bfd32b32",
+			"_postman_id": "7a436f23-0235-42fd-9bba-f5f8cedea138",
 			"name": "Teams (teams/:id)",
 			"event": [
 				{
@@ -684,7 +684,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "698e6e2f-d00e-45ed-b24c-e70da9f6c3c1",
+			"_postman_id": "bd28f61c-dcba-4c5d-b6b2-bada68acd315",
 			"name": "Teams (teams/:id/link)",
 			"event": [
 				{
@@ -734,7 +734,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "bb45b7e2-3fa3-48bc-b5d8-6f25ac5ccbad",
+			"_postman_id": "2e02d462-d83f-4fe8-89b2-e7360316f37e",
 			"name": "Teams (teams/:id/unlink)",
 			"event": [
 				{
@@ -784,7 +784,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "08a54d7f-9e89-4cc9-b762-63da63d3eb4c",
+			"_postman_id": "b05cb74d-089e-4bb3-aaee-4d10dc23108b",
 			"name": "Teams (teams/:id/users)",
 			"event": [
 				{
@@ -834,7 +834,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "aa3bd856-a5d8-4bc1-9274-9ab20fd529ca",
+			"_postman_id": "2e131333-4ce3-4414-bfe8-2753e6b4e889",
 			"name": "Teams (teams/:id)",
 			"event": [
 				{
@@ -883,7 +883,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "b8afaf91-6574-4f6e-b345-ffc343b15c68",
+			"_postman_id": "5f46700b-062a-4cb8-bf9c-d0a47fedf521",
 			"name": "Teams (teams/:id)",
 			"event": [
 				{
@@ -932,7 +932,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "ef1311d3-e215-4478-9e28-2950b7ed6bcc",
+			"_postman_id": "856972b7-3b26-4328-9653-9b60be12f831",
 			"name": "Teams (teams/:id/config)",
 			"event": [
 				{
@@ -1000,7 +1000,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "c29a74e7-7878-4ea2-8624-41c352ccfb31",
+			"_postman_id": "a7c2b6a9-160f-45b5-ab10-b31203d26526",
 			"name": "Teams (teams/:id/config)",
 			"event": [
 				{
@@ -1073,7 +1073,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "df344d9a-111d-40a6-996a-07a51c4d533f",
+			"_postman_id": "b853936a-fb47-40ca-bb71-6660dca0c518",
 			"name": "Users (users)",
 			"event": [
 				{
@@ -1101,7 +1101,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "380165e8-29c6-403e-b1db-34f87d835bb7",
+			"_postman_id": "5e809c9b-be1a-4d9a-a4ba-9e47ae428303",
 			"name": "Users (users/global)",
 			"event": [
 				{
@@ -1148,7 +1148,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "70e9ec70-ddba-4dd8-8714-304a2aaaf7ab",
+			"_postman_id": "f3604008-d734-4aad-a1de-690305c4f46c",
 			"name": "Users (users)",
 			"event": [
 				{
@@ -1188,13 +1188,13 @@
 			"response": []
 		},
 		{
-			"_postman_id": "09dce218-e3b8-4b58-b9cb-21ac7f260fa6",
+			"_postman_id": "60585559-c0c1-4361-b573-fd4ad27e0bf5",
 			"name": "Apps (apps)",
 			"event": [
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "b5bd4386-09e9-47ac-9eab-c0b25836a986",
+						"id": "f1a88013-f86e-409e-b4b8-07c974a4031a",
 						"type": "text/javascript",
 						"exec": [
 							"eval(pm.environment.get(\"func:authorize\"));"
@@ -1232,7 +1232,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "990fab46-3c1b-4e70-a628-c48787422189",
+			"_postman_id": "e6bf373f-28c1-46b5-893f-d7f19d825235",
 			"name": "Apps (apps?filters)",
 			"event": [
 				{
@@ -1284,7 +1284,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "e6686916-d97e-45ea-8efb-42f2382fd405",
+			"_postman_id": "92e5bb88-ca09-4d75-afd4-f81ad994038e",
 			"name": "Apps (apps/overview)",
 			"event": [
 				{
@@ -1331,7 +1331,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "e3987cc3-f8e0-49b4-8de2-0c4239a2a433",
+			"_postman_id": "06835790-f5aa-4529-abeb-a6aca0c5e50b",
 			"name": "Apps (teams/:id/apps/overview)",
 			"event": [
 				{
@@ -1400,7 +1400,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "f00f9cf1-949e-44c9-92f2-26fa892ffabf",
+			"_postman_id": "14875607-6861-406a-88c8-36f571c99a3e",
 			"name": "Apps (teams/:id/apps/info)",
 			"event": [
 				{
@@ -1469,7 +1469,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "7b44b869-37de-418c-a4d4-d6635cafa66a",
+			"_postman_id": "75740075-b61e-432a-ad8c-44967602079e",
 			"name": "Apps (teams/:id/apps)",
 			"event": [
 				{
@@ -1529,7 +1529,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "463a4bd0-cc69-4e26-96e2-c10f3ffce248",
+			"_postman_id": "01354aa7-9941-4b7b-9ebd-dc5ae2ee7214",
 			"name": "Apps (apps?token)",
 			"event": [
 				{
@@ -1588,7 +1588,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "69f8d09b-ddfa-44d1-a1bf-67eb46faaa4e",
+			"_postman_id": "33969c61-5556-480c-8082-295ba19e6f4e",
 			"name": "Apps (apps/:id)",
 			"request": {
 				"method": "GET",
@@ -1615,7 +1615,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "e41ba5c5-3098-46ff-888b-9bf5482c822b",
+			"_postman_id": "e902e4b3-18dc-4d80-aee7-39862ea1c813",
 			"name": "Apps (apps/:id/auth)",
 			"event": [
 				{
@@ -1675,7 +1675,52 @@
 			"response": []
 		},
 		{
-			"_postman_id": "0e24100f-19c3-483c-8080-3a0bcd5b4186",
+			"_postman_id": "8d2da579-5f84-497c-a1e3-62bbe1eb5f8e",
+			"name": "Apps (apps/:id/icon)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "090b0686-dd13-480c-a2a8-ac34491fe080",
+						"type": "text/javascript",
+						"exec": [
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"image/png\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}apps/{{APP_ID}}/icon",
+					"host": [
+						"{{SERVER}}apps"
+					],
+					"path": [
+						"{{APP_ID}}",
+						"icon"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "9b9615bb-00f5-4175-bf37-fd28cbc9fa25",
 			"name": "Apps (apps/plist)",
 			"request": {
 				"method": "GET",
@@ -1708,7 +1753,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "65421014-24b1-4f89-85cc-84541d4732ea",
+			"_postman_id": "745d8568-55e6-4ad1-9cce-de5d1327cb43",
 			"name": "Apps (apps/file)",
 			"request": {
 				"method": "GET",
@@ -1741,7 +1786,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "23fd22d9-755f-410b-a649-f5585a2c659b",
+			"_postman_id": "292a67b1-b559-4a07-8e34-eb941fbf475d",
 			"name": "Apps (apps/:id/tags)",
 			"request": {
 				"method": "GET",
@@ -1769,7 +1814,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "b4efa413-8f6d-470f-8095-9318cba80a9c",
+			"_postman_id": "2415878a-525a-4679-acce-545730080cfc",
 			"name": "Apps (apps/:id)",
 			"request": {
 				"method": "DELETE",
@@ -1796,7 +1841,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "73b3cd03-3662-45cb-b7e1-5c56b62fe610",
+			"_postman_id": "74db3d19-c8f1-48a5-a6c5-8b25877e2713",
 			"name": "Upload keys (keys)",
 			"request": {
 				"method": "GET",
@@ -1820,7 +1865,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "758dbfe2-5e0c-42ad-bc88-884f9e89f5f7",
+			"_postman_id": "896e5ec2-68e8-466f-9d4e-fdba48bb8932",
 			"name": "Upload keys (apps/:id/keys)",
 			"request": {
 				"method": "GET",
@@ -1848,7 +1893,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "9c9ab6d5-9c81-4afd-ab0f-13be7ddeb677",
+			"_postman_id": "c318dd4a-7371-46f7-b535-5137dfa581c9",
 			"name": "Upload keys (keys/:id)",
 			"request": {
 				"method": "GET",
@@ -1875,7 +1920,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "b8308308-05ab-46fa-9810-60a018ba9ea9",
+			"_postman_id": "75690b03-6520-4812-84db-05cc1b8e4731",
 			"name": "Upload keys (apps/:id/keys)",
 			"event": [
 				{
@@ -1942,7 +1987,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "30f9ef31-c089-4456-92c5-eb6a6f80be26",
+			"_postman_id": "a1e4c3d0-bf3d-4afc-912f-4798cbfbb49e",
 			"name": "Upload keys (keys/:id)",
 			"request": {
 				"method": "PUT",
@@ -1973,7 +2018,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "100e3ab7-cb04-4923-95b6-fd28d5724ebb",
+			"_postman_id": "f96b2a8e-66ff-4bdd-8a07-c19eb48a9667",
 			"name": "Upload keys (keys/:id)",
 			"request": {
 				"method": "DELETE",
@@ -2000,7 +2045,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "d54cc2b8-6bdb-4b80-baa9-f51043e47f32",
+			"_postman_id": "b6346edf-49b0-43f2-bf83-c69c23f843ac",
 			"name": "Unknown URL",
 			"request": {
 				"method": "GET",
@@ -2016,7 +2061,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "a05ab05c-2d1b-4ea4-89e0-1b71dbbf91ae",
+			"_postman_id": "21b13784-c3d9-4191-b97c-c2e40d456b4e",
 			"name": "Database info",
 			"request": {
 				"auth": {
@@ -2035,7 +2080,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "466445c4-fe44-4494-ad4a-44332ae7c0c5",
+			"_postman_id": "9ac1695d-24b5-4f80-a372-9d9449ddc4fd",
 			"name": "Settings (settings)",
 			"request": {
 				"auth": {
@@ -2054,7 +2099,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "a62b7188-a18f-491e-a73c-44d6c7429317",
+			"_postman_id": "f4fb98ca-bf40-4798-afed-59b0fc35aac4",
 			"name": "Settings (settings?plain)",
 			"request": {
 				"auth": {
@@ -2079,7 +2124,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "8b13ef4a-e678-43bb-b568-e9fb851a2cad",
+			"_postman_id": "422e7e19-9ae2-40bf-a018-b72916a09db5",
 			"name": "Settings (settings)",
 			"event": [
 				{
@@ -2140,7 +2185,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "68f6395b-3e72-4ff4-9c57-b84431006936",
+			"_postman_id": "e5b41ecf-a01b-4212-8f2d-866115f6eaa7",
 			"name": "Settings (settings/:id)",
 			"request": {
 				"auth": {
@@ -2177,7 +2222,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "b7c52ce5-4e0c-48b7-9386-ec89973e8e67",
+			"_postman_id": "39764e9b-1525-4446-8af5-7505b86f5dae",
 			"name": "Settings (settings/:id)",
 			"request": {
 				"auth": {
@@ -2214,7 +2259,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "b04ac59a-152f-4afe-9333-252f0b9ddffd",
+			"_postman_id": "71bf41c6-2fc8-403b-8f05-95fe3b6f0803",
 			"name": "Server (server/image)",
 			"event": [
 				{
@@ -2274,7 +2319,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "e5083905-a9da-4fb3-bda6-84087625032c",
+			"_postman_id": "46d7a0eb-61af-4336-97d6-8560df2f957c",
 			"name": "Server (server/image/64)",
 			"event": [
 				{
@@ -2334,7 +2379,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "f883ca64-476b-458e-a9d8-154b255e3ce1",
+			"_postman_id": "12b1f62b-ca2a-4dc1-ad42-ee9c882a5e5b",
 			"name": "Server (server/image/128)",
 			"event": [
 				{
@@ -2394,7 +2439,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "78ebe129-efe8-44cf-9c34-157653a294b4",
+			"_postman_id": "09afd946-e92f-4cdf-9d59-fc03baff60e0",
 			"name": "Server (server/image/192)",
 			"event": [
 				{
@@ -2454,7 +2499,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "ab668f1a-c524-48c1-ba73-28fd26842cb1",
+			"_postman_id": "33ccc43a-fac8-47b0-9a6a-714395103f15",
 			"name": "Server (server/image/256)",
 			"event": [
 				{
@@ -2514,7 +2559,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "27f810dc-ec54-42c2-9bd4-a23e2b5b9f8a",
+			"_postman_id": "4b03c617-07e2-40c6-97ad-647ad8dc64dc",
 			"name": "Server (server/image/512)",
 			"event": [
 				{
@@ -2574,7 +2619,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "0f0f45f3-41aa-48a1-a613-159167658712",
+			"_postman_id": "f6eb7083-382b-4783-b5dd-2e13a26da107",
 			"name": "Server (server/image)",
 			"event": [
 				{
@@ -2633,7 +2678,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "e8693345-8f9c-47c1-bbfe-8a08534b193e",
+			"_postman_id": "497d6ac5-20a6-48d3-bbb9-5a0cd7d35e50",
 			"name": "Teapot",
 			"request": {
 				"auth": {
@@ -2652,7 +2697,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "0b885cdb-41d7-4f9e-bab0-ae36a17964ab",
+			"_postman_id": "4ac0b98b-59b2-4cb0-856c-b6902bbffa59",
 			"name": "Ping",
 			"request": {
 				"auth": {
@@ -2671,7 +2716,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "f0e446d6-41a9-4f8e-ab36-56ab01bf0969",
+			"_postman_id": "1479578f-dacf-4f14-bd4f-1e9350aab459",
 			"name": "Errors",
 			"request": {
 				"auth": {
@@ -2697,7 +2742,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "75245dda-56ce-4699-aa9c-346eaca47a18",
+			"_postman_id": "2e3e64a2-795e-468b-904a-ae453699f16b",
 			"name": "Info",
 			"request": {
 				"auth": {

@@ -1,10 +1,8 @@
-FROM liveui/boost-base:1.1
+FROM liveui/boost-base:1.1.1
 
 WORKDIR /boost
 
 ADD Public ./Public
-#ADD Boost.xcodeproj ./Boost.xcodeproj
-#ADD Boost.xcworkspace ./Boost.xcworkspace
 ADD Resources ./Resources
 ADD Sources ./Sources
 ADD Tests ./Tests
