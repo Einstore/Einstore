@@ -86,16 +86,6 @@ To install on Heroku please press the button and follow the instructions:
 
 We love PR’s, we can’t get enough of them ... so if you have an interesting improvement, bug-fix or a new feature please don’t hesitate to get in touch. If you are not sure about something before you start the development you can always contact our dev and product team through our Slack.
 
-## Supplementary components
-
-#### BumpUp!
-Cloud based build number management system
-Like Boost, BumpUp! Is an open source feature licensed under Apache 2.0 license
-BumpUp! Is also available as a free service online.
-Support for Android and all current Apple based operating systems
-BumpUp! Can be found here: http://github.com/liveui/bumpup
-Xxxxxxxxxxx include screenshot
-
 ## Support
 
 We try to support even our free tier clients through our Slack channel or create a Stack Overflow question tagging BoostXXXXXXXXXX.
