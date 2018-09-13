@@ -6,14 +6,18 @@
 	},
 	"item": [
 		{
-			"_postman_id": "2e30d565-3a78-4894-b380-f3eceea709f3",
 			"name": "CORS",
 			"request": {
 				"auth": {
 					"type": "noauth"
 				},
 				"method": "OPTIONS",
-				"header": [],
+				"header": [
+					{
+						"key": "Origin",
+						"value": "{{SERVER}}"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": ""
@@ -28,7 +32,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "79b6d727-480c-47c5-8d56-dbd470c79e0e",
 			"name": "Install",
 			"request": {
 				"auth": {
@@ -50,7 +53,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "edc34cf6-0389-42a1-9451-6de1d86331ff",
 			"name": "Demo",
 			"request": {
 				"auth": {
@@ -77,7 +79,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "80bb904a-2553-4860-ba81-75122e3aaf2c",
 			"name": "Re-Install",
 			"request": {
 				"auth": {
@@ -104,7 +105,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "a2d4a6cc-3db0-41a1-ab9e-214000a94cf2",
 			"name": "Un-Install",
 			"request": {
 				"auth": {
@@ -131,7 +131,437 @@
 			"response": []
 		},
 		{
-			"_postman_id": "71f5d03c-78bd-4751-9091-8dccf43903f5",
+			"name": "Recovery (START)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ff8cd911-e63a-48df-a3e2-205807e80395",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 201\"] = responseCode.code === 201;",
+							"",
+							"// Token check",
+							"tests[\"Code is correct\"] = (jsonData[\"code\"] == \"auth.recovery_sent\")",
+							"tests[\"Description is correct\"] = (jsonData[\"description\"] == \"Password recovery email has been sent\")",
+							"",
+							"postman.setEnvironmentVariable(\"RECOVERY_TOKEN\", \"needs token\");",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0d43ff69-0ee0-44f2-b2f1-f0a273c92a0b",
+						"type": "text/javascript",
+						"exec": [
+							"var authorize = 'var server = pm.environment.get(\"SERVER\");\\",
+							"var token = pm.environment.get(\"AUTH_TOKEN\");\\",
+							"pm.sendRequest({\\",
+							"    url: server + \"token\",\\",
+							"    method: \"GET\",\\",
+							"    header: \"Authorization:Token \" + token\\",
+							"}, function (err, response) {\\",
+							"    console.log(response.headers);\\",
+							"    if (response) {\\",
+							"        var a = response.headers.get(\"authorization\").substring(7);\\",
+							"        pm.environment.set(\"JWT_AUTH\", a);\\",
+							"    }\\",
+							"});';",
+							"",
+							"pm.environment.set(\"func:authorize\", authorize);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"core@liveui.io\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}auth/start-recovery",
+					"host": [
+						"{{SERVER}}auth"
+					],
+					"path": [
+						"start-recovery"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Recovery (INPUT)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0a4fca42-18ee-49ac-bbe5-0fdca7102e0a",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"// Token check",
+							"tests[\"Token has an id\"] = (jsonData[\"id\"].length > 10)",
+							"tests[\"Token has a user\"] = (jsonData[\"user\"][\"id\"].length > 10)",
+							"tests[\"Token has a token\"] = (jsonData[\"token\"].length > 10)",
+							"tests[\"Token has expires\"] = (jsonData[\"expires\"] > 543533823)",
+							"",
+							"postman.setEnvironmentVariable(\"AUTH_TOKEN\", jsonData[\"token\"]);",
+							"",
+							"// JWT",
+							"var jwtAuthExists = responseHeaders.hasOwnProperty(\"Authorization\") || responseHeaders.hasOwnProperty(\"authorization\");",
+							"tests[\"JWT Token is present\"] = jwtAuthExists;",
+							"",
+							"if (jwtAuthExists) {",
+							"    var a = responseHeaders[\"Authorization\"] || responseHeaders[\"authorization\"];",
+							"    tests[\"JWT token has a bearer\"] = a.has(\"Bearer \");",
+							"    tests[\"JWT token has a value\"] = (a.length > 15);",
+							"    postman.setEnvironmentVariable(\"JWT_AUTH\", a.substring(7));",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0d43ff69-0ee0-44f2-b2f1-f0a273c92a0b",
+						"type": "text/javascript",
+						"exec": [
+							"var authorize = 'var server = pm.environment.get(\"SERVER\");\\",
+							"var token = pm.environment.get(\"AUTH_TOKEN\");\\",
+							"pm.sendRequest({\\",
+							"    url: server + \"token\",\\",
+							"    method: \"GET\",\\",
+							"    header: \"Authorization:Token \" + token\\",
+							"}, function (err, response) {\\",
+							"    console.log(response.headers);\\",
+							"    if (response) {\\",
+							"        var a = response.headers.get(\"authorization\").substring(7);\\",
+							"        pm.environment.set(\"JWT_AUTH\", a);\\",
+							"    }\\",
+							"});';",
+							"",
+							"pm.environment.set(\"func:authorize\", authorize);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"admin@liveui.io\",\n  \"password\": \"password123\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}auth/input-recovery?token={{RECOVERY_TOKEN}}",
+					"host": [
+						"{{SERVER}}auth"
+					],
+					"path": [
+						"input-recovery"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "{{RECOVERY_TOKEN}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Recovery (FINISH)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0a4fca42-18ee-49ac-bbe5-0fdca7102e0a",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"// Token check",
+							"tests[\"Token has an id\"] = (jsonData[\"id\"].length > 10)",
+							"tests[\"Token has a user\"] = (jsonData[\"user\"][\"id\"].length > 10)",
+							"tests[\"Token has a token\"] = (jsonData[\"token\"].length > 10)",
+							"tests[\"Token has expires\"] = (jsonData[\"expires\"] > 543533823)",
+							"",
+							"postman.setEnvironmentVariable(\"AUTH_TOKEN\", jsonData[\"token\"]);",
+							"",
+							"// JWT",
+							"var jwtAuthExists = responseHeaders.hasOwnProperty(\"Authorization\") || responseHeaders.hasOwnProperty(\"authorization\");",
+							"tests[\"JWT Token is present\"] = jwtAuthExists;",
+							"",
+							"if (jwtAuthExists) {",
+							"    var a = responseHeaders[\"Authorization\"] || responseHeaders[\"authorization\"];",
+							"    tests[\"JWT token has a bearer\"] = a.has(\"Bearer \");",
+							"    tests[\"JWT token has a value\"] = (a.length > 15);",
+							"    postman.setEnvironmentVariable(\"JWT_AUTH\", a.substring(7));",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0d43ff69-0ee0-44f2-b2f1-f0a273c92a0b",
+						"type": "text/javascript",
+						"exec": [
+							"var authorize = 'var server = pm.environment.get(\"SERVER\");\\",
+							"var token = pm.environment.get(\"AUTH_TOKEN\");\\",
+							"pm.sendRequest({\\",
+							"    url: server + \"token\",\\",
+							"    method: \"GET\",\\",
+							"    header: \"Authorization:Token \" + token\\",
+							"}, function (err, response) {\\",
+							"    console.log(response.headers);\\",
+							"    if (response) {\\",
+							"        var a = response.headers.get(\"authorization\").substring(7);\\",
+							"        pm.environment.set(\"JWT_AUTH\", a);\\",
+							"    }\\",
+							"});';",
+							"",
+							"pm.environment.set(\"func:authorize\", authorize);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"admin@liveui.io\",\n  \"password\": \"password123\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}auth/finish-recovery?token={{RECOVERY_TOKEN}}",
+					"host": [
+						"{{SERVER}}auth"
+					],
+					"path": [
+						"finish-recovery"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "{{RECOVERY_TOKEN}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Recovery (FINISH)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0a4fca42-18ee-49ac-bbe5-0fdca7102e0a",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"// Token check",
+							"tests[\"Token has an id\"] = (jsonData[\"id\"].length > 10)",
+							"tests[\"Token has a user\"] = (jsonData[\"user\"][\"id\"].length > 10)",
+							"tests[\"Token has a token\"] = (jsonData[\"token\"].length > 10)",
+							"tests[\"Token has expires\"] = (jsonData[\"expires\"] > 543533823)",
+							"",
+							"postman.setEnvironmentVariable(\"AUTH_TOKEN\", jsonData[\"token\"]);",
+							"",
+							"// JWT",
+							"var jwtAuthExists = responseHeaders.hasOwnProperty(\"Authorization\") || responseHeaders.hasOwnProperty(\"authorization\");",
+							"tests[\"JWT Token is present\"] = jwtAuthExists;",
+							"",
+							"if (jwtAuthExists) {",
+							"    var a = responseHeaders[\"Authorization\"] || responseHeaders[\"authorization\"];",
+							"    tests[\"JWT token has a bearer\"] = a.has(\"Bearer \");",
+							"    tests[\"JWT token has a value\"] = (a.length > 15);",
+							"    postman.setEnvironmentVariable(\"JWT_AUTH\", a.substring(7));",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0d43ff69-0ee0-44f2-b2f1-f0a273c92a0b",
+						"type": "text/javascript",
+						"exec": [
+							"var authorize = 'var server = pm.environment.get(\"SERVER\");\\",
+							"var token = pm.environment.get(\"AUTH_TOKEN\");\\",
+							"pm.sendRequest({\\",
+							"    url: server + \"token\",\\",
+							"    method: \"GET\",\\",
+							"    header: \"Authorization:Token \" + token\\",
+							"}, function (err, response) {\\",
+							"    console.log(response.headers);\\",
+							"    if (response) {\\",
+							"        var a = response.headers.get(\"authorization\").substring(7);\\",
+							"        pm.environment.set(\"JWT_AUTH\", a);\\",
+							"    }\\",
+							"});';",
+							"",
+							"pm.environment.set(\"func:authorize\", authorize);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"admin@liveui.io\",\n  \"password\": \"password123\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}auth/finish-recovery?token={{RECOVERY_TOKEN}}",
+					"host": [
+						"{{SERVER}}auth"
+					],
+					"path": [
+						"finish-recovery"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "{{RECOVERY_TOKEN}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Auth (auth/password-check)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b26c1813-6cd9-4bea-9297-916788afd1e8",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"// Token check",
+							"tests[\"Code is correct\"] = (jsonData[\"code\"] == \"auth.password_ok\")",
+							"tests[\"Description is correct\"] = (jsonData[\"description\"] == \"Password seems to be valid\")",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0d43ff69-0ee0-44f2-b2f1-f0a273c92a0b",
+						"type": "text/javascript",
+						"exec": [
+							"var authorize = 'var server = pm.environment.get(\"SERVER\");\\",
+							"var token = pm.environment.get(\"AUTH_TOKEN\");\\",
+							"pm.sendRequest({\\",
+							"    url: server + \"token\",\\",
+							"    method: \"GET\",\\",
+							"    header: \"Authorization:Token \" + token\\",
+							"}, function (err, response) {\\",
+							"    console.log(response.headers);\\",
+							"    if (response) {\\",
+							"        var a = response.headers.get(\"authorization\").substring(7);\\",
+							"        pm.environment.set(\"JWT_AUTH\", a);\\",
+							"    }\\",
+							"});';",
+							"",
+							"pm.environment.set(\"func:authorize\", authorize);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"password\": \"pasword123\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}auth/password-check",
+					"host": [
+						"{{SERVER}}auth"
+					],
+					"path": [
+						"password-check"
+					]
+				},
+				"description": "Check validity of a password before a registration or password change is attempted"
+			},
+			"response": []
+		},
+		{
 			"name": "Auth (BASIC)",
 			"event": [
 				{
@@ -200,13 +630,13 @@
 					"type": "basic",
 					"basic": [
 						{
-							"key": "password",
-							"value": "admin",
+							"key": "username",
+							"value": "core@liveui.io",
 							"type": "string"
 						},
 						{
-							"key": "username",
-							"value": "admin@liveui.io",
+							"key": "password",
+							"value": "admin",
 							"type": "string"
 						}
 					]
@@ -227,7 +657,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "2d39ce07-81d5-47fc-a62d-e60a20fe2392",
 			"name": "Auth",
 			"event": [
 				{
@@ -304,7 +733,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"admin@liveui.io\",\n  \"password\": \"admin\"\n}"
+					"raw": "{\n  \"email\": \"core@liveui.io\",\n  \"password\": \"admin\"\n}"
 				},
 				"url": {
 					"raw": "{{SERVER}}auth",
@@ -316,7 +745,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "8739e167-ccb0-4fe1-98f6-b56ad4141c63",
 			"name": "JWT refresh",
 			"event": [
 				{
@@ -372,6 +800,10 @@
 					{
 						"key": "Authorization",
 						"value": "Token {{AUTH_TOKEN}}"
+					},
+					{
+						"key": "Origin",
+						"value": "{{SERVER}}"
 					}
 				],
 				"body": {
@@ -388,7 +820,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "aa250781-a2f0-497f-8e34-2e7a817e1ed7",
 			"name": "JWT refresh",
 			"event": [
 				{
@@ -450,7 +881,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "1ffe6971-7a52-4c38-b6ff-8236216d3332",
 			"name": "Teams (teams)",
 			"event": [
 				{
@@ -486,7 +916,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "e9e346a6-1237-45b7-8ac0-b9fe0125465a",
 			"name": "Teams (teams)",
 			"event": [
 				{
@@ -560,7 +989,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "f876106b-8d22-4ae4-ae44-f7d49aef628f",
 			"name": "Teams (teams/check)",
 			"event": [
 				{
@@ -609,7 +1037,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "7a436f23-0235-42fd-9bba-f5f8cedea138",
 			"name": "Teams (teams/:id)",
 			"event": [
 				{
@@ -684,7 +1111,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "bd28f61c-dcba-4c5d-b6b2-bada68acd315",
 			"name": "Teams (teams/:id/link)",
 			"event": [
 				{
@@ -734,7 +1160,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "2e02d462-d83f-4fe8-89b2-e7360316f37e",
 			"name": "Teams (teams/:id/unlink)",
 			"event": [
 				{
@@ -784,7 +1209,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "b05cb74d-089e-4bb3-aaee-4d10dc23108b",
 			"name": "Teams (teams/:id/users)",
 			"event": [
 				{
@@ -834,7 +1258,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "2e131333-4ce3-4414-bfe8-2753e6b4e889",
 			"name": "Teams (teams/:id)",
 			"event": [
 				{
@@ -883,7 +1306,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "5f46700b-062a-4cb8-bf9c-d0a47fedf521",
 			"name": "Teams (teams/:id)",
 			"event": [
 				{
@@ -932,7 +1354,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "856972b7-3b26-4328-9653-9b60be12f831",
 			"name": "Teams (teams/:id/config)",
 			"event": [
 				{
@@ -1000,7 +1421,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "a7c2b6a9-160f-45b5-ab10-b31203d26526",
 			"name": "Teams (teams/:id/config)",
 			"event": [
 				{
@@ -1073,7 +1493,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "b853936a-fb47-40ca-bb71-6660dca0c518",
 			"name": "Users (users)",
 			"event": [
 				{
@@ -1101,7 +1520,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "5e809c9b-be1a-4d9a-a4ba-9e47ae428303",
 			"name": "Users (users/global)",
 			"event": [
 				{
@@ -1148,7 +1566,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "f3604008-d734-4aad-a1de-690305c4f46c",
 			"name": "Users (users)",
 			"event": [
 				{
@@ -1188,7 +1605,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "60585559-c0c1-4361-b573-fd4ad27e0bf5",
 			"name": "Apps (apps)",
 			"event": [
 				{
@@ -1214,7 +1630,12 @@
 					]
 				},
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Origin",
+						"value": "{{SERVER}}"
+					}
+				],
 				"body": {},
 				"url": {
 					"raw": "{{SERVER}}apps?limit=20",
@@ -1232,7 +1653,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "e6bf373f-28c1-46b5-893f-d7f19d825235",
 			"name": "Apps (apps?filters)",
 			"event": [
 				{
@@ -1284,7 +1704,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "92e5bb88-ca09-4d75-afd4-f81ad994038e",
 			"name": "Apps (apps/overview)",
 			"event": [
 				{
@@ -1331,7 +1750,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "06835790-f5aa-4529-abeb-a6aca0c5e50b",
 			"name": "Apps (teams/:id/apps/overview)",
 			"event": [
 				{
@@ -1400,7 +1818,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "14875607-6861-406a-88c8-36f571c99a3e",
 			"name": "Apps (teams/:id/apps/info)",
 			"event": [
 				{
@@ -1469,7 +1886,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "75740075-b61e-432a-ad8c-44967602079e",
 			"name": "Apps (teams/:id/apps)",
 			"event": [
 				{
@@ -1529,7 +1945,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "01354aa7-9941-4b7b-9ebd-dc5ae2ee7214",
 			"name": "Apps (apps?token)",
 			"event": [
 				{
@@ -1588,7 +2003,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "33969c61-5556-480c-8082-295ba19e6f4e",
 			"name": "Apps (apps/:id)",
 			"request": {
 				"method": "GET",
@@ -1615,7 +2029,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "e902e4b3-18dc-4d80-aee7-39862ea1c813",
 			"name": "Apps (apps/:id/auth)",
 			"event": [
 				{
@@ -1675,7 +2088,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "8d2da579-5f84-497c-a1e3-62bbe1eb5f8e",
 			"name": "Apps (apps/:id/icon)",
 			"event": [
 				{
@@ -1720,7 +2132,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "9b9615bb-00f5-4175-bf37-fd28cbc9fa25",
 			"name": "Apps (apps/plist)",
 			"request": {
 				"method": "GET",
@@ -1753,7 +2164,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "745d8568-55e6-4ad1-9cce-de5d1327cb43",
 			"name": "Apps (apps/file)",
 			"request": {
 				"method": "GET",
@@ -1786,7 +2196,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "292a67b1-b559-4a07-8e34-eb941fbf475d",
 			"name": "Apps (apps/:id/tags)",
 			"request": {
 				"method": "GET",
@@ -1814,7 +2223,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "2415878a-525a-4679-acce-545730080cfc",
 			"name": "Apps (apps/:id)",
 			"request": {
 				"method": "DELETE",
@@ -1841,7 +2249,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "74db3d19-c8f1-48a5-a6c5-8b25877e2713",
 			"name": "Upload keys (keys)",
 			"request": {
 				"method": "GET",
@@ -1865,7 +2272,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "896e5ec2-68e8-466f-9d4e-fdba48bb8932",
 			"name": "Upload keys (apps/:id/keys)",
 			"request": {
 				"method": "GET",
@@ -1893,7 +2299,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "c318dd4a-7371-46f7-b535-5137dfa581c9",
 			"name": "Upload keys (keys/:id)",
 			"request": {
 				"method": "GET",
@@ -1920,7 +2325,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "75690b03-6520-4812-84db-05cc1b8e4731",
 			"name": "Upload keys (apps/:id/keys)",
 			"event": [
 				{
@@ -1987,7 +2391,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "a1e4c3d0-bf3d-4afc-912f-4798cbfbb49e",
 			"name": "Upload keys (keys/:id)",
 			"request": {
 				"method": "PUT",
@@ -2018,7 +2421,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "f96b2a8e-66ff-4bdd-8a07-c19eb48a9667",
 			"name": "Upload keys (keys/:id)",
 			"request": {
 				"method": "DELETE",
@@ -2045,7 +2447,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "b6346edf-49b0-43f2-bf83-c69c23f843ac",
 			"name": "Unknown URL",
 			"request": {
 				"method": "GET",
@@ -2061,7 +2462,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "21b13784-c3d9-4191-b97c-c2e40d456b4e",
 			"name": "Database info",
 			"request": {
 				"auth": {
@@ -2080,7 +2480,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "9ac1695d-24b5-4f80-a372-9d9449ddc4fd",
 			"name": "Settings (settings)",
 			"request": {
 				"auth": {
@@ -2099,7 +2498,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "f4fb98ca-bf40-4798-afed-59b0fc35aac4",
 			"name": "Settings (settings?plain)",
 			"request": {
 				"auth": {
@@ -2124,7 +2522,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "422e7e19-9ae2-40bf-a018-b72916a09db5",
 			"name": "Settings (settings)",
 			"event": [
 				{
@@ -2185,7 +2582,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "e5b41ecf-a01b-4212-8f2d-866115f6eaa7",
 			"name": "Settings (settings/:id)",
 			"request": {
 				"auth": {
@@ -2222,7 +2618,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "39764e9b-1525-4446-8af5-7505b86f5dae",
 			"name": "Settings (settings/:id)",
 			"request": {
 				"auth": {
@@ -2259,7 +2654,65 @@
 			"response": []
 		},
 		{
-			"_postman_id": "71bf41c6-2fc8-403b-8f05-95fe3b6f0803",
+			"name": "Server (server/favicon)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d36c4ce3-9694-467e-a8c5-b334c61820df",
+						"type": "text/javascript",
+						"exec": [
+							"// var jsonData = JSON.parse(responseBody);",
+							"",
+							"// // Status code",
+							"// tests[\"Status code is 201\"] = responseCode.code === 201;",
+							"",
+							"// // Token check",
+							"// tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
+							"// tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
+							"// tests[\"Key has a token\"] = (jsonData[\"config\"].length > 0)",
+							"",
+							"// postman.setEnvironmentVariable(\"TEST_SETTING_ID\", jsonData[\"id\"]);",
+							"",
+							"",
+							"// // Content type",
+							"// tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"// tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "{{SERVER}}server/favicon/",
+					"host": [
+						"{{SERVER}}server"
+					],
+					"path": [
+						"favicon",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Server (server/image)",
 			"event": [
 				{
@@ -2319,7 +2772,65 @@
 			"response": []
 		},
 		{
-			"_postman_id": "46d7a0eb-61af-4336-97d6-8560df2f957c",
+			"name": "Server (server/image/16)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d36c4ce3-9694-467e-a8c5-b334c61820df",
+						"type": "text/javascript",
+						"exec": [
+							"// var jsonData = JSON.parse(responseBody);",
+							"",
+							"// // Status code",
+							"// tests[\"Status code is 201\"] = responseCode.code === 201;",
+							"",
+							"// // Token check",
+							"// tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
+							"// tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
+							"// tests[\"Key has a token\"] = (jsonData[\"config\"].length > 0)",
+							"",
+							"// postman.setEnvironmentVariable(\"TEST_SETTING_ID\", jsonData[\"id\"]);",
+							"",
+							"",
+							"// // Content type",
+							"// tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"// tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "{{SERVER}}server/image/16",
+					"host": [
+						"{{SERVER}}server"
+					],
+					"path": [
+						"image",
+						"16"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Server (server/image/64)",
 			"event": [
 				{
@@ -2379,7 +2890,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "12b1f62b-ca2a-4dc1-ad42-ee9c882a5e5b",
 			"name": "Server (server/image/128)",
 			"event": [
 				{
@@ -2439,7 +2949,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "09afd946-e92f-4cdf-9d59-fc03baff60e0",
 			"name": "Server (server/image/192)",
 			"event": [
 				{
@@ -2499,7 +3008,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "33ccc43a-fac8-47b0-9a6a-714395103f15",
 			"name": "Server (server/image/256)",
 			"event": [
 				{
@@ -2559,7 +3067,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "4b03c617-07e2-40c6-97ad-647ad8dc64dc",
 			"name": "Server (server/image/512)",
 			"event": [
 				{
@@ -2619,7 +3126,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "f6eb7083-382b-4783-b5dd-2e13a26da107",
 			"name": "Server (server/image)",
 			"event": [
 				{
@@ -2678,7 +3184,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "497d6ac5-20a6-48d3-bbb9-5a0cd7d35e50",
 			"name": "Teapot",
 			"request": {
 				"auth": {
@@ -2697,7 +3202,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "4ac0b98b-59b2-4cb0-856c-b6902bbffa59",
 			"name": "Ping",
 			"request": {
 				"auth": {
@@ -2716,7 +3220,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "1479578f-dacf-4f14-bd4f-1e9350aab459",
 			"name": "Errors",
 			"request": {
 				"auth": {
@@ -2742,7 +3245,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "2e3e64a2-795e-468b-904a-ae453699f16b",
 			"name": "Info",
 			"request": {
 				"auth": {
