@@ -9,7 +9,6 @@ let package = Package(
         .package(url: "https://github.com/vapor/fluent-postgresql.git", from: "1.0.0-rc.4.1"),
         .package(url: "https://github.com/LiveUI/ApiCore.git", .branch("master")),
         .package(url: "https://github.com/LiveUI/BoostCore.git", .branch("master")),
-        .package(url: "https://github.com/LiveUI/DbCore.git", .branch("master")),
         .package(url: "https://github.com/LiveUI/VaporTestTools.git", from: "0.1.5")
     ],
     targets: [
@@ -26,7 +25,6 @@ let package = Package(
                 "Vapor",
                 "Fluent",
                 "FluentPostgreSQL",
-                "DbCore",
                 "ApiCore"
             ]
         ),
