@@ -729,6 +729,10 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Origin",
+						"value": "localhost"
 					}
 				],
 				"body": {
@@ -1593,7 +1597,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "    {\n        \"email\": \"rafaj@mangoweb.cz\",\n        \"username\": \"rafiki270\",\n        \"lastname\": \"Ondrej\",\n        \"firstname\": \"Rafaj\",\n        \"password\": \"aaaaaa\"\n    }"
+					"raw": "    {\n        \"email\": \"rafaj@liveui.io\",\n        \"username\": \"rafiki270\",\n        \"lastname\": \"Rafaj\",\n        \"firstname\": \"Ondrej\",\n        \"password\": \"aaaaaa\"\n    }"
 				},
 				"url": {
 					"raw": "{{SERVER}}users",
@@ -1732,7 +1736,7 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "{{SERVER}}apps/overview?limit=3",
+					"raw": "{{SERVER}}apps/overview?limit=3&from=0",
 					"host": [
 						"{{SERVER}}apps"
 					],
@@ -1743,6 +1747,10 @@
 						{
 							"key": "limit",
 							"value": "3"
+						},
+						{
+							"key": "from",
+							"value": "0"
 						}
 					]
 				}
@@ -2197,6 +2205,35 @@
 		},
 		{
 			"name": "Apps (apps/:id/tags)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8a8c7f89-3f8b-4a4c-acde-c95ca1175470",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"if (responseCode.code === 200) {",
+							"    // Token check",
+							"    tests[\"App has tags\"] = (jsonData.length > 0)",
+							"    tests[\"App has a tag with identifier\"] = (jsonData[0][\"identifier\"].length > 0)",
+							"    ",
+							"    postman.setEnvironmentVariable(\"TAG_ID\", jsonData[(jsonData.length - 1)][\"id\"]);",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						]
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [
@@ -2217,6 +2254,69 @@
 					"path": [
 						"{{APP_ID}}",
 						"tags"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apps (apps/:id/tags)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n\t\"new_tag_1\",\n\t\"new_tag_2\",\n\t\"new_tag_3\"\n]"
+				},
+				"url": {
+					"raw": "{{SERVER}}apps/{{APP_ID}}/tags",
+					"host": [
+						"{{SERVER}}apps"
+					],
+					"path": [
+						"{{APP_ID}}",
+						"tags"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apps (apps/:id/tags/:id)",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n\t\"new_tag_1\",\n\t\"new_tag_2\"\n]"
+				},
+				"url": {
+					"raw": "{{SERVER}}apps/{{APP_ID}}/tags/{{TAG_ID}}",
+					"host": [
+						"{{SERVER}}apps"
+					],
+					"path": [
+						"{{APP_ID}}",
+						"tags",
+						"{{TAG_ID}}"
 					]
 				}
 			},
@@ -2648,6 +2748,64 @@
 					],
 					"path": [
 						"{{TEST_SETTING_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Server (server/image)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d36c4ce3-9694-467e-a8c5-b334c61820df",
+						"type": "text/javascript",
+						"exec": [
+							"// var jsonData = JSON.parse(responseBody);",
+							"",
+							"// // Status code",
+							"// tests[\"Status code is 201\"] = responseCode.code === 201;",
+							"",
+							"// // Token check",
+							"// tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
+							"// tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
+							"// tests[\"Key has a token\"] = (jsonData[\"config\"].length > 0)",
+							"",
+							"// postman.setEnvironmentVariable(\"TEST_SETTING_ID\", jsonData[\"id\"]);",
+							"",
+							"",
+							"// // Content type",
+							"// tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"// tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "{{SERVER}}server/image",
+					"host": [
+						"{{SERVER}}server"
+					],
+					"path": [
+						"image"
 					]
 				}
 			},
@@ -3120,64 +3278,6 @@
 					"path": [
 						"image",
 						"512"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Server (server/image)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "d36c4ce3-9694-467e-a8c5-b334c61820df",
-						"type": "text/javascript",
-						"exec": [
-							"// var jsonData = JSON.parse(responseBody);",
-							"",
-							"// // Status code",
-							"// tests[\"Status code is 201\"] = responseCode.code === 201;",
-							"",
-							"// // Token check",
-							"// tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
-							"// tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
-							"// tests[\"Key has a token\"] = (jsonData[\"config\"].length > 0)",
-							"",
-							"// postman.setEnvironmentVariable(\"TEST_SETTING_ID\", jsonData[\"id\"]);",
-							"",
-							"",
-							"// // Content type",
-							"// tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"// tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
-						]
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{JWT_AUTH}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "file",
-					"file": {}
-				},
-				"url": {
-					"raw": "{{SERVER}}server/image",
-					"host": [
-						"{{SERVER}}server"
-					],
-					"path": [
-						"image"
 					]
 				}
 			},
