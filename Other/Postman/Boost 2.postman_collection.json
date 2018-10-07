@@ -630,13 +630,13 @@
 					"type": "basic",
 					"basic": [
 						{
-							"key": "username",
-							"value": "core@liveui.io",
+							"key": "password",
+							"value": "sup3rS3cr3t",
 							"type": "string"
 						},
 						{
-							"key": "password",
-							"value": "admin",
+							"key": "username",
+							"value": "core@liveui.io",
 							"type": "string"
 						}
 					]
@@ -737,7 +737,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"core@liveui.io\",\n  \"password\": \"admin\"\n}"
+					"raw": "{\n  \"email\": \"core@liveui.io\",\n  \"password\": \"sup3rS3cr3t\"\n}"
 				},
 				"url": {
 					"raw": "{{SERVER}}auth",
@@ -1831,7 +1831,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "7cdb43e8-605a-4109-b4d9-2018354f7e6b",
+						"id": "cd8a0b59-0286-49dc-8dd7-7d1859983d60",
 						"type": "text/javascript",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
@@ -1840,9 +1840,9 @@
 							"tests[\"Status code is 200\"] = responseCode.code === 200;",
 							"",
 							"// Token check",
-							"tests[\"App has an id\"] = (jsonData[\"id\"].length > 0)",
-							"tests[\"App has a name\"] = (jsonData[\"name\"].length > 0)",
-							"tests[\"App has an identifier\"] = (jsonData[\"identifier\"].length > 2)",
+							"tests[\"Team has an id\"] = (jsonData[\"teamId\"].length > 0)",
+							"tests[\"Team has apps property\"] = (jsonData[\"apps\"] >= 0)",
+							"tests[\"Team has builds property\"] = (jsonData[\"builds\"] >= 0)",
 							"",
 							"",
 							"// Content type",
@@ -2204,6 +2204,32 @@
 			"response": []
 		},
 		{
+			"name": "Apps (apps/:id)",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}apps/{{APP_ID}}",
+					"host": [
+						"{{SERVER}}apps"
+					],
+					"path": [
+						"{{APP_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Apps (apps/:id/tags)",
 			"event": [
 				{
@@ -2317,32 +2343,6 @@
 						"{{APP_ID}}",
 						"tags",
 						"{{TAG_ID}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Apps (apps/:id)",
-			"request": {
-				"method": "DELETE",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{SERVER}}apps/{{APP_ID}}",
-					"host": [
-						"{{SERVER}}apps"
-					],
-					"path": [
-						"{{APP_ID}}"
 					]
 				}
 			},
