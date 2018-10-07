@@ -2372,7 +2372,7 @@
 			"response": []
 		},
 		{
-			"name": "Upload keys (apps/:id/keys)",
+			"name": "Upload keys (teams/:id/keys)",
 			"request": {
 				"method": "GET",
 				"header": [
@@ -2425,7 +2425,7 @@
 			"response": []
 		},
 		{
-			"name": "Upload keys (apps/:id/keys)",
+			"name": "Upload keys (teams/:id/keys)",
 			"event": [
 				{
 					"listen": "test",
