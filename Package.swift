@@ -19,16 +19,7 @@ let package = Package(
                 "BoostCore"
             ]
         ),
-        .target(
-            name: "BumpUpCore",
-            dependencies: [
-                "Vapor",
-                "Fluent",
-                "FluentPostgreSQL",
-                "ApiCore"
-            ]
-        ),
-        .target(name: "Run", dependencies: [
+       .target(name: "Run", dependencies: [
             "App"
             ]
         ),

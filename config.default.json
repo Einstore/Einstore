@@ -1,4 +1,12 @@
 {
+	"general": {
+		"single_team": false
+	},
+	"auth": {
+		"allow_registrations": true,
+		"allow_invitations": true,
+		"registration_domains": []
+	},
 	"server": {
 		"name": "Booster!",
 		"url": "http://localhost:8080",
@@ -14,6 +22,7 @@
 		"logging": true
 	},
 	"mail": {
+		"email": "admin@boost",
 		"mailgun": {
 			"domain": "sandbox-domain.mailgun.org",
 			"key": "secret-key"
@@ -28,8 +37,10 @@
 			"bucket": "",
 			"access_key": "",
 			"secret_key": "",
-			"region": "eu-west-2",
+			"region": "us-east-1",
 			"security_token": null
-		}
+		},
+		"root_temp_path": "temp",
+		"app_destination_path": "apps"
 	}
-}
+}	
