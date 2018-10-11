@@ -6,7 +6,7 @@
         "repositoryURL": "https://github.com/LiveUI/ApiCore.git",
         "state": {
           "branch": "master",
-          "revision": "dc20ad180d022b646fa9ff2b8f815146fa077030",
+          "revision": "ad860cb2ce7b185300a0ea953a0f9ba7e0f8f551",
           "version": null
         }
       },
@@ -42,7 +42,7 @@
         "repositoryURL": "https://github.com/LiveUI/BoostCore.git",
         "state": {
           "branch": "master",
-          "revision": "0766c25d001c0a6d8b6860711f9724190ef6d9e7",
+          "revision": "09f3e406b2d5e22178d755e7e3941136726df0d1",
           "version": null
         }
       },
@@ -114,8 +114,8 @@
         "repositoryURL": "https://github.com/vapor/fluent.git",
         "state": {
           "branch": null,
-          "revision": "270b6fa372f03809b9795e8f8b9d1c31267a0ff3",
-          "version": "3.0.0"
+          "revision": "413a975c18ae2c1e4af179cef1c5dcdb87ca4603",
+          "version": "3.0.1"
         }
       },
       {

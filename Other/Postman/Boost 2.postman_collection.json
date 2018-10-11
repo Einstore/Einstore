@@ -1615,10 +1615,10 @@
 					"listen": "prerequest",
 					"script": {
 						"id": "f1a88013-f86e-409e-b4b8-07c974a4031a",
-						"type": "text/javascript",
 						"exec": [
 							"eval(pm.environment.get(\"func:authorize\"));"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -1642,14 +1642,14 @@
 				],
 				"body": {},
 				"url": {
-					"raw": "{{SERVER}}apps?limit=20",
+					"raw": "{{SERVER}}apps?limit=10",
 					"host": [
 						"{{SERVER}}apps"
 					],
 					"query": [
 						{
 							"key": "limit",
-							"value": "20"
+							"value": "10"
 						}
 					]
 				}
@@ -1959,7 +1959,6 @@
 					"listen": "test",
 					"script": {
 						"id": "e5df00c9-6382-47b9-98ce-f2fc1870ff1b",
-						"type": "text/javascript",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"",
@@ -1977,7 +1976,8 @@
 							"// Content type",
 							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
 							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -2142,6 +2142,9 @@
 		{
 			"name": "Apps (apps/plist)",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "GET",
 				"header": [
 					{
@@ -2174,13 +2177,11 @@
 		{
 			"name": "Apps (apps/file)",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
-					}
-				],
+				"header": [],
 				"body": {
 					"mode": "raw",
 					"raw": ""
