@@ -57,7 +57,7 @@ To install on Heroku please press the button and follow the instructions:
 - [x] Upload, process and install Android app
 - [ ] Search apps by it's tags, name, platform and bundle Id
 - [ ] Integrated web client (web interface)
-- [ ] Basic emails (forgotten password, registration, invitation)
+- [x] Basic emails (forgotten password, registration, invitation)
 
 
 #### Phase 2
