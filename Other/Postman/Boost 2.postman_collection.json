@@ -79,33 +79,7 @@
 			"response": []
 		},
 		{
-			"name": "Re-Install",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"email\": \"admin@liveui.io\",\n  \"password\": \"password123\"\n}"
-				},
-				"url": {
-					"raw": "{{SERVER}}reinstall",
-					"host": [
-						"{{SERVER}}reinstall"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Un-Install",
+			"name": "Uninstall",
 			"request": {
 				"auth": {
 					"type": "noauth"
@@ -131,7 +105,7 @@
 			"response": []
 		},
 		{
-			"name": "Recovery (START)",
+			"name": "Password recovery (START)",
 			"event": [
 				{
 					"listen": "test",
@@ -209,7 +183,7 @@
 			"response": []
 		},
 		{
-			"name": "Recovery (INPUT)",
+			"name": "Password recovery (INPUT)",
 			"event": [
 				{
 					"listen": "test",
@@ -301,99 +275,7 @@
 			"response": []
 		},
 		{
-			"name": "Recovery (FINISH)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "0a4fca42-18ee-49ac-bbe5-0fdca7102e0a",
-						"type": "text/javascript",
-						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"",
-							"// Status code",
-							"tests[\"Status code is 200\"] = responseCode.code === 200;",
-							"",
-							"// Token check",
-							"tests[\"Token has an id\"] = (jsonData[\"id\"].length > 10)",
-							"tests[\"Token has a user\"] = (jsonData[\"user\"][\"id\"].length > 10)",
-							"tests[\"Token has a token\"] = (jsonData[\"token\"].length > 10)",
-							"tests[\"Token has expires\"] = (jsonData[\"expires\"] > 543533823)",
-							"",
-							"postman.setEnvironmentVariable(\"AUTH_TOKEN\", jsonData[\"token\"]);",
-							"",
-							"// JWT",
-							"var jwtAuthExists = responseHeaders.hasOwnProperty(\"Authorization\") || responseHeaders.hasOwnProperty(\"authorization\");",
-							"tests[\"JWT Token is present\"] = jwtAuthExists;",
-							"",
-							"if (jwtAuthExists) {",
-							"    var a = responseHeaders[\"Authorization\"] || responseHeaders[\"authorization\"];",
-							"    tests[\"JWT token has a bearer\"] = a.has(\"Bearer \");",
-							"    tests[\"JWT token has a value\"] = (a.length > 15);",
-							"    postman.setEnvironmentVariable(\"JWT_AUTH\", a.substring(7));",
-							"}",
-							"",
-							"// Content type",
-							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
-						]
-					}
-				},
-				{
-					"listen": "prerequest",
-					"script": {
-						"id": "0d43ff69-0ee0-44f2-b2f1-f0a273c92a0b",
-						"type": "text/javascript",
-						"exec": [
-							"var authorize = 'var server = pm.environment.get(\"SERVER\");\\",
-							"var token = pm.environment.get(\"AUTH_TOKEN\");\\",
-							"pm.sendRequest({\\",
-							"    url: server + \"token\",\\",
-							"    method: \"GET\",\\",
-							"    header: \"Authorization:Token \" + token\\",
-							"}, function (err, response) {\\",
-							"    console.log(response.headers);\\",
-							"    if (response) {\\",
-							"        var a = response.headers.get(\"authorization\").substring(7);\\",
-							"        pm.environment.set(\"JWT_AUTH\", a);\\",
-							"    }\\",
-							"});';",
-							"",
-							"pm.environment.set(\"func:authorize\", authorize);"
-						]
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"email\": \"admin@liveui.io\",\n  \"password\": \"password123\"\n}"
-				},
-				"url": {
-					"raw": "{{SERVER}}auth/finish-recovery?token={{RECOVERY_TOKEN}}",
-					"host": [
-						"{{SERVER}}auth"
-					],
-					"path": [
-						"finish-recovery"
-					],
-					"query": [
-						{
-							"key": "token",
-							"value": "{{RECOVERY_TOKEN}}"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Recovery (FINISH)",
+			"name": "Password recovery (FINISH)",
 			"event": [
 				{
 					"listen": "test",
@@ -568,7 +450,6 @@
 					"listen": "test",
 					"script": {
 						"id": "0a4fca42-18ee-49ac-bbe5-0fdca7102e0a",
-						"type": "text/javascript",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"",
@@ -579,7 +460,7 @@
 							"tests[\"Token has an id\"] = (jsonData[\"id\"].length > 10)",
 							"tests[\"Token has a user\"] = (jsonData[\"user\"][\"id\"].length > 10)",
 							"tests[\"Token has a token\"] = (jsonData[\"token\"].length > 10)",
-							"tests[\"Token has expires\"] = (jsonData[\"expires\"] > 543533823)",
+							"tests[\"Token has expires\"] = (jsonData[\"expires\"].length > 10)",
 							"",
 							"postman.setEnvironmentVariable(\"AUTH_TOKEN\", jsonData[\"token\"]);",
 							"",
@@ -597,14 +478,14 @@
 							"// Content type",
 							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
 							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
-						]
+						],
+						"type": "text/javascript"
 					}
 				},
 				{
 					"listen": "prerequest",
 					"script": {
 						"id": "0d43ff69-0ee0-44f2-b2f1-f0a273c92a0b",
-						"type": "text/javascript",
 						"exec": [
 							"var authorize = 'var server = pm.environment.get(\"SERVER\");\\",
 							"var token = pm.environment.get(\"AUTH_TOKEN\");\\",
@@ -621,7 +502,8 @@
 							"});';",
 							"",
 							"pm.environment.set(\"func:authorize\", authorize);"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -926,7 +808,6 @@
 					"listen": "test",
 					"script": {
 						"id": "50c4544a-37b5-4294-9dbe-c06e3fe7e21b",
-						"type": "text/javascript",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"",
@@ -947,17 +828,18 @@
 							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
 							"",
 							""
-						]
+						],
+						"type": "text/javascript"
 					}
 				},
 				{
 					"listen": "prerequest",
 					"script": {
 						"id": "56d344a5-51cb-4ee9-8641-250a8cfc94dd",
-						"type": "text/javascript",
 						"exec": [
 							"eval(pm.environment.get(\"func:authorize\"));"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -1041,13 +923,12 @@
 			"response": []
 		},
 		{
-			"name": "Teams (teams/:id)",
+			"name": "Teams (teams/:id/icon)",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"id": "81cd4170-4a0e-4db5-90b4-fd3cf82170a1",
-						"type": "text/javascript",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"",
@@ -1066,17 +947,93 @@
 							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
 							"",
 							""
-						]
+						],
+						"type": "text/javascript"
 					}
 				},
 				{
 					"listen": "prerequest",
 					"script": {
 						"id": "19a1abfc-56ea-4447-8d56-05b2b7906765",
-						"type": "text/javascript",
 						"exec": [
 							"eval(pm.environment.get(\"func:authorize\"));"
-						]
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}",
+						"icon"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Teams (teams/:id)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "81cd4170-4a0e-4db5-90b4-fd3cf82170a1",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"if (responseCode.code === 200) {",
+							"    // Token check",
+							"    tests[\"Team has an id\"] = (jsonData[\"id\"].length > 0)",
+							"    tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
+							"    tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "19a1abfc-56ea-4447-8d56-05b2b7906765",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -1109,6 +1066,687 @@
 					],
 					"path": [
 						"{{TEST_TEAM_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Teams (teams/:id/icon)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "81cd4170-4a0e-4db5-90b4-fd3cf82170a1",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"if (responseCode.code === 200) {",
+							"    // Token check",
+							"    tests[\"Team has an id\"] = (jsonData[\"id\"].length > 0)",
+							"    tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
+							"    tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "19a1abfc-56ea-4447-8d56-05b2b7906765",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}",
+						"icon"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Teams (teams/:id/favicon)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "81cd4170-4a0e-4db5-90b4-fd3cf82170a1",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"if (responseCode.code === 200) {",
+							"    // Token check",
+							"    tests[\"Team has an id\"] = (jsonData[\"id\"].length > 0)",
+							"    tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
+							"    tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "19a1abfc-56ea-4447-8d56-05b2b7906765",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/favicon",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}",
+						"favicon"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Teams (teams/:id/icon/16)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "81cd4170-4a0e-4db5-90b4-fd3cf82170a1",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"if (responseCode.code === 200) {",
+							"    // Token check",
+							"    tests[\"Team has an id\"] = (jsonData[\"id\"].length > 0)",
+							"    tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
+							"    tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "19a1abfc-56ea-4447-8d56-05b2b7906765",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon/16",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}",
+						"icon",
+						"16"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Teams (teams/:id/icon/64)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "81cd4170-4a0e-4db5-90b4-fd3cf82170a1",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"if (responseCode.code === 200) {",
+							"    // Token check",
+							"    tests[\"Team has an id\"] = (jsonData[\"id\"].length > 0)",
+							"    tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
+							"    tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "19a1abfc-56ea-4447-8d56-05b2b7906765",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon/64",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}",
+						"icon",
+						"64"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Teams (teams/:id/icon/128)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "81cd4170-4a0e-4db5-90b4-fd3cf82170a1",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"if (responseCode.code === 200) {",
+							"    // Token check",
+							"    tests[\"Team has an id\"] = (jsonData[\"id\"].length > 0)",
+							"    tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
+							"    tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "19a1abfc-56ea-4447-8d56-05b2b7906765",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon/128",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}",
+						"icon",
+						"128"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Teams (teams/:id/icon/192)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "81cd4170-4a0e-4db5-90b4-fd3cf82170a1",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"if (responseCode.code === 200) {",
+							"    // Token check",
+							"    tests[\"Team has an id\"] = (jsonData[\"id\"].length > 0)",
+							"    tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
+							"    tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "19a1abfc-56ea-4447-8d56-05b2b7906765",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon/256",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}",
+						"icon",
+						"256"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Teams (teams/:id/icon/256)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "81cd4170-4a0e-4db5-90b4-fd3cf82170a1",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"if (responseCode.code === 200) {",
+							"    // Token check",
+							"    tests[\"Team has an id\"] = (jsonData[\"id\"].length > 0)",
+							"    tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
+							"    tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "19a1abfc-56ea-4447-8d56-05b2b7906765",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon/256",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}",
+						"icon",
+						"256"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Teams (teams/:id/icon/512)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "81cd4170-4a0e-4db5-90b4-fd3cf82170a1",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"if (responseCode.code === 200) {",
+							"    // Token check",
+							"    tests[\"Team has an id\"] = (jsonData[\"id\"].length > 0)",
+							"    tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
+							"    tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "19a1abfc-56ea-4447-8d56-05b2b7906765",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon/512",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}",
+						"icon",
+						"512"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Teams (teams/:id/icon)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "81cd4170-4a0e-4db5-90b4-fd3cf82170a1",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"if (responseCode.code === 200) {",
+							"    // Token check",
+							"    tests[\"Team has an id\"] = (jsonData[\"id\"].length > 0)",
+							"    tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
+							"    tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "19a1abfc-56ea-4447-8d56-05b2b7906765",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}",
+						"icon"
 					]
 				}
 			},
@@ -1609,6 +2247,48 @@
 			"response": []
 		},
 		{
+			"name": "Invite user (users/invite)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "245c9eb5-1349-4660-8e3f-8a2e2ece34a5",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "    {\n        \"email\": \"rafaj@liveui.io\",\n        \"lastname\": \"Rafaj\",\n        \"firstname\": \"Ondrej\"\n    }"
+				},
+				"url": {
+					"raw": "{{SERVER}}users/invite",
+					"host": [
+						"{{SERVER}}users"
+					],
+					"path": [
+						"invite"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Apps (apps)",
 			"event": [
 				{
@@ -1714,10 +2394,10 @@
 					"listen": "prerequest",
 					"script": {
 						"id": "091247ec-a5f8-40a7-86f9-67f2f4912de9",
-						"type": "text/javascript",
 						"exec": [
 							"eval(pm.environment.get(\"func:authorize\"));"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -1764,33 +2444,27 @@
 					"listen": "test",
 					"script": {
 						"id": "7cdb43e8-605a-4109-b4d9-2018354f7e6b",
-						"type": "text/javascript",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"",
 							"// Status code",
 							"tests[\"Status code is 200\"] = responseCode.code === 200;",
 							"",
-							"// Token check",
-							"tests[\"App has an id\"] = (jsonData[\"id\"].length > 0)",
-							"tests[\"App has a name\"] = (jsonData[\"name\"].length > 0)",
-							"tests[\"App has an identifier\"] = (jsonData[\"identifier\"].length > 2)",
-							"",
-							"",
 							"// Content type",
 							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
 							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
-						]
+						],
+						"type": "text/javascript"
 					}
 				},
 				{
 					"listen": "prerequest",
 					"script": {
 						"id": "51d1f430-a5a1-45d2-9272-014852176c70",
-						"type": "text/javascript",
 						"exec": [
 							"eval(pm.environment.get(\"func:authorize\"));"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -2548,39 +3222,6 @@
 			"response": []
 		},
 		{
-			"name": "Unknown URL",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {},
-				"url": {
-					"raw": "{{SERVER}}unknown",
-					"host": [
-						"{{SERVER}}unknown"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Database info",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [],
-				"body": {},
-				"url": {
-					"raw": "{{SERVER}}tables",
-					"host": [
-						"{{SERVER}}tables"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Settings (settings)",
 			"request": {
 				"auth": {
@@ -3285,6 +3926,24 @@
 			"response": []
 		},
 		{
+			"name": "Database info",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{SERVER}}database",
+					"host": [
+						"{{SERVER}}database"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Teapot",
 			"request": {
 				"auth": {
@@ -3365,6 +4024,21 @@
 					"raw": "{{SERVER}}info",
 					"host": [
 						"{{SERVER}}info"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Unknown URL",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{SERVER}}unknown",
+					"host": [
+						"{{SERVER}}unknown"
 					]
 				}
 			},
