@@ -6,7 +6,7 @@
         "repositoryURL": "https://github.com/LiveUI/ApiCore.git",
         "state": {
           "branch": "master",
-          "revision": "7cf10703b9c4e7da904d6ad11c33c1e562841b24",
+          "revision": "1f4b0ebca68ba65d2d42dda93fd25139d35f0e9a",
           "version": null
         }
       },
@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/IBM-Swift/BlueCryptor.git",
         "state": {
           "branch": null,
-          "revision": "2bf9fd19e21cae84c8050623437562da083c501a",
-          "version": "1.0.16"
+          "revision": "0e6a217921e593192a749dee4cdcc85641ace3e5",
+          "version": "1.0.17"
         }
       },
       {
@@ -42,7 +42,7 @@
         "repositoryURL": "https://github.com/LiveUI/BoostCore.git",
         "state": {
           "branch": "master",
-          "revision": "d12db07be0fc458e8a7c94b561edc15b0baf1ea1",
+          "revision": "0836dae9fecce3f31b98f1ea8b39c6c1f773f821",
           "version": null
         }
       },
