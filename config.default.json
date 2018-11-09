@@ -10,7 +10,7 @@
 	"server": {
 		"name": "Booster!",
 		"url": "http://localhost:8080",
-		"max_upload": 50
+		"max_upload": 1500
 	},
 	"jwt_secret": "secret",
 	"database": {
