@@ -767,21 +767,47 @@
 			"response": []
 		},
 		{
-			"name": "Teams (teams)",
+			"name": "Teams (teams/check)",
 			"event": [
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "116dcf70-2c69-453a-a623-ab4762e9962b",
-						"type": "text/javascript",
+						"id": "dec41314-4b28-4144-b0ff-84ece146d04d",
 						"exec": [
 							"eval(pm.environment.get(\"func:authorize\"));"
-						]
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "abba48fc-1e64-423b-9763-45faad0dbaf2",
+						"exec": [
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
 			"request": {
-				"method": "GET",
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
 				"header": [
 					{
 						"key": "Content-Type",
@@ -790,12 +816,15 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+					"raw": "{\n  \"identifier\": \"admin\"\n}"
 				},
 				"url": {
-					"raw": "{{SERVER}}teams",
+					"raw": "{{SERVER}}teams/check",
 					"host": [
 						"{{SERVER}}teams"
+					],
+					"path": [
+						"check"
 					]
 				}
 			},
@@ -875,31 +904,37 @@
 			"response": []
 		},
 		{
-			"name": "Teams (teams/check)",
+			"name": "Teams (teams)",
 			"event": [
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "dec41314-4b28-4144-b0ff-84ece146d04d",
-						"type": "text/javascript",
+						"id": "116dcf70-2c69-453a-a623-ab4762e9962b",
 						"exec": [
 							"eval(pm.environment.get(\"func:authorize\"));"
-						]
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "0beebf1b-d76d-4678-8a3f-df0debb385d7",
+						"exec": [
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
 			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{JWT_AUTH}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
+				"method": "GET",
 				"header": [
 					{
 						"key": "Content-Type",
@@ -908,15 +943,12 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"identifier\": \"admin\"\n}"
+					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}teams/check",
+					"raw": "{{SERVER}}teams",
 					"host": [
 						"{{SERVER}}teams"
-					],
-					"path": [
-						"check"
 					]
 				}
 			},
@@ -930,17 +962,11 @@
 					"script": {
 						"id": "81cd4170-4a0e-4db5-90b4-fd3cf82170a1",
 						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"",
 							"// Status code",
-							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"tests[\"Status code is 204\"] = responseCode.code === 204;",
 							"",
-							"if (responseCode.code === 200) {",
-							"    // Token check",
-							"    tests[\"Team has an id\"] = (jsonData[\"id\"].length > 0)",
-							"    tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
-							"    tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
-							"}",
+							"// Empty content",
+							"tests[\"Content in not present\"] = responseBody.length === 0",
 							"",
 							"// Content type",
 							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
@@ -1079,23 +1105,13 @@
 					"script": {
 						"id": "81cd4170-4a0e-4db5-90b4-fd3cf82170a1",
 						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"",
 							"// Status code",
 							"tests[\"Status code is 200\"] = responseCode.code === 200;",
 							"",
-							"if (responseCode.code === 200) {",
-							"    // Token check",
-							"    tests[\"Team has an id\"] = (jsonData[\"id\"].length > 0)",
-							"    tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
-							"    tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
-							"}",
 							"",
 							"// Content type",
 							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
-							"",
-							""
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"image/png\");"
 						],
 						"type": "text/javascript"
 					}
@@ -1131,7 +1147,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon",
@@ -1154,23 +1170,13 @@
 					"script": {
 						"id": "81cd4170-4a0e-4db5-90b4-fd3cf82170a1",
 						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"",
 							"// Status code",
 							"tests[\"Status code is 200\"] = responseCode.code === 200;",
 							"",
-							"if (responseCode.code === 200) {",
-							"    // Token check",
-							"    tests[\"Team has an id\"] = (jsonData[\"id\"].length > 0)",
-							"    tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
-							"    tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
-							"}",
 							"",
 							"// Content type",
 							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
-							"",
-							""
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"image/png\");"
 						],
 						"type": "text/javascript"
 					}
@@ -1206,7 +1212,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/favicon",
@@ -1229,23 +1235,13 @@
 					"script": {
 						"id": "81cd4170-4a0e-4db5-90b4-fd3cf82170a1",
 						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"",
 							"// Status code",
 							"tests[\"Status code is 200\"] = responseCode.code === 200;",
 							"",
-							"if (responseCode.code === 200) {",
-							"    // Token check",
-							"    tests[\"Team has an id\"] = (jsonData[\"id\"].length > 0)",
-							"    tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
-							"    tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
-							"}",
 							"",
 							"// Content type",
 							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
-							"",
-							""
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"image/png\");"
 						],
 						"type": "text/javascript"
 					}
@@ -1281,7 +1277,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon/16",
@@ -1305,23 +1301,13 @@
 					"script": {
 						"id": "81cd4170-4a0e-4db5-90b4-fd3cf82170a1",
 						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"",
 							"// Status code",
 							"tests[\"Status code is 200\"] = responseCode.code === 200;",
 							"",
-							"if (responseCode.code === 200) {",
-							"    // Token check",
-							"    tests[\"Team has an id\"] = (jsonData[\"id\"].length > 0)",
-							"    tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
-							"    tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
-							"}",
 							"",
 							"// Content type",
 							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
-							"",
-							""
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"image/png\");"
 						],
 						"type": "text/javascript"
 					}
@@ -1357,7 +1343,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon/64",
@@ -1381,23 +1367,13 @@
 					"script": {
 						"id": "81cd4170-4a0e-4db5-90b4-fd3cf82170a1",
 						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"",
 							"// Status code",
 							"tests[\"Status code is 200\"] = responseCode.code === 200;",
 							"",
-							"if (responseCode.code === 200) {",
-							"    // Token check",
-							"    tests[\"Team has an id\"] = (jsonData[\"id\"].length > 0)",
-							"    tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
-							"    tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
-							"}",
 							"",
 							"// Content type",
 							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
-							"",
-							""
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"image/png\");"
 						],
 						"type": "text/javascript"
 					}
@@ -1433,7 +1409,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon/128",
@@ -1457,23 +1433,13 @@
 					"script": {
 						"id": "81cd4170-4a0e-4db5-90b4-fd3cf82170a1",
 						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"",
 							"// Status code",
 							"tests[\"Status code is 200\"] = responseCode.code === 200;",
 							"",
-							"if (responseCode.code === 200) {",
-							"    // Token check",
-							"    tests[\"Team has an id\"] = (jsonData[\"id\"].length > 0)",
-							"    tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
-							"    tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
-							"}",
 							"",
 							"// Content type",
 							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
-							"",
-							""
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"image/png\");"
 						],
 						"type": "text/javascript"
 					}
@@ -1509,17 +1475,17 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon/256",
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon/192",
 					"host": [
 						"{{SERVER}}teams"
 					],
 					"path": [
 						"{{TEST_TEAM_ID}}",
 						"icon",
-						"256"
+						"192"
 					]
 				}
 			},
@@ -1533,23 +1499,13 @@
 					"script": {
 						"id": "81cd4170-4a0e-4db5-90b4-fd3cf82170a1",
 						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"",
 							"// Status code",
 							"tests[\"Status code is 200\"] = responseCode.code === 200;",
 							"",
-							"if (responseCode.code === 200) {",
-							"    // Token check",
-							"    tests[\"Team has an id\"] = (jsonData[\"id\"].length > 0)",
-							"    tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
-							"    tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
-							"}",
 							"",
 							"// Content type",
 							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
-							"",
-							""
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"image/png\");"
 						],
 						"type": "text/javascript"
 					}
@@ -1585,7 +1541,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon/256",
@@ -1609,23 +1565,13 @@
 					"script": {
 						"id": "81cd4170-4a0e-4db5-90b4-fd3cf82170a1",
 						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"",
 							"// Status code",
 							"tests[\"Status code is 200\"] = responseCode.code === 200;",
 							"",
-							"if (responseCode.code === 200) {",
-							"    // Token check",
-							"    tests[\"Team has an id\"] = (jsonData[\"id\"].length > 0)",
-							"    tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
-							"    tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
-							"}",
 							"",
 							"// Content type",
 							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
-							"",
-							""
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"image/png\");"
 						],
 						"type": "text/javascript"
 					}
@@ -1661,7 +1607,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon/512",
@@ -3402,25 +3348,18 @@
 					"listen": "test",
 					"script": {
 						"id": "d36c4ce3-9694-467e-a8c5-b334c61820df",
-						"type": "text/javascript",
 						"exec": [
-							"// var jsonData = JSON.parse(responseBody);",
+							"// Status code",
+							"tests[\"Status code is 201\"] = responseCode.code === 204;",
 							"",
-							"// // Status code",
-							"// tests[\"Status code is 201\"] = responseCode.code === 201;",
+							"// Empty content",
+							"tests[\"Content in not present\"] = responseBody.length === 0",
 							"",
-							"// // Token check",
-							"// tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
-							"// tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
-							"// tests[\"Key has a token\"] = (jsonData[\"config\"].length > 0)",
-							"",
-							"// postman.setEnvironmentVariable(\"TEST_SETTING_ID\", jsonData[\"id\"]);",
-							"",
-							"",
-							"// // Content type",
-							"// tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"// tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
-						]
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -3460,25 +3399,16 @@
 					"listen": "test",
 					"script": {
 						"id": "d36c4ce3-9694-467e-a8c5-b334c61820df",
-						"type": "text/javascript",
 						"exec": [
-							"// var jsonData = JSON.parse(responseBody);",
-							"",
-							"// // Status code",
-							"// tests[\"Status code is 201\"] = responseCode.code === 201;",
-							"",
-							"// // Token check",
-							"// tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
-							"// tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
-							"// tests[\"Key has a token\"] = (jsonData[\"config\"].length > 0)",
-							"",
-							"// postman.setEnvironmentVariable(\"TEST_SETTING_ID\", jsonData[\"id\"]);",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
 							"",
 							"",
-							"// // Content type",
-							"// tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"// tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
-						]
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"image/png\");"
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -3496,8 +3426,8 @@
 				"method": "GET",
 				"header": [],
 				"body": {
-					"mode": "file",
-					"file": {}
+					"mode": "raw",
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}server/favicon/",
@@ -3519,25 +3449,16 @@
 					"listen": "test",
 					"script": {
 						"id": "d36c4ce3-9694-467e-a8c5-b334c61820df",
-						"type": "text/javascript",
 						"exec": [
-							"// var jsonData = JSON.parse(responseBody);",
-							"",
-							"// // Status code",
-							"// tests[\"Status code is 201\"] = responseCode.code === 201;",
-							"",
-							"// // Token check",
-							"// tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
-							"// tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
-							"// tests[\"Key has a token\"] = (jsonData[\"config\"].length > 0)",
-							"",
-							"// postman.setEnvironmentVariable(\"TEST_SETTING_ID\", jsonData[\"id\"]);",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
 							"",
 							"",
-							"// // Content type",
-							"// tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"// tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
-						]
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"image/png\");"
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -3555,8 +3476,8 @@
 				"method": "GET",
 				"header": [],
 				"body": {
-					"mode": "file",
-					"file": {}
+					"mode": "raw",
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}server/image/",
@@ -3578,25 +3499,16 @@
 					"listen": "test",
 					"script": {
 						"id": "d36c4ce3-9694-467e-a8c5-b334c61820df",
-						"type": "text/javascript",
 						"exec": [
-							"// var jsonData = JSON.parse(responseBody);",
-							"",
-							"// // Status code",
-							"// tests[\"Status code is 201\"] = responseCode.code === 201;",
-							"",
-							"// // Token check",
-							"// tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
-							"// tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
-							"// tests[\"Key has a token\"] = (jsonData[\"config\"].length > 0)",
-							"",
-							"// postman.setEnvironmentVariable(\"TEST_SETTING_ID\", jsonData[\"id\"]);",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
 							"",
 							"",
-							"// // Content type",
-							"// tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"// tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
-						]
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"image/png\");"
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -3614,8 +3526,8 @@
 				"method": "GET",
 				"header": [],
 				"body": {
-					"mode": "file",
-					"file": {}
+					"mode": "raw",
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}server/image/16",
@@ -3637,25 +3549,16 @@
 					"listen": "test",
 					"script": {
 						"id": "d36c4ce3-9694-467e-a8c5-b334c61820df",
-						"type": "text/javascript",
 						"exec": [
-							"// var jsonData = JSON.parse(responseBody);",
-							"",
-							"// // Status code",
-							"// tests[\"Status code is 201\"] = responseCode.code === 201;",
-							"",
-							"// // Token check",
-							"// tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
-							"// tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
-							"// tests[\"Key has a token\"] = (jsonData[\"config\"].length > 0)",
-							"",
-							"// postman.setEnvironmentVariable(\"TEST_SETTING_ID\", jsonData[\"id\"]);",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
 							"",
 							"",
-							"// // Content type",
-							"// tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"// tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
-						]
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"image/png\");"
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -3673,8 +3576,8 @@
 				"method": "GET",
 				"header": [],
 				"body": {
-					"mode": "file",
-					"file": {}
+					"mode": "raw",
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}server/image/64",
@@ -3696,25 +3599,16 @@
 					"listen": "test",
 					"script": {
 						"id": "d36c4ce3-9694-467e-a8c5-b334c61820df",
-						"type": "text/javascript",
 						"exec": [
-							"// var jsonData = JSON.parse(responseBody);",
-							"",
-							"// // Status code",
-							"// tests[\"Status code is 201\"] = responseCode.code === 201;",
-							"",
-							"// // Token check",
-							"// tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
-							"// tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
-							"// tests[\"Key has a token\"] = (jsonData[\"config\"].length > 0)",
-							"",
-							"// postman.setEnvironmentVariable(\"TEST_SETTING_ID\", jsonData[\"id\"]);",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
 							"",
 							"",
-							"// // Content type",
-							"// tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"// tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
-						]
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"image/png\");"
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -3732,8 +3626,8 @@
 				"method": "GET",
 				"header": [],
 				"body": {
-					"mode": "file",
-					"file": {}
+					"mode": "raw",
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}server/image/128",
@@ -3814,25 +3708,16 @@
 					"listen": "test",
 					"script": {
 						"id": "d36c4ce3-9694-467e-a8c5-b334c61820df",
-						"type": "text/javascript",
 						"exec": [
-							"// var jsonData = JSON.parse(responseBody);",
-							"",
-							"// // Status code",
-							"// tests[\"Status code is 201\"] = responseCode.code === 201;",
-							"",
-							"// // Token check",
-							"// tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
-							"// tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
-							"// tests[\"Key has a token\"] = (jsonData[\"config\"].length > 0)",
-							"",
-							"// postman.setEnvironmentVariable(\"TEST_SETTING_ID\", jsonData[\"id\"]);",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
 							"",
 							"",
-							"// // Content type",
-							"// tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"// tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
-						]
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"image/png\");"
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -3850,8 +3735,8 @@
 				"method": "GET",
 				"header": [],
 				"body": {
-					"mode": "file",
-					"file": {}
+					"mode": "raw",
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}server/image/256",
@@ -3873,25 +3758,16 @@
 					"listen": "test",
 					"script": {
 						"id": "d36c4ce3-9694-467e-a8c5-b334c61820df",
-						"type": "text/javascript",
 						"exec": [
-							"// var jsonData = JSON.parse(responseBody);",
-							"",
-							"// // Status code",
-							"// tests[\"Status code is 201\"] = responseCode.code === 201;",
-							"",
-							"// // Token check",
-							"// tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
-							"// tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
-							"// tests[\"Key has a token\"] = (jsonData[\"config\"].length > 0)",
-							"",
-							"// postman.setEnvironmentVariable(\"TEST_SETTING_ID\", jsonData[\"id\"]);",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
 							"",
 							"",
-							"// // Content type",
-							"// tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"// tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
-						]
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"image/png\");"
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -3909,8 +3785,8 @@
 				"method": "GET",
 				"header": [],
 				"body": {
-					"mode": "file",
-					"file": {}
+					"mode": "raw",
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}server/image/512",
