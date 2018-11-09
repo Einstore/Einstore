@@ -2,7 +2,7 @@ FROM swift:4.1
 
 RUN \
     apt-get update && \
-    apt-get install -y python python-dev python-pip python-virtualenv unzip libgd-dev openssl && \
+    apt-get install -y python python-dev python-pip python-virtualenv unzip libgd-dev openssl libssl-dev && \
     rm -rf /var/lib/apt/lists/*
 
 RUN \
