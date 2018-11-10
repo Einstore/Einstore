@@ -1,6 +1,6 @@
 REPO = liveui
 IMAGE = boost-base
-TAG = 1.1.3
+TAG = 1.2.0
 
 build:
 	docker build -t $(REPO)/$(IMAGE):$(TAG) .
