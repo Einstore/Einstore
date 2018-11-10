@@ -1,36 +1,54 @@
-version: '3.1'
-
+version: "3.2"
 services:
-    web:
-        build: .
-        ports:
-            - "8080:8080"
-        volumes:
-            - .:/tmp
-        environment:
-            apicore.server.name: Booster
-            apicore.database.host: db
-            apicore.database.user: boost
-            apicore.database.password: aaaaaa
-            apicore.database.database: boost
-            apicore.database.port: 5432
-            apicore.jwt_secret: secret
-            apicore.storage.s3.enabled: 0
-            apicore.storage.local.root: /home/Boost
-        depends_on:
-            - "db"
-        command: ["./wait-for-it.sh", "db:5432", "--", "./boost", "serve", "--hostname", "0.0.0.0", "--port", "8080"]
-    db:
-        image: postgres
-        restart: always
-        environment:
-            POSTGRES_USER: boost
-            POSTGRES_PASSWORD: aaaaaa
-            POSTGRES_DB: boost
-    adminer:
-        image: adminer
-        restart: always
-        ports:
-            - 8081:8080
-        depends_on:
-            - "db"
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: boost
+      POSTGRES_PASSWORD: aaaaaa
+      POSTGRES_DB: boost
+
+  # database admin UI. You can remove this
+  adminer:
+    image: adminer
+    restart: always
+    depends_on:
+      - "db"
+
+  api:
+    image: liveui/boost:latest
+    restart: always
+    depends_on:
+      - "db"
+    volumes:
+      - ./docker-volume/tmp:/tmp
+      - ./docker-volume/home/Boost:/home/Boost
+    environment:
+      apicore.server.name: Booster
+      apicore.server.url: 'http://localhost:8000'
+      apicore.server.path_prefix: 'api'
+      apicore.database.host: db
+      apicore.database.user: boost
+      apicore.database.password: aaaaaa
+      apicore.database.database: boost
+      apicore.database.port: 5432
+      apicore.jwt_secret: secret
+      apicore.storage.s3.enabled: 0
+      apicore.storage.local.root: /home/Boost
+    command: ["./wait-for-it.sh", "db:5432", "--", "./boost", "serve", "--hostname", "0.0.0.0", "--port", "8080"]
+
+  admin-ui:
+    image: nginx
+    restart: always
+    depends_on:
+      - "adminer"
+      - "api"
+    volumes:
+      - ./utils/site.template:/etc/nginx/conf.d/site.template
+      - ./admin/build:/var/www/public
+    ports:
+      - "8000:80"
+    environment:
+      - NGINX_PORT=80
+    command: /bin/bash -c "envsubst < /etc/nginx/conf.d/site.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"

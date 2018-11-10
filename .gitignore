@@ -15,3 +15,6 @@ DerivedData/
 # End of https://www.gitignore.io/api/vapor
 /tmp
 /Boost.xcodeproj
+
+# Docker storage
+/docker-volume/
