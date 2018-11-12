@@ -19,7 +19,7 @@ Boost is an enterprise mobile app distribution platform. Boost has been made ori
 
 ## Test run
 
-If you have Docker installed. You can easily try Boost. Just clone this repo, and run `docker-compose up`. You should initialize database by visiting `/api/install` when you first run the project.
+You can easily try Boost if you have Docker installed. Just clone this repo and run `docker-compose up`. You should initialize database by visiting `/api/install` when you first run the project.
 
 ```shell
 git clone git@github.com:LiveUI/Boost.git
@@ -31,7 +31,7 @@ docker-compose up
 
 ### Reverse proxy
 
-You can serve on your custom domain (possibly with HTTPS enabled). You can change port of running app (default is `8000`) by setting env variable `BOOST_POST`. And set the final URL, so the App can generate correct links by setting `BOOST_BASE_URL`.
+You can serve on your custom domain (possibly with HTTPS enabled). You can change port of running app (default is `8000`) by setting env variable `BOOST_POST` and set the final URL so the App can generate correct links by setting `BOOST_BASE_URL`.
 
 ```shell
 # Expecting running reverse proxy from https://testing-boost.com => http://localhost:1234
