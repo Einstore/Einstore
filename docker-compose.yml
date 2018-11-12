@@ -26,7 +26,7 @@ services:
       - ./docker-volume/home/Boost:/home/Boost
     environment:
       apicore.server.name: Booster
-      apicore.server.url: 'http://localhost:8000'
+      apicore.server.url: ${BOOST_BASE_URL:-http://localhost:8000}
       apicore.server.path_prefix: 'api'
       apicore.database.host: db
       apicore.database.user: boost
@@ -48,7 +48,7 @@ services:
       - ./utils/site.template:/etc/nginx/conf.d/site.template
       - ./admin/build:/var/www/public
     ports:
-      - "8000:80"
+      - "${BOOST_PORT:-8000}:80"
     environment:
       - NGINX_PORT=80
     command: /bin/bash -c "envsubst < /etc/nginx/conf.d/site.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"

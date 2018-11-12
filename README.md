@@ -17,6 +17,27 @@
 
 Boost is an enterprise mobile app distribution platform. Boost has been made originally to help us distribute mobile apps to our clients on our own platform but eventually we have decided to share our baby with the world. Let’s see what it will grow into!
 
+## Test run
+
+If you have Docker installed. You can easily try Boost. Just clone this repo, and run `docker-compose up`. You should initialize database by visiting `/api/install` when you first run the project.
+
+```shell
+git clone git@github.com:LiveUI/Boost.git
+cd Boost
+
+# run on http://localhost:8000
+docker-compose up
+```
+
+### Reverse proxy
+
+You can serve on your custom domain (possibly with HTTPS enabled). You can change port of running app (default is `8000`) by setting env variable `BOOST_POST`. And set the final URL, so the App can generate correct links by setting `BOOST_BASE_URL`.
+
+```shell
+# Expecting running reverse proxy from https://testing-boost.com => http://localhost:1234
+BOOST_PORT=1234 BOOST_BASE_URL=https://testing-boost.com docker-compose up
+```
+
 ## Main dependencies
 
 * [BoostCore](https://github.com/LiveUI/BoostCore/) - AppStore core module
