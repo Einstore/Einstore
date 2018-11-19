@@ -31,7 +31,7 @@ docker-compose up
 
 ### Reverse proxy
 
-You can serve on your custom domain (possibly with HTTPS enabled). You can change port of running app (default is `8000`) by setting env variable `BOOST_POST` and set the final URL so the App can generate correct links by setting `BOOST_BASE_URL`.
+To serve Boost on your custom domain (Boost needs HTTPS enabled in order to serve iOS applications). You can change port of running app (default is `8000`) by setting env variable `BOOST_PORT` and set the final URL so the App generates correct download links when you set `BOOST_BASE_URL`, default value is `http://localhost:8080.
 
 ```shell
 # Expecting running reverse proxy from https://testing-boost.com => http://localhost:1234
@@ -50,7 +50,7 @@ BOOST_PORT=1234 BOOST_BASE_URL=https://testing-boost.com docker-compose up
 
 The main documentation for boost can be found in our [GitHub.com Wiki](https://github.com/LiveUI/Boost/wiki). For API documentation go to our [Boost API documentation](https://boost.docs.apiary.io)
 
-In the repo we also maintain a [Postman](https://www.getpostman.com) collection of all available requests [here](https://github.com/LiveUI/Boost/tree/master/Other/Postman). Use these to test any of the available endpoints.
+In the repo we also maintain a [Postman](https://www.getpostman.com) collection of all available API requests [here](https://github.com/LiveUI/Boost/tree/master/Other/Postman). Use these to test any of the available endpoints.
 
 #### Links:
 * [GitHub.com Wiki](https://github.com/LiveUI/Boost/wiki)
@@ -71,30 +71,32 @@ To install on Heroku please press the button and follow the instructions:
 
 ## Features
 
-#### MVP (current)
+#### MVP (current iteration)
 - [x] Build basic framework
 - [x] Authenticate with username and password
 - [x] Upload, process and install iOS app
 - [x] Upload, process and install Android app
-- [ ] Search apps by it's tags, name, platform and bundle Id
-- [ ] Integrated web client (web interface)
+- [x] Search apps by name, platform and bundle Id
+- [x] Integrated web client (web interface)
 - [x] Basic emails (forgotten password, registration, invitation)
+- [ ] Authenticate with Github
 
 
-#### Phase 2
+#### Phase 2 (January 2019)
 - [x] Support for S3 (and others through protocol) to store files
-- [ ] Authenticate in enterprise environment (`ActiveDirectory`, etc ...)
+- [ ] Authenticate in enterprise environment (`ActiveDirectory`, Gitlab, etc ...)
 - [ ] Create client accounts
+- [ ] Download & install history
 - [x] Native iOS client
 - [ ] Native Android client
 - [ ] Email notifications (new builds, clents, etc)
 
 
-#### Phase 3
+#### Phase 3 (June 2019)
 - [ ] Native tvOS client
 - [ ] Comment on builds
 - [ ] Create virtual apps for web-apps (urls)
-- [ ] Authenticate in enterprise environment (custom plugins and integrations for common systems)
+- [ ] Authenticate in enterprise environment (extend for custom plugins and integrations for common systems)
 
 
 #### Phase 4
