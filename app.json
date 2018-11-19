@@ -43,6 +43,6 @@
         }
     },
 	"buildpacks": [{
-		"url": "https://github.com/LiveUI/heroku-buildpack"
+		"url": "https://github.com/vapor-community/heroku-buildpack"
 	}]
 }
