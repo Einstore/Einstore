@@ -43,10 +43,9 @@ BOOST_PORT=1234 BOOST_BASE_URL=https://testing-boost.com docker-compose up
 * [BoostCore](https://github.com/LiveUI/BoostCore/) - AppStore core module
 * [ApiCore](https://github.com/LiveUI/ApiCore/) - Base user & team management including forgotten passwords, etc ...
 * [MailCore](https://github.com/LiveUI/MailCore/) - Mailing wrapper for multiple mailing services like MailGun, SendGrig or SMTP (coming)
-* [DBCore](https://github.com/LiveUI/DbCore/) - Set of tools for work with PostgreSQL database
 * [VaporTestTools](https://github.com/LiveUI/VaporTestTools) - Test tools and helpers for Vapor 3
 
-## Documentation
+## Documentation (work in progress)
 
 The main documentation for boost can be found in our [GitHub.com Wiki](https://github.com/LiveUI/Boost/wiki). For API documentation go to our [Boost API documentation](https://boost.docs.apiary.io)
 
@@ -61,7 +60,7 @@ In the repo we also maintain a [Postman](https://www.getpostman.com) collection 
 
 If the documentation is not good enough for you, feel free to join our slack channel and get help using and installing this product from us and other experienced users right away. [Slack](http://bit.ly/2B0dEyt), channel <b>#help-boost</b>
 
-## Test on Heroku
+## Test on Heroku (work in progress)
 
 If you after a quick example of what boost can do, get yourself a Heroku account (if you don't have one already) and see for yourself.
 
@@ -111,12 +110,11 @@ We love PR’s, we can’t get enough of them ... so if you have an interesting 
 
 ## Support
 
-We try to support even our free tier clients through our Slack channel or create a Stack Overflow question tagging BoostXXXXXXXXXX.
-To signup for our Slack please visit http://bit.ly/2B0dEyt and we’ll send you an invitation email.
+You can signup for our Slack! To do so, please visit http://bit.ly/2B0dEyt and we’ll send you an invitation email.
 
 ## OnDemand hosted service (sounds better than software as a service)
 
-We also working on a hosted service including a free tier for indie developers. For more information on our hosted services, please visit our website on http://www.boostappstore.com
+We are also working on a hosted service including a free tier for indie developers. This service will become available just few weeks after the first official release here on github. For more information on our hosted services, please visit our website on http://www.boostappstore.com
 
 ## Enterprise
 
