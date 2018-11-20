@@ -366,8 +366,8 @@
         "repositoryURL": "https://github.com/LiveUI/VaporTestTools.git",
         "state": {
           "branch": null,
-          "revision": "e07ce263257463f2f2af9e640f81eb95a72760e4",
-          "version": "0.1.5"
+          "revision": "135d02e2e2a632c134567754d65ce2afe262bab3",
+          "version": "0.1.7"
         }
       },
       {
