@@ -29,15 +29,6 @@ cd Boost
 docker-compose up
 ```
 
-### Reverse proxy
-
-To serve Boost on your custom domain (Boost needs HTTPS enabled in order to serve iOS applications). You can change port of running app (default is `8000`) by setting env variable `BOOST_PORT` and set the final URL so the App generates correct download links when you set `BOOST_BASE_URL`, default value is `http://localhost:8080.
-
-```shell
-# Expecting running reverse proxy from https://testing-boost.com => http://localhost:1234
-BOOST_PORT=1234 BOOST_BASE_URL=https://testing-boost.com docker-compose up
-```
-
 ## Main dependencies
 
 * [BoostCore](https://github.com/LiveUI/BoostCore/) - AppStore core module
