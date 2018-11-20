@@ -25,7 +25,7 @@ You can easily try Boost if you have Docker installed. Just clone this repo and 
 git clone git@github.com:LiveUI/Boost.git
 cd Boost
 
-# Will run Boost on http://localhost:8000
+# Will run Boost on http://localhost:80
 docker-compose up
 ```
 
