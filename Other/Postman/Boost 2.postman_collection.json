@@ -2362,7 +2362,7 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "{{SERVER}}apps/overview?limit=3&from=0",
+					"raw": "{{SERVER}}apps/overview?limit=10&from=0",
 					"host": [
 						"{{SERVER}}apps"
 					],
@@ -2372,7 +2372,7 @@
 					"query": [
 						{
 							"key": "limit",
-							"value": "3"
+							"value": "10"
 						},
 						{
 							"key": "from",

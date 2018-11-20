@@ -15,4 +15,4 @@ RUN ln -s .build/x86_64-unknown-linux/debug/Run ./boost
 COPY ./scripts/wait-for-it.sh .
 
 EXPOSE 8080
-CMD echo "build: Thu Aug  9 15:53:26 CEST 2018" && ./boost serve --hostname 0.0.0.0
+CMD echo "build: Thu Aug 9 15:53:26 CEST 2018" && ./boost serve --hostname 0.0.0.0

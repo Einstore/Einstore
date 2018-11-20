@@ -25,17 +25,17 @@ services:
       - ./docker-volume/tmp:/tmp
       - ./docker-volume/home/Boost:/home/Boost
     environment:
-      apicore.server.name: Booster
-      apicore.server.url: ${BOOST_BASE_URL:-http://localhost:8000}
-      apicore.server.path_prefix: 'api'
-      apicore.database.host: db
-      apicore.database.user: boost
-      apicore.database.password: aaaaaa
-      apicore.database.database: boost
-      apicore.database.port: 5432
-      apicore.jwt_secret: secret
-      apicore.storage.s3.enabled: 0
-      apicore.storage.local.root: /home/Boost
+      APICORE_SERVER_NAME: Booster
+      APICORE_SERVER_URL: ${BOOST_BASE_URL:-http://localhost:8000}
+      APICORE_SERVER_PATH_PREFIX: 'api'
+      APICORE_DATABASE_HOST: db
+      APICORE_DATABASE_USER: boost
+      APICORE_DATABASE_PASSWORD: aaaaaa
+      APICORE_DATABASE_DATABASE: boost
+      APICORE_DATABASE_PORT: 5432
+      APICORE_JWT_SECRET: secret
+      APICORE_STORAGE_S3_ENABLED: 0
+      APICORE_STORAGE_LOCAL_ROOT: /home/Boost
     command: ["./wait-for-it.sh", "db:5432", "--", "./boost", "serve", "--hostname", "0.0.0.0", "--port", "8080"]
 
   admin-ui:
