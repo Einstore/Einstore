@@ -41,7 +41,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"admin@liveui.io\",\n  \"password\": \"password123\"\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}install",
@@ -67,7 +67,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"admin@liveui.io\",\n  \"password\": \"password123\"\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}demo",
@@ -93,7 +93,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"admin@liveui.io\",\n  \"password\": \"password123\"\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}uninstall",
@@ -254,7 +254,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"admin@liveui.io\",\n  \"password\": \"password123\"\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}auth/input-recovery?token={{RECOVERY_TOKEN}}",
@@ -527,7 +527,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"admin@liveui.io\",\n  \"password\": \"password123\"\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}auth",
@@ -694,7 +694,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"admin@liveui.io\",\n  \"password\": \"password123\"\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}token",
@@ -1083,7 +1083,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}",
@@ -1830,7 +1830,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/users",
@@ -1993,7 +1993,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"Admin\",\n    \"identifier\": \"admin5\"\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/config",
@@ -2097,7 +2097,10 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{SERVER}}users",
 					"host": [
@@ -2134,7 +2137,10 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{SERVER}}users/global?search=ad",
 					"host": [
@@ -2266,7 +2272,10 @@
 						"value": "{{SERVER}}"
 					}
 				],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{SERVER}}apps?limit=10",
 					"host": [
@@ -2309,7 +2318,10 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{SERVER}}apps?limit=20&page=40&platform=ios",
 					"host": [
@@ -2360,7 +2372,10 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{SERVER}}apps/overview?limit=10&from=0",
 					"host": [
@@ -2428,8 +2443,8 @@
 				"method": "GET",
 				"header": [],
 				"body": {
-					"mode": "file",
-					"file": {}
+					"mode": "raw",
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/apps/overview",
@@ -2496,8 +2511,8 @@
 				"method": "GET",
 				"header": [],
 				"body": {
-					"mode": "file",
-					"file": {}
+					"mode": "raw",
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/apps/info",
@@ -2760,6 +2775,50 @@
 			"response": []
 		},
 		{
+			"name": "Apps (apps/:id/downloads)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "090b0686-dd13-480c-a2a8-ac34491fe080",
+						"exec": [
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"image/png\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}apps/{{APP_ID}}/history",
+					"host": [
+						"{{SERVER}}apps"
+					],
+					"path": [
+						"{{APP_ID}}",
+						"history"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Apps (apps/plist)",
 			"request": {
 				"auth": {
@@ -2970,6 +3029,141 @@
 			"response": []
 		},
 		{
+			"name": "Cluster (cluster)",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n\t\"new_tag_1\",\n\t\"new_tag_2\"\n]"
+				},
+				"url": {
+					"raw": "{{SERVER}}cluster?identifier={{APP_IDENTIFIER}}&platform={{APP_PLATFORM}}",
+					"host": [
+						"{{SERVER}}cluster"
+					],
+					"query": [
+						{
+							"key": "identifier",
+							"value": "{{APP_IDENTIFIER}}"
+						},
+						{
+							"key": "platform",
+							"value": "{{APP_PLATFORM}}"
+						}
+					]
+				},
+				"description": "Delete a cluster (all builds for an app) based on it's identifier (apps bundle ID) and platform"
+			},
+			"response": []
+		},
+		{
+			"name": "Cluster (cluster/:id)",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n\t\"new_tag_1\",\n\t\"new_tag_2\"\n]"
+				},
+				"url": {
+					"raw": "{{SERVER}}cluster/{{CLUSTER_ID}}",
+					"host": [
+						"{{SERVER}}cluster"
+					],
+					"path": [
+						"{{CLUSTER_ID}}"
+					]
+				},
+				"description": "Delete a cluster (all builds for an app) based on it's ID"
+			},
+			"response": []
+		},
+		{
+			"name": "Upload keys (teams/:id/keys)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "710a0a32-3cbc-4cb2-a3d1-aaa38465ab17",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 201\"] = responseCode.code === 201;",
+							"",
+							"// Token check",
+							"tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
+							"tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
+							"tests[\"Key has a token\"] = (jsonData[\"token\"].length > 0)",
+							"tests[\"Key has a correct team_id\"] = (jsonData[\"team_id\"] == postman.getEnvironmentVariable(\"TEST_TEAM_ID\"))",
+							"",
+							"postman.setEnvironmentVariable(\"TEST_UPLOAD_KEY_ID\", jsonData[\"id\"]);",
+							"postman.setEnvironmentVariable(\"TEST_UPLOAD_KEY\", jsonData[\"token\"]);",
+							"",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Upload key yo!\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/keys",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}",
+						"keys"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Upload keys (keys)",
 			"request": {
 				"method": "GET",
@@ -3046,72 +3240,6 @@
 			"response": []
 		},
 		{
-			"name": "Upload keys (teams/:id/keys)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "710a0a32-3cbc-4cb2-a3d1-aaa38465ab17",
-						"type": "text/javascript",
-						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"",
-							"// Status code",
-							"tests[\"Status code is 201\"] = responseCode.code === 201;",
-							"",
-							"// Token check",
-							"tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
-							"tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
-							"tests[\"Key has a token\"] = (jsonData[\"token\"].length > 0)",
-							"tests[\"Key has a correct team_id\"] = (jsonData[\"team_id\"] == postman.getEnvironmentVariable(\"TEST_TEAM_ID\"))",
-							"",
-							"postman.setEnvironmentVariable(\"TEST_UPLOAD_KEY_ID\", jsonData[\"id\"]);",
-							"postman.setEnvironmentVariable(\"TEST_UPLOAD_KEY\", jsonData[\"token\"]);",
-							"",
-							"",
-							"// Content type",
-							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
-						]
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{JWT_AUTH}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"name\": \"Upload key yo!\"\n}"
-				},
-				"url": {
-					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/keys",
-					"host": [
-						"{{SERVER}}teams"
-					],
-					"path": [
-						"{{TEST_TEAM_ID}}",
-						"keys"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Upload keys (keys/:id)",
 			"request": {
 				"method": "PUT",
@@ -3175,7 +3303,10 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{SERVER}}settings",
 					"host": [
@@ -3193,7 +3324,10 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{SERVER}}settings?plain=true",
 					"host": [
@@ -3685,8 +3819,8 @@
 				"method": "GET",
 				"header": [],
 				"body": {
-					"mode": "file",
-					"file": {}
+					"mode": "raw",
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{SERVER}}server/image/192",
@@ -3809,7 +3943,10 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{SERVER}}database",
 					"host": [
@@ -3827,7 +3964,10 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{SERVER}}teapot",
 					"host": [
@@ -3845,7 +3985,10 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{SERVER}}ping",
 					"host": [
@@ -3870,7 +4013,10 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{SERVER}}errors",
 					"host": [
@@ -3895,7 +4041,10 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{SERVER}}info",
 					"host": [
@@ -3910,7 +4059,10 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{SERVER}}unknown",
 					"host": [
