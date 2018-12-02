@@ -2199,6 +2199,55 @@
 			"response": []
 		},
 		{
+			"name": "Users (users)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "245c9eb5-1349-4660-8e3f-8a2e2ece34a5",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "    {\n        \"email\": \"rafaj@liveui.io\",\n        \"username\": \"rafiki270\",\n        \"lastname\": \"Rafaj\",\n        \"firstname\": \"Ondrej\",\n        \"password\": \"aaaaaa\"\n    }"
+				},
+				"url": {
+					"raw": "{{SERVER}}users",
+					"host": [
+						"{{SERVER}}users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Invite user (users/invite)",
 			"event": [
 				{
@@ -2819,7 +2868,7 @@
 			"response": []
 		},
 		{
-			"name": "Apps (apps/plist)",
+			"name": "Apps (apps/:id/plist/:token/:file)",
 			"request": {
 				"auth": {
 					"type": "noauth"
@@ -2836,18 +2885,15 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}apps/plist?token={{DOWNLOAD_TOKEN}}",
+					"raw": "{{SERVER}}apps/{{APP_ID}}/plist/{{DOWNLOAD_TOKEN}}/app.plist",
 					"host": [
 						"{{SERVER}}apps"
 					],
 					"path": [
-						"plist"
-					],
-					"query": [
-						{
-							"key": "token",
-							"value": "{{DOWNLOAD_TOKEN}}"
-						}
+						"{{APP_ID}}",
+						"plist",
+						"{{DOWNLOAD_TOKEN}}",
+						"app.plist"
 					]
 				}
 			},
@@ -2904,125 +2950,6 @@
 					],
 					"path": [
 						"{{APP_ID}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Apps (apps/:id/tags)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "8a8c7f89-3f8b-4a4c-acde-c95ca1175470",
-						"type": "text/javascript",
-						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"",
-							"// Status code",
-							"tests[\"Status code is 200\"] = responseCode.code === 200;",
-							"",
-							"if (responseCode.code === 200) {",
-							"    // Token check",
-							"    tests[\"App has tags\"] = (jsonData.length > 0)",
-							"    tests[\"App has a tag with identifier\"] = (jsonData[0][\"identifier\"].length > 0)",
-							"    ",
-							"    postman.setEnvironmentVariable(\"TAG_ID\", jsonData[(jsonData.length - 1)][\"id\"]);",
-							"}",
-							"",
-							"// Content type",
-							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
-							"",
-							""
-						]
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{SERVER}}apps/{{APP_ID}}/tags",
-					"host": [
-						"{{SERVER}}apps"
-					],
-					"path": [
-						"{{APP_ID}}",
-						"tags"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Apps (apps/:id/tags)",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
-					},
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "[\n\t\"new_tag_1\",\n\t\"new_tag_2\",\n\t\"new_tag_3\"\n]"
-				},
-				"url": {
-					"raw": "{{SERVER}}apps/{{APP_ID}}/tags",
-					"host": [
-						"{{SERVER}}apps"
-					],
-					"path": [
-						"{{APP_ID}}",
-						"tags"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Apps (apps/:id/tags/:id)",
-			"request": {
-				"method": "DELETE",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
-					},
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "[\n\t\"new_tag_1\",\n\t\"new_tag_2\"\n]"
-				},
-				"url": {
-					"raw": "{{SERVER}}apps/{{APP_ID}}/tags/{{TAG_ID}}",
-					"host": [
-						"{{SERVER}}apps"
-					],
-					"path": [
-						"{{APP_ID}}",
-						"tags",
-						"{{TAG_ID}}"
 					]
 				}
 			},
@@ -3094,6 +3021,233 @@
 					]
 				},
 				"description": "Delete a cluster (all builds for an app) based on it's ID"
+			},
+			"response": []
+		},
+		{
+			"name": "Apps (apps/:id/tags)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8a8c7f89-3f8b-4a4c-acde-c95ca1175470",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"if (responseCode.code === 200) {",
+							"    // Token check",
+							"    tests[\"App has tags\"] = (jsonData.length > 0)",
+							"    tests[\"App has a tag with identifier\"] = (jsonData[0][\"identifier\"].length > 0)",
+							"    ",
+							"    postman.setEnvironmentVariable(\"TAG_ID\", jsonData[(jsonData.length - 1)][\"id\"]);",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}apps/{{APP_ID}}/tags",
+					"host": [
+						"{{SERVER}}apps"
+					],
+					"path": [
+						"{{APP_ID}}",
+						"tags"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Tags (tags)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8a8c7f89-3f8b-4a4c-acde-c95ca1175470",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"if (responseCode.code === 200) {",
+							"    // Token check",
+							"    tests[\"App has tags\"] = (jsonData.length > 0)",
+							"    tests[\"App has a tag with identifier\"] = (jsonData[0][\"identifier\"].length > 0)",
+							"    ",
+							"    postman.setEnvironmentVariable(\"TAG_ID\", jsonData[(jsonData.length - 1)][\"id\"]);",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}tags",
+					"host": [
+						"{{SERVER}}tags"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Tags (teams/:id/tags)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8a8c7f89-3f8b-4a4c-acde-c95ca1175470",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"if (responseCode.code === 200) {",
+							"    // Token check",
+							"    tests[\"App has tags\"] = (jsonData.length > 0)",
+							"    tests[\"App has a tag with identifier\"] = (jsonData[0][\"identifier\"].length > 0)",
+							"    ",
+							"    postman.setEnvironmentVariable(\"TAG_ID\", jsonData[(jsonData.length - 1)][\"id\"]);",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/tags",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}",
+						"tags"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apps (apps/:id/tags)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n\t\"new_tag_1\",\n\t\"new_tag_2\",\n\t\"new_tag_3\"\n]"
+				},
+				"url": {
+					"raw": "{{SERVER}}apps/{{APP_ID}}/tags",
+					"host": [
+						"{{SERVER}}apps"
+					],
+					"path": [
+						"{{APP_ID}}",
+						"tags"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apps (apps/:id/tags/:id)",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}apps/{{APP_ID}}/tags/{{TAG_ID}}",
+					"host": [
+						"{{SERVER}}apps"
+					],
+					"path": [
+						"{{APP_ID}}",
+						"tags",
+						"{{TAG_ID}}"
+					]
+				}
 			},
 			"response": []
 		},
