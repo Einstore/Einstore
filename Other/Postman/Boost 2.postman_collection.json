@@ -2111,16 +2111,50 @@
 			"response": []
 		},
 		{
+			"name": "Users (users/me)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "476b1181-999e-4143-a808-c06c4df8796d",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}users/me",
+					"host": [
+						"{{SERVER}}users"
+					],
+					"path": [
+						"me"
+					]
+				},
+				"description": "Authenticated user object"
+			},
+			"response": []
+		},
+		{
 			"name": "Users (users/global)",
 			"event": [
 				{
 					"listen": "prerequest",
 					"script": {
 						"id": "692d2e1a-e43e-4587-b518-85fbe7ec8598",
-						"type": "text/javascript",
 						"exec": [
 							"eval(pm.environment.get(\"func:authorize\"));"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -2142,7 +2176,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}users/global?search=ad",
+					"raw": "{{SERVER}}users/global?search=co",
 					"host": [
 						"{{SERVER}}users"
 					],
@@ -2152,7 +2186,7 @@
 					"query": [
 						{
 							"key": "search",
-							"value": "ad"
+							"value": "co"
 						}
 					]
 				}
@@ -2236,7 +2270,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "    {\n        \"email\": \"rafaj@liveui.io\",\n        \"username\": \"rafiki270\",\n        \"lastname\": \"Rafaj\",\n        \"firstname\": \"Ondrej\",\n        \"password\": \"aaaaaa\"\n    }"
+					"raw": "    {\n        \"lastname\": \"Rafaj\",\n        \"firstname\": \"Ondrej\",\n        \"password\": \"aaaaaa\"\n    }"
 				},
 				"url": {
 					"raw": "{{SERVER}}users",
