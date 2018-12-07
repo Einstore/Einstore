@@ -6,7 +6,7 @@
         "repositoryURL": "https://github.com/LiveUI/ApiCore.git",
         "state": {
           "branch": "master",
-          "revision": "1b9943943a344fd4975186c2242131189d508cbc",
+          "revision": "de39c5158bdfaf00345f6f76b6e857e442a7e5f9",
           "version": null
         }
       },
@@ -42,7 +42,7 @@
         "repositoryURL": "https://github.com/LiveUI/BoostCore.git",
         "state": {
           "branch": "master",
-          "revision": "01d21a75037a8e9d29d11dac1cc2390ef2b488f4",
+          "revision": "497bc069340025a666d865cdd2f7a62b5919efb5",
           "version": null
         }
       },
@@ -213,7 +213,7 @@
         "repositoryURL": "https://github.com/LiveUI/S3.git",
         "state": {
           "branch": "master",
-          "revision": "c1a4defef149cbc71e78dba592041ca74e8fde40",
+          "revision": "d8058ae64ad7bcfa42830e9570d04ef4fb25e6ad",
           "version": null
         }
       },
@@ -258,8 +258,8 @@
         "repositoryURL": "https://github.com/apple/swift-nio.git",
         "state": {
           "branch": null,
-          "revision": "035962e6b6e03c8721a91a9b96dc084289795cb4",
-          "version": "1.11.0"
+          "revision": "a20e129c22ad00a51c902dca54a5456f90664780",
+          "version": "1.12.0"
         }
       },
       {

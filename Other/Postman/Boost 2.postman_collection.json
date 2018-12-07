@@ -2710,7 +2710,7 @@
 					"file": {}
 				},
 				"url": {
-					"raw": "{{SERVER}}apps?token={{TEST_UPLOAD_KEY}}&tags=tag1|tag2|tag3|tag4",
+					"raw": "{{SERVER}}apps?token={{TEST_UPLOAD_KEY}}&tags=boost|bricks|bricklayer_1.2.3|mortar_v12&pm[ticket][url]=http://jira.example.com/tickets?id=123456&pm[ticket][message]=Build a wall, big wall, we are good at building walls!\\nVERY GOOD!&sc[commit][url]=http://github.example.com/commit/ig84rtx1984r9h2837yrx28&sc[commit][message]=Another brick in the wall!&sc[pr][url]=http://github.example.com/pull/6&sc[pr][message]=Adding bricks\\nAnd mortar&sc[commit][id]=ig84rtx1984r9h2837yrx28",
 					"host": [
 						"{{SERVER}}apps"
 					],
@@ -2721,7 +2721,42 @@
 						},
 						{
 							"key": "tags",
-							"value": "tag1|tag2|tag3|tag4"
+							"value": "boost|bricks|bricklayer_1.2.3|mortar_v12"
+						},
+						{
+							"key": "pm[ticket][url]",
+							"value": "http://jira.example.com/tickets?id=123456",
+							"description": "Project management"
+						},
+						{
+							"key": "pm[ticket][message]",
+							"value": "Build a wall, big wall, we are good at building walls!\\nVERY GOOD!",
+							"description": "Project management"
+						},
+						{
+							"key": "sc[commit][url]",
+							"value": "http://github.example.com/commit/ig84rtx1984r9h2837yrx28",
+							"description": "Source control"
+						},
+						{
+							"key": "sc[commit][message]",
+							"value": "Another brick in the wall!",
+							"description": "Source control"
+						},
+						{
+							"key": "sc[pr][url]",
+							"value": "http://github.example.com/pull/6",
+							"description": "Source control"
+						},
+						{
+							"key": "sc[pr][message]",
+							"value": "Adding bricks\\nAnd mortar",
+							"description": "Source control"
+						},
+						{
+							"key": "sc[commit][id]",
+							"value": "ig84rtx1984r9h2837yrx28",
+							"description": "Source control"
 						}
 					]
 				}
@@ -3210,13 +3245,19 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/tags",
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/tags?search=ta",
 					"host": [
 						"{{SERVER}}teams"
 					],
 					"path": [
 						"{{TEST_TEAM_ID}}",
 						"tags"
+					],
+					"query": [
+						{
+							"key": "search",
+							"value": "ta"
+						}
 					]
 				}
 			},
