@@ -2460,7 +2460,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}apps/overview?limit=10&from=0",
+					"raw": "{{SERVER}}apps/overview?limit=10&from=0&search=&platform=ios",
 					"host": [
 						"{{SERVER}}apps"
 					],
@@ -2475,6 +2475,14 @@
 						{
 							"key": "from",
 							"value": "0"
+						},
+						{
+							"key": "search",
+							"value": ""
+						},
+						{
+							"key": "platform",
+							"value": "ios"
 						}
 					]
 				}
@@ -2766,13 +2774,18 @@
 		{
 			"name": "Apps (apps/:id)",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
-					}
-				],
+				"header": [],
 				"body": {
 					"mode": "raw",
 					"raw": ""
@@ -2796,7 +2809,6 @@
 					"listen": "test",
 					"script": {
 						"id": "c075b435-49e3-494c-940d-02f1613f4776",
-						"type": "text/javascript",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"",
@@ -2819,18 +2831,24 @@
 							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
 							"",
 							""
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
-					}
-				],
+				"header": [],
 				"body": {
 					"mode": "raw",
 					"raw": ""
@@ -2893,7 +2911,7 @@
 			"response": []
 		},
 		{
-			"name": "Apps (apps/:id/downloads)",
+			"name": "Apps (apps/:id/history)",
 			"event": [
 				{
 					"listen": "test",
@@ -2912,13 +2930,18 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
-					}
-				],
+				"header": [],
 				"body": {
 					"mode": "raw",
 					"raw": ""
