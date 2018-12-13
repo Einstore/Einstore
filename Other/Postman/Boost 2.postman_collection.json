@@ -2360,7 +2360,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}apps?limit=10",
+					"raw": "{{SERVER}}apps?limit=10&tags=alliedsdk_1.1.1|alliedsdk_1.1.2",
 					"host": [
 						"{{SERVER}}apps"
 					],
@@ -2368,6 +2368,10 @@
 						{
 							"key": "limit",
 							"value": "10"
+						},
+						{
+							"key": "tags",
+							"value": "alliedsdk_1.1.1|alliedsdk_1.1.2"
 						}
 					]
 				}
@@ -2460,7 +2464,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}apps/overview?limit=10&from=0&search=&platform=ios",
+					"raw": "{{SERVER}}apps/overview?limit=100&from=0&search=&platform=ios",
 					"host": [
 						"{{SERVER}}apps"
 					],
@@ -2470,7 +2474,7 @@
 					"query": [
 						{
 							"key": "limit",
-							"value": "10"
+							"value": "100"
 						},
 						{
 							"key": "from",
@@ -3216,9 +3220,15 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}tags",
+					"raw": "{{SERVER}}tags?search=1.4.3",
 					"host": [
 						"{{SERVER}}tags"
+					],
+					"query": [
+						{
+							"key": "search",
+							"value": "1.4.3"
+						}
 					]
 				}
 			},
@@ -3268,7 +3278,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/tags?search=ta",
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/tags?search=1.4.3",
 					"host": [
 						"{{SERVER}}teams"
 					],
@@ -3279,7 +3289,7 @@
 					"query": [
 						{
 							"key": "search",
-							"value": "ta"
+							"value": "1.4.3"
 						}
 					]
 				}
@@ -3800,14 +3810,7 @@
 			],
 			"request": {
 				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{JWT_AUTH}}",
-							"type": "string"
-						}
-					]
+					"type": "noauth"
 				},
 				"method": "GET",
 				"header": [],
