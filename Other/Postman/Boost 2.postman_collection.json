@@ -4273,7 +4273,14 @@
 			"name": "Server security overview",
 			"request": {
 				"auth": {
-					"type": "noauth"
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
 				},
 				"method": "GET",
 				"header": [],
@@ -4388,6 +4395,38 @@
 						"{{SERVER}}info"
 					]
 				}
+			},
+			"response": []
+		},
+		{
+			"name": "Commit (server/commit)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}server/commit",
+					"host": [
+						"{{SERVER}}server"
+					],
+					"path": [
+						"commit"
+					]
+				},
+				"description": "Get the latest commit info if available (needs ./Resources/commit.txt file which can be edited during automated deployment)"
 			},
 			"response": []
 		},
