@@ -2360,7 +2360,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}apps?limit=10&tags=alliedsdk_1.1.1|alliedsdk_1.1.2",
+					"raw": "{{SERVER}}apps?limit=10&tags=[\"bricks\"]",
 					"host": [
 						"{{SERVER}}apps"
 					],
@@ -2371,7 +2371,7 @@
 						},
 						{
 							"key": "tags",
-							"value": "alliedsdk_1.1.1|alliedsdk_1.1.2"
+							"value": "[\"bricks\"]"
 						}
 					]
 				}
@@ -4264,6 +4264,30 @@
 					"raw": "{{SERVER}}database",
 					"host": [
 						"{{SERVER}}database"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Server security overview",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}server/security",
+					"host": [
+						"{{SERVER}}server"
+					],
+					"path": [
+						"security"
 					]
 				}
 			},
