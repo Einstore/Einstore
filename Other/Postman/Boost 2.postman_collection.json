@@ -767,6 +767,148 @@
 			"response": []
 		},
 		{
+			"name": "Logout (logout/all)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0c9fe589-fee6-417f-9105-96a38bbe8b6e",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"// Token check",
+							"tests[\"Token has an id\"] = (jsonData[\"id\"].length > 10)",
+							"tests[\"Token has a user\"] = (jsonData[\"user\"][\"id\"].length > 10)",
+							"tests[\"Token has expires\"] = (jsonData[\"expires\"] > 543533823)",
+							"",
+							"// JWT",
+							"var jwtAuthExists = responseHeaders.hasOwnProperty(\"Authorization\") || responseHeaders.hasOwnProperty(\"authorization\");",
+							"tests[\"JWT Token is present\"] = jwtAuthExists;",
+							"",
+							"if (jwtAuthExists) {",
+							"    var a = responseHeaders[\"Authorization\"] || responseHeaders[\"authorization\"];",
+							"    tests[\"JWT token has a bearer\"] = a.has(\"Bearer \");",
+							"    tests[\"JWT token has a value\"] = (a.length > 15);",
+							"    postman.setEnvironmentVariable(\"JWT_AUTH\", a.substring(7));",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "90616aa4-124c-423d-bf50-1cdbe31f8fe6",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token {{AUTH_TOKEN}}"
+					},
+					{
+						"key": "Origin",
+						"value": "{{SERVER}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}logout/all",
+					"host": [
+						"{{SERVER}}logout"
+					],
+					"path": [
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout (logout/all)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1512bc88-43bb-4ec2-a819-b0872e3cae15",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"// Token check",
+							"tests[\"Token has an id\"] = (jsonData[\"id\"].length > 10)",
+							"tests[\"Token has a user_id\"] = (jsonData[\"user\"][\"id\"].length > 10)",
+							"tests[\"Token has expires\"] = (jsonData[\"expires\"] > 543533823)",
+							"",
+							"// JWT",
+							"var jwtAuthExists = responseHeaders.hasOwnProperty(\"Authorization\") || responseHeaders.hasOwnProperty(\"authorization\");",
+							"tests[\"JWT Token is present\"] = jwtAuthExists;",
+							"",
+							"if (jwtAuthExists) {",
+							"    var a = responseHeaders[\"Authorization\"] || responseHeaders[\"authorization\"];",
+							"    tests[\"JWT token has a bearer\"] = a.has(\"Bearer \");",
+							"    tests[\"JWT token has a value\"] = (a.length > 15);",
+							"    postman.setEnvironmentVariable(\"JWT_AUTH\", a.substring(7));",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"token\": \"{{AUTH_TOKEN}}\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}logout/all",
+					"host": [
+						"{{SERVER}}logout"
+					],
+					"path": [
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Teams (teams/check)",
 			"event": [
 				{
