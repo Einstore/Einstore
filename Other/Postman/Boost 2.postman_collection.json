@@ -2683,7 +2683,7 @@
 			"response": []
 		},
 		{
-			"name": "Apps (apps?token)",
+			"name": "Apps (apps?token&info)",
 			"event": [
 				{
 					"listen": "test",
@@ -2769,6 +2769,64 @@
 							"key": "sc[commit][id]",
 							"value": "ig84rtx1984r9h2837yrx28",
 							"description": "Source control"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apps (apps?token)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e5df00c9-6382-47b9-98ce-f2fc1870ff1b",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 201\"] = responseCode.code === 201;",
+							"",
+							"// Token check",
+							"tests[\"App has an id\"] = (jsonData[\"id\"].length > 0)",
+							"tests[\"App has a name\"] = (jsonData[\"name\"].length > 0)",
+							"tests[\"App has an identifier\"] = (jsonData[\"identifier\"].length > 2)",
+							"",
+							"postman.setEnvironmentVariable(\"APP_ID\", jsonData[\"id\"]);",
+							"",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "{{SERVER}}apps?token={{TEST_UPLOAD_KEY}}&tags=boost|bricks|bricklayer_1.2.3|mortar_v12",
+					"host": [
+						"{{SERVER}}apps"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "{{TEST_UPLOAD_KEY}}"
+						},
+						{
+							"key": "tags",
+							"value": "boost|bricks|bricklayer_1.2.3|mortar_v12"
 						}
 					]
 				}

@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/IBM-Swift/BlueSocket.git",
         "state": {
           "branch": null,
-          "revision": "29358e679082b6fbe4d6d871574919ad1cbe4613",
-          "version": "1.0.36"
+          "revision": "9c1b578c618f0bfac017aaaaead19de57bb37831",
+          "version": "1.0.43"
         }
       },
       {
@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/IBM-Swift/BlueSSLService.git",
         "state": {
           "branch": null,
-          "revision": "9cc0b14544409e709554b4a4b51909d82c895cdd",
-          "version": "1.0.36"
+          "revision": "631133404387077c5ac80a40e338d09e0f58aaff",
+          "version": "1.0.43"
         }
       },
       {
@@ -42,7 +42,7 @@
         "repositoryURL": "https://github.com/LiveUI/BoostCore.git",
         "state": {
           "branch": "master",
-          "revision": "b9960301dd5cf137314601340c73ce68d074406f",
+          "revision": "90739b40b7f0e6ddbd5d4bccffb66f956135b966",
           "version": null
         }
       },
