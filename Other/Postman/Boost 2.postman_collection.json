@@ -4541,6 +4541,37 @@
 			"response": []
 		},
 		{
+			"name": "STDOut flush",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}server/flush",
+					"host": [
+						"{{SERVER}}server"
+					],
+					"path": [
+						"flush"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Commit (server/commit)",
 			"request": {
 				"auth": {
