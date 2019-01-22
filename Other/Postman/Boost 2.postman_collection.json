@@ -988,8 +988,8 @@
 							"if (responseCode.code === 201) {",
 							"    // Token check",
 							"    tests[\"Team has an id\"] = (jsonData[\"id\"].length > 0)",
-							"    tests[\"Team has an name\"] = (jsonData[\"name\"].length > 0)",
-							"    tests[\"Team has an identifier\"] = (jsonData[\"identifier\"].length > 0)",
+							"    tests[\"Team has a name\"] = (jsonData[\"name\"].length > 0)",
+							"    tests[\"Team has a identifier\"] = (jsonData[\"identifier\"].length > 0)",
 							"    ",
 							"    postman.setEnvironmentVariable(\"TEST_TEAM_ID\", jsonData[\"id\"]);",
 							"}",
@@ -2264,6 +2264,35 @@
 						],
 						"type": "text/javascript"
 					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "7e8b0f7c-b43f-405a-9abe-4a29dcb4eeaa",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"if (responseCode.code === 200) {",
+							"    // Token check",
+							"    tests[\"User has an id\"] = (jsonData[\"id\"].length > 0)",
+							"    tests[\"User has a first name\"] = (jsonData[\"firstname\"].length > 0)",
+							"    tests[\"User has a last name\"] = (jsonData[\"lastname\"].length > 0)",
+							"    tests[\"User has a nick-name\"] = (jsonData[\"username\"].length > 0)",
+							"    ",
+							"    postman.setEnvironmentVariable(\"TEST_USER_ID\", jsonData[\"id\"]);",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
 				}
 			],
 			"request": {
@@ -2375,7 +2404,7 @@
 			"response": []
 		},
 		{
-			"name": "Users (users)",
+			"name": "Users (users/:id)",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -2415,9 +2444,12 @@
 					"raw": "    {\n        \"lastname\": \"Rafaj\",\n        \"firstname\": \"Ondrej\",\n        \"password\": \"aaaaaa\"\n    }"
 				},
 				"url": {
-					"raw": "{{SERVER}}users",
+					"raw": "{{SERVER}}users/{{TEST_USER_ID}}",
 					"host": [
 						"{{SERVER}}users"
+					],
+					"path": [
+						"{{TEST_USER_ID}}"
 					]
 				}
 			},
@@ -2772,7 +2804,6 @@
 					"listen": "test",
 					"script": {
 						"id": "e5df00c9-6382-47b9-98ce-f2fc1870ff1b",
-						"type": "text/javascript",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"",
@@ -2790,7 +2821,8 @@
 							"// Content type",
 							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
 							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
