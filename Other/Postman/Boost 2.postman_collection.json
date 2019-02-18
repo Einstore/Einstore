@@ -544,8 +544,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "fb96d006-ff14-4369-ab66-b908f5816ac3",
-						"type": "text/javascript",
+						"id": "1c4951fa-8f11-427b-a3cc-2e538bba68dd",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"",
@@ -574,14 +573,14 @@
 							"// Content type",
 							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
 							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
-						]
+						],
+						"type": "text/javascript"
 					}
 				},
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "bfe6c598-e7ad-4ae4-b73b-7aa7e15e77b5",
-						"type": "text/javascript",
+						"id": "a39aefe5-0b4b-4dce-b6d4-6eaeab77811c",
 						"exec": [
 							"var authorize = 'var server = pm.environment.get(\"SERVER\");\\",
 							"var token = pm.environment.get(\"AUTH_TOKEN\");\\",
@@ -598,7 +597,8 @@
 							"});';",
 							"",
 							"pm.environment.set(\"func:authorize\", authorize);"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -3421,6 +3421,64 @@
 							"// Status code",
 							"tests[\"Status code is 200\"] = responseCode.code === 200;",
 							"",
+							"// if (responseCode.code === 200) {",
+							"//     // Token check",
+							"//     tests[\"App has tags\"] = (jsonData.length > 0)",
+							"//     tests[\"App has a tag with identifier\"] = (jsonData[0][\"identifier\"].length > 0)",
+							"    ",
+							"//     postman.setEnvironmentVariable(\"TAG_ID\", jsonData[(jsonData.length - 1)][\"id\"]);",
+							"// }",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}tags?search=1.4",
+					"host": [
+						"{{SERVER}}tags"
+					],
+					"query": [
+						{
+							"key": "search",
+							"value": "1.4"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Tags (tags/common)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8a8c7f89-3f8b-4a4c-acde-c95ca1175470",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
 							"if (responseCode.code === 200) {",
 							"    // Token check",
 							"    tests[\"App has tags\"] = (jsonData.length > 0)",
@@ -3452,15 +3510,12 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}tags?search=1.4.3",
+					"raw": "{{SERVER}}tags/common",
 					"host": [
 						"{{SERVER}}tags"
 					],
-					"query": [
-						{
-							"key": "search",
-							"value": "1.4.3"
-						}
+					"path": [
+						"common"
 					]
 				}
 			},
@@ -3510,7 +3565,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/tags?search=1.4.3",
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/tags?search=1",
 					"host": [
 						"{{SERVER}}teams"
 					],
@@ -3521,8 +3576,66 @@
 					"query": [
 						{
 							"key": "search",
-							"value": "1.4.3"
+							"value": "1"
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Tags (teams/:id/tags/common)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8a8c7f89-3f8b-4a4c-acde-c95ca1175470",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"if (responseCode.code === 200) {",
+							"    // Token check",
+							"    tests[\"Tags have data\"] = (jsonData.length > 0)",
+							"    tests[\"Tags have identifier\"] = (jsonData[0][\"identifier\"].length > 0)",
+							"    tests[\"Tags have uses count\"] = (jsonData[0][\"uses\"] > 0)",
+							"    ",
+							"    postman.setEnvironmentVariable(\"TAG_ID\", jsonData[(jsonData.length - 1)][\"id\"]);",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/tags/common",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}",
+						"tags",
+						"common"
 					]
 				}
 			},
@@ -3544,7 +3657,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "[\n\t\"new_tag_1\",\n\t\"new_tag_2\",\n\t\"new_tag_3\"\n]"
+					"raw": "[\n\t\"new_tag_1\",\n\t\"new_tag_2\",\n\t\"new_tag_3\",\n\t\"1.4.4\"\n]"
 				},
 				"url": {
 					"raw": "{{SERVER}}apps/{{APP_ID}}/tags",
