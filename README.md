@@ -32,7 +32,7 @@ If you don't like going through documentation, feel free to join our slack chann
 
 ### Documentation
 
-The main documentation for Einstore can be found in our [Wiki hre on Github](https://github.com/Einstore/Einstore/wiki). For API documentation go to our [Einstore API documentation](https://boost.docs.apiary.io)
+The main documentation for Einstore can be found in our [Wiki here on Github](https://github.com/Einstore/Einstore/wiki). For API documentation go to our [Einstore API documentation](https://boost.docs.apiary.io)
 
 ### License
 
