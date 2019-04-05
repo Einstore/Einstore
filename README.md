@@ -2,8 +2,9 @@
 
 [![Slack](https://img.shields.io/badge/join-slack-745EAF.svg?style=flat)](https://bit.ly/2UkyFO8)
 [![Docker](https://img.shields.io/badge/docker-enabled-blue.svg?style=flat)](https://hub.docker.com/u/einstore)
+[![macOS](https://img.shields.io/badge/macOS-10.13-ff0000.svg?style=flat)](https://github.com/Einstore/Einstore)
+[![Ubuntu](https://img.shields.io/badge/Ubuntu-18.04%20LTS-D95E33.svg?style=flat)](https://www.ubuntu.com/download/server)
 [![Apiary.io API documentation for Einstore](https://img.shields.io/badge/docs-API-02BFF4.svg?style=flat)](https://boost.docs.apiary.io)
-[![Platforms](https://img.shields.io/badge/platforms-macOS%2010.13%20|%20Ubuntu%2016.04%20LTS-ff0000.svg?style=flat)](https://github.com/Einstore/Einstore)
 [![Swift 4](https://img.shields.io/badge/swift-4.1-orange.svg?style=flat)](http://swift.org)
 [![Vapor 3](https://img.shields.io/badge/vapor-3.0-blue.svg?style=flat)](https://vapor.codes)
 
