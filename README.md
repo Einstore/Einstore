@@ -23,7 +23,7 @@
 
 ### Slack support and community
 
-If you don't like going through documentation, feel free to join our slack channel and get help using and installing this product from us directly and other experienced users right away. [Slack](http://bit.ly/2B0dEyt)
+If you don't like going through documentation, feel free to join our slack channel and get help using and installing this product from us directly and other experienced users right away. [Slack](https://bit.ly/2UkyFO8)
 
 ### Main dependencies
 
