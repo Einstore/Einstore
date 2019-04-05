@@ -1,0 +1,19 @@
+version: '2.4'
+
+services:
+  adminer:
+    ports:
+      - 8082:8080
+
+  api:
+    ports:
+      - 8080:8080
+    environment:
+      APICORE_SERVER_URL: http://127.0.0.1:8080
+      APICORE_SERVER_INTERFACE: http://localhost:8081
+
+  admin:
+    ports:
+      - 8081:80
+    environment:
+      API_URL: http://127.0.0.1:8080
