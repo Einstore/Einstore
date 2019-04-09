@@ -35,6 +35,9 @@ If you don't like going through documentation, feel free to join our slack chann
 
 The main documentation for Einstore can be found in our [Wiki here on Github](https://github.com/Einstore/Einstore/wiki). For API documentation go to our [Einstore API documentation](https://boost.docs.apiary.io)
 
+#### Shortcuts
+* [Environmental variables](https://github.com/Einstore/Einstore/wiki/Environmental-variables)
+
 ### License
 
 Einstore is distributed under an Apache 2 license and can be shared or used freely within the bounds of the license itself.
