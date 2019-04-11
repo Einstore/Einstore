@@ -23,5 +23,8 @@ install-demo: up install-db ## Install demo data
 	@echo "\nInstalling demo data..."
 	docker-compose exec api curl "http://localhost:8080/$${APICORE_SERVER_PATH_PREFIX}/demo"
 
+update: ## Update to the latest docker images
+	docker-compose pull
+
 docker-compose.override.yaml:
 	cp docker-compose.override.dist.yaml docker-compose.override.yaml
