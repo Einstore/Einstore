@@ -14,8 +14,11 @@
     <td><img src="/Screenshots/Admin/screen1.png?raw=true" width="210" /></td>
     <td><img src="/Screenshots/Admin/screen2.png?raw=true" width="210" /></td>
     <td><img src="/Screenshots/Admin/screen3.png?raw=true" width="210" /></td>
+  </tr>
+  <tr>
     <td><img src="/Screenshots/Admin/screen4.png?raw=true" width="210" /></td>
     <td><img src="/Screenshots/Admin/screen5.png?raw=true" width="210" /></td>
+    <td>&nbsp;</td>
   </tr>
 </table>
   
