@@ -8,6 +8,8 @@
 [![Swift 4](https://img.shields.io/badge/swift-4.1-orange.svg?style=flat)](http://swift.org)
 [![Vapor 3](https://img.shields.io/badge/vapor-3.0-blue.svg?style=flat)](https://vapor.codes)
 
+Enterprise distribution platform for mobile apps ... the first open source appstore
+
 ### Screenshots
 <table>
   <tr>
