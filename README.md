@@ -36,7 +36,9 @@ If you don't like going through documentation, feel free to join our slack chann
 The main documentation for Einstore can be found in our [Wiki here on Github](https://github.com/Einstore/Einstore/wiki). For API documentation go to our [Einstore API documentation](https://boost.docs.apiary.io)
 
 #### Shortcuts
+* [Continuous integration (CI)](https://github.com/Einstore/Einstore/wiki/Continuous-integrations)
 * [Environmental variables](https://github.com/Einstore/Einstore/wiki/Environmental-variables)
+* [Tags](https://github.com/Einstore/Einstore/wiki/Tags)
 
 ### License
 
