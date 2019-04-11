@@ -8,7 +8,7 @@
 [![Swift 4](https://img.shields.io/badge/swift-4.1-orange.svg?style=flat)](http://swift.org)
 [![Vapor 3](https://img.shields.io/badge/vapor-3.0-blue.svg?style=flat)](https://vapor.codes)
 
-## Screenshots
+### Screenshots
 <table>
   <tr>
     <td><img src="/Screenshots/Admin/screen1.png?raw=true" width="210" /></td>
