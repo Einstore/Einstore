@@ -32,10 +32,16 @@ Enterprise distribution platform for mobile apps ... the first open source appst
 
 ### Basic usage
 
-- To run do `make setup-demo`
+- To install run `make install-db`
 - To start and stop the project `make up` and `make stop`
-- Run `make help` for other commands
+- Run `make help` or just `make` for other commands
 - Optionally look into the [Makefile](https://github.com/Einstore/Einstore/blob/master/Makefile) for all remaining scripts
+
+#### Demo mode
+
+- Ton install demo data run `make install-demo`
+- To start and stop the project `make up` and `make stop`
+
 
 ### Documentation
 
