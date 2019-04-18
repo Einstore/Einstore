@@ -4992,7 +4992,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"test-template\",\n\t\"html\": \"html\",\n\t\"plain\": \"plain\"\n}"
+					"raw": "{\n\t\"name\": \"test-template\",\n\t\"source\": \"html\",\n\t\"link\": \"http\"\n}"
 				},
 				"url": {
 					"raw": "{{SERVER}}templates",
@@ -5038,7 +5038,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"test-template\",\n\t\"html\": \"html edited\",\n\t\"plain\": \"plain edited\"\n}"
+					"raw": "{\n\t\"name\": \"test-template\",\n\t\"source\": \"<html>\",\n\t\"link\": \"http://\"\n}"
 				},
 				"url": {
 					"raw": "{{SERVER}}templates/{{TEMPLATE_ID}}",
