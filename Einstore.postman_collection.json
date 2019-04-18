@@ -789,6 +789,85 @@
 			"response": []
 		},
 		{
+			"name": "Authenticators",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0a4fca42-18ee-49ac-bbe5-0fdca7102e0a",
+						"exec": [
+							"// var jsonData = JSON.parse(responseBody);",
+							"",
+							"// // Status code",
+							"// tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"// // Token check",
+							"// tests[\"Token has an id\"] = (jsonData[\"id\"].length > 10)",
+							"// tests[\"Token has a user\"] = (jsonData[\"user\"][\"id\"].length > 10)",
+							"// tests[\"Token has a token\"] = (jsonData[\"token\"].length > 10)",
+							"// tests[\"Token has expires\"] = (jsonData[\"expires\"].length > 10)",
+							"",
+							"// postman.setEnvironmentVariable(\"AUTH_TOKEN\", jsonData[\"token\"]);",
+							"",
+							"// // JWT",
+							"// var jwtAuthExists = responseHeaders.hasOwnProperty(\"Authorization\") || responseHeaders.hasOwnProperty(\"authorization\");",
+							"// tests[\"JWT Token is present\"] = jwtAuthExists;",
+							"",
+							"// if (jwtAuthExists) {",
+							"//     var a = responseHeaders[\"Authorization\"] || responseHeaders[\"authorization\"];",
+							"//     tests[\"JWT token has a bearer\"] = a.has(\"Bearer \");",
+							"//     tests[\"JWT token has a value\"] = (a.length > 15);",
+							"//     postman.setEnvironmentVariable(\"JWT_AUTH\", a.substring(7));",
+							"// }",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0d43ff69-0ee0-44f2-b2f1-f0a273c92a0b",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}auth/gitlab/login?link=this_has_been_success",
+					"host": [
+						"{{SERVER}}auth"
+					],
+					"path": [
+						"gitlab",
+						"login"
+					],
+					"query": [
+						{
+							"key": "link",
+							"value": "this_has_been_success"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "JWT refresh",
 			"event": [
 				{
