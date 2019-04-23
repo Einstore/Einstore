@@ -48,6 +48,7 @@ Enterprise distribution platform for mobile apps ... the first open source appst
 The main documentation for Einstore can be found in our [Wiki here on Github](https://github.com/Einstore/Einstore/wiki). For API documentation go to our [Einstore API documentation](https://boost.docs.apiary.io)
 
 #### Shortcuts
+* [Emails](https://github.com/Einstore/Einstore/wiki/Configure-email)
 * [Continuous integration (CI)](https://github.com/Einstore/Einstore/wiki/Continuous-integrations)
 * [Environmental variables](https://github.com/Einstore/Einstore/wiki/Environmental-variables)
 * [Tags](https://github.com/Einstore/Einstore/wiki/Tags)
