@@ -13,7 +13,7 @@ up: docker-compose.yaml docker-compose.override.yaml ## Does docker-compose up, 
 clean: ## Deletes all containers and volumes. WILL DROP ALL DB DATA
 	docker-compose down --volumes --remove-orphans
 
-stop: ## Stops all containers
+down: ## Stops all containers
 	docker-compose stop -t 5
 
 install-db: up ## Install basic data
