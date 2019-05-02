@@ -849,19 +849,9 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}auth/gitlab/login?link=this_has_been_success",
+					"raw": "{{SERVER}}authenticators",
 					"host": [
-						"{{SERVER}}auth"
-					],
-					"path": [
-						"gitlab",
-						"login"
-					],
-					"query": [
-						{
-							"key": "link",
-							"value": "this_has_been_success"
-						}
+						"{{SERVER}}authenticators"
 					]
 				}
 			},
@@ -3951,13 +3941,12 @@
 			"response": []
 		},
 		{
-			"name": "Upload keys (teams/:id/keys)",
+			"name": "API keys (teams/:id/keys)",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"id": "710a0a32-3cbc-4cb2-a3d1-aaa38465ab17",
-						"type": "text/javascript",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"",
@@ -3977,7 +3966,8 @@
 							"// Content type",
 							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
 							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -4001,7 +3991,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"name\": \"Upload key yo!\"\n}"
+					"raw": "{\n  \"name\": \"SDK key yo!\",\n  \"type\": 1\n}"
 				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/keys",
@@ -4017,7 +4007,7 @@
 			"response": []
 		},
 		{
-			"name": "Upload keys (keys)",
+			"name": "API keys (keys)",
 			"request": {
 				"method": "GET",
 				"header": [
@@ -4040,7 +4030,7 @@
 			"response": []
 		},
 		{
-			"name": "Upload keys (teams/:id/keys)",
+			"name": "API keys (teams/:id/keys)",
 			"request": {
 				"method": "GET",
 				"header": [
@@ -4081,12 +4071,13 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}keys/{{TEST_UPLOAD_KEY_ID}}",
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/keys",
 					"host": [
-						"{{SERVER}}keys"
+						"{{SERVER}}teams"
 					],
 					"path": [
-						"{{TEST_UPLOAD_KEY_ID}}"
+						"{{TEST_TEAM_ID}}",
+						"keys"
 					]
 				}
 			},
@@ -4143,6 +4134,68 @@
 					],
 					"path": [
 						"{{TEST_UPLOAD_KEY_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SDK (sdk)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "710a0a32-3cbc-4cb2-a3d1-aaa38465ab17",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 201\"] = responseCode.code === 201;",
+							"",
+							"// Token check",
+							"tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
+							"tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
+							"tests[\"Key has a token\"] = (jsonData[\"token\"].length > 0)",
+							"tests[\"Key has a correct team_id\"] = (jsonData[\"team_id\"] == postman.getEnvironmentVariable(\"TEST_TEAM_ID\"))",
+							"",
+							"postman.setEnvironmentVariable(\"TEST_UPLOAD_KEY_ID\", jsonData[\"id\"]);",
+							"postman.setEnvironmentVariable(\"TEST_UPLOAD_KEY\", jsonData[\"token\"]);",
+							"",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"identifier\": \"com.ford.app\",\n  \"version\": \"2.0\",\n  \"build\": \"12345\",\n  \"created\": \"2019-05-01T11:50:42Z\",\n  \"sdk\": \"1.0\",\n  \"language\": \"en-gb\",\n  \"platform\": \"android\",\n  \"os_version\": \"7.2\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}sdk",
+					"host": [
+						"{{SERVER}}sdk"
 					]
 				}
 			},
@@ -5015,6 +5068,16 @@
 		{
 			"name": "Templates",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"body": {
