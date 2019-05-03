@@ -39,7 +39,7 @@ Enterprise distribution platform for mobile apps ... the first open source appst
 
 #### Demo mode
 
-- Ton install demo data run `make install-demo`
+- To install demo data run `make install-demo`
 - To start and stop the project `make up` and `make stop`
 
 
