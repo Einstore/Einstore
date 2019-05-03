@@ -5004,7 +5004,7 @@
 			"response": []
 		},
 		{
-			"name": "Templates (tempolates/:id)",
+			"name": "Templates (templates/:id)",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -5025,7 +5025,7 @@
 			"response": []
 		},
 		{
-			"name": "Templates (tempolates/:id)",
+			"name": "Templates (templates/:id)",
 			"request": {
 				"method": "PUT",
 				"header": [
@@ -5053,7 +5053,7 @@
 			"response": []
 		},
 		{
-			"name": "Templates (tempolates/:id)",
+			"name": "Templates (templates/:id)",
 			"request": {
 				"method": "DELETE",
 				"header": [],
