@@ -2725,160 +2725,7 @@
 			"response": []
 		},
 		{
-			"name": "Apps (apps)",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"id": "f1a88013-f86e-409e-b4b8-07c974a4031a",
-						"exec": [
-							"eval(pm.environment.get(\"func:authorize\"));"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{JWT_AUTH}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Origin",
-						"value": "{{SERVER}}"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{SERVER}}apps?limit=10&tags=[\"bricks\"]",
-					"host": [
-						"{{SERVER}}apps"
-					],
-					"query": [
-						{
-							"key": "limit",
-							"value": "10"
-						},
-						{
-							"key": "tags",
-							"value": "[\"bricks\"]"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Apps (apps?filters)",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"id": "b5bd4386-09e9-47ac-9eab-c0b25836a986",
-						"type": "text/javascript",
-						"exec": [
-							"eval(pm.environment.get(\"func:authorize\"));"
-						]
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{JWT_AUTH}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{SERVER}}apps?limit=20&page=40&platform=ios",
-					"host": [
-						"{{SERVER}}apps"
-					],
-					"query": [
-						{
-							"key": "limit",
-							"value": "20"
-						},
-						{
-							"key": "page",
-							"value": "40"
-						},
-						{
-							"key": "platform",
-							"value": "ios"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Apps in a cluster (clusters/:id/apps)",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"id": "b5bd4386-09e9-47ac-9eab-c0b25836a986",
-						"exec": [
-							"eval(pm.environment.get(\"func:authorize\"));"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{JWT_AUTH}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{SERVER}}clusters/{{CLUSTER_ID}}/apps",
-					"host": [
-						"{{SERVER}}clusters"
-					],
-					"path": [
-						"{{CLUSTER_ID}}",
-						"apps"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Apps (apps/overview)",
+			"name": "Apps overview (apps)",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -2909,12 +2756,9 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}apps/overview?limit=100&from=0&search=&platform=ios",
+					"raw": "{{SERVER}}apps?limit=100&from=0&search=&platform=ios",
 					"host": [
 						"{{SERVER}}apps"
-					],
-					"path": [
-						"overview"
 					],
 					"query": [
 						{
@@ -2939,7 +2783,7 @@
 			"response": []
 		},
 		{
-			"name": "Apps (teams/:id/apps/overview)",
+			"name": "Apps overview (teams/:id/apps)",
 			"event": [
 				{
 					"listen": "test",
@@ -2987,14 +2831,13 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/apps/overview",
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/apps",
 					"host": [
 						"{{SERVER}}teams"
 					],
 					"path": [
 						"{{TEST_TEAM_ID}}",
-						"apps",
-						"overview"
+						"apps"
 					]
 				}
 			},
@@ -3087,7 +2930,7 @@
 							"tests[\"App has an identifier\"] = (jsonData[\"identifier\"].length > 2)",
 							"tests[\"Size is not 0\"] = (jsonData[\"size\"] > 0)",
 							"",
-							"postman.setEnvironmentVariable(\"APP_ID\", jsonData[\"id\"]);",
+							"postman.setEnvironmentVariable(\"BUILD_ID\", jsonData[\"id\"]);",
 							"postman.setEnvironmentVariable(\"CLUSTER_ID\", jsonData[\"cluster_id\"]);",
 							"",
 							"// Content type",
@@ -3147,7 +2990,7 @@
 							"tests[\"App has an identifier\"] = (jsonData[\"identifier\"].length > 2)",
 							"tests[\"Size is not 0\"] = (jsonData[\"size\"] > 0)",
 							"",
-							"postman.setEnvironmentVariable(\"APP_ID\", jsonData[\"id\"]);",
+							"postman.setEnvironmentVariable(\"BUILD_ID\", jsonData[\"id\"]);",
 							"postman.setEnvironmentVariable(\"CLUSTER_ID\", jsonData[\"cluster_id\"]);",
 							"",
 							"// Content type",
@@ -3241,7 +3084,7 @@
 							"tests[\"App has an identifier\"] = (jsonData[\"identifier\"].length > 2)",
 							"tests[\"Size is not 0\"] = (jsonData[\"size\"] > 0)",
 							"",
-							"postman.setEnvironmentVariable(\"APP_ID\", jsonData[\"id\"]);",
+							"postman.setEnvironmentVariable(\"BUILD_ID\", jsonData[\"id\"]);",
 							"postman.setEnvironmentVariable(\"CLUSTER_ID\", jsonData[\"cluster_id\"]);",
 							"",
 							"// Content type",
@@ -3284,6 +3127,49 @@
 		{
 			"name": "Apps (apps/:id)",
 			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n\t\"new_tag_1\",\n\t\"new_tag_2\"\n]"
+				},
+				"url": {
+					"raw": "{{SERVER}}apps/{{APP_ID}}",
+					"host": [
+						"{{SERVER}}apps"
+					],
+					"path": [
+						"{{APP_ID}}"
+					]
+				},
+				"description": "Delete a cluster (all builds for an app) based on it's ID"
+			},
+			"response": []
+		},
+		{
+			"name": "Builds for app (app/:id/builds)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "b5bd4386-09e9-47ac-9eab-c0b25836a986",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
 				"auth": {
 					"type": "bearer",
 					"bearer": [
@@ -3301,19 +3187,160 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}apps/{{APP_ID}}",
+					"raw": "{{SERVER}}app/{{APP_ID}}/builds",
 					"host": [
-						"{{SERVER}}apps"
+						"{{SERVER}}app"
 					],
 					"path": [
-						"{{APP_ID}}"
+						"{{APP_ID}}",
+						"builds"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Apps (apps/:id/auth)",
+			"name": "Builds (builds)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "f1a88013-f86e-409e-b4b8-07c974a4031a",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Origin",
+						"value": "{{SERVER}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}builds?limit=10&tags=[\"bricks\"]",
+					"host": [
+						"{{SERVER}}builds"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "10"
+						},
+						{
+							"key": "tags",
+							"value": "[\"bricks\"]"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Builds (builds?filters)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "b5bd4386-09e9-47ac-9eab-c0b25836a986",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}builds?limit=20&page=40&platform=ios",
+					"host": [
+						"{{SERVER}}builds"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "20"
+						},
+						{
+							"key": "page",
+							"value": "40"
+						},
+						{
+							"key": "platform",
+							"value": "ios"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Builds (builds/:id)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}builds/{{BUILD_ID}}",
+					"host": [
+						"{{SERVER}}builds"
+					],
+					"path": [
+						"{{BUILD_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Builds (builds/:id/auth)",
 			"event": [
 				{
 					"listen": "test",
@@ -3364,12 +3391,12 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}apps/{{APP_ID}}/auth",
+					"raw": "{{SERVER}}builds/{{BUILD_ID}}/auth",
 					"host": [
-						"{{SERVER}}apps"
+						"{{SERVER}}builds"
 					],
 					"path": [
-						"{{APP_ID}}",
+						"{{BUILD_ID}}",
 						"auth"
 					]
 				}
@@ -3377,13 +3404,12 @@
 			"response": []
 		},
 		{
-			"name": "Apps (apps/:id/icon)",
+			"name": "Builds (builds/:id/icon)",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"id": "090b0686-dd13-480c-a2a8-ac34491fe080",
-						"type": "text/javascript",
 						"exec": [
 							"// Status code",
 							"tests[\"Status code is 200\"] = responseCode.code === 200;",
@@ -3391,7 +3417,8 @@
 							"// Content type",
 							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
 							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"image/png\");"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -3408,12 +3435,12 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}apps/{{APP_ID}}/icon",
+					"raw": "{{SERVER}}builds/{{BUILD_ID}}/icon",
 					"host": [
-						"{{SERVER}}apps"
+						"{{SERVER}}builds"
 					],
 					"path": [
-						"{{APP_ID}}",
+						"{{BUILD_ID}}",
 						"icon"
 					]
 				}
@@ -3421,7 +3448,7 @@
 			"response": []
 		},
 		{
-			"name": "Apps (apps/:id/history)",
+			"name": "Builds (builds/:id/history)",
 			"event": [
 				{
 					"listen": "test",
@@ -3457,12 +3484,12 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}apps/{{APP_ID}}/history",
+					"raw": "{{SERVER}}builds/{{BUILD_ID}}/history",
 					"host": [
-						"{{SERVER}}apps"
+						"{{SERVER}}builds"
 					],
 					"path": [
-						"{{APP_ID}}",
+						"{{BUILD_ID}}",
 						"history"
 					]
 				}
@@ -3470,7 +3497,7 @@
 			"response": []
 		},
 		{
-			"name": "Apps (apps/:id/plist/:token/:file)",
+			"name": "Builds (builds/:id/plist/:token/:file)",
 			"request": {
 				"auth": {
 					"type": "noauth"
@@ -3487,12 +3514,12 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}apps/{{APP_ID}}/plist/{{DOWNLOAD_TOKEN}}/app.plist",
+					"raw": "{{SERVER}}builds/{{BUILD_ID}}/plist/{{DOWNLOAD_TOKEN}}/app.plist",
 					"host": [
-						"{{SERVER}}apps"
+						"{{SERVER}}builds"
 					],
 					"path": [
-						"{{APP_ID}}",
+						"{{BUILD_ID}}",
 						"plist",
 						"{{DOWNLOAD_TOKEN}}",
 						"app.plist"
@@ -3502,7 +3529,7 @@
 			"response": []
 		},
 		{
-			"name": "Apps (apps/file)",
+			"name": "Builds (builds/file)",
 			"request": {
 				"auth": {
 					"type": "noauth"
@@ -3514,9 +3541,9 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}apps/file?token={{DOWNLOAD_TOKEN}}",
+					"raw": "{{SERVER}}builds/file?token={{DOWNLOAD_TOKEN}}",
 					"host": [
-						"{{SERVER}}apps"
+						"{{SERVER}}builds"
 					],
 					"path": [
 						"file"
@@ -3532,7 +3559,7 @@
 			"response": []
 		},
 		{
-			"name": "Apps (apps/:id)",
+			"name": "Builds (builds/:id)",
 			"request": {
 				"method": "DELETE",
 				"header": [
@@ -3546,56 +3573,24 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}apps/{{APP_ID}}",
+					"raw": "{{SERVER}}builds/{{BUILD_ID}}",
 					"host": [
-						"{{SERVER}}apps"
+						"{{SERVER}}builds"
 					],
 					"path": [
-						"{{APP_ID}}"
+						"{{BUILD_ID}}"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Cluster (clusters/:id)",
-			"request": {
-				"method": "DELETE",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
-					},
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "[\n\t\"new_tag_1\",\n\t\"new_tag_2\"\n]"
-				},
-				"url": {
-					"raw": "{{SERVER}}clusters/{{CLUSTER_ID}}",
-					"host": [
-						"{{SERVER}}clusters"
-					],
-					"path": [
-						"{{CLUSTER_ID}}"
-					]
-				},
-				"description": "Delete a cluster (all builds for an app) based on it's ID"
-			},
-			"response": []
-		},
-		{
-			"name": "Apps (apps/:id/tags)",
+			"name": "Tags for build (builds/:id/tags)",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"id": "8a8c7f89-3f8b-4a4c-acde-c95ca1175470",
-						"type": "text/javascript",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"",
@@ -3615,7 +3610,8 @@
 							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
 							"",
 							""
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -3632,12 +3628,12 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}apps/{{APP_ID}}/tags",
+					"raw": "{{SERVER}}builds/{{BUILD_ID}}/tags",
 					"host": [
-						"{{SERVER}}apps"
+						"{{SERVER}}builds"
 					],
 					"path": [
-						"{{APP_ID}}",
+						"{{BUILD_ID}}",
 						"tags"
 					]
 				}
@@ -3758,7 +3754,7 @@
 			"response": []
 		},
 		{
-			"name": "Tags (teams/:id/tags)",
+			"name": "Tags for team (teams/:id/tags)",
 			"event": [
 				{
 					"listen": "test",
@@ -3878,7 +3874,7 @@
 			"response": []
 		},
 		{
-			"name": "Apps (apps/:id/tags)",
+			"name": "Builds (builds/:id/tags)",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -3896,12 +3892,12 @@
 					"raw": "[\n\t\"new_tag_1\",\n\t\"new_tag_2\",\n\t\"new_tag_3\",\n\t\"1.4.4\"\n]"
 				},
 				"url": {
-					"raw": "{{SERVER}}apps/{{APP_ID}}/tags",
+					"raw": "{{SERVER}}builds/{{BUILD_ID}}/tags",
 					"host": [
-						"{{SERVER}}apps"
+						"{{SERVER}}builds"
 					],
 					"path": [
-						"{{APP_ID}}",
+						"{{BUILD_ID}}",
 						"tags"
 					]
 				}
@@ -3909,7 +3905,7 @@
 			"response": []
 		},
 		{
-			"name": "Apps (apps/:id/tags/:id)",
+			"name": "Builds (builds/:id/tags/:id)",
 			"request": {
 				"method": "DELETE",
 				"header": [
@@ -3927,12 +3923,12 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{SERVER}}apps/{{APP_ID}}/tags/{{TAG_ID}}",
+					"raw": "{{SERVER}}builds/{{BUILD_ID}}/tags/{{TAG_ID}}",
 					"host": [
-						"{{SERVER}}apps"
+						"{{SERVER}}builds"
 					],
 					"path": [
-						"{{APP_ID}}",
+						"{{BUILD_ID}}",
 						"tags",
 						"{{TAG_ID}}"
 					]
@@ -4190,7 +4186,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"identifier\": \"com.ford.app\",\n  \"version\": \"2.0\",\n  \"build\": \"12345\",\n  \"created\": \"2019-05-01T11:50:42Z\",\n  \"sdk\": \"1.0\",\n  \"language\": \"en-gb\",\n  \"platform\": \"android\",\n  \"os_version\": \"7.2\",\n  \"link\": \"aaaaaaa\"\n}"
+					"raw": "{\n  \"identifier\": \"com.ford.app\",\n  \"version\": \"2.0\",\n  \"build\": \"12345\",\n  \"created\": \"2019-05-01T11:50:42Z\",\n  \"sdk\": \"1.0\",\n  \"language\": \"en-gb\",\n  \"platform\": \"android\",\n  \"os_version\": \"7.2\",\n  \"link\": \"aaaaaaa :)\"\n}"
 				},
 				"url": {
 					"raw": "{{SERVER}}sdk",
@@ -4979,6 +4975,34 @@
 					"raw": "{{SERVER}}info",
 					"host": [
 						"{{SERVER}}info"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mode",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}mode",
+					"host": [
+						"{{SERVER}}mode"
 					]
 				}
 			},
