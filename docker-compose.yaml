@@ -32,7 +32,7 @@ services:
     environment:
       APICORE_STORAGE_LOCAL_ROOT: /home/einstore
 
-      APICORE_SERVER_NAME: "Einstore - admin dev"
+      APICORE_SERVER_NAME: "Einstore - Enterprise AppStore"
       APICORE_SERVER_PATH_PREFIX: ~
       APICORE_SERVER_MAX_UPLOAD_FILESIZE: 50
 
