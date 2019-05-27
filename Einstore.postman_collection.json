@@ -4062,6 +4062,72 @@
 			"response": []
 		},
 		{
+			"name": "API keys (teams/:id/keys?tags)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "710a0a32-3cbc-4cb2-a3d1-aaa38465ab17",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 201\"] = responseCode.code === 201;",
+							"",
+							"// Token check",
+							"tests[\"Key has an id\"] = (jsonData[\"id\"].length > 0)",
+							"tests[\"Key has an name\"] = (jsonData[\"name\"].length > 0)",
+							"tests[\"Key has a token\"] = (jsonData[\"token\"].length > 0)",
+							"tests[\"Key has a correct team_id\"] = (jsonData[\"team_id\"] == postman.getEnvironmentVariable(\"TEST_TEAM_ID\"))",
+							"",
+							"postman.setEnvironmentVariable(\"TEST_UPLOAD_KEY_ID\", jsonData[\"id\"]);",
+							"postman.setEnvironmentVariable(\"TEST_UPLOAD_KEY\", jsonData[\"token\"]);",
+							"",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_AUTH}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"SDK key with tags yo!\",\n\t\"type\": 1,\n\t\"tags\": \"bricks, tag1\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/keys",
+					"host": [
+						"{{SERVER}}teams"
+					],
+					"path": [
+						"{{TEST_TEAM_ID}}",
+						"keys"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "API keys (keys)",
 			"request": {
 				"method": "GET",
@@ -4112,7 +4178,7 @@
 			"response": []
 		},
 		{
-			"name": "Upload keys (keys/:id)",
+			"name": "API keys (keys/:id)",
 			"request": {
 				"method": "GET",
 				"header": [
@@ -4139,7 +4205,7 @@
 			"response": []
 		},
 		{
-			"name": "Upload keys (keys/:id)",
+			"name": "API keys (keys/:id)",
 			"request": {
 				"method": "PUT",
 				"header": [
@@ -4154,7 +4220,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Upload key changed yohoho!\"\n}"
+					"raw": "{\n\t\"name\": \"Upload key changed yohoho!\",\n\t\"tags\": \"bricks, tag2\"\n}"
 				},
 				"url": {
 					"raw": "{{SERVER}}keys/{{TEST_UPLOAD_KEY_ID}}",
@@ -4169,7 +4235,7 @@
 			"response": []
 		},
 		{
-			"name": "Upload keys (keys/:id)",
+			"name": "API keys (keys/:id)",
 			"request": {
 				"method": "DELETE",
 				"header": [
