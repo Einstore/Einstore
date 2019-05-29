@@ -39,10 +39,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}install",
 					"host": [
@@ -65,10 +61,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}demo",
 					"host": [
@@ -91,10 +83,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}uninstall",
 					"host": [
@@ -105,13 +93,12 @@
 			"response": []
 		},
 		{
-			"name": "Password recovery (START)",
+			"name": "Recovery (auth/recovery)",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"id": "ff8cd911-e63a-48df-a3e2-205807e80395",
-						"type": "text/javascript",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"",
@@ -127,14 +114,14 @@
 							"// Content type",
 							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
 							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
-						]
+						],
+						"type": "text/javascript"
 					}
 				},
 				{
 					"listen": "prerequest",
 					"script": {
 						"id": "0d43ff69-0ee0-44f2-b2f1-f0a273c92a0b",
-						"type": "text/javascript",
 						"exec": [
 							"var authorize = 'var server = pm.environment.get(\"SERVER\");\\",
 							"var token = pm.environment.get(\"AUTH_TOKEN\");\\",
@@ -151,7 +138,8 @@
 							"});';",
 							"",
 							"pm.environment.set(\"func:authorize\", authorize);"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -168,64 +156,56 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"core@liveui.io\"\n}"
+					"raw": "{\n  \"email\": \"core@liveui.io\",\n  \"link\": \"https://frontend.example.com/recovery\"\n}"
 				},
 				"url": {
-					"raw": "{{SERVER}}auth/start-recovery",
+					"raw": "{{SERVER}}auth/recovery",
 					"host": [
 						"{{SERVER}}auth"
 					],
 					"path": [
-						"start-recovery"
+						"recovery"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Password recovery (INPUT)",
+			"name": "Recovery (auth/recovery/finish)",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"id": "0a4fca42-18ee-49ac-bbe5-0fdca7102e0a",
-						"type": "text/javascript",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"",
 							"// Status code",
 							"tests[\"Status code is 200\"] = responseCode.code === 200;",
 							"",
-							"// Token check",
-							"tests[\"Token has an id\"] = (jsonData[\"id\"].length > 10)",
-							"tests[\"Token has a user\"] = (jsonData[\"user\"][\"id\"].length > 10)",
-							"tests[\"Token has a token\"] = (jsonData[\"token\"].length > 10)",
-							"tests[\"Token has expires\"] = (jsonData[\"expires\"] > 543533823)",
-							"",
-							"postman.setEnvironmentVariable(\"AUTH_TOKEN\", jsonData[\"token\"]);",
-							"",
-							"// JWT",
-							"var jwtAuthExists = responseHeaders.hasOwnProperty(\"Authorization\") || responseHeaders.hasOwnProperty(\"authorization\");",
-							"tests[\"JWT Token is present\"] = jwtAuthExists;",
-							"",
-							"if (jwtAuthExists) {",
-							"    var a = responseHeaders[\"Authorization\"] || responseHeaders[\"authorization\"];",
-							"    tests[\"JWT token has a bearer\"] = a.has(\"Bearer \");",
-							"    tests[\"JWT token has a value\"] = (a.length > 15);",
-							"    postman.setEnvironmentVariable(\"JWT_AUTH\", a.substring(7));",
+							"if (responseCode.code === 200) {",
+							"    // Token check",
+							"    tests[\"User has an id\"] = (jsonData[\"id\"].length > 0)",
+							"    tests[\"User has a first name\"] = (jsonData[\"firstname\"].length > 0)",
+							"    tests[\"User has a last name\"] = (jsonData[\"lastname\"].length > 0)",
+							"    tests[\"User has a nick-name\"] = (jsonData[\"username\"].length > 0)",
+							"    ",
+							"    postman.setEnvironmentVariable(\"TEST_USER_ID\", jsonData[\"id\"]);",
 							"}",
 							"",
 							"// Content type",
 							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
-						]
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						],
+						"type": "text/javascript"
 					}
 				},
 				{
 					"listen": "prerequest",
 					"script": {
 						"id": "0d43ff69-0ee0-44f2-b2f1-f0a273c92a0b",
-						"type": "text/javascript",
 						"exec": [
 							"var authorize = 'var server = pm.environment.get(\"SERVER\");\\",
 							"var token = pm.environment.get(\"AUTH_TOKEN\");\\",
@@ -242,99 +222,8 @@
 							"});';",
 							"",
 							"pm.environment.set(\"func:authorize\", authorize);"
-						]
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{SERVER}}auth/input-recovery?token={{RECOVERY_TOKEN}}",
-					"host": [
-						"{{SERVER}}auth"
-					],
-					"path": [
-						"input-recovery"
-					],
-					"query": [
-						{
-							"key": "token",
-							"value": "{{RECOVERY_TOKEN}}"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Password recovery (FINISH)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "0a4fca42-18ee-49ac-bbe5-0fdca7102e0a",
-						"type": "text/javascript",
-						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"",
-							"// Status code",
-							"tests[\"Status code is 200\"] = responseCode.code === 200;",
-							"",
-							"// Token check",
-							"tests[\"Token has an id\"] = (jsonData[\"id\"].length > 10)",
-							"tests[\"Token has a user\"] = (jsonData[\"user\"][\"id\"].length > 10)",
-							"tests[\"Token has a token\"] = (jsonData[\"token\"].length > 10)",
-							"tests[\"Token has expires\"] = (jsonData[\"expires\"] > 543533823)",
-							"",
-							"postman.setEnvironmentVariable(\"AUTH_TOKEN\", jsonData[\"token\"]);",
-							"",
-							"// JWT",
-							"var jwtAuthExists = responseHeaders.hasOwnProperty(\"Authorization\") || responseHeaders.hasOwnProperty(\"authorization\");",
-							"tests[\"JWT Token is present\"] = jwtAuthExists;",
-							"",
-							"if (jwtAuthExists) {",
-							"    var a = responseHeaders[\"Authorization\"] || responseHeaders[\"authorization\"];",
-							"    tests[\"JWT token has a bearer\"] = a.has(\"Bearer \");",
-							"    tests[\"JWT token has a value\"] = (a.length > 15);",
-							"    postman.setEnvironmentVariable(\"JWT_AUTH\", a.substring(7));",
-							"}",
-							"",
-							"// Content type",
-							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
-							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
-						]
-					}
-				},
-				{
-					"listen": "prerequest",
-					"script": {
-						"id": "0d43ff69-0ee0-44f2-b2f1-f0a273c92a0b",
-						"type": "text/javascript",
-						"exec": [
-							"var authorize = 'var server = pm.environment.get(\"SERVER\");\\",
-							"var token = pm.environment.get(\"AUTH_TOKEN\");\\",
-							"pm.sendRequest({\\",
-							"    url: server + \"token\",\\",
-							"    method: \"GET\",\\",
-							"    header: \"Authorization:Token \" + token\\",
-							"}, function (err, response) {\\",
-							"    console.log(response.headers);\\",
-							"    if (response) {\\",
-							"        var a = response.headers.get(\"authorization\").substring(7);\\",
-							"        pm.environment.set(\"JWT_AUTH\", a);\\",
-							"    }\\",
-							"});';",
-							"",
-							"pm.environment.set(\"func:authorize\", authorize);"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -343,18 +232,25 @@
 					"type": "noauth"
 				},
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"admin@liveui.io\",\n  \"password\": \"password123\"\n}"
+					"raw": "{\n  \"password\": \"password123\"\n}"
 				},
 				"url": {
-					"raw": "{{SERVER}}auth/finish-recovery?token={{RECOVERY_TOKEN}}",
+					"raw": "{{SERVER}}auth/recovery/finish?token={{RECOVERY_TOKEN}}",
 					"host": [
 						"{{SERVER}}auth"
 					],
 					"path": [
-						"finish-recovery"
+						"recovery",
+						"finish"
 					],
 					"query": [
 						{
@@ -373,7 +269,6 @@
 					"listen": "test",
 					"script": {
 						"id": "b26c1813-6cd9-4bea-9297-916788afd1e8",
-						"type": "text/javascript",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"",
@@ -387,14 +282,14 @@
 							"// Content type",
 							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
 							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");"
-						]
+						],
+						"type": "text/javascript"
 					}
 				},
 				{
 					"listen": "prerequest",
 					"script": {
 						"id": "0d43ff69-0ee0-44f2-b2f1-f0a273c92a0b",
-						"type": "text/javascript",
 						"exec": [
 							"var authorize = 'var server = pm.environment.get(\"SERVER\");\\",
 							"var token = pm.environment.get(\"AUTH_TOKEN\");\\",
@@ -411,7 +306,8 @@
 							"});';",
 							"",
 							"pm.environment.set(\"func:authorize\", authorize);"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -525,10 +421,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}auth",
 					"host": [
@@ -594,10 +486,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}auth/github/login?link=this_has_been_success",
 					"host": [
@@ -673,10 +561,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}auth/gitlab/login?link=this_has_been_success",
 					"host": [
@@ -844,10 +728,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}authenticators",
 					"host": [
@@ -919,10 +799,6 @@
 						"value": "{{SERVER}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}token",
 					"host": [
@@ -1055,10 +931,6 @@
 						"value": "{{SERVER}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}logout/all",
 					"host": [
@@ -1314,10 +1186,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}teams",
 					"host": [
@@ -1454,10 +1322,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}",
 					"host": [
@@ -1518,10 +1382,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon",
 					"host": [
@@ -1583,10 +1443,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/favicon",
 					"host": [
@@ -1648,10 +1504,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon/16",
 					"host": [
@@ -1714,10 +1566,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon/64",
 					"host": [
@@ -1780,10 +1628,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon/128",
 					"host": [
@@ -1846,10 +1690,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon/192",
 					"host": [
@@ -1912,10 +1752,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon/256",
 					"host": [
@@ -1978,10 +1814,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/icon/512",
 					"host": [
@@ -2201,10 +2033,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/users",
 					"host": [
@@ -2364,10 +2192,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/config",
 					"host": [
@@ -2470,10 +2294,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}users",
 					"host": [
@@ -2529,10 +2349,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}users/me",
 					"host": [
@@ -2573,10 +2389,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}users/global?search=co",
 					"host": [
@@ -2622,10 +2434,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}users/identify?search=core@liveui.io",
 					"host": [
@@ -2645,16 +2453,48 @@
 			"response": []
 		},
 		{
-			"name": "Users (users)",
+			"name": "Registration (users)",
 			"event": [
 				{
 					"listen": "prerequest",
 					"script": {
 						"id": "245c9eb5-1349-4660-8e3f-8a2e2ece34a5",
-						"type": "text/javascript",
 						"exec": [
 							"eval(pm.environment.get(\"func:authorize\"));"
-						]
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "7ac349fb-41dd-4bee-9404-f40f48fef16c",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 201;",
+							"",
+							"if (responseCode.code === 201) {",
+							"    // Token check",
+							"    tests[\"User has an id\"] = (jsonData[\"id\"].length > 0)",
+							"    tests[\"User has a first name\"] = (jsonData[\"firstname\"].length > 0)",
+							"    tests[\"User has a last name\"] = (jsonData[\"lastname\"].length > 0)",
+							"    tests[\"User has a nick-name\"] = (jsonData[\"username\"].length > 0)",
+							"    tests[\"User is not verified\"] = (jsonData[\"verified\"] === false)",
+							"    tests[\"User is not super user\"] = (jsonData[\"su\"] === false)",
+							"    tests[\"User is not disabled\"] = (jsonData[\"disabled\"] === false)",
+							"    ",
+							"    postman.setEnvironmentVariable(\"TEST_USER_ID\", jsonData[\"id\"]);",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -2672,12 +2512,252 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "    {\n        \"email\": \"rafaj@liveui.io\",\n        \"username\": \"rafiki270\",\n        \"lastname\": \"Rafaj\",\n        \"firstname\": \"Ondrej\",\n        \"password\": \"aaaaaa\"\n    }"
+					"raw": "    {\n        \"email\": \"rafaj@liveui.io\",\n        \"username\": \"rafiki270\",\n        \"lastname\": \"Rafaj\",\n        \"firstname\": \"Ondrej\",\n        \"password\": \"aaaaaa\",\n        \"link\": \"https://frontend.example.com/registration\"\n    }"
 				},
 				"url": {
 					"raw": "{{SERVER}}users",
 					"host": [
 						"{{SERVER}}users"
+					]
+				},
+				"description": "Registration"
+			},
+			"response": []
+		},
+		{
+			"name": "Registration (users/verify)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "245c9eb5-1349-4660-8e3f-8a2e2ece34a5",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "ea60c8fa-eaa2-4601-bae8-847be1aa359e",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"if (responseCode.code === 200) {",
+							"    // Token check",
+							"    tests[\"User has an id\"] = (jsonData[\"id\"].length > 0)",
+							"    tests[\"User has a first name\"] = (jsonData[\"firstname\"].length > 0)",
+							"    tests[\"User has a last name\"] = (jsonData[\"lastname\"].length > 0)",
+							"    tests[\"User has a nick-name\"] = (jsonData[\"username\"].length > 0)",
+							"    tests[\"User is not verified\"] = (jsonData[\"verified\"] === true)",
+							"    tests[\"User is not super user\"] = (jsonData[\"su\"] === false)",
+							"    tests[\"User is not disabled\"] = (jsonData[\"disabled\"] === false)",
+							"    ",
+							"    postman.setEnvironmentVariable(\"TEST_USER_ID\", jsonData[\"id\"]);",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SERVER}}users/verify?token={{REGISTRATION_TOKEN}}",
+					"host": [
+						"{{SERVER}}users"
+					],
+					"path": [
+						"verify"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "{{REGISTRATION_TOKEN}}"
+						}
+					]
+				},
+				"description": "Registration"
+			},
+			"response": []
+		},
+		{
+			"name": "Invite user (users/invite)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "245c9eb5-1349-4660-8e3f-8a2e2ece34a5",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "0e6805e0-c702-4d66-98a7-d88c3cef3d85",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 201;",
+							"",
+							"if (responseCode.code === 201) {",
+							"    // Token check",
+							"    tests[\"User has an id\"] = (jsonData[\"id\"].length > 0)",
+							"    tests[\"User has a first name\"] = (jsonData[\"firstname\"].length > 0)",
+							"    tests[\"User has a last name\"] = (jsonData[\"lastname\"].length > 0)",
+							"    tests[\"User has a nick-name\"] = (jsonData[\"username\"].length === 0)",
+							"    tests[\"User is not verified\"] = (jsonData[\"verified\"] === false)",
+							"    tests[\"User is not super user\"] = (jsonData[\"su\"] === false)",
+							"    tests[\"User is not disabled\"] = (jsonData[\"disabled\"] === false)",
+							"    ",
+							"    postman.setEnvironmentVariable(\"TEST_USER_ID\", jsonData[\"id\"]);",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "    {\n        \"email\": \"rafaj5@liveui.io\",\n        \"lastname\": \"Rafaj\",\n        \"firstname\": \"Ondrej\",\n        \"link\": \"https://frontend.example.com/invite\"\n    }"
+				},
+				"url": {
+					"raw": "{{SERVER}}users/invite",
+					"host": [
+						"{{SERVER}}users"
+					],
+					"path": [
+						"invite"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invite user (users/invite/finish)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "245c9eb5-1349-4660-8e3f-8a2e2ece34a5",
+						"exec": [
+							"eval(pm.environment.get(\"func:authorize\"));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "033a292a-caac-4ffa-989a-779fd808e8ea",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"// Status code",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"if (responseCode.code === 200) {",
+							"    // Token check",
+							"    tests[\"User has an id\"] = (jsonData[\"id\"].length > 0)",
+							"    tests[\"User has a first name\"] = (jsonData[\"firstname\"].length > 0)",
+							"    tests[\"User has a last name\"] = (jsonData[\"lastname\"].length > 0)",
+							"    tests[\"User has a nick-name\"] = (jsonData[\"username\"].length > 0)",
+							"    tests[\"User is not verified\"] = (jsonData[\"verified\"] === true)",
+							"    tests[\"User is not super user\"] = (jsonData[\"su\"] === false)",
+							"    tests[\"User is not disabled\"] = (jsonData[\"disabled\"] === false)",
+							"    ",
+							"    postman.setEnvironmentVariable(\"TEST_USER_ID\", jsonData[\"id\"]);",
+							"}",
+							"",
+							"// Content type",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"tests[\"Content-Type is correct\"] = (postman.getResponseHeader(\"Content-Type\") == \"application/json; charset=utf-8\");",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{JWT_AUTH}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "    {\n        \"username\": \"rafiki270\",\n        \"password\": \"sup3rS3cr3t\"\n    }"
+				},
+				"url": {
+					"raw": "{{SERVER}}users/invite/finish?token={{INVITE_TOKEN}}",
+					"host": [
+						"{{SERVER}}users"
+					],
+					"path": [
+						"invite",
+						"finish"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "{{INVITE_TOKEN}}"
+						}
 					]
 				}
 			},
@@ -2736,48 +2816,6 @@
 			"response": []
 		},
 		{
-			"name": "Invite user (users/invite)",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"id": "245c9eb5-1349-4660-8e3f-8a2e2ece34a5",
-						"exec": [
-							"eval(pm.environment.get(\"func:authorize\"));"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{JWT_AUTH}}"
-					},
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "    {\n        \"email\": \"rafaj@liveui.io\",\n        \"lastname\": \"Rafaj\",\n        \"firstname\": \"Ondrej\"\n    }"
-				},
-				"url": {
-					"raw": "{{SERVER}}users/invite",
-					"host": [
-						"{{SERVER}}users"
-					],
-					"path": [
-						"invite"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Apps overview (apps)",
 			"event": [
 				{
@@ -2804,10 +2842,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}apps?limit=100&from=0&search=&platform=ios",
 					"host": [
@@ -2879,10 +2913,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/apps",
 					"host": [
@@ -2946,10 +2976,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/apps/info",
 					"host": [
@@ -3241,10 +3267,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}apps/{{APP_ID}}/builds",
 					"host": [
@@ -3290,10 +3312,6 @@
 						"value": "{{SERVER}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}builds?limit=10&tags=bricks",
 					"host": [
@@ -3340,10 +3358,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}builds?limit=20&page=40&platform=ios",
 					"host": [
@@ -3382,10 +3396,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}builds/{{BUILD_ID}}",
 					"host": [
@@ -3445,10 +3455,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}builds/{{BUILD_ID}}/auth",
 					"host": [
@@ -3489,10 +3495,6 @@
 						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}builds/{{BUILD_ID}}/icon",
 					"host": [
@@ -3538,10 +3540,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}builds/{{BUILD_ID}}/history",
 					"host": [
@@ -3568,10 +3566,6 @@
 						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}builds/{{BUILD_ID}}/plist/{{DOWNLOAD_TOKEN}}/app.plist",
 					"host": [
@@ -3595,10 +3589,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}builds/file?token={{DOWNLOAD_TOKEN}}",
 					"host": [
@@ -3682,10 +3672,6 @@
 						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}builds/{{BUILD_ID}}/tags",
 					"host": [
@@ -3738,10 +3724,6 @@
 						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}tags?search=1.4",
 					"host": [
@@ -3796,10 +3778,6 @@
 						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}tags/common",
 					"host": [
@@ -3851,10 +3829,6 @@
 						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/tags?search=1",
 					"host": [
@@ -3914,10 +3888,6 @@
 						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/tags/common",
 					"host": [
@@ -4137,10 +4107,6 @@
 						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}keys",
 					"host": [
@@ -4160,10 +4126,6 @@
 						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/keys",
 					"host": [
@@ -4187,10 +4149,6 @@
 						"value": "Bearer {{JWT_AUTH}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}teams/{{TEST_TEAM_ID}}/keys",
 					"host": [
@@ -4293,14 +4251,7 @@
 			],
 			"request": {
 				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{JWT_AUTH}}",
-							"type": "string"
-						}
-					]
+					"type": "noauth"
 				},
 				"method": "POST",
 				"header": [
@@ -4330,10 +4281,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}settings",
 					"host": [
@@ -4351,10 +4298,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}settings?plain=true",
 					"host": [
@@ -4579,10 +4522,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}server/favicon/",
 					"host": [
@@ -4629,10 +4568,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}server/image/",
 					"host": [
@@ -4679,10 +4614,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}server/image/16",
 					"host": [
@@ -4729,10 +4660,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}server/image/64",
 					"host": [
@@ -4779,10 +4706,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}server/image/128",
 					"host": [
@@ -4838,10 +4761,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}server/image/192",
 					"host": [
@@ -4888,10 +4807,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}server/image/256",
 					"host": [
@@ -4938,10 +4853,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}server/image/512",
 					"host": [
@@ -4963,10 +4874,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}database",
 					"host": [
@@ -4991,10 +4898,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}server/security",
 					"host": [
@@ -5015,10 +4918,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}teapot",
 					"host": [
@@ -5036,10 +4935,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}ping",
 					"host": [
@@ -5064,10 +4959,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}errors",
 					"host": [
@@ -5092,10 +4983,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}info",
 					"host": [
@@ -5120,10 +5007,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}mode",
 					"host": [
@@ -5148,10 +5031,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}server/flush",
 					"host": [
@@ -5179,10 +5058,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}server/commit",
 					"host": [
@@ -5201,10 +5076,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}unknown",
 					"host": [
@@ -5229,10 +5100,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}templates",
 					"host": [
@@ -5299,10 +5166,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}templates/{{TEMPLATE_ID}}",
 					"host": [
@@ -5348,10 +5211,6 @@
 			"request": {
 				"method": "DELETE",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SERVER}}templates/{{TEMPLATE_ID}}",
 					"host": [
