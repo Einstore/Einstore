@@ -61,7 +61,7 @@ services:
       start_period: 10s
 
   admin:
-    image: einstore/einstore-admin:dev.master
+    image: einstore/einstore-admin:0.1.0
 
 volumes:
   pgsql-data: ~
