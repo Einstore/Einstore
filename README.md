@@ -39,7 +39,7 @@ Enterprise distribution platform for mobile apps ... the first open source appst
 
 #### Login
 
-> Default username and password is `core@liveui.io`/`sup3rS3cr3t`
+> Default username and password is **core@liveui.io**/**sup3rS3cr3t**
 
 #### Demo mode
 
