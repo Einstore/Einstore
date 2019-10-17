@@ -37,6 +37,10 @@ Enterprise distribution platform for mobile apps ... the first open source appst
 - Run `make help` or just `make` for other commands
 - Optionally look into the [Makefile](https://github.com/Einstore/Einstore/blob/master/Makefile) for all remaining scripts
 
+#### Login
+
+> Default username and password is `core@liveui.io`/`sup3rS3cr3t`
+
 #### Demo mode
 
 - To install demo data run `make install-demo`
