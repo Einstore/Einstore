@@ -10,6 +10,8 @@
 
 Enterprise distribution platform for mobile apps ... the first open source appstore
 
+> <b>Please</b> help us, to support the project and our sales case, it would help us if we kne how many users Einstore has and who they are. We will be extremely grateful to anyone who will touch base with any feedback at all ... hello@einstore.io
+
 ### Screenshots
 <table>
   <tr>
