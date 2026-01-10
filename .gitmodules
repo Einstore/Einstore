@@ -1,0 +1,3 @@
+[submodule "Libraries/rafiki-auth"]
+	path = Libraries/rafiki-auth
+	url = git@github.com:rafiki270/auth.git

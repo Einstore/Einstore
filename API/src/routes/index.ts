@@ -1,0 +1,32 @@
+import { FastifyInstance } from "fastify";
+import { healthRoutes } from "./health.js";
+import { infoRoutes } from "./info.js";
+import { buildRoutes } from "./builds.js";
+import { targetRoutes } from "./targets.js";
+import { appRoutes } from "./apps.js";
+import { versionRoutes } from "./versions.js";
+import { variantRoutes } from "./variants.js";
+import { moduleRoutes } from "./modules.js";
+import { capabilityRoutes } from "./capabilities.js";
+import { artifactRoutes } from "./artifacts.js";
+import { resolveRoutes } from "./resolve.js";
+import { storageRoutes } from "./storage.js";
+import { pipelineRoutes } from "./pipeline.js";
+import { authRoutes } from "./auth.js";
+
+export async function registerRoutes(app: FastifyInstance) {
+  await app.register(healthRoutes);
+  await app.register(infoRoutes);
+  await app.register(buildRoutes);
+  await app.register(targetRoutes);
+  await app.register(appRoutes);
+  await app.register(versionRoutes);
+  await app.register(variantRoutes);
+  await app.register(moduleRoutes);
+  await app.register(capabilityRoutes);
+  await app.register(artifactRoutes);
+  await app.register(resolveRoutes);
+  await app.register(storageRoutes);
+  await app.register(pipelineRoutes);
+  await app.register(authRoutes);
+}

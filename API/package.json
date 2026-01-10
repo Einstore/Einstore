@@ -1,0 +1,35 @@
+{
+  "name": "einstore-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "test:unit": "vitest run",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy"
+  },
+  "dependencies": {
+    "@devicefarmer/adbkit-apkreader": "^3.2.4",
+    "@prisma/client": "^6.16.1",
+    "@unlikeother/auth": "file:../Libraries/rafiki-auth",
+    "adm-zip": "^0.5.16",
+    "apk-parser3": "^0.1.7",
+    "dotenv": "^16.4.5",
+    "fastify": "^4.29.0",
+    "plist": "^3.1.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.5.7",
+    "@types/node": "^22.10.1",
+    "@types/plist": "^3.0.5",
+    "prisma": "^6.16.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^1.6.0"
+  }
+}

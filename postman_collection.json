@@ -1,0 +1,1258 @@
+{
+  "info": {
+    "name": "Einstore API Integration",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/health"
+      }
+    },
+    {
+      "name": "Register",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 201) {",
+              "  const json = pm.response.json();",
+              "  pm.environment.set('accessToken', json.session.accessToken);",
+              "  pm.environment.set('refreshToken', json.session.refreshToken);",
+              "}",
+              "pm.test('Register response ok', function () {",
+              "  pm.expect([200, 201, 400]).to.include(pm.response.code);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"StrongPass123!\",\n  \"email\": \"{{email}}\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/register"
+      }
+    },
+    {
+      "name": "Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.environment.set('accessToken', json.session.accessToken);",
+              "pm.environment.set('refreshToken', json.session.refreshToken);",
+              "pm.test('Login ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"identifier\": \"{{username}}\",\n  \"password\": \"StrongPass123!\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/login"
+      }
+    },
+    {
+      "name": "Auth Session",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/auth/session",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "session"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Auth session ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth Refresh",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/refresh",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "refresh"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json.session && json.session.accessToken) {",
+              "  pm.environment.set('accessToken', json.session.accessToken);",
+              "}",
+              "if (json.session && json.session.refreshToken) {",
+              "  pm.environment.set('refreshToken', json.session.refreshToken);",
+              "}",
+              "pm.test('Auth refresh ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create App",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.environment.set('appId', json.id);",
+              "pm.test('Create app ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(201);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Sample App\",\n  \"identifier\": \"{{appIdentifier}}\"\n}"
+        },
+        "url": "{{baseUrl}}/apps"
+      }
+    },
+    {
+      "name": "Create Version",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.environment.set('versionId', json.id);",
+              "pm.test('Create version ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(201);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"appId\": \"{{appId}}\",\n  \"version\": \"1.0.0\"\n}"
+        },
+        "url": "{{baseUrl}}/versions"
+      }
+    },
+    {
+      "name": "Create Build",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.environment.set('buildId', json.id);",
+              "pm.test('Create build ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(201);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"appIdentifier\": \"{{appIdentifier}}\",\n  \"appName\": \"Sample App\",\n  \"version\": \"1.0.0\",\n  \"buildNumber\": \"1\",\n  \"displayName\": \"Sample App\",\n  \"storageKind\": \"local\",\n  \"storagePath\": \"/tmp/sample.ipa\",\n  \"sizeBytes\": 12345\n}"
+        },
+        "url": "{{baseUrl}}/builds"
+      }
+    },
+    {
+      "name": "Create Target",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.environment.set('targetId', json.id);",
+              "pm.test('Create target ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(201);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"buildId\": \"{{buildId}}\",\n  \"platform\": \"ios\",\n  \"role\": \"app\",\n  \"bundleId\": \"com.example.sample\"\n}"
+        },
+        "url": "{{baseUrl}}/targets"
+      }
+    },
+    {
+      "name": "Create Variant",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Create variant ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(201);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"buildId\": \"{{buildId}}\",\n  \"kind\": \"device\",\n  \"key\": \"family\",\n  \"value\": \"iphone\"\n}"
+        },
+        "url": "{{baseUrl}}/variants"
+      }
+    },
+    {
+      "name": "Create Module",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Create module ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(201);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"buildId\": \"{{buildId}}\",\n  \"name\": \"base\",\n  \"onDemand\": false\n}"
+        },
+        "url": "{{baseUrl}}/modules"
+      }
+    },
+    {
+      "name": "Create Capability",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Create capability ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(201);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"targetId\": \"{{targetId}}\",\n  \"name\": \"push_notifications\"\n}"
+        },
+        "url": "{{baseUrl}}/capabilities"
+      }
+    },
+    {
+      "name": "Create Artifact",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Create artifact ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(201);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"buildId\": \"{{buildId}}\",\n  \"kind\": \"privacy_manifest\",\n  \"storageKind\": \"local\",\n  \"storagePath\": \"/tmp/privacy.plist\"\n}"
+        },
+        "url": "{{baseUrl}}/artifacts"
+      }
+    },
+    {
+      "name": "Get Apps",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/apps",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "apps"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Get apps ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get App By Id",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/apps/{{appId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "apps",
+            "{{appId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Get app ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Versions",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/versions?appId={{appId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "versions"
+          ],
+          "query": [
+            {
+              "key": "appId",
+              "value": "{{appId}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Get versions ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Version By Id",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/versions/{{versionId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "versions",
+            "{{versionId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Get version ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Builds",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/builds",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "builds"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Get builds ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Build By Id",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/builds/{{buildId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "builds",
+            "{{buildId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Get build ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Targets",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/targets?buildId={{buildId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "targets"
+          ],
+          "query": [
+            {
+              "key": "buildId",
+              "value": "{{buildId}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Get targets ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Variants",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/variants?buildId={buildId}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "variants"
+          ],
+          "query": [
+            {
+              "key": "buildId",
+              "value": "{{buildId}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Get variants ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Modules",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/modules?buildId={{buildId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "modules"
+          ],
+          "query": [
+            {
+              "key": "buildId",
+              "value": "{{buildId}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Get modules ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Capabilities",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/capabilities?targetId={{targetId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "capabilities"
+          ],
+          "query": [
+            {
+              "key": "targetId",
+              "value": "{{targetId}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Get capabilities ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Artifacts",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/artifacts?buildId={{buildId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "artifacts"
+          ],
+          "query": [
+            {
+              "key": "buildId",
+              "value": "{{buildId}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Get artifacts ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Info",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/info",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "info"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Info ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Storage",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/storage",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "storage"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Get storage ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Set Storage",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"kind\": \"local\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/storage",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "storage"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Set storage ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Resolve Install",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Resolve ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"buildId\": \"{{buildId}}\",\n  \"device\": {\n    \"platform\": \"ios\",\n    \"osVersion\": \"17.0\",\n    \"deviceFamily\": \"iphone\",\n    \"pairedWatch\": false\n  }\n}"
+        },
+        "url": "{{baseUrl}}/resolve-install"
+      }
+    },
+    {
+      "name": "Android Ingest",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Android ingest ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(201);",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.result.manifest).to.be.an('object');",
+              "  pm.expect(body.result.manifest.packageName).to.be.a('string').and.not.empty;",
+              "  pm.expect(body.result.appName).to.equal('GPTeen');",
+              "  pm.expect(body.result.icons).to.be.an('array').and.not.empty;",
+              "  pm.expect(body.result.manifest.icon).to.be.a('string').and.not.empty;",
+              "  pm.expect(body.result.iconBitmap).to.be.an('object');",
+              "  pm.expect(body.result.iconBitmap.width).to.be.a('number').above(0);",
+              "  pm.expect(body.result.iconBitmap.height).to.be.a('number').above(0);",
+              "  pm.expect(body.result.iconBitmap.sizeBytes).to.be.a('number').above(0);",
+              "  pm.expect(body.result.iconBitmap.path).to.be.a('string').and.not.empty;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"filePath\": \"{{apkPath}}\",\n  \"kind\": \"apk\"\n}"
+        },
+        "url": "{{baseUrl}}/ingest"
+      }
+    },
+    {
+      "name": "iOS Ingest",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"filePath\": \"/System/Volumes/Data/.internal/projects/Projects/GPTeen/ios/build_simulator/PocketPal-sim.ipa\",\n  \"kind\": \"ipa\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ingest",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ingest"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('iOS ingest ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(201);",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.result.appName).to.equal('GPTeen');",
+              "  pm.expect(body.result.identifier).to.equal('ai.pocketpal');",
+              "  pm.expect(body.result.version).to.equal('1.11.12');",
+              "  pm.expect(body.result.buildNumber).to.equal('121');",
+              "  pm.expect(body.result.targets).to.be.an('array').and.not.empty;",
+              "  const main = body.result.targets[0];",
+              "  pm.expect(main.supportedDevices).to.include('iphone');",
+              "  pm.expect(main.supportedDevices).to.include('ipad');",
+              "  pm.expect(main.orientations).to.be.an('array').and.not.empty;",
+              "  pm.expect(main.iconBitmap).to.be.an('object');",
+              "  pm.expect(main.iconBitmap.path).to.be.a('string').and.not.empty;",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth Password Reset Request",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/password-reset",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "password-reset"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json.token) { pm.environment.set('resetToken', json.token); }",
+              "pm.test('Password reset request ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth Password Reset Confirm",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"newpassword123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/password-reset/confirm",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "password-reset",
+            "confirm"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Password reset confirm ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth Logout",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/logout",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "logout"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Auth logout ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.environment.get('username')) {",
+          "  const now = Date.now();",
+          "  pm.environment.set('username', `tester_${now}`);",
+          "  pm.environment.set('email', `tester_${now}@example.com`);",
+          "  pm.environment.set('appIdentifier', `com.example.sample.${now}`);",
+          "}"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,1017 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Einstore API",
+    "version": "1.0.0",
+    "description": "Refactor API (MVP)"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "AuthSession": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "expiresIn": {
+            "type": "number"
+          }
+        }
+      },
+      "AuthRegisterResult": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "session": {
+            "$ref": "#/components/schemas/AuthSession"
+          }
+        }
+      },
+      "AuthLoginResult": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "session": {
+            "$ref": "#/components/schemas/AuthSession"
+          }
+        }
+      },
+      "App": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "identifier": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Version": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "appId": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "Build": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "versionId": {
+            "type": "string"
+          },
+          "buildNumber": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "storageKind": {
+            "type": "string"
+          },
+          "storagePath": {
+            "type": "string"
+          },
+          "sizeBytes": {
+            "type": "number"
+          }
+        }
+      },
+      "Target": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "buildId": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "bundleId": {
+            "type": "string"
+          }
+        }
+      },
+      "Variant": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "buildId": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "Module": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "buildId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "onDemand": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Capability": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "targetId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "ComplianceArtifact": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "buildId": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "storageKind": {
+            "type": "string"
+          },
+          "storagePath": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/info": {
+      "get": {
+        "summary": "Service info",
+        "responses": {
+          "200": {
+            "description": "Info"
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "summary": "Register user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "username",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthRegisterResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "identifier": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "identifier",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthLoginResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "summary": "Refresh token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "refreshToken": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "refreshToken"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Session"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "summary": "Logout",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "refreshToken": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "refreshToken"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Revoked"
+          }
+        }
+      }
+    },
+    "/auth/session": {
+      "get": {
+        "summary": "Get session",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session"
+          }
+        }
+      }
+    },
+    "/auth/password-reset": {
+      "post": {
+        "summary": "Request password reset",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sent"
+          }
+        }
+      }
+    },
+    "/auth/password-reset/confirm": {
+      "post": {
+        "summary": "Confirm password reset",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  },
+                  "newPassword": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token",
+                  "newPassword"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reset"
+          }
+        }
+      }
+    },
+    "/apps": {
+      "post": {
+        "summary": "Create app",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/App"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      },
+      "get": {
+        "summary": "List apps",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List"
+          }
+        }
+      }
+    },
+    "/apps/{id}": {
+      "get": {
+        "summary": "Get app",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "App"
+          }
+        }
+      }
+    },
+    "/versions": {
+      "post": {
+        "summary": "Create version",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Version"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      },
+      "get": {
+        "summary": "List versions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List"
+          }
+        }
+      }
+    },
+    "/versions/{id}": {
+      "get": {
+        "summary": "Get version",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Version"
+          }
+        }
+      }
+    },
+    "/builds": {
+      "post": {
+        "summary": "Create build",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      },
+      "get": {
+        "summary": "List builds",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List"
+          }
+        }
+      }
+    },
+    "/builds/{id}": {
+      "get": {
+        "summary": "Get build",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Build"
+          }
+        }
+      }
+    },
+    "/targets": {
+      "post": {
+        "summary": "Create target",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      },
+      "get": {
+        "summary": "List targets",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List"
+          }
+        }
+      }
+    },
+    "/variants": {
+      "post": {
+        "summary": "Create variant",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      },
+      "get": {
+        "summary": "List variants",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List"
+          }
+        }
+      }
+    },
+    "/modules": {
+      "post": {
+        "summary": "Create module",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      },
+      "get": {
+        "summary": "List modules",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List"
+          }
+        }
+      }
+    },
+    "/capabilities": {
+      "post": {
+        "summary": "Create capability",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      },
+      "get": {
+        "summary": "List capabilities",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List"
+          }
+        }
+      }
+    },
+    "/artifacts": {
+      "post": {
+        "summary": "Create compliance artifact",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      },
+      "get": {
+        "summary": "List compliance artifacts",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List"
+          }
+        }
+      }
+    },
+    "/ingest": {
+      "post": {
+        "summary": "Queue ingestion",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "filePath": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "ipa",
+                      "apk",
+                      "aab"
+                    ]
+                  }
+                },
+                "required": [
+                  "filePath",
+                  "kind"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ingested",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "result": {
+                      "type": "object",
+                      "properties": {
+                        "appId": {
+                          "type": "string"
+                        },
+                        "versionId": {
+                          "type": "string"
+                        },
+                        "buildId": {
+                          "type": "string"
+                        },
+                        "targetId": {
+                          "type": "string"
+                        },
+                        "packageName": {
+                          "type": "string"
+                        },
+                        "versionName": {
+                          "type": "string"
+                        },
+                        "versionCode": {
+                          "type": "string"
+                        },
+                        "appName": {
+                          "type": "string"
+                        },
+                        "minSdk": {
+                          "type": "string"
+                        },
+                        "targetSdk": {
+                          "type": "string"
+                        },
+                        "permissions": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "icons": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "density": {
+                                "type": "string"
+                              },
+                              "path": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "manifest": {
+                          "type": "object",
+                          "properties": {
+                            "packageName": {
+                              "type": "string"
+                            },
+                            "versionName": {
+                              "type": "string"
+                            },
+                            "versionCode": {
+                              "type": "string"
+                            },
+                            "minSdk": {
+                              "type": "string"
+                            },
+                            "targetSdk": {
+                              "type": "string"
+                            },
+                            "permissions": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "icon": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "iconBitmap": {
+                          "type": "object",
+                          "properties": {
+                            "path": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "number"
+                            },
+                            "height": {
+                              "type": "number"
+                            },
+                            "sizeBytes": {
+                              "type": "number"
+                            }
+                          }
+                        },
+                        "targets": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "bundleId": {
+                                "type": "string"
+                              },
+                              "role": {
+                                "type": "string"
+                              },
+                              "platform": {
+                                "type": "string"
+                              },
+                              "version": {
+                                "type": "string"
+                              },
+                              "build": {
+                                "type": "string"
+                              },
+                              "supportedDevices": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "orientations": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "minOsVersion": {
+                                "type": "string"
+                              },
+                              "iconBitmap": {
+                                "type": "object",
+                                "properties": {
+                                  "path": {
+                                    "type": "string"
+                                  },
+                                  "width": {
+                                    "type": "number"
+                                  },
+                                  "height": {
+                                    "type": "number"
+                                  },
+                                  "sizeBytes": {
+                                    "type": "number"
+                                  }
+                                }
+                              },
+                              "info": {
+                                "type": "object"
+                              }
+                            }
+                          }
+                        },
+                        "identifier": {
+                          "type": "string"
+                        },
+                        "buildNumber": {
+                          "type": "string"
+                        },
+                        "version": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Not implemented"
+          }
+        }
+      }
+    },
+    "/resolve-install": {
+      "post": {
+        "summary": "Resolve install",
+        "responses": {
+          "200": {
+            "description": "Resolver response"
+          }
+        }
+      }
+    },
+    "/storage": {
+      "get": {
+        "summary": "Get storage config",
+        "responses": {
+          "200": {
+            "description": "Storage config"
+          }
+        }
+      },
+      "post": {
+        "summary": "Set storage config",
+        "responses": {
+          "200": {
+            "description": "Storage config"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,268 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PlatformKind {
+  ios
+  watchos
+  tvos
+  visionos
+  android
+  wearos
+  auto
+}
+
+enum TargetRole {
+  app
+  extension
+  widget
+  clip
+  feature
+}
+
+enum VariantKind {
+  abi
+  density
+  language
+  device
+}
+
+enum ArtifactKind {
+  privacy_manifest
+  provisioning_profile
+  entitlements
+  permissions
+  signing_info
+  icon_set
+  manifest
+}
+
+enum StorageKind {
+  local
+  s3
+}
+
+enum UserStatus {
+  active
+  disabled
+}
+
+enum AuthProvider {
+  google
+  apple
+}
+
+model App {
+  id        String   @id @default(uuid())
+  name      String
+  identifier String  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  versions  Version[]
+}
+
+model Version {
+  id        String   @id @default(uuid())
+  appId     String
+  version   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  app       App      @relation(fields: [appId], references: [id])
+  builds    Build[]
+
+  @@unique([appId, version])
+}
+
+model Build {
+  id            String   @id @default(uuid())
+  versionId     String
+  buildNumber   String
+  displayName   String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  storageKind   StorageKind
+  storagePath   String
+  sizeBytes     Int
+
+  version       Version  @relation(fields: [versionId], references: [id])
+  targets       Target[]
+  variants      Variant[]
+  modules       Module[]
+  artifacts     ComplianceArtifact[]
+  signing       SigningIdentity?
+
+  @@index([versionId])
+}
+
+model Target {
+  id             String      @id @default(uuid())
+  buildId        String
+  platform       PlatformKind
+  role           TargetRole
+  bundleId       String
+  hostTargetId   String?
+  minOsVersion   String?
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  build          Build       @relation(fields: [buildId], references: [id])
+  hostTarget     Target?     @relation("TargetHost", fields: [hostTargetId], references: [id])
+  hostedTargets  Target[]    @relation("TargetHost")
+  capabilities   Capability[]
+
+  @@index([buildId])
+  @@index([bundleId])
+}
+
+model Variant {
+  id         String      @id @default(uuid())
+  buildId    String
+  kind       VariantKind
+  key        String
+  value      String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  build      Build       @relation(fields: [buildId], references: [id])
+
+  @@index([buildId])
+}
+
+model Module {
+  id         String   @id @default(uuid())
+  buildId    String
+  name       String
+  onDemand   Boolean  @default(false)
+  metadata   Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  build      Build    @relation(fields: [buildId], references: [id])
+
+  @@unique([buildId, name])
+}
+
+model Capability {
+  id         String   @id @default(uuid())
+  targetId   String
+  name       String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  target     Target   @relation(fields: [targetId], references: [id])
+
+  @@index([targetId])
+}
+
+model ComplianceArtifact {
+  id         String       @id @default(uuid())
+  buildId    String
+  kind       ArtifactKind
+  label      String?
+  metadata   Json?
+  storageKind StorageKind
+  storagePath String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  build      Build        @relation(fields: [buildId], references: [id])
+
+  @@index([buildId])
+}
+
+model SigningIdentity {
+  id         String   @id @default(uuid())
+  buildId    String   @unique
+  issuer     String?
+  subject    String?
+  serial     String?
+  metadata   Json?
+
+  build      Build    @relation(fields: [buildId], references: [id])
+}
+
+model User {
+  id                  String               @id @default(uuid())
+  username            String               @unique
+  email               String?              @unique
+  status              UserStatus           @default(active)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  credential          Credential?
+  sessions            Session[]
+  oauthAccounts       OAuthAccount[]
+  authCodes           AuthCode[]
+  passwordResetTokens PasswordResetToken[]
+}
+
+model Credential {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  passwordHash  String
+  passwordAlgo  String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  lastChangedAt DateTime @default(now())
+}
+
+model OAuthAccount {
+  id             String       @id @default(uuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider       AuthProvider
+  providerUserId String
+  email          String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([provider, providerUserId])
+  @@index([userId])
+}
+
+model Session {
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshTokenHash String   @unique
+  createdAt        DateTime @default(now())
+  expiresAt        DateTime
+  ip               String?
+  userAgent        String?
+  revokedAt        DateTime?
+  authCodes        AuthCode[]
+
+  @@index([userId])
+}
+
+model AuthCode {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId String?
+  session   Session? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  codeHash  String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  usedAt    DateTime?
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  usedAt    DateTime?
+}

@@ -1,30 +1,39 @@
-help:  ## Display this help
-	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n\nTargets:\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-13s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
+.PHONY: test test-unit launch docker
 
-setup-demo: up install-demo ## Setups whole demo
-	@echo "\n"
-	@echo "Admin GUI should be running on http://127.0.0.1:$$(docker-compose ps -q admin | xargs docker port | cut -d':' -f2)"
+launch:
+	@set -e; \
+	cd API && npm run dev & \
+	API_PID=$$!; \
+	cd Admin && npm run dev & \
+	ADMIN_PID=$$!; \
+	trap 'kill $$API_PID $$ADMIN_PID' INT TERM; \
+	wait $$API_PID $$ADMIN_PID
 
-up: docker-compose.yaml docker-compose.override.yaml ## Does docker-compose up, automaticly create docker-compose.override.yaml
-	docker-compose up -d --remove-orphans
-	@echo "\n"
-	@echo "Admin GUI should be running on http://127.0.0.1:$$(docker-compose ps -q admin | xargs docker port | cut -d':' -f2)"
+test:
+	@npm --prefix API run test:unit
+	@PORT=8083 \
+	AUTH_JWT_SECRET=change-me \
+	AUTH_JWT_ISSUER=einstore \
+	AUTH_JWT_AUDIENCE=einstore-api \
+	AUTH_REFRESH_TTL_DAYS=30 \
+	AUTH_ACCESS_TTL_MINUTES=15 \
+	DATABASE_URL="postgresql://postgres@localhost:5432/einstore-test?schema=public" \
+	NODE_ENV=test \
+	node API/dist/index.js > /tmp/einstore-api-test.log 2>&1 & \
+	PID=$$!; \
+	sleep 1; \
+	newman run postman_collection.json -e API/tests/postman_environment.json; \
+	STATUS=$$?; \
+	kill $$PID; \
+	exit $$STATUS
 
-clean: ## Deletes all containers and volumes. WILL DROP ALL DB DATA
-	docker-compose down --volumes --remove-orphans
+test-unit:
+	@npm --prefix API run test:unit
 
-stop: ## Stops all containers
-	docker-compose stop -t 5
-
-install-db: up ## Install basic data
-	docker-compose exec api curl "http://localhost:8080/$${APICORE_SERVER_PATH_PREFIX}/install"
-
-install-demo: up install-db ## Install demo data
-	@echo "\nInstalling demo data..."
-	docker-compose exec api curl "http://localhost:8080/$${APICORE_SERVER_PATH_PREFIX}/demo"
-
-update: ## Update to the latest docker images
-	docker-compose pull
-
-docker-compose.override.yaml:
-	cp docker-compose.override.dist.yaml docker-compose.override.yaml
+docker:
+	@docker compose down --remove-orphans
+	@docker compose up --build -d
+	@IP=$$(ipconfig getifaddr en0 || ipconfig getifaddr en1 || echo localhost); \
+	echo "API:   http://$$IP:8080"; \
+	echo "Admin: http://$$IP:8081"; \
+	open http://$$IP:8081

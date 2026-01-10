@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: API/Dockerfile
+    image: einstore-api:1.0.0
+    environment:
+      NODE_ENV: development
+      PORT: 8080
+      DATABASE_URL: postgresql://einstore:einstore@db:5432/einstore?schema=public
+      AAPT_PATH: /usr/local/bin/aapt2
+      AUTH_JWT_SECRET: change-me
+      AUTH_JWT_ISSUER: einstore
+      AUTH_JWT_AUDIENCE: einstore-api
+      AUTH_REFRESH_TTL_DAYS: 30
+      AUTH_ACCESS_TTL_MINUTES: 15
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  admin:
+    build:
+      context: ./Admin
+      dockerfile: Dockerfile
+    image: einstore-admin:1.0.0
+    environment:
+      NODE_ENV: development
+    ports:
+      - "8081:8081"
+    depends_on:
+      - api
+
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: einstore
+      POSTGRES_PASSWORD: einstore
+      POSTGRES_DB: einstore
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgsql-data:/var/lib/postgresql/data
+
+volumes:
+  pgsql-data:
