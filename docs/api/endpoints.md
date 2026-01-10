@@ -233,6 +233,11 @@ All endpoints return JSON. Authenticated endpoints require `Authorization: Beare
 - Response schema: `{ buildId: string, targetId?: string, variants?: Variant[] }`
 - Side effects: none
 - Platform relevance: ios, android
+- Notes:
+  - iOS: the returned install manifest must embed a prevalidated HTTPS download URL. The plist itself is not protected, so the file URL must be tokenized.
+  - Local storage: generate a short-lived tokenized download URL for the IPA.
+  - S3 storage: generate a time-limited pre-signed HTTPS URL for the IPA.
+  - Both the plist URL and the download URL must be HTTPS with valid certificates.
 
 ## GET /storage
 - Purpose: Get active storage configuration
