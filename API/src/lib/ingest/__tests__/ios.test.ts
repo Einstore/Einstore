@@ -19,6 +19,12 @@ const { ingestIosIpa } = await import("../ios.js");
 const ipaPath =
   "/System/Volumes/Data/.internal/projects/Projects/GPTeen/ios/build_simulator/PocketPal-sim.ipa";
 
+const isPng = (filePath: string) => {
+  const buffer = fs.readFileSync(filePath);
+  const signature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+  return buffer.subarray(0, 8).equals(signature);
+};
+
 describe("ingestIosIpa", () => {
   beforeEach(() => {
     prismaMock.app.upsert.mockResolvedValue({ id: "app-ios" });
@@ -48,5 +54,6 @@ describe("ingestIosIpa", () => {
     expect(mainTarget.supportedDevices).toContain("ipad");
     expect(mainTarget.orientations.length).toBeGreaterThan(0);
     expect(mainTarget.iconBitmap?.path).toBeTruthy();
+    expect(isPng(mainTarget.iconBitmap!.path)).toBe(true);
   });
 });
