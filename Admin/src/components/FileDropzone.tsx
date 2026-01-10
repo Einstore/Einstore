@@ -2,6 +2,8 @@ import { useRef, useState } from "react";
 
 import ActionButton from "./ActionButton";
 
+const allowedExtensions = [".ipa", ".apk", ".aab"];
+
 const formatFile = (file: File | null) => {
   if (!file) {
     return "No file selected";
@@ -20,9 +22,21 @@ const FileDropzone = ({ label, helper, onFileSelect }: FileDropzoneProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [error, setError] = useState("");
 
   const handleFiles = (files: FileList | null) => {
     const selected = files?.[0] ?? null;
+    if (selected) {
+      const lower = selected.name.toLowerCase();
+      const isAllowed = allowedExtensions.some((ext) => lower.endsWith(ext));
+      if (!isAllowed) {
+        setError("Only .ipa, .apk, or .aab files are supported.");
+        setFile(null);
+        onFileSelect(null);
+        return;
+      }
+    }
+    setError("");
     setFile(selected);
     onFileSelect(selected);
   };
@@ -62,6 +76,7 @@ const FileDropzone = ({ label, helper, onFileSelect }: FileDropzoneProps) => {
           onClick={() => inputRef.current?.click()}
         />
         <p className="text-xs text-ink/50">{formatFile(file)}</p>
+        {error ? <p className="text-xs text-coral">{error}</p> : null}
         <input
           ref={inputRef}
           type="file"

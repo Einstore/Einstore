@@ -18,6 +18,7 @@ export type AppSummary = {
 
 export type BuildJob = {
   id: string;
+  appId: string;
   name: string;
   branch: string;
   status: "queued" | "running" | "failed" | "success";
@@ -194,6 +195,7 @@ export const apps: AppSummary[] = [
 export const buildQueue: BuildJob[] = [
   {
     id: "job-1",
+    appId: "app-1",
     name: "Atlas Field",
     branch: "release/4.2.1",
     status: "running",
@@ -202,6 +204,7 @@ export const buildQueue: BuildJob[] = [
   },
   {
     id: "job-2",
+    appId: "app-2",
     name: "Pulse Monitor",
     branch: "hotfix/login-gate",
     status: "queued",
@@ -210,6 +213,7 @@ export const buildQueue: BuildJob[] = [
   },
   {
     id: "job-3",
+    appId: "app-3",
     name: "Courier Flow",
     branch: "main",
     status: "success",
@@ -218,6 +222,7 @@ export const buildQueue: BuildJob[] = [
   },
   {
     id: "job-4",
+    appId: "app-4",
     name: "Summit POS",
     branch: "release/6.1.0",
     status: "failed",

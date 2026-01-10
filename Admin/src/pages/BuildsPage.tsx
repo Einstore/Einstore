@@ -6,12 +6,13 @@ import type { BuildJob } from "../data/mock";
 
 type BuildsPageProps = {
   builds: BuildJob[];
+  selectedAppId?: string | null;
   selectedAppName?: string | null;
 };
 
-const BuildsPage = ({ builds, selectedAppName }: BuildsPageProps) => {
-  const visibleBuilds = selectedAppName
-    ? builds.filter((build) => build.name === selectedAppName)
+const BuildsPage = ({ builds, selectedAppId, selectedAppName }: BuildsPageProps) => {
+  const visibleBuilds = selectedAppId
+    ? builds.filter((build) => build.appId === selectedAppId)
     : builds;
 
   return (
