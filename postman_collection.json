@@ -902,6 +902,296 @@
       ]
     },
     {
+      "name": "Create Feature Flag",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/feature-flags",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "feature-flags"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"key\": \"beta.feature\", \"description\": \"Beta rollout\", \"defaultEnabled\": false}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code === 201) {",
+              "  const json = pm.response.json();",
+              "  pm.environment.set('featureFlagKey', json.key || 'beta.feature');",
+              "}",
+              "pm.test('Create feature flag ok', function () {",
+              "  pm.expect([200, 201]).to.include(pm.response.code);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "List Feature Flags",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/feature-flags",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "feature-flags"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('List feature flags ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Feature Flag",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/feature-flags/{{featureFlagKey}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "feature-flags",
+            "{{featureFlagKey}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Get feature flag ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Update Feature Flag",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/feature-flags/{{featureFlagKey}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "feature-flags",
+            "{{featureFlagKey}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"defaultEnabled\": true}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Update feature flag ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Feature Flag Override",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/feature-flags/{{featureFlagKey}}/overrides",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "feature-flags",
+            "{{featureFlagKey}}",
+            "overrides"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"scope\": \"platform\", \"enabled\": true, \"rolloutPercentage\": 100}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Create feature flag override ok', function () {",
+              "  pm.expect([200, 201]).to.include(pm.response.code);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "List Feature Flag Overrides",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/feature-flags/{{featureFlagKey}}/overrides",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "feature-flags",
+            "{{featureFlagKey}}",
+            "overrides"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('List feature flag overrides ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Evaluate Feature Flag",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/feature-flags/{{featureFlagKey}}/evaluate",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "feature-flags",
+            "{{featureFlagKey}}",
+            "evaluate"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Evaluate feature flag ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
       "name": "Info",
       "request": {
         "method": "GET",

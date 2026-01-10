@@ -191,6 +191,35 @@ model SigningIdentity {
   build      Build    @relation(fields: [buildId], references: [id])
 }
 
+model FeatureFlag {
+  id             String                @id @default(uuid())
+  key            String                @unique
+  description    String?
+  defaultEnabled Boolean               @default(false)
+  metadata       Json?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  overrides      FeatureFlagOverride[]
+}
+
+model FeatureFlagOverride {
+  id                String      @id @default(uuid())
+  flagId            String
+  scope             String      @default("platform")
+  targetKey         String?
+  enabled           Boolean     @default(false)
+  rolloutPercentage Int?
+  metadata          Json?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  flag              FeatureFlag @relation(fields: [flagId], references: [id], onDelete: Cascade)
+
+  @@index([flagId])
+  @@index([scope, targetKey])
+  @@unique([flagId, scope, targetKey])
+}
+
 model User {
   id                  String               @id @default(uuid())
   username            String               @unique

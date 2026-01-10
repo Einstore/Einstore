@@ -13,6 +13,7 @@ import { resolveRoutes } from "./resolve.js";
 import { storageRoutes } from "./storage.js";
 import { pipelineRoutes } from "./pipeline.js";
 import { authRoutes } from "./auth.js";
+import { featureFlagRoutes } from "./featureFlags.js";
 
 export async function registerRoutes(app: FastifyInstance) {
   await app.register(healthRoutes);
@@ -29,4 +30,5 @@ export async function registerRoutes(app: FastifyInstance) {
   await app.register(storageRoutes);
   await app.register(pipelineRoutes);
   await app.register(authRoutes);
+  await app.register(featureFlagRoutes);
 }

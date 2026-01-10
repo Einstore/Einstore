@@ -39,6 +39,18 @@ const prismaMock = {
     create: vi.fn(),
     findMany: vi.fn(),
   },
+  featureFlag: {
+    create: vi.fn(),
+    findMany: vi.fn(),
+    findUnique: vi.fn(),
+    update: vi.fn(),
+  },
+  featureFlagOverride: {
+    create: vi.fn(),
+    findMany: vi.fn(),
+    findFirst: vi.fn(),
+    update: vi.fn(),
+  },
 };
 
 vi.mock("../../lib/prisma.js", () => ({
@@ -72,6 +84,14 @@ vi.mock("../../lib/ingest/android.js", () => ({
 
 vi.mock("../../lib/ingest/ios.js", () => ({
   ingestIosIpa: ingestIosMock,
+}));
+
+const ensureFeatureFlagMock = vi.fn();
+const isFeatureFlagEnabledMock = vi.fn();
+
+vi.mock("@rafiki270/feature-flags", () => ({
+  ensureFeatureFlag: ensureFeatureFlagMock,
+  isFeatureFlagEnabled: isFeatureFlagEnabledMock,
 }));
 
 const { registerRoutes } = await import("../index.js");
@@ -142,6 +162,19 @@ describe("routes", () => {
 
     ingestAndroidMock.mockResolvedValue({ buildId: "build-android" });
     ingestIosMock.mockResolvedValue({ buildId: "build-ios" });
+
+    prismaMock.featureFlag.create.mockResolvedValue({ id: "flag-1", key: "beta.feature" });
+    prismaMock.featureFlag.findMany.mockResolvedValue([{ id: "flag-1", key: "beta.feature" }]);
+    prismaMock.featureFlag.findUnique.mockResolvedValue({ id: "flag-1", key: "beta.feature" });
+    prismaMock.featureFlag.update.mockResolvedValue({ id: "flag-1", key: "beta.feature", defaultEnabled: true });
+
+    prismaMock.featureFlagOverride.findFirst.mockResolvedValue(null);
+    prismaMock.featureFlagOverride.create.mockResolvedValue({ id: "override-1", enabled: true });
+    prismaMock.featureFlagOverride.findMany.mockResolvedValue([{ id: "override-1" }]);
+    prismaMock.featureFlagOverride.update.mockResolvedValue({ id: "override-1", enabled: true });
+
+    ensureFeatureFlagMock.mockResolvedValue({ id: "flag-1", key: "beta.feature" });
+    isFeatureFlagEnabledMock.mockResolvedValue(true);
   });
 
   it("GET /health", async () => {
@@ -291,6 +324,34 @@ describe("routes", () => {
     expect(createResponse.statusCode).toBe(201);
     const listResponse = await app.inject({ method: "GET", url: `/artifacts?buildId=${ids.buildId}` });
     expect(listResponse.statusCode).toBe(200);
+  });
+
+  it("feature flags endpoints", async () => {
+    const createResponse = await postJson("/feature-flags", {
+      key: "beta.feature",
+      defaultEnabled: false,
+    });
+    expect(createResponse.statusCode).toBe(201);
+    const listResponse = await app.inject({ method: "GET", url: "/feature-flags" });
+    expect(listResponse.statusCode).toBe(200);
+    const getResponse = await app.inject({ method: "GET", url: "/feature-flags/beta.feature" });
+    expect(getResponse.statusCode).toBe(200);
+    const updateResponse = await app.inject({
+      method: "PATCH",
+      url: "/feature-flags/beta.feature",
+      payload: { defaultEnabled: true },
+      headers: { "content-type": "application/json" },
+    });
+    expect(updateResponse.statusCode).toBe(200);
+    const overrideResponse = await postJson("/feature-flags/beta.feature/overrides", {
+      scope: "platform",
+      enabled: true,
+    });
+    expect(overrideResponse.statusCode).toBe(201);
+    const overridesList = await app.inject({ method: "GET", url: "/feature-flags/beta.feature/overrides" });
+    expect(overridesList.statusCode).toBe(200);
+    const evaluateResponse = await app.inject({ method: "GET", url: "/feature-flags/beta.feature/evaluate" });
+    expect(evaluateResponse.statusCode).toBe(200);
   });
 
   it("POST /resolve-install", async () => {
