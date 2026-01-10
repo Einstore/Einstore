@@ -16,10 +16,18 @@ type SidebarProps = {
   activeId: string;
   footer?: ReactNode;
   onSelect?: (id: string) => void;
+  teamSwitcher?: ReactNode;
   dropzone?: ReactNode;
 };
 
-const Sidebar = ({ items, activeId, footer, onSelect, dropzone }: SidebarProps) => {
+const Sidebar = ({
+  items,
+  activeId,
+  footer,
+  onSelect,
+  teamSwitcher,
+  dropzone,
+}: SidebarProps) => {
   return (
     <aside className="flex h-full flex-col rounded-[32px] border border-ink/10 bg-white/70 p-6 shadow-float backdrop-blur">
       <div className="flex items-center gap-3">
@@ -34,7 +42,9 @@ const Sidebar = ({ items, activeId, footer, onSelect, dropzone }: SidebarProps) 
         </div>
       </div>
 
-      <nav className="mt-10 flex flex-1 flex-col gap-2">
+      {teamSwitcher ? <div className="mt-10">{teamSwitcher}</div> : null}
+
+      <nav className="mt-8 flex flex-1 flex-col gap-2">
         {items.map((item) => {
           const isActive = item.id === activeId;
           return (

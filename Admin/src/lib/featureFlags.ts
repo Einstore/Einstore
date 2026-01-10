@@ -17,7 +17,7 @@ const defaultFeatureFlags: Record<FeatureFlagKey, boolean> = {
   "admin.pipeline_health": false,
   "admin.activity_stream": false,
   "admin.storage_usage": false,
-  "admin.future_flags": false,
+  "admin.future_flags": true,
   "admin.security_posture": false,
   "admin.workspace_settings": false,
 };

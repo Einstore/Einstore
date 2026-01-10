@@ -89,6 +89,28 @@ export type FeatureFlag = {
   defaultEnabled: boolean;
 };
 
+export type UserRole = "admin" | "user";
+
+export type CurrentUser = {
+  id: string;
+  name: string;
+  role: UserRole;
+};
+
+export type Team = {
+  id: string;
+  name: string;
+  slug: string;
+  memberCount: number;
+};
+
+export type TeamMember = {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+};
+
 export const metrics: Metric[] = [
   {
     label: "Active apps",
@@ -401,3 +423,87 @@ export const futureFlags: FeatureFlag[] = [
     defaultEnabled: true,
   },
 ];
+
+export const currentUser: CurrentUser = {
+  id: "user-1",
+  name: "Maya Singh",
+  role: "admin",
+};
+
+export const teams: Team[] = [
+  {
+    id: "team-all",
+    name: "All teams",
+    slug: "all",
+    memberCount: 42,
+  },
+  {
+    id: "team-1",
+    name: "Northstar Ops",
+    slug: "northstar",
+    memberCount: 12,
+  },
+  {
+    id: "team-2",
+    name: "Clinical Tools",
+    slug: "clinical-tools",
+    memberCount: 8,
+  },
+  {
+    id: "team-3",
+    name: "Retail Edge",
+    slug: "retail-edge",
+    memberCount: 11,
+  },
+];
+
+export const teamMembers: Record<string, TeamMember[]> = {
+  "team-1": [
+    {
+      id: "member-1",
+      name: "Maya Singh",
+      email: "maya@einstore.dev",
+      role: "admin",
+    },
+    {
+      id: "member-2",
+      name: "Samir Ortiz",
+      email: "samir@einstore.dev",
+      role: "user",
+    },
+    {
+      id: "member-3",
+      name: "Kai Patel",
+      email: "kai@einstore.dev",
+      role: "user",
+    },
+  ],
+  "team-2": [
+    {
+      id: "member-4",
+      name: "Rafael Vega",
+      email: "rafael@einstore.dev",
+      role: "admin",
+    },
+    {
+      id: "member-5",
+      name: "Dina Park",
+      email: "dina@einstore.dev",
+      role: "user",
+    },
+  ],
+  "team-3": [
+    {
+      id: "member-6",
+      name: "Liam Carter",
+      email: "liam@einstore.dev",
+      role: "admin",
+    },
+    {
+      id: "member-7",
+      name: "Tara Martinez",
+      email: "tara@einstore.dev",
+      role: "user",
+    },
+  ],
+};

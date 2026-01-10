@@ -1,75 +1,88 @@
+import { useMemo, useState } from "react";
+
 import Panel from "../components/Panel";
 import SectionHeader from "../components/SectionHeader";
-import SelectField from "../components/SelectField";
+import Tabs from "../components/Tabs";
+import TeamMembersTable from "../components/TeamMembersTable";
 import TextInput from "../components/TextInput";
-import ToggleField from "../components/ToggleField";
-import type { SettingsProfile } from "../data/mock";
+import type { Team, TeamMember } from "../data/mock";
 
 type SettingsPageProps = {
-  settings: SettingsProfile;
+  teams: Team[];
+  activeTeamId: string;
+  teamMembers: TeamMember[];
+  isSaas: boolean;
 };
 
-const SettingsPage = ({ settings }: SettingsPageProps) => {
+const SettingsPage = ({
+  teams,
+  activeTeamId,
+  teamMembers,
+  isSaas,
+}: SettingsPageProps) => {
+  const [activeTab, setActiveTab] = useState("team");
+  const activeTeam = useMemo(
+    () => teams.find((team) => team.id === activeTeamId) || teams[0],
+    [teams, activeTeamId]
+  );
+
+  const tabs = [
+    {
+      id: "team",
+      label: "Team",
+      content: (
+        <Panel className="space-y-6">
+          <TextInput
+            id="team-name"
+            label="Team name"
+            value={activeTeam?.name ?? ""}
+            placeholder="Team name"
+          />
+          <TextInput
+            id="team-slug"
+            label="Team slug"
+            value={activeTeam?.slug ?? ""}
+            placeholder="team-slug"
+          />
+        </Panel>
+      ),
+    },
+    {
+      id: "users",
+      label: "Users",
+      content: (
+        <div className="space-y-4">
+          <SectionHeader
+            title="Team members"
+            description="Users can be admins or standard users."
+          />
+          <TeamMembersTable members={teamMembers} />
+        </div>
+      ),
+    },
+  ];
+
+  if (isSaas) {
+    tabs.push({
+      id: "billing",
+      label: "Billing",
+      content: (
+        <Panel>
+          <p className="text-sm text-ink/60">
+            Billing settings are available only in the SaaS version.
+          </p>
+        </Panel>
+      ),
+    });
+  }
+
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Workspace settings"
-        description="Configure default approvals, integrations, and alert routing."
+        title="Team settings"
+        description="Manage team identity, users, and billing."
       />
-      <Panel className="space-y-6">
-        <div className="grid gap-6 md:grid-cols-2">
-          <TextInput
-            id="workspace-name"
-            label="Workspace name"
-            value={settings.workspaceName}
-            placeholder="Einstore Operations"
-          />
-          <TextInput
-            id="release-domain"
-            label="Release domain"
-            value={settings.releaseDomain}
-            placeholder="releases.einstore.dev"
-            type="url"
-          />
-          <SelectField
-            id="approval-window"
-            label="Default approval window"
-            value={settings.approvalWindow}
-            options={[
-              { value: "24", label: "24 hours" },
-              { value: "48", label: "48 hours" },
-              { value: "72", label: "72 hours" },
-            ]}
-          />
-          <TextInput
-            id="alert-email"
-            label="Alert email"
-            value={settings.alertEmail}
-            placeholder="ops@einstore.dev"
-            type="email"
-          />
-        </div>
-      </Panel>
-      <Panel className="space-y-4">
-        <ToggleField
-          id="auto-promote"
-          label="Auto-promote passing builds"
-          description="Automatically move builds to staging after smoke tests."
-          defaultChecked={settings.autoPromote}
-        />
-        <ToggleField
-          id="policy-digest"
-          label="Weekly policy digest"
-          description="Send compliance summary to security leads every Friday."
-          defaultChecked={settings.policyDigest}
-        />
-        <ToggleField
-          id="signature-rotation"
-          label="Certificate rotation reminders"
-          description="Notify owners 30 days before certificate expiry."
-          defaultChecked={settings.rotationReminders}
-        />
-      </Panel>
+      <Tabs items={tabs} activeId={activeTab} onChange={setActiveTab} />
     </div>
   );
 };

@@ -5,6 +5,7 @@ import AddAppDialog from "./components/AddAppDialog";
 import AppShell from "./components/AppShell";
 import FileDropzone from "./components/FileDropzone";
 import Sidebar, { type NavItem } from "./components/Sidebar";
+import TeamSwitcher from "./components/TeamSwitcher";
 import Topbar from "./components/Topbar";
 import AppsPage from "./pages/AppsPage";
 import BuildsPage from "./pages/BuildsPage";
@@ -17,13 +18,15 @@ import {
   activity,
   apps,
   buildQueue,
+  currentUser,
   metrics,
   pipelineAlerts,
   pipelineStages,
   securityAudits,
   securityPolicies,
-  settingsProfile,
   storageBuckets,
+  teamMembers,
+  teams,
 } from "./data/mock";
 import { apiFetch } from "./lib/api";
 import {
@@ -124,7 +127,10 @@ const App = () => {
   const [featureFlags, setFeatureFlags] = useState(getDefaultFeatureFlags());
   const [selectedAppName, setSelectedAppName] = useState<string | null>(null);
   const [isAddAppOpen, setIsAddAppOpen] = useState(false);
+  const [activeTeamId, setActiveTeamId] = useState("team-all");
   const config = pageConfig[activePage];
+  const isAdmin = currentUser.role === "admin";
+  const isSaas = import.meta.env.VITE_SAAS === "true";
 
   useEffect(() => {
     let isMounted = true;
@@ -146,10 +152,13 @@ const App = () => {
 
   const visibleNavItems = useMemo(
     () =>
-      navItems.filter(
-        (item) => !item.featureFlag || featureFlags[item.featureFlag]
-      ),
-    [featureFlags]
+      navItems.filter((item) => {
+        if (item.id === "settings" && !isAdmin) {
+          return false;
+        }
+        return !item.featureFlag || featureFlags[item.featureFlag];
+      }),
+    [featureFlags, isAdmin]
   );
 
   useEffect(() => {
@@ -181,7 +190,14 @@ const App = () => {
       case "security":
         return <SecurityPage policies={securityPolicies} audits={securityAudits} />;
       case "settings":
-        return <SettingsPage settings={settingsProfile} />;
+        return (
+          <SettingsPage
+            teams={teams}
+            activeTeamId={activeTeamId}
+            teamMembers={teamMembers[activeTeamId] ?? []}
+            isSaas={isSaas}
+          />
+        );
       case "overview":
       default:
         return (
@@ -214,6 +230,13 @@ const App = () => {
           items={visibleNavItems}
           activeId={activePage}
           onSelect={(id) => setActivePage(id as PageKey)}
+          teamSwitcher={
+            <TeamSwitcher
+              teams={teams}
+              activeTeamId={activeTeamId}
+              onChange={setActiveTeamId}
+            />
+          }
           dropzone={
             <FileDropzone
               label="Quick upload"
