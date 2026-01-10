@@ -2,7 +2,11 @@ import { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { requireAuth } from "../auth/guard.js";
-import { ensureFeatureFlag, isFeatureFlagEnabled } from "@rafiki270/feature-flags";
+import {
+  deleteFeatureFlag,
+  ensureFeatureFlag,
+  isFeatureFlagEnabled,
+} from "@rafiki270/feature-flags";
 
 const listQuerySchema = z.object({
   limit: z.coerce.number().int().positive().max(100).default(20),
@@ -102,11 +106,10 @@ export async function featureFlagRoutes(app: FastifyInstance) {
 
   app.delete("/feature-flags/:key", { preHandler: requireAuth }, async (request, reply) => {
     const key = (request.params as { key: string }).key;
-    const record = await prisma.featureFlag.findUnique({ where: { key } });
-    if (!record) {
+    const deleted = await deleteFeatureFlag(prisma, key);
+    if (!deleted) {
       return reply.status(404).send({ error: "Not found" });
     }
-    const deleted = await prisma.featureFlag.delete({ where: { key } });
     return reply.send(deleted);
   });
 
