@@ -47,6 +47,10 @@ COPY Libraries/rafiki-auth ./Libraries/rafiki-auth
 WORKDIR /app/Libraries/rafiki-auth
 RUN npm install && npm run build
 
+# Copy feature flags dependency
+WORKDIR /app
+COPY Libraries/feature-flags ./Libraries/feature-flags
+
 # Install API dependencies
 WORKDIR /app/API
 COPY API/package.json API/package-lock.json* ./
