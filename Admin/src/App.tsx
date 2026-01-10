@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 
 import ActionButton from "./components/ActionButton";
+import AddAppDialog from "./components/AddAppDialog";
 import AppShell from "./components/AppShell";
+import FileDropzone from "./components/FileDropzone";
 import Sidebar, { type NavItem } from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 import AppsPage from "./pages/AppsPage";
@@ -72,55 +74,56 @@ const pageConfig: Record<
   PageKey,
   {
     title: string;
-    subtitle: string;
-    actions: { label: string; variant?: "primary" | "outline" }[];
+    breadcrumbs: { label: string }[];
+    actions: { id: string; label: string; variant?: "primary" | "outline" }[];
   }
 > = {
   overview: {
     title: "Release operations",
-    subtitle:
-      "Control distribution, pipelines, and compliance from a single workspace.",
+    breadcrumbs: [{ label: "Home" }, { label: "Overview" }],
     actions: [
-      { label: "New release" },
-      { label: "Invite team" },
-      { label: "Audit policies" },
+      { id: "new-release", label: "New release" },
+      { id: "invite-team", label: "Invite team" },
+      { id: "audit-policies", label: "Audit policies" },
     ],
   },
   apps: {
-    title: "Apps catalog",
-    subtitle: "Manage app inventory, owners, and distribution readiness.",
-    actions: [{ label: "Add app", variant: "primary" }],
+    title: "Apps",
+    breadcrumbs: [{ label: "Apps" }, { label: "Catalog" }],
+    actions: [{ id: "add-app", label: "Add app", variant: "primary" }],
   },
   builds: {
-    title: "Build operations",
-    subtitle: "Track jobs, failures, and release readiness signals.",
-    actions: [{ label: "Trigger build", variant: "primary" }],
+    title: "Latest builds",
+    breadcrumbs: [{ label: "Builds" }, { label: "Latest" }],
+    actions: [{ id: "trigger-build", label: "Trigger build", variant: "primary" }],
   },
   flags: {
     title: "Future flags",
-    subtitle: "Create and manage flags before the next rollout window.",
-    actions: [{ label: "Create flag", variant: "primary" }],
+    breadcrumbs: [{ label: "Governance" }, { label: "Future flags" }],
+    actions: [{ id: "create-flag", label: "Create flag", variant: "primary" }],
   },
   pipelines: {
     title: "Pipeline health",
-    subtitle: "Monitor delivery throughput and escalation timelines.",
-    actions: [{ label: "Run checks", variant: "primary" }],
+    breadcrumbs: [{ label: "Operations" }, { label: "Pipelines" }],
+    actions: [{ id: "run-checks", label: "Run checks", variant: "primary" }],
   },
   security: {
     title: "Security posture",
-    subtitle: "Review policy coverage and access review timelines.",
-    actions: [{ label: "Download report", variant: "primary" }],
+    breadcrumbs: [{ label: "Governance" }, { label: "Security" }],
+    actions: [{ id: "download-report", label: "Download report", variant: "primary" }],
   },
   settings: {
     title: "Workspace settings",
-    subtitle: "Control defaults, alerts, and review cadence.",
-    actions: [{ label: "Save changes", variant: "primary" }],
+    breadcrumbs: [{ label: "Workspace" }, { label: "Settings" }],
+    actions: [{ id: "save-settings", label: "Save changes", variant: "primary" }],
   },
 };
 
 const App = () => {
   const [activePage, setActivePage] = useState<PageKey>("overview");
   const [featureFlags, setFeatureFlags] = useState(getDefaultFeatureFlags());
+  const [selectedAppName, setSelectedAppName] = useState<string | null>(null);
+  const [isAddAppOpen, setIsAddAppOpen] = useState(false);
   const config = pageConfig[activePage];
 
   useEffect(() => {
@@ -160,9 +163,17 @@ const App = () => {
   const pageContent = useMemo(() => {
     switch (activePage) {
       case "apps":
-        return <AppsPage apps={apps} />;
+        return (
+          <AppsPage
+            apps={apps}
+            onSelectApp={(app) => {
+              setSelectedAppName(app.name);
+              setActivePage("builds");
+            }}
+          />
+        );
       case "builds":
-        return <BuildsPage builds={buildQueue} />;
+        return <BuildsPage builds={buildQueue} selectedAppName={selectedAppName} />;
       case "flags":
         return <FutureFlagsPage />;
       case "pipelines":
@@ -190,6 +201,12 @@ const App = () => {
     }
   }, [activePage, featureFlags]);
 
+  const handleAction = (actionId: string) => {
+    if (actionId === "add-app") {
+      setIsAddAppOpen(true);
+    }
+  };
+
   return (
     <AppShell
       sidebar={
@@ -197,6 +214,13 @@ const App = () => {
           items={visibleNavItems}
           activeId={activePage}
           onSelect={(id) => setActivePage(id as PageKey)}
+          dropzone={
+            <FileDropzone
+              label="Quick upload"
+              helper="Drop a build to start ingestion."
+              onFileSelect={() => undefined}
+            />
+          }
           footer={
             <div className="rounded-2xl border border-ink/10 bg-sand p-4 text-sm text-ink/70">
               Next checkpoint: SOC2 evidence export due in 2 days.
@@ -207,7 +231,7 @@ const App = () => {
     >
       <Topbar
         title={config.title}
-        subtitle={config.subtitle}
+        breadcrumbs={config.breadcrumbs}
         actions={
           <>
             {config.actions.map((action) => (
@@ -215,12 +239,14 @@ const App = () => {
                 key={action.label}
                 label={action.label}
                 variant={action.variant ?? "outline"}
+                onClick={() => handleAction(action.id)}
               />
             ))}
           </>
         }
       />
       {pageContent}
+      <AddAppDialog isOpen={isAddAppOpen} onClose={() => setIsAddAppOpen(false)} />
     </AppShell>
   );
 };

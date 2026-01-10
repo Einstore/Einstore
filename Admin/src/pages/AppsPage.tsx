@@ -8,13 +8,14 @@ import type { AppSummary } from "../data/mock";
 
 type AppsPageProps = {
   apps: AppSummary[];
+  onSelectApp?: (app: AppSummary) => void;
 };
 
-const AppsPage = ({ apps }: AppsPageProps) => {
+const AppsPage = ({ apps, onSelectApp }: AppsPageProps) => {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Apps catalog"
+        title="Catalog filters"
         description="Track approved builds, ownership, and current release status."
       />
       <Panel className="space-y-6">
@@ -53,7 +54,7 @@ const AppsPage = ({ apps }: AppsPageProps) => {
           <FilterPill label="Pending rollout" />
         </div>
       </Panel>
-      <AppsTable apps={apps} />
+      <AppsTable apps={apps} onSelectApp={onSelectApp} />
     </div>
   );
 };

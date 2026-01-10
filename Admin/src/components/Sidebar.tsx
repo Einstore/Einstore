@@ -16,9 +16,10 @@ type SidebarProps = {
   activeId: string;
   footer?: ReactNode;
   onSelect?: (id: string) => void;
+  dropzone?: ReactNode;
 };
 
-const Sidebar = ({ items, activeId, footer, onSelect }: SidebarProps) => {
+const Sidebar = ({ items, activeId, footer, onSelect, dropzone }: SidebarProps) => {
   return (
     <aside className="flex h-full flex-col rounded-[32px] border border-ink/10 bg-white/70 p-6 shadow-float backdrop-blur">
       <div className="flex items-center gap-3">
@@ -68,6 +69,7 @@ const Sidebar = ({ items, activeId, footer, onSelect }: SidebarProps) => {
         })}
       </nav>
 
+      {dropzone ? <div className="pt-6">{dropzone}</div> : null}
       {footer ? <div className="pt-6">{footer}</div> : null}
     </aside>
   );
