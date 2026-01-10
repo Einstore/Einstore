@@ -968,6 +968,26 @@
             }
           }
         }
+      },
+      "delete": {
+        "summary": "Delete feature flag",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeatureFlag"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/feature-flags/{key}/overrides": {

@@ -11,7 +11,18 @@ launch:
 
 test:
 	@npm --prefix API run test:unit
+	@npm --prefix API run prisma:generate
+	@npm --prefix API run build
 	@PORT=8083 \
+	AUTH_JWT_SECRET=change-me \
+	AUTH_JWT_ISSUER=einstore \
+	AUTH_JWT_AUDIENCE=einstore-api \
+	AUTH_REFRESH_TTL_DAYS=30 \
+	AUTH_ACCESS_TTL_MINUTES=15 \
+	DATABASE_URL="postgresql://postgres@localhost:5432/einstore-test?schema=public" \
+	NODE_ENV=test \
+	npm --prefix API run prisma:deploy; \
+	PORT=8083 \
 	AUTH_JWT_SECRET=change-me \
 	AUTH_JWT_ISSUER=einstore \
 	AUTH_JWT_AUDIENCE=einstore-api \

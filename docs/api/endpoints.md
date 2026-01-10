@@ -290,6 +290,14 @@ All endpoints return JSON. Authenticated endpoints require `Authorization: Beare
 - Side effects: Updates FeatureFlag
 - Platform relevance: all
 
+## DELETE /feature-flags/{key}
+- Purpose: Delete feature flag
+- Auth scope: Bearer (rafiki270/auth)
+- Request schema: path `{ key: string }`
+- Response schema: `FeatureFlag`
+- Side effects: Deletes FeatureFlag and overrides
+- Platform relevance: all
+
 ## POST /feature-flags/{key}/overrides
 - Purpose: Create/update feature flag override
 - Auth scope: Bearer (rafiki270/auth)
