@@ -1,0 +1,13 @@
+name: einstore
+region: lon
+static_sites:
+  - name: web
+    github:
+      repo: Einstore/Einstore
+      branch: main
+      deploy_on_push: true
+    source_dir: /Web
+    output_dir: .
+    index_document: index.html
+    routes:
+      - path: /
