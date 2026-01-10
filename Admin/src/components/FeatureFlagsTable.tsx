@@ -8,6 +8,7 @@ type FeatureFlagsTableProps = {
   isLoading?: boolean;
   onEdit: (flag: FeatureFlag) => void;
   onToggle: (flag: FeatureFlag) => void;
+  onDelete: (flag: FeatureFlag) => void;
 };
 
 const FeatureFlagsTable = ({
@@ -15,6 +16,7 @@ const FeatureFlagsTable = ({
   isLoading,
   onEdit,
   onToggle,
+  onDelete,
 }: FeatureFlagsTableProps) => {
   return (
     <Panel className="p-0">
@@ -55,11 +57,18 @@ const FeatureFlagsTable = ({
                     />
                   </td>
                   <td className="px-6 py-4">
-                    <ActionButton
-                      label="Edit"
-                      variant="outline"
-                      onClick={() => onEdit(flag)}
-                    />
+                    <div className="flex flex-wrap gap-2">
+                      <ActionButton
+                        label="Edit"
+                        variant="outline"
+                        onClick={() => onEdit(flag)}
+                      />
+                      <ActionButton
+                        label="Delete"
+                        variant="danger"
+                        onClick={() => onDelete(flag)}
+                      />
+                    </div>
                   </td>
                 </tr>
               ))}

@@ -1,8 +1,7 @@
 import { useMemo, useState } from "react";
 
-import FeatureFlagForm, {
-  type FeatureFlagFormValues,
-} from "../components/FeatureFlagForm";
+import ConfirmDialog from "../components/ConfirmDialog";
+import FeatureFlagForm, { type FeatureFlagFormValues } from "../components/FeatureFlagForm";
 import FeatureFlagsTable from "../components/FeatureFlagsTable";
 import SectionHeader from "../components/SectionHeader";
 import type { FeatureFlag } from "../data/mock";
@@ -17,6 +16,7 @@ const emptyForm: FeatureFlagFormValues = {
 const FutureFlagsPage = () => {
   const [flags, setFlags] = useState<FeatureFlag[]>(futureFlags);
   const [activeFlagId, setActiveFlagId] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<FeatureFlag | null>(null);
   const [formValues, setFormValues] = useState<FeatureFlagFormValues>(emptyForm);
   const [error, setError] = useState<string>("");
 
@@ -49,6 +49,21 @@ const FutureFlagsPage = () => {
     setActiveFlagId(null);
     setFormValues(emptyForm);
     setError("");
+  };
+
+  const handleDelete = (flag: FeatureFlag) => {
+    setPendingDelete(flag);
+  };
+
+  const confirmDelete = () => {
+    if (!pendingDelete) {
+      return;
+    }
+    setFlags((prev) => prev.filter((flag) => flag.id !== pendingDelete.id));
+    if (activeFlagId === pendingDelete.id) {
+      resetForm();
+    }
+    setPendingDelete(null);
   };
 
   const handleSubmit = () => {
@@ -104,6 +119,15 @@ const FutureFlagsPage = () => {
         flags={sortedFlags}
         onEdit={handleEdit}
         onToggle={handleToggle}
+        onDelete={handleDelete}
+      />
+      <ConfirmDialog
+        isOpen={Boolean(pendingDelete)}
+        title="Delete future flag?"
+        description={`This will remove ${pendingDelete?.key ?? "this flag"} from the rollout plan.`}
+        confirmLabel="Delete flag"
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDelete(null)}
       />
     </div>
   );

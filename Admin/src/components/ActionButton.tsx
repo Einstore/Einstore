@@ -1,6 +1,6 @@
 type ActionButtonProps = {
   label: string;
-  variant?: "primary" | "outline";
+  variant?: "primary" | "outline" | "danger";
   type?: "button" | "submit";
   onClick?: () => void;
   disabled?: boolean;
@@ -9,6 +9,7 @@ type ActionButtonProps = {
 const variantStyles = {
   primary: "bg-ink text-sand hover:bg-ink/90",
   outline: "border border-ink/20 text-ink hover:border-ink",
+  danger: "bg-coral text-ink hover:bg-coral/90",
 } as const;
 
 const ActionButton = ({
