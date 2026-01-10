@@ -3,9 +3,9 @@ import { createRequire } from "node:module";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import AdmZip from "adm-zip";
 import ApkReader from "@devicefarmer/adbkit-apkreader";
 import { prisma } from "../prisma.js";
+import { listZipEntries, readZipEntries } from "../zip.js";
 const parseMatch = (line, key) => {
     const match = line.match(new RegExp(`${key}='([^']+)'`));
     return match?.[1];
@@ -94,12 +94,9 @@ const readPngDimensions = (buffer) => {
         return null;
     return { width, height };
 };
-const extractBestIconBitmap = (apkPath, outputDir) => {
-    const zip = new AdmZip(apkPath);
-    const entries = zip.getEntries();
+const extractBestIconBitmap = async (apkPath, outputDir) => {
+    const entries = await listZipEntries(apkPath);
     const candidates = entries
-        .filter((entry) => !entry.isDirectory)
-        .map((entry) => entry.entryName)
         .filter((name) => name.startsWith("res/") && name.endsWith(".png"))
         .map((name) => {
         const lower = name.toLowerCase();
@@ -111,11 +108,11 @@ const extractBestIconBitmap = (apkPath, outputDir) => {
         return { name, score };
     });
     let best = null;
+    const buffers = await readZipEntries(apkPath, new Set(candidates.map((candidate) => candidate.name)));
     for (const candidate of candidates) {
-        const entry = zip.getEntry(candidate.name);
-        if (!entry)
+        const buffer = buffers.get(candidate.name);
+        if (!buffer)
             continue;
-        const buffer = entry.getData();
         const dimensions = readPngDimensions(buffer);
         if (!dimensions)
             continue;
@@ -256,7 +253,7 @@ export async function ingestAndroidApk(filePath) {
         },
     });
     const iconOutputDir = path.resolve(process.cwd(), "storage", "ingest", build.id);
-    const iconBitmap = extractBestIconBitmap(filePath, iconOutputDir);
+    const iconBitmap = await extractBestIconBitmap(filePath, iconOutputDir);
     const target = await prisma.target.create({
         data: {
             buildId: build.id,

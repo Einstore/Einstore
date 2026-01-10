@@ -1,9 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
-import AdmZip from "adm-zip";
 import plist from "plist";
 import { Prisma, PlatformKind, TargetRole } from "@prisma/client";
 import { prisma } from "../prisma.js";
+import { listZipEntries, readZipEntries } from "../zip.js";
 
 type IconBitmap = {
   sourcePath: string;
@@ -66,15 +66,15 @@ const resolveIconCandidates = (info: Record<string, unknown>) => {
   return Array.from(candidates);
 };
 
-const extractBestIcon = (
-  zip: AdmZip,
+const extractBestIcon = async (
+  filePath: string,
   targetRoot: string,
+  entries: string[],
   outputDir: string,
   info: Record<string, unknown>,
-): IconBitmap | null => {
-  const entries = zip.getEntries();
+): Promise<IconBitmap | null> => {
   const targetEntries = entries.filter(
-    (entry) => !entry.isDirectory && entry.entryName.startsWith(targetRoot),
+    (entry) => !entry.endsWith("/") && entry.startsWith(targetRoot),
   );
   const candidates = resolveIconCandidates(info);
 
@@ -82,55 +82,59 @@ const extractBestIcon = (
     | { entryName: string; width: number; height: number; size: number; buffer: Buffer }
     | null = null;
 
-  const pickFromEntry = (entryName: string) => {
-    const entry = zip.getEntry(entryName);
-    if (!entry) return;
-    const buffer = entry.getData();
-    const dimensions = readPngDimensions(buffer);
-    if (!dimensions) return;
-    const size = buffer.length;
-    if (
-      !best ||
-      dimensions.width * dimensions.height > best.width * best.height ||
-      (dimensions.width * dimensions.height === best.width * best.height &&
-        size > best.size)
-    ) {
-      best = {
-        entryName,
-        width: dimensions.width,
-        height: dimensions.height,
-        size,
-        buffer,
-      };
+  const pickFromBuffers = async (entryNames: string[]) => {
+    if (!entryNames.length) return;
+    const buffers = await readZipEntries(filePath, new Set(entryNames));
+    for (const entryName of entryNames) {
+      const buffer = buffers.get(entryName);
+      if (!buffer) continue;
+      const dimensions = readPngDimensions(buffer);
+      if (!dimensions) continue;
+      const size = buffer.length;
+      if (
+        !best ||
+        dimensions.width * dimensions.height > best.width * best.height ||
+        (dimensions.width * dimensions.height === best.width * best.height &&
+          size > best.size)
+      ) {
+        best = {
+          entryName,
+          width: dimensions.width,
+          height: dimensions.height,
+          size,
+          buffer,
+        };
+      }
     }
   };
 
   if (candidates.length) {
+    const candidateEntries: string[] = [];
     for (const candidate of candidates) {
-      const entry = targetEntries.find(
-        (item) => item.entryName.toLowerCase().endsWith(`/${candidate.toLowerCase()}`),
+      const entry = targetEntries.find((item) =>
+        item.toLowerCase().endsWith(`/${candidate.toLowerCase()}`),
       );
       if (entry) {
-        pickFromEntry(entry.entryName);
+        candidateEntries.push(entry);
       }
     }
+    await pickFromBuffers(candidateEntries);
   }
 
   if (!best) {
-    for (const entry of targetEntries) {
-      const lower = entry.entryName.toLowerCase();
-      if (!lower.endsWith(".png")) continue;
-      if (lower.includes("appicon") || lower.includes("icon") || lower.includes("launcher")) {
-        pickFromEntry(entry.entryName);
-      }
-    }
+    const fallbackEntries = targetEntries.filter((entry) => {
+      const lower = entry.toLowerCase();
+      return (
+        lower.endsWith(".png") &&
+        (lower.includes("appicon") || lower.includes("icon") || lower.includes("launcher"))
+      );
+    });
+    await pickFromBuffers(fallbackEntries);
   }
 
   if (!best) {
-    for (const entry of targetEntries) {
-      if (!entry.entryName.toLowerCase().endsWith(".png")) continue;
-      pickFromEntry(entry.entryName);
-    }
+    const allPngEntries = targetEntries.filter((entry) => entry.toLowerCase().endsWith(".png"));
+    await pickFromBuffers(allPngEntries);
   }
 
   if (!best) return null;
@@ -143,11 +147,11 @@ const extractBestIcon = (
   };
   fs.mkdirSync(outputDir, { recursive: true });
   const fileName = `icon-${resolved.width}x${resolved.height}.png`;
-  const filePath = path.join(outputDir, fileName);
-  fs.writeFileSync(filePath, resolved.buffer);
+  const iconPath = path.join(outputDir, fileName);
+  fs.writeFileSync(iconPath, resolved.buffer);
   return {
     sourcePath: resolved.entryName,
-    path: filePath,
+    path: iconPath,
     width: resolved.width,
     height: resolved.height,
     sizeBytes: resolved.size,
@@ -166,21 +170,17 @@ const resolveRole = (extensionPoint?: string) => {
   return "extension";
 };
 
-const resolveTargetRoots = (zip: AdmZip) => {
+const resolveTargetRoots = (entries: string[]) => {
   const roots = new Set<string>();
-  for (const entry of zip.getEntries()) {
-    if (entry.isDirectory && entry.entryName.match(/^Payload\/[^/]+\.app\/$/)) {
-      roots.add(entry.entryName);
+  for (const entry of entries) {
+    if (entry.match(/^Payload\/[^/]+\.app\/Info\.plist$/)) {
+      roots.add(entry.replace(/Info\.plist$/, ""));
     }
-  }
-  for (const entry of zip.getEntries()) {
-    if (entry.isDirectory && entry.entryName.match(/^Payload\/[^/]+\.app\/.*\.appex\/$/)) {
-      roots.add(entry.entryName);
+    if (entry.match(/^Payload\/[^/]+\.app\/PlugIns\/[^/]+\.appex\/Info\.plist$/)) {
+      roots.add(entry.replace(/Info\.plist$/, ""));
     }
-  }
-  for (const entry of zip.getEntries()) {
-    if (entry.isDirectory && entry.entryName.match(/^Payload\/[^/]+\.app\/Watch\/[^/]+\.app\/$/)) {
-      roots.add(entry.entryName);
+    if (entry.match(/^Payload\/[^/]+\.app\/Watch\/[^/]+\.app\/Info\.plist$/)) {
+      roots.add(entry.replace(/Info\.plist$/, ""));
     }
   }
   return Array.from(roots);
@@ -217,18 +217,20 @@ export async function ingestIosIpa(filePath: string): Promise<IosIngestResult> {
   }
 
   const stats = fs.statSync(filePath);
-  const zip = new AdmZip(filePath);
-  const targetRoots = resolveTargetRoots(zip);
+  const entryNames = await listZipEntries(filePath);
+  const targetRoots = resolveTargetRoots(entryNames);
   if (!targetRoots.length) {
     throw new Error("No app bundles found in IPA");
   }
 
   const targets: IosTarget[] = [];
+  const plistPaths = targetRoots.map((root) => `${root}Info.plist`);
+  const plistBuffers = await readZipEntries(filePath, new Set(plistPaths));
 
   for (const root of targetRoots) {
-    const plistEntry = zip.getEntry(`${root}Info.plist`);
-    if (!plistEntry) continue;
-    const info = parsePlist(plistEntry.getData());
+    const plistBuffer = plistBuffers.get(`${root}Info.plist`);
+    if (!plistBuffer) continue;
+    const info = parsePlist(plistBuffer);
     const bundleId = String(info.CFBundleIdentifier || "");
     if (!bundleId) continue;
     const name =
@@ -261,7 +263,13 @@ export async function ingestIosIpa(filePath: string): Promise<IosIngestResult> {
       "ingest",
       sanitizePathSegment(bundleId),
     );
-    const iconBitmap = extractBestIcon(zip, root, iconOutputDir, info);
+    const iconBitmap = await extractBestIcon(
+      filePath,
+      root,
+      entryNames,
+      iconOutputDir,
+      info,
+    );
 
     targets.push({
       name,

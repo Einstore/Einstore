@@ -3,9 +3,9 @@ import { createRequire } from "node:module";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import AdmZip from "adm-zip";
 import ApkReader from "@devicefarmer/adbkit-apkreader";
 import { prisma } from "../prisma.js";
+import { listZipEntries, readZipEntries } from "../zip.js";
 
 const parseMatch = (line: string, key: string): string | undefined => {
   const match = line.match(new RegExp(`${key}='([^']+)'`));
@@ -99,12 +99,9 @@ const readPngDimensions = (buffer: Buffer) => {
   return { width, height };
 };
 
-const extractBestIconBitmap = (apkPath: string, outputDir: string) => {
-  const zip = new AdmZip(apkPath);
-  const entries = zip.getEntries();
+const extractBestIconBitmap = async (apkPath: string, outputDir: string) => {
+  const entries = await listZipEntries(apkPath);
   const candidates = entries
-    .filter((entry) => !entry.isDirectory)
-    .map((entry) => entry.entryName)
     .filter((name) => name.startsWith("res/") && name.endsWith(".png"))
     .map((name) => {
       const lower = name.toLowerCase();
@@ -121,10 +118,14 @@ const extractBestIconBitmap = (apkPath: string, outputDir: string) => {
     | { name: string; score: number; width: number; height: number; size: number; buffer: Buffer }
     | null = null;
 
+  const buffers = await readZipEntries(
+    apkPath,
+    new Set(candidates.map((candidate) => candidate.name)),
+  );
+
   for (const candidate of candidates) {
-    const entry = zip.getEntry(candidate.name);
-    if (!entry) continue;
-    const buffer = entry.getData();
+    const buffer = buffers.get(candidate.name);
+    if (!buffer) continue;
     const dimensions = readPngDimensions(buffer);
     if (!dimensions) continue;
     const size = buffer.length;
@@ -293,7 +294,7 @@ export async function ingestAndroidApk(filePath: string): Promise<AndroidIngestR
   });
 
   const iconOutputDir = path.resolve(process.cwd(), "storage", "ingest", build.id);
-  const iconBitmap = extractBestIconBitmap(filePath, iconOutputDir);
+  const iconBitmap = await extractBestIconBitmap(filePath, iconOutputDir);
 
   const target = await prisma.target.create({
     data: {
