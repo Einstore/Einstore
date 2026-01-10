@@ -1,12 +1,14 @@
 import type { ReactNode } from "react";
 
 import Icon, { type IconName } from "./Icon";
+import type { FeatureFlagKey } from "../lib/featureFlags";
 
 export type NavItem = {
   id: string;
   label: string;
   icon: IconName;
   badge?: string;
+  featureFlag?: FeatureFlagKey;
 };
 
 type SidebarProps = {

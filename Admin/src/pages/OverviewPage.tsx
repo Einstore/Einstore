@@ -21,6 +21,10 @@ type OverviewPageProps = {
   buildQueue: BuildJob[];
   activity: ActivityItem[];
   storageBuckets: StorageBucket[];
+  showMetrics?: boolean;
+  showPipeline?: boolean;
+  showActivity?: boolean;
+  showStorage?: boolean;
 };
 
 const OverviewPage = ({
@@ -30,21 +34,37 @@ const OverviewPage = ({
   buildQueue,
   activity,
   storageBuckets,
+  showMetrics = false,
+  showPipeline = false,
+  showActivity = false,
+  showStorage = false,
 }: OverviewPageProps) => {
+  const showActivityStorage = showActivity || showStorage;
+  const showBothActivityStorage = showActivity && showStorage;
+
   return (
     <>
-      <OverviewSection metrics={metrics} />
-      <PipelineSection stages={pipelineStages} />
+      {showMetrics ? <OverviewSection metrics={metrics} /> : null}
+      {showPipeline ? <PipelineSection stages={pipelineStages} /> : null}
       <SplitLayout
         className="lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]"
         left={<ReleasesSection apps={apps} />}
         right={<BuildQueueSection jobs={buildQueue} />}
       />
-      <SplitLayout
-        className="lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
-        left={<ActivitySection items={activity} />}
-        right={<StorageSection buckets={storageBuckets} />}
-      />
+      {showActivityStorage && !showBothActivityStorage ? (
+        showActivity ? (
+          <ActivitySection items={activity} />
+        ) : (
+          <StorageSection buckets={storageBuckets} />
+        )
+      ) : null}
+      {showBothActivityStorage ? (
+        <SplitLayout
+          className="lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
+          left={<ActivitySection items={activity} />}
+          right={<StorageSection buckets={storageBuckets} />}
+        />
+      ) : null}
     </>
   );
 };

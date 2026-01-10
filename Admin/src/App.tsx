@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import ActionButton from "./components/ActionButton";
 import AppShell from "./components/AppShell";
@@ -23,6 +23,11 @@ import {
   settingsProfile,
   storageBuckets,
 } from "./data/mock";
+import { apiFetch } from "./lib/api";
+import {
+  buildFeatureFlagMap,
+  getDefaultFeatureFlags,
+} from "./lib/featureFlags";
 
 type PageKey =
   | "overview"
@@ -37,10 +42,30 @@ const navItems: NavItem[] = [
   { id: "overview", label: "Overview", icon: "overview" },
   { id: "apps", label: "Apps", icon: "apps", badge: "5" },
   { id: "builds", label: "Builds", icon: "builds", badge: "2" },
-  { id: "flags", label: "Future flags", icon: "flags" },
-  { id: "pipelines", label: "Pipelines", icon: "pipelines" },
-  { id: "security", label: "Security", icon: "security" },
-  { id: "settings", label: "Settings", icon: "settings" },
+  {
+    id: "flags",
+    label: "Future flags",
+    icon: "flags",
+    featureFlag: "admin.future_flags",
+  },
+  {
+    id: "pipelines",
+    label: "Pipelines",
+    icon: "pipelines",
+    featureFlag: "admin.pipeline_health",
+  },
+  {
+    id: "security",
+    label: "Security",
+    icon: "security",
+    featureFlag: "admin.security_posture",
+  },
+  {
+    id: "settings",
+    label: "Settings",
+    icon: "settings",
+    featureFlag: "admin.workspace_settings",
+  },
 ];
 
 const pageConfig: Record<
@@ -95,7 +120,42 @@ const pageConfig: Record<
 
 const App = () => {
   const [activePage, setActivePage] = useState<PageKey>("overview");
+  const [featureFlags, setFeatureFlags] = useState(getDefaultFeatureFlags());
   const config = pageConfig[activePage];
+
+  useEffect(() => {
+    let isMounted = true;
+    apiFetch<{ key: string; defaultEnabled?: boolean }[]>("/feature-flags")
+      .then((flags) => {
+        if (isMounted) {
+          setFeatureFlags(buildFeatureFlagMap(Array.isArray(flags) ? flags : []));
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setFeatureFlags(getDefaultFeatureFlags());
+        }
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const visibleNavItems = useMemo(
+    () =>
+      navItems.filter(
+        (item) => !item.featureFlag || featureFlags[item.featureFlag]
+      ),
+    [featureFlags]
+  );
+
+  useEffect(() => {
+    const allowed = new Set(visibleNavItems.map((item) => item.id));
+    if (!allowed.has(activePage)) {
+      const next = visibleNavItems[0]?.id ?? "overview";
+      setActivePage(next as PageKey);
+    }
+  }, [activePage, visibleNavItems]);
 
   const pageContent = useMemo(() => {
     switch (activePage) {
@@ -121,16 +181,20 @@ const App = () => {
             buildQueue={buildQueue}
             activity={activity}
             storageBuckets={storageBuckets}
+            showMetrics={featureFlags["admin.overview_metrics"]}
+            showPipeline={featureFlags["admin.pipeline_health"]}
+            showActivity={featureFlags["admin.activity_stream"]}
+            showStorage={featureFlags["admin.storage_usage"]}
           />
         );
     }
-  }, [activePage]);
+  }, [activePage, featureFlags]);
 
   return (
     <AppShell
       sidebar={
         <Sidebar
-          items={navItems}
+          items={visibleNavItems}
           activeId={activePage}
           onSelect={(id) => setActivePage(id as PageKey)}
           footer={
