@@ -1,0 +1,83 @@
+import ActionButton from "./ActionButton";
+import CheckboxField from "./CheckboxField";
+import Panel from "./Panel";
+import TextInput from "./TextInput";
+
+export type FeatureFlagFormValues = {
+  key: string;
+  description: string;
+  defaultEnabled: boolean;
+};
+
+type FeatureFlagFormProps = {
+  values: FeatureFlagFormValues;
+  isEditing: boolean;
+  isSubmitting?: boolean;
+  error?: string;
+  onChange: (values: FeatureFlagFormValues) => void;
+  onSubmit: () => void;
+  onCancel?: () => void;
+};
+
+const FeatureFlagForm = ({
+  values,
+  isEditing,
+  isSubmitting,
+  error,
+  onChange,
+  onSubmit,
+  onCancel,
+}: FeatureFlagFormProps) => {
+  return (
+    <Panel className="space-y-6">
+      <div>
+        <h2 className="text-xl font-display text-ink">
+          {isEditing ? "Edit flag" : "Create flag"}
+        </h2>
+        <p className="mt-2 text-sm text-ink/60">
+          Use future flags to prepare staged rollouts before they are activated.
+        </p>
+      </div>
+      <div className="grid gap-4 lg:grid-cols-[minmax(220px,1fr)_minmax(220px,2fr)_auto]">
+        <TextInput
+          id="flag-key"
+          label="Flag key"
+          value={values.key}
+          placeholder="release_notes_v2"
+          onChange={(next) => onChange({ ...values, key: next })}
+        />
+        <TextInput
+          id="flag-description"
+          label="Description"
+          value={values.description}
+          placeholder="Explain how the flag will be used"
+          onChange={(next) => onChange({ ...values, description: next })}
+        />
+        <div className="flex items-end gap-3">
+          <CheckboxField
+            id="flag-enabled"
+            label="Default"
+            checked={values.defaultEnabled}
+            onChange={(checked) =>
+              onChange({ ...values, defaultEnabled: checked })
+            }
+          />
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-3">
+        <ActionButton
+          label={isEditing ? "Update flag" : "Create flag"}
+          variant="primary"
+          onClick={onSubmit}
+          disabled={isSubmitting}
+        />
+        {isEditing && onCancel ? (
+          <ActionButton label="Cancel" variant="outline" onClick={onCancel} />
+        ) : null}
+      </div>
+      {error ? <p className="text-xs text-coral">{error}</p> : null}
+    </Panel>
+  );
+};
+
+export default FeatureFlagForm;

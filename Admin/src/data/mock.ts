@@ -82,6 +82,13 @@ export type SettingsProfile = {
   rotationReminders: boolean;
 };
 
+export type FeatureFlag = {
+  id: string;
+  key: string;
+  description: string | null;
+  defaultEnabled: boolean;
+};
+
 export const metrics: Metric[] = [
   {
     label: "Active apps",
@@ -367,3 +374,30 @@ export const settingsProfile: SettingsProfile = {
   policyDigest: true,
   rotationReminders: false,
 };
+
+export const futureFlags: FeatureFlag[] = [
+  {
+    id: "flag-1",
+    key: "release_notes_v2",
+    description: "New release notes layout for mobile clients.",
+    defaultEnabled: false,
+  },
+  {
+    id: "flag-2",
+    key: "auto_qa_gate",
+    description: "Automatic QA gating for staged rollouts.",
+    defaultEnabled: true,
+  },
+  {
+    id: "flag-3",
+    key: "ios_signed_assets",
+    description: "Signed asset downloads for iOS distribution.",
+    defaultEnabled: false,
+  },
+  {
+    id: "flag-4",
+    key: "compliance_digest",
+    description: "Weekly compliance digest emails.",
+    defaultEnabled: true,
+  },
+];

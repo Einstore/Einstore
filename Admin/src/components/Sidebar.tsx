@@ -1,9 +1,11 @@
 import type { ReactNode } from "react";
 
+import Icon, { type IconName } from "./Icon";
+
 export type NavItem = {
   id: string;
   label: string;
-  icon: ReactNode;
+  icon: IconName;
   badge?: string;
 };
 
@@ -45,7 +47,7 @@ const Sidebar = ({ items, activeId, footer, onSelect }: SidebarProps) => {
               onClick={() => onSelect?.(item.id)}
             >
               <span className="flex items-center gap-3">
-                <span className="text-lg">{item.icon}</span>
+                <Icon name={item.icon} className="text-lg" />
                 {item.label}
               </span>
               {item.badge ? (

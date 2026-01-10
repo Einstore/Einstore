@@ -6,6 +6,7 @@ import Sidebar, { type NavItem } from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 import AppsPage from "./pages/AppsPage";
 import BuildsPage from "./pages/BuildsPage";
+import FutureFlagsPage from "./pages/FutureFlagsPage";
 import OverviewPage from "./pages/OverviewPage";
 import PipelinesPage from "./pages/PipelinesPage";
 import SecurityPage from "./pages/SecurityPage";
@@ -27,17 +28,19 @@ type PageKey =
   | "overview"
   | "apps"
   | "builds"
+  | "flags"
   | "pipelines"
   | "security"
   | "settings";
 
 const navItems: NavItem[] = [
-  { id: "overview", label: "Overview", icon: "O" },
-  { id: "apps", label: "Apps", icon: "#", badge: "5" },
-  { id: "builds", label: "Builds", icon: "*", badge: "2" },
-  { id: "pipelines", label: "Pipelines", icon: ">" },
-  { id: "security", label: "Security", icon: "!" },
-  { id: "settings", label: "Settings", icon: "=" },
+  { id: "overview", label: "Overview", icon: "overview" },
+  { id: "apps", label: "Apps", icon: "apps", badge: "5" },
+  { id: "builds", label: "Builds", icon: "builds", badge: "2" },
+  { id: "flags", label: "Future flags", icon: "flags" },
+  { id: "pipelines", label: "Pipelines", icon: "pipelines" },
+  { id: "security", label: "Security", icon: "security" },
+  { id: "settings", label: "Settings", icon: "settings" },
 ];
 
 const pageConfig: Record<
@@ -68,6 +71,11 @@ const pageConfig: Record<
     subtitle: "Track jobs, failures, and release readiness signals.",
     actions: [{ label: "Trigger build", variant: "primary" }],
   },
+  flags: {
+    title: "Future flags",
+    subtitle: "Create and manage flags before the next rollout window.",
+    actions: [{ label: "Create flag", variant: "primary" }],
+  },
   pipelines: {
     title: "Pipeline health",
     subtitle: "Monitor delivery throughput and escalation timelines.",
@@ -95,6 +103,8 @@ const App = () => {
         return <AppsPage apps={apps} />;
       case "builds":
         return <BuildsPage builds={buildQueue} />;
+      case "flags":
+        return <FutureFlagsPage />;
       case "pipelines":
         return <PipelinesPage stages={pipelineStages} alerts={pipelineAlerts} />;
       case "security":
