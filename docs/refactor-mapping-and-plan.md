@@ -11,6 +11,8 @@ Ground-up refactor of the legacy Einstore system into a modern, compliant privat
 - Auth must use rafiki/auth as an external contract (submodule).
 - Monorepo only (no separate internal modules aside from auth submodule).
 - Storage must support local filesystem or S3 (self-hosted).
+- Extraction and processing run in a DigitalOcean Function; results are returned to the API.
+- Images and binaries are stored in DigitalOcean Spaces.
 
 ## Repo Setup (Target State)
 ```
