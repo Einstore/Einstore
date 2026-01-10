@@ -100,6 +100,16 @@ export async function featureFlagRoutes(app: FastifyInstance) {
     return reply.send(updated);
   });
 
+  app.delete("/feature-flags/:key", { preHandler: requireAuth }, async (request, reply) => {
+    const key = (request.params as { key: string }).key;
+    const record = await prisma.featureFlag.findUnique({ where: { key } });
+    if (!record) {
+      return reply.status(404).send({ error: "Not found" });
+    }
+    const deleted = await prisma.featureFlag.delete({ where: { key } });
+    return reply.send(deleted);
+  });
+
   app.post("/feature-flags/:key/overrides", { preHandler: requireAuth }, async (request, reply) => {
     const key = (request.params as { key: string }).key;
     const parsed = createOverrideSchema.safeParse(request.body);

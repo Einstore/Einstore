@@ -43,6 +43,7 @@ const prismaMock = {
     create: vi.fn(),
     findMany: vi.fn(),
     findUnique: vi.fn(),
+    delete: vi.fn(),
     update: vi.fn(),
   },
   featureFlagOverride: {
@@ -166,6 +167,7 @@ describe("routes", () => {
     prismaMock.featureFlag.create.mockResolvedValue({ id: "flag-1", key: "beta.feature" });
     prismaMock.featureFlag.findMany.mockResolvedValue([{ id: "flag-1", key: "beta.feature" }]);
     prismaMock.featureFlag.findUnique.mockResolvedValue({ id: "flag-1", key: "beta.feature" });
+    prismaMock.featureFlag.delete.mockResolvedValue({ id: "flag-1", key: "beta.feature" });
     prismaMock.featureFlag.update.mockResolvedValue({ id: "flag-1", key: "beta.feature", defaultEnabled: true });
 
     prismaMock.featureFlagOverride.findFirst.mockResolvedValue(null);
@@ -343,6 +345,8 @@ describe("routes", () => {
       headers: { "content-type": "application/json" },
     });
     expect(updateResponse.statusCode).toBe(200);
+    const deleteResponse = await app.inject({ method: "DELETE", url: "/feature-flags/beta.feature" });
+    expect(deleteResponse.statusCode).toBe(200);
     const overrideResponse = await postJson("/feature-flags/beta.feature/overrides", {
       scope: "platform",
       enabled: true,
