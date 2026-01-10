@@ -238,6 +238,8 @@ All endpoints return JSON. Authenticated endpoints require `Authorization: Beare
   - Local storage: generate a short-lived tokenized download URL for the IPA.
   - S3 storage: generate a time-limited pre-signed HTTPS URL for the IPA.
   - Both the plist URL and the download URL must be HTTPS with valid certificates.
+  - Android: when resolving AABs, use bundletool with a device spec (ABI, density, language, sdkVersion) to generate the device-specific APK set.
+  - Android: enforce compressed APK set size <= 4 GB (base + config splits).
 
 ## GET /storage
 - Purpose: Get active storage configuration

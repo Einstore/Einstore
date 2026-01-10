@@ -87,6 +87,12 @@ vi.mock("../../lib/ingest/ios.js", () => ({
   ingestIosIpa: ingestIosMock,
 }));
 
+const resolveAndroidMock = vi.fn();
+
+vi.mock("../../lib/resolve/android.js", () => ({
+  resolveAndroidInstall: resolveAndroidMock,
+}));
+
 const ensureFeatureFlagMock = vi.fn();
 const isFeatureFlagEnabledMock = vi.fn();
 
@@ -163,6 +169,7 @@ describe("routes", () => {
 
     ingestAndroidMock.mockResolvedValue({ buildId: "build-android" });
     ingestIosMock.mockResolvedValue({ buildId: "build-ios" });
+    resolveAndroidMock.mockResolvedValue({ status: "resolved" });
 
     prismaMock.featureFlag.create.mockResolvedValue({ id: "flag-1", key: "beta.feature" });
     prismaMock.featureFlag.findMany.mockResolvedValue([{ id: "flag-1", key: "beta.feature" }]);
@@ -362,6 +369,14 @@ describe("routes", () => {
     const response = await postJson("/resolve-install", {
       buildId: ids.buildId,
       device: { platform: "ios", osVersion: "17.0" },
+    });
+    expect(response.statusCode).toBe(200);
+  });
+
+  it("POST /resolve-install (android)", async () => {
+    const response = await postJson("/resolve-install", {
+      buildId: ids.buildId,
+      device: { platform: "android", osVersion: "34", abi: "arm64-v8a", density: "480" },
     });
     expect(response.statusCode).toBe(200);
   });

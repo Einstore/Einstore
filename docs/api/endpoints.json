@@ -1324,7 +1324,7 @@
     "/resolve-install": {
       "post": {
         "summary": "Resolve install",
-        "description": "For iOS installs, the plist must include a prevalidated HTTPS download URL. The plist itself is not protected, so the IPA URL must be tokenized (local) or pre-signed (S3) and time-limited. Both plist and IPA download URLs require valid HTTPS certificates.",
+        "description": "For iOS installs, the plist must include a prevalidated HTTPS download URL. The plist itself is not protected, so the IPA URL must be tokenized (local) or pre-signed (S3) and time-limited. Both plist and IPA download URLs require valid HTTPS certificates. For Android AABs, use bundletool with a device spec (ABI, density, language, sdkVersion) to generate device-specific APK sets and enforce the 4 GB compressed APK-set limit.",
         "responses": {
           "200": {
             "description": "Resolver response"
