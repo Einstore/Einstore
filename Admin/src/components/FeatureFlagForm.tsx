@@ -14,6 +14,7 @@ type FeatureFlagFormProps = {
   isEditing: boolean;
   isSubmitting?: boolean;
   error?: string;
+  keyLocked?: boolean;
   onChange: (values: FeatureFlagFormValues) => void;
   onSubmit: () => void;
   onCancel?: () => void;
@@ -24,6 +25,7 @@ const FeatureFlagForm = ({
   isEditing,
   isSubmitting,
   error,
+  keyLocked,
   onChange,
   onSubmit,
   onCancel,
@@ -38,43 +40,52 @@ const FeatureFlagForm = ({
           Use future flags to prepare staged rollouts before they are activated.
         </p>
       </div>
-      <div className="grid gap-4 lg:grid-cols-[minmax(220px,1fr)_minmax(220px,2fr)_auto]">
-        <TextInput
-          id="flag-key"
-          label="Flag key"
-          value={values.key}
-          placeholder="release_notes_v2"
-          onChange={(next) => onChange({ ...values, key: next })}
-        />
-        <TextInput
-          id="flag-description"
-          label="Description"
-          value={values.description}
-          placeholder="Explain how the flag will be used"
-          onChange={(next) => onChange({ ...values, description: next })}
-        />
-        <div className="flex items-end gap-3">
-          <CheckboxField
-            id="flag-enabled"
-            label="Default"
-            checked={values.defaultEnabled}
-            onChange={(checked) =>
-              onChange({ ...values, defaultEnabled: checked })
-            }
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          onSubmit();
+        }}
+        className="space-y-6"
+      >
+        <div className="grid gap-4 lg:grid-cols-[minmax(220px,1fr)_minmax(220px,2fr)_auto]">
+          <TextInput
+            id="flag-key"
+            label="Flag key"
+            value={values.key}
+            placeholder="release_notes_v2"
+            onChange={(next) => onChange({ ...values, key: next })}
+            disabled={keyLocked}
           />
+          <TextInput
+            id="flag-description"
+            label="Description"
+            value={values.description}
+            placeholder="Explain how the flag will be used"
+            onChange={(next) => onChange({ ...values, description: next })}
+          />
+          <div className="flex items-end gap-3">
+            <CheckboxField
+              id="flag-enabled"
+              label="Default"
+              checked={values.defaultEnabled}
+              onChange={(checked) =>
+                onChange({ ...values, defaultEnabled: checked })
+              }
+            />
+          </div>
         </div>
-      </div>
-      <div className="flex flex-wrap gap-3">
-        <ActionButton
-          label={isEditing ? "Update flag" : "Create flag"}
-          variant="primary"
-          onClick={onSubmit}
-          disabled={isSubmitting}
-        />
-        {isEditing && onCancel ? (
-          <ActionButton label="Cancel" variant="outline" onClick={onCancel} />
-        ) : null}
-      </div>
+        <div className="flex flex-wrap gap-3">
+          <ActionButton
+            label={isEditing ? "Update flag" : "Create flag"}
+            variant="primary"
+            type="submit"
+            disabled={isSubmitting}
+          />
+          {isEditing && onCancel ? (
+            <ActionButton label="Cancel" variant="outline" onClick={onCancel} />
+          ) : null}
+        </div>
+      </form>
       {error ? <p className="text-xs text-coral">{error}</p> : null}
     </Panel>
   );

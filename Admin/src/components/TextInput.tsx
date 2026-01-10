@@ -9,6 +9,7 @@ type TextInputProps = {
   type?: "text" | "url" | "email";
   hint?: string;
   onChange?: (value: string) => void;
+  disabled?: boolean;
 };
 
 const TextInput = ({
@@ -20,6 +21,7 @@ const TextInput = ({
   type = "text",
   hint,
   onChange,
+  disabled,
 }: TextInputProps) => {
   return (
     <FormField label={label} htmlFor={id} hint={hint}>
@@ -30,6 +32,7 @@ const TextInput = ({
         defaultValue={value ? undefined : defaultValue}
         placeholder={placeholder}
         onChange={(event) => onChange?.(event.target.value)}
+        disabled={disabled}
         className="h-11 w-full rounded-2xl border border-ink/15 bg-white/80 px-4 text-sm text-ink shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30"
       />
     </FormField>

@@ -1,11 +1,11 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import ConfirmDialog from "../components/ConfirmDialog";
 import FeatureFlagForm, { type FeatureFlagFormValues } from "../components/FeatureFlagForm";
 import FeatureFlagsTable from "../components/FeatureFlagsTable";
 import SectionHeader from "../components/SectionHeader";
 import type { FeatureFlag } from "../data/mock";
-import { futureFlags } from "../data/mock";
+import { apiFetch } from "../lib/api";
 
 const emptyForm: FeatureFlagFormValues = {
   key: "",
@@ -14,30 +14,52 @@ const emptyForm: FeatureFlagFormValues = {
 };
 
 const FutureFlagsPage = () => {
-  const [flags, setFlags] = useState<FeatureFlag[]>(futureFlags);
-  const [activeFlagId, setActiveFlagId] = useState<string | null>(null);
+  const [flags, setFlags] = useState<FeatureFlag[]>([]);
+  const [activeFlagKey, setActiveFlagKey] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<FeatureFlag | null>(null);
   const [formValues, setFormValues] = useState<FeatureFlagFormValues>(emptyForm);
   const [error, setError] = useState<string>("");
+  const [loadError, setLoadError] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const sortedFlags = useMemo(
     () => [...flags].sort((a, b) => a.key.localeCompare(b.key)),
     [flags]
   );
 
-  const handleToggle = (flag: FeatureFlag) => {
-    setFlags((prev) =>
-      prev.map((item) =>
-        item.id === flag.id
-          ? { ...item, defaultEnabled: !item.defaultEnabled }
-          : item
-      )
-    );
+  const loadFlags = useCallback(async () => {
+    setIsLoading(true);
+    setLoadError("");
+    try {
+      const response = await apiFetch<FeatureFlag[]>("/feature-flags");
+      setFlags(Array.isArray(response) ? response : []);
+    } catch (loadError) {
+      setLoadError(loadError instanceof Error ? loadError.message : "Unable to load flags.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const handleToggle = async (flag: FeatureFlag) => {
+    setError("");
+    try {
+      const updated = await apiFetch<FeatureFlag>(
+        `/feature-flags/${encodeURIComponent(flag.key)}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({ defaultEnabled: !flag.defaultEnabled }),
+        }
+      );
+      setFlags((prev) => prev.map((item) => (item.key === flag.key ? updated : item)));
+    } catch (actionError) {
+      setError(actionError instanceof Error ? actionError.message : "Unable to update flag.");
+    }
   };
 
   const handleEdit = (flag: FeatureFlag) => {
     setError("");
-    setActiveFlagId(flag.id);
+    setActiveFlagKey(flag.key);
     setFormValues({
       key: flag.key,
       description: flag.description ?? "",
@@ -46,7 +68,7 @@ const FutureFlagsPage = () => {
   };
 
   const resetForm = () => {
-    setActiveFlagId(null);
+    setActiveFlagKey(null);
     setFormValues(emptyForm);
     setError("");
   };
@@ -59,47 +81,70 @@ const FutureFlagsPage = () => {
     if (!pendingDelete) {
       return;
     }
-    setFlags((prev) => prev.filter((flag) => flag.id !== pendingDelete.id));
-    if (activeFlagId === pendingDelete.id) {
-      resetForm();
-    }
-    setPendingDelete(null);
+    setIsSubmitting(true);
+    setError("");
+    apiFetch(`/feature-flags/${encodeURIComponent(pendingDelete.key)}`, {
+      method: "DELETE",
+    })
+      .then(() => {
+        setFlags((prev) => prev.filter((flag) => flag.key !== pendingDelete.key));
+        if (activeFlagKey === pendingDelete.key) {
+          resetForm();
+        }
+        setPendingDelete(null);
+      })
+      .catch((actionError) => {
+        setError(actionError instanceof Error ? actionError.message : "Unable to delete flag.");
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setError("");
     if (!formValues.key.trim()) {
       setError("Flag key is required.");
       return;
     }
+    setIsSubmitting(true);
+    try {
+      if (activeFlagKey) {
+        const updated = await apiFetch<FeatureFlag>(
+          `/feature-flags/${encodeURIComponent(activeFlagKey)}`,
+          {
+            method: "PATCH",
+            body: JSON.stringify({
+              description: formValues.description.trim() || null,
+              defaultEnabled: formValues.defaultEnabled,
+            }),
+          }
+        );
+        setFlags((prev) => prev.map((flag) => (flag.key === updated.key ? updated : flag)));
+        resetForm();
+        return;
+      }
 
-    if (activeFlagId) {
-      setFlags((prev) =>
-        prev.map((flag) =>
-          flag.id === activeFlagId
-            ? {
-                ...flag,
-                key: formValues.key.trim(),
-                description: formValues.description.trim() || null,
-                defaultEnabled: formValues.defaultEnabled,
-              }
-            : flag
-        )
-      );
+      const created = await apiFetch<FeatureFlag>("/feature-flags", {
+        method: "POST",
+        body: JSON.stringify({
+          key: formValues.key.trim(),
+          description: formValues.description.trim() || null,
+          defaultEnabled: formValues.defaultEnabled,
+        }),
+      });
+      setFlags((prev) => [...prev, created]);
       resetForm();
-      return;
+    } catch (actionError) {
+      setError(actionError instanceof Error ? actionError.message : "Unable to save flag.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    const nextFlag: FeatureFlag = {
-      id: `flag-${Date.now()}`,
-      key: formValues.key.trim(),
-      description: formValues.description.trim() || null,
-      defaultEnabled: formValues.defaultEnabled,
-    };
-
-    setFlags((prev) => [...prev, nextFlag]);
-    resetForm();
   };
+
+  useEffect(() => {
+    void loadFlags();
+  }, [loadFlags]);
 
   return (
     <div className="space-y-6">
@@ -107,9 +152,12 @@ const FutureFlagsPage = () => {
         title="Future flags"
         description="Stage upcoming rollouts and prepare releases with toggles that are ready when you are."
       />
+      {loadError ? <p className="text-sm text-coral">{loadError}</p> : null}
       <FeatureFlagForm
         values={formValues}
-        isEditing={Boolean(activeFlagId)}
+        isEditing={Boolean(activeFlagKey)}
+        keyLocked={Boolean(activeFlagKey)}
+        isSubmitting={isSubmitting}
         onChange={setFormValues}
         onSubmit={handleSubmit}
         onCancel={resetForm}
@@ -117,6 +165,7 @@ const FutureFlagsPage = () => {
       />
       <FeatureFlagsTable
         flags={sortedFlags}
+        isLoading={isLoading}
         onEdit={handleEdit}
         onToggle={handleToggle}
         onDelete={handleDelete}
