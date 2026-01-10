@@ -2,3 +2,4 @@
 /dev/
 /storage/
 node_modules/
+functions/**/.deployed

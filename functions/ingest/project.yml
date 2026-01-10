@@ -1,0 +1,7 @@
+packages:
+  - name: einstore
+    functions:
+      - name: ingest
+        runtime: nodejs:18
+        web: true
+        main: index.js
