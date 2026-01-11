@@ -497,6 +497,8 @@ Team-scoped endpoints:
 - Response schema: `{ status: string, result: object }`
 - Side effects: Parses file, creates/updates App/Version/Build/Target/Artifacts
 - Platform relevance: ios, android
+- Notes:
+  - iOS: extracts entitlements/provisioning profile and stores an `entitlements` artifact with `distribution` = adhoc | appstore | enterprise | none | broken.
 
 ## POST /ingest/upload
 - Purpose: Upload and ingest an IPA/APK in one step

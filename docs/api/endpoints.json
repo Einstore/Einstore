@@ -1768,6 +1768,7 @@
     "/ingest": {
       "post": {
         "summary": "Queue ingestion",
+        "description": "iOS: extracts entitlements/provisioning profile and stores an entitlements artifact with distribution = adhoc | appstore | enterprise | none | broken.",
         "security": [
           {
             "bearerAuth": []

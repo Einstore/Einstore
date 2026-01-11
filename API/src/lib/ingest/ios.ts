@@ -4,6 +4,11 @@ import plist from "plist";
 import { Prisma, PlatformKind, TargetRole } from "@prisma/client";
 import { prisma } from "../prisma.js";
 import { listZipEntries, readZipEntries, scanZipEntries } from "../zip.js";
+import {
+  extractIosEntitlements,
+  IosDistributionInfo,
+  IosEntitlementsInfo,
+} from "./ios-entitlements.js";
 
 type IconBitmap = {
   sourcePath: string;
@@ -206,6 +211,7 @@ export type IosIngestResult = {
   version: string;
   buildNumber: string;
   targets: IosTarget[];
+  distribution: IosDistributionInfo;
 };
 
 export async function ingestIosIpa(
@@ -225,6 +231,7 @@ export async function ingestIosIpa(
   }
 
   const targets: IosTarget[] = [];
+  const targetRootsByBundleId = new Map<string, string>();
   const plistPaths = targetRoots.map((root) => `${root}Info.plist`);
   const plistBuffers = await readZipEntries(filePath, new Set(plistPaths));
 
@@ -271,6 +278,7 @@ export async function ingestIosIpa(
       iconOutputDir,
       info,
     );
+    targetRootsByBundleId.set(bundleId, root);
 
     targets.push({
       name,
@@ -291,6 +299,11 @@ export async function ingestIosIpa(
   if (!mainTarget) {
     throw new Error("Unable to determine primary app target");
   }
+
+  const mainTargetRoot = targetRootsByBundleId.get(mainTarget.bundleId);
+  const entitlementsInfo: IosEntitlementsInfo = mainTargetRoot
+    ? await extractIosEntitlements(filePath, entryNames, mainTargetRoot)
+    : { distribution: { kind: "broken", reason: "main_target_root_missing" } };
 
   const resolvedAppName = mainTarget.name;
   const resolvedVersion = mainTarget.version || "1.0.0";
@@ -362,6 +375,22 @@ export async function ingestIosIpa(
     },
   });
 
+  await prisma.complianceArtifact.create({
+    data: {
+      buildId: build.id,
+      kind: "entitlements",
+      storageKind: "local",
+      storagePath: filePath,
+      metadata: normalizeJson({
+        distribution: entitlementsInfo.distribution,
+        entitlements: entitlementsInfo.entitlements,
+        entitlementsSource: entitlementsInfo.entitlementsSource,
+        provisioningProfile: entitlementsInfo.provisioningProfile,
+        provisioningProfileSource: entitlementsInfo.provisioningProfileSource,
+      }) as Prisma.InputJsonValue,
+    },
+  });
+
   return {
     appId: appRecord.id,
     versionId: versionRecord.id,
@@ -371,5 +400,6 @@ export async function ingestIosIpa(
     version: resolvedVersion,
     buildNumber: resolvedBuild,
     targets,
+    distribution: entitlementsInfo.distribution,
   };
 }
