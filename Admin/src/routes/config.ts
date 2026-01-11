@@ -8,6 +8,7 @@ export type NavItemConfig = NavItem & { superOnly?: boolean; adminOnly?: boolean
 export const navItems: NavItemConfig[] = [
   { id: "overview", label: "Overview", icon: "overview" },
   { id: "apps", label: "Apps", icon: "apps" },
+  { id: "search", label: "Search", icon: "search" },
   { id: "builds", label: "Latest builds", icon: "builds" },
   { id: "flags", label: "Future flags", icon: "flags", superOnly: true },
   {

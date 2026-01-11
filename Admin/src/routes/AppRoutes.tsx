@@ -326,6 +326,17 @@ const AppRoutes = () => {
   }, [apps, hasToken, activeTeamId]);
 
 
+  const handleIngest = useCallback(
+    async (file: File) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      await apiUpload("/ingest/upload", formData);
+      await loadApps();
+      setIngestNonce((current) => current + 1);
+    },
+    [loadApps]
+  );
+
   const coreRoutes: RouteConfig[] = [
     {
       id: "overview",
@@ -500,17 +511,6 @@ const AppRoutes = () => {
     pageConfig[activeRoute.id as keyof typeof pageConfig] ??
     privatePageConfig[activeRoute.id] ??
     pageConfig.overview;
-
-  const handleIngest = useCallback(
-    async (file: File) => {
-      const formData = new FormData();
-      formData.append("file", file);
-      await apiUpload("/ingest/upload", formData);
-      await loadApps();
-      setIngestNonce((current) => current + 1);
-    },
-    [loadApps]
-  );
 
   return (
     <Routes>
