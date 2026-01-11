@@ -1,13 +1,115 @@
+databases:
+- engine: PG
+  name: db
+  version: "17"
+domains:
+- domain: einstore.pro
+  type: PRIMARY
+- domain: admin.einstore.pro
+  type: ALIAS
+- domain: api.einstore.pro
+  type: ALIAS
+features:
+- buildpack-stack=ubuntu-22
+ingress:
+  rules:
+  - component:
+      name: api
+    match:
+      authority:
+        exact: api.einstore.pro
+      path:
+        prefix: /
+  - component:
+      name: admin
+    match:
+      authority:
+        exact: admin.einstore.pro
+      path:
+        prefix: /
+  - component:
+      name: web
+    match:
+      authority:
+        exact: einstore.pro
+      path:
+        prefix: /
 name: einstore
 region: lon
+services:
+- build_command: npm install && npm run prisma:generate && npm run build
+  envs:
+  - key: DATABASE_URL
+    scope: RUN_TIME
+    type: SECRET
+    value: EV[1:LM67ZaHgoYR8Yhn6gmpjiEtr7Q3t7C7Q:gvjcmk/1mCbn37Qk5dVy/I3Y9uiw3AaeOzO3wXQEYRupLp5fHuB29yKgQsxTGDl4BE0vJ4cK3PuriKmTzlkMiXo6vZ/OU7kBWHOQSxOQSNFkP+WG3hclnN289Zjmzk4K1PaPKEe608WDYi3TMYdXGkHU0r65y2gGH44a/0GlMdUxmZCOW+aEy8/obv+naznF7BtPko9LFRQW1z9jDxP+DCis8no=]
+  - key: SPACES_ENDPOINT
+    scope: RUN_TIME
+    value: https://lon1.digitaloceanspaces.com
+  - key: SPACES_REGION
+    scope: RUN_TIME
+    value: lon1
+  - key: SPACES_BUCKET
+    scope: RUN_TIME
+    value: einstore
+  - key: SPACES_KEY
+    scope: RUN_TIME
+    type: SECRET
+    value: EV[1:Bnd9dlhgqxxCgE5fXBkyc6Y+7x2EzUup:mc8YoFne5QBCV9xRPYpFOc7jFPsJrGMt6/vDQjm5gDDXeDsd]
+  - key: SPACES_SECRET
+    scope: RUN_TIME
+    type: SECRET
+    value: EV[1:fd8+yzvlF7vd/05qq7ueHFaR8LnDLrkA:uiX2d/K07pldbBnahamt9GTCG1JVajRQWN3TLyyXv1DYeXpuNvWCauJ3yuF/FJNCfkdJEyqRup6L4pM=]
+  - key: GOOGLE_CLIENT_ID
+    scope: RUN_TIME
+  - key: GOOGLE_CLIENT_SECRET
+    scope: RUN_TIME
+    type: SECRET
+    value: EV[1:r+aT/9VF1eX87sQmFuxMuU92jIOyqVh2:aOE+tZp6TLCR6QL3EbkQ9w==]
+  - key: GOOGLE_REDIRECT_URI
+    scope: RUN_TIME
+  - key: AUTH_JWT_SECRET
+    scope: RUN_TIME
+    type: SECRET
+    value: EV[1:YfqHHTyx+SCMRz+bXUUd6xGfhwmgPT+0:cVzQmkJoUhqRnCNikNOybgI2TJbvxaufoRG0auAaFraPRRTePxEQrF26FN9ClGXoQr1y5HMRpqC/jgzZjpNlpV3XBCf+uXZ1ITFOiVz+WTI=]
+  - key: AUTH_JWT_ISSUER
+    scope: RUN_TIME
+    value: einstore
+  - key: AUTH_JWT_AUDIENCE
+    scope: RUN_TIME
+    value: einstore-api
+  - key: AUTH_REFRESH_TTL_DAYS
+    scope: RUN_TIME
+    value: "30"
+  - key: AUTH_ACCESS_TTL_MINUTES
+    scope: RUN_TIME
+    value: "15"
+  github:
+    branch: main
+    deploy_on_push: true
+    repo: Einstore/Einstore
+  health_check:
+    http_path: /health
+  http_port: 8080
+  instance_count: 1
+  instance_size_slug: apps-s-1vcpu-0.5gb
+  name: api
+  run_command: npm run start
+  source_dir: /API
 static_sites:
-  - name: web
-    github:
-      repo: Einstore/Einstore
-      branch: main
-      deploy_on_push: true
-    source_dir: /Web
-    output_dir: .
-    index_document: index.html
-    routes:
-      - path: /
+- github:
+    branch: main
+    deploy_on_push: true
+    repo: Einstore/Einstore
+  index_document: index.html
+  name: web
+  output_dir: .
+  source_dir: /Web
+- build_command: npm install && npm run build
+  github:
+    branch: main
+    deploy_on_push: true
+    repo: Einstore/Einstore
+  name: admin
+  output_dir: dist
+  source_dir: /Admin
