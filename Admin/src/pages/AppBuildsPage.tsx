@@ -1,10 +1,12 @@
 import AppAvatar from "../components/AppAvatar";
 import BuildQueueList from "../components/BuildQueueList";
 import Panel from "../components/Panel";
+import Pagination from "../components/Pagination";
 import SectionHeader from "../components/SectionHeader";
 import StatusPill from "../components/StatusPill";
 import type { ApiApp, ApiBuild } from "../lib/apps";
 import { formatDateTime } from "../lib/apps";
+import type { PaginationMeta } from "../lib/pagination";
 
 type AppBuildsPageProps = {
   app: ApiApp | null;
@@ -13,6 +15,9 @@ type AppBuildsPageProps = {
   buildIcons?: Record<string, string>;
   buildPlatforms?: Record<string, string>;
   onSelectBuild?: (id: string) => void;
+  pagination: PaginationMeta;
+  onPageChange: (page: number) => void;
+  onPerPageChange: (perPage: number) => void;
 };
 
 const AppBuildsPage = ({
@@ -22,6 +27,9 @@ const AppBuildsPage = ({
   buildIcons,
   buildPlatforms,
   onSelectBuild,
+  pagination,
+  onPageChange,
+  onPerPageChange,
 }: AppBuildsPageProps) => {
   const latestBuild = builds[0] ?? null;
   const lastUploaded = latestBuild ? formatDateTime(latestBuild.createdAt) : "—";
@@ -71,6 +79,14 @@ const AppBuildsPage = ({
         icons={buildIcons}
         platforms={buildPlatforms}
         onSelect={onSelectBuild}
+      />
+      <Pagination
+        page={pagination.page}
+        totalPages={pagination.totalPages}
+        perPage={pagination.perPage}
+        total={pagination.total}
+        onPageChange={onPageChange}
+        onPerPageChange={onPerPageChange}
       />
     </div>
   );

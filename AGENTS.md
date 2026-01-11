@@ -47,3 +47,9 @@ postgresql://postgres@localhost:5432/einstore?schema=public
 - Worktree safety: never discard/revert uncommitted changes, especially ones not created in the current task context.
 - No destructive commands unless explicitly requested (e.g., `git reset`, `git clean`, `git restore`, `rm`).
 - Commit and push after each turn.
+
+## Pagination standard
+
+- Endpoints that list resources must accept `page` and `perPage` query params (defaults: page 1, perPage 25; max perPage 100).
+- Backward compatibility: continue to accept `limit` and `offset` when present.
+- List responses must return `{ items, page, perPage, total, totalPages }`.

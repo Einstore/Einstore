@@ -1031,12 +1031,22 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/apps",
+          "raw": "{{baseUrl}}/apps?page=1&perPage=25",
           "host": [
             "{{baseUrl}}"
           ],
           "path": [
             "apps"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "perPage",
+              "value": "25"
+            }
           ]
         }
       },
@@ -1207,12 +1217,22 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/builds",
+          "raw": "{{baseUrl}}/builds?page=1&perPage=25",
           "host": [
             "{{baseUrl}}"
           ],
           "path": [
             "builds"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "perPage",
+              "value": "25"
+            }
           ]
         }
       },
@@ -2144,7 +2164,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/search?q={{searchQuery}}&buildLimit=6&appLimit=6",
+          "raw": "{{baseUrl}}/search?q={{searchQuery}}&buildPerPage=6&appPerPage=6",
           "host": [
             "{{baseUrl}}"
           ],
@@ -2157,11 +2177,11 @@
               "value": "{{searchQuery}}"
             },
             {
-              "key": "buildLimit",
+              "key": "buildPerPage",
               "value": "6"
             },
             {
-              "key": "appLimit",
+              "key": "appPerPage",
               "value": "6"
             }
           ]

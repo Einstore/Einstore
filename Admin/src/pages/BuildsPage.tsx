@@ -1,15 +1,28 @@
 import BuildQueueList from "../components/BuildQueueList";
 import Panel from "../components/Panel";
+import Pagination from "../components/Pagination";
 import type { ApiBuild } from "../lib/apps";
+import type { PaginationMeta } from "../lib/pagination";
 
 type BuildsPageProps = {
   builds: ApiBuild[];
   buildIcons?: Record<string, string>;
   buildPlatforms?: Record<string, string>;
   onSelectBuild?: (id: string) => void;
+  pagination: PaginationMeta;
+  onPageChange: (page: number) => void;
+  onPerPageChange: (perPage: number) => void;
 };
 
-const BuildsPage = ({ builds, buildIcons, buildPlatforms, onSelectBuild }: BuildsPageProps) => {
+const BuildsPage = ({
+  builds,
+  buildIcons,
+  buildPlatforms,
+  onSelectBuild,
+  pagination,
+  onPageChange,
+  onPerPageChange,
+}: BuildsPageProps) => {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-12 gap-6">
@@ -31,6 +44,14 @@ const BuildsPage = ({ builds, buildIcons, buildPlatforms, onSelectBuild }: Build
         icons={buildIcons}
         platforms={buildPlatforms}
         onSelect={onSelectBuild}
+      />
+      <Pagination
+        page={pagination.page}
+        totalPages={pagination.totalPages}
+        perPage={pagination.perPage}
+        total={pagination.total}
+        onPageChange={onPageChange}
+        onPerPageChange={onPerPageChange}
       />
     </div>
   );

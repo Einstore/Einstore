@@ -52,9 +52,12 @@ Team-scoped endpoints:
 - Request schema: query params
   - `q` (string, required): search term
   - `appId` (string, optional): filter builds by app ID
-  - `appLimit` (number, optional, default 10): max apps returned
-  - `buildLimit` (number, optional, default 6): max builds returned
-- Response schema: `{ "apps": [{ "id": "app", "name": "App", "identifier": "com.app" }], "builds": [{ "id": "build", "buildNumber": "42", "displayName": "Release", "version": "1.0.0", "createdAt": "2026-01-11T00:00:00.000Z", "appId": "app", "appName": "App", "appIdentifier": "com.app" }] }`
+  - `appPage` (number, optional, default 1): apps page
+  - `appPerPage` (number, optional, default 10): apps per page
+  - `buildPage` (number, optional, default 1): builds page
+  - `buildPerPage` (number, optional, default 6): builds per page
+  - `appLimit`, `buildLimit`, `appOffset`, `buildOffset` (legacy, optional)
+- Response schema: `{ "apps": { "items": [{ "id": "app", "name": "App", "identifier": "com.app" }], "page": 1, "perPage": 10, "total": 1, "totalPages": 1 }, "builds": { "items": [{ "id": "build", "buildNumber": "42", "displayName": "Release", "version": "1.0.0", "createdAt": "2026-01-11T00:00:00.000Z", "appId": "app", "appName": "App", "appIdentifier": "com.app" }], "page": 1, "perPage": 6, "total": 1, "totalPages": 1 } }`
 - Side effects: none
 - Platform relevance: all
 
@@ -365,8 +368,8 @@ Team-scoped endpoints:
 ## GET /apps
 - Purpose: List apps
 - Auth scope: Bearer (rafiki270/auth)
-- Request schema: query `{ limit?: number, offset?: number }`
-- Response schema: `App[]`
+- Request schema: query `{ page?: number, perPage?: number, limit?: number, offset?: number }`
+- Response schema: `{ items: App[], page: number, perPage: number, total: number, totalPages: number }`
 - Side effects: none
 - Platform relevance: all
 
@@ -413,8 +416,8 @@ Team-scoped endpoints:
 ## GET /builds
 - Purpose: List builds for app
 - Auth scope: Bearer (rafiki270/auth)
-- Request schema: query `{ appId: string }`
-- Response schema: `Build[]`
+- Request schema: query `{ appId?: string, versionId?: string, page?: number, perPage?: number, limit?: number, offset?: number }`
+- Response schema: `{ items: Build[], page: number, perPage: number, total: number, totalPages: number }`
 - Side effects: none
 - Platform relevance: ios, android
 

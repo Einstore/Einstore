@@ -7,6 +7,7 @@ import { getInitialTheme, setTheme, type ThemeMode } from "../lib/theme";
 import type { SessionUser } from "../lib/session";
 import { apiFetch } from "../lib/api";
 import type { SearchResponse } from "../lib/search";
+import type { PaginatedResponse } from "../lib/pagination";
 
 type TopbarProps = {
   title: string;
@@ -34,10 +35,17 @@ const Topbar = ({
   const [searchValue, setSearchValue] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-  const [searchResults, setSearchResults] = useState<SearchResponse>({
-    apps: [],
-    builds: [],
-  });
+  const emptyResults = useMemo(() => {
+    const emptyPage = <T,>(): PaginatedResponse<T> => ({
+      items: [],
+      page: 1,
+      perPage: 0,
+      total: 0,
+      totalPages: 1,
+    });
+    return { apps: emptyPage(), builds: emptyPage() };
+  }, []);
+  const [searchResults, setSearchResults] = useState<SearchResponse>(emptyResults);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
   const searchRef = useRef<HTMLDivElement | null>(null);
   const avatarUrl = user?.avatarUrl ?? null;
@@ -46,12 +54,15 @@ const Topbar = ({
 
   const buildResults = useMemo(() => {
     const deduped = new Map(
-      (searchResults.builds ?? []).map((build) => [build.id, build])
+      (searchResults.builds?.items ?? []).map((build) => [build.id, build])
     );
     return Array.from(deduped.values()).slice(0, 6);
   }, [searchResults.builds]);
 
-  const appResults = useMemo(() => searchResults.apps ?? [], [searchResults.apps]);
+  const appResults = useMemo(
+    () => searchResults.apps?.items ?? [],
+    [searchResults.apps]
+  );
 
   useEffect(() => {
     if (!isUserMenuOpen) return;
@@ -83,7 +94,7 @@ const Topbar = ({
 
   useEffect(() => {
     if (!activeTeamId || trimmedQuery.length < 2) {
-      setSearchResults({ apps: [], builds: [] });
+      setSearchResults(emptyResults);
       setIsSearchOpen(false);
       setIsSearching(false);
       return;
@@ -93,16 +104,16 @@ const Topbar = ({
     const handle = window.setTimeout(() => {
       const params = new URLSearchParams();
       params.set("q", trimmedQuery);
-      params.set("appLimit", "6");
-      params.set("buildLimit", "6");
+      params.set("appPerPage", "6");
+      params.set("buildPerPage", "6");
       apiFetch<SearchResponse>(`/search?${params.toString()}`, {
         headers: { "x-team-id": activeTeamId },
       })
         .then((payload) => {
-          setSearchResults(payload ?? { apps: [], builds: [] });
+          setSearchResults(payload ?? emptyResults);
         })
         .catch(() => {
-          setSearchResults({ apps: [], builds: [] });
+          setSearchResults(emptyResults);
         })
         .finally(() => {
           setIsSearching(false);

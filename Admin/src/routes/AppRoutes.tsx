@@ -40,6 +40,7 @@ import {
 } from "../lib/apps";
 import { enableAnalytics, trackPageView } from "../lib/analytics";
 import { useSessionState } from "../lib/session";
+import type { PaginatedResponse, PaginationMeta } from "../lib/pagination";
 import RequireAuth from "./RequireAuth";
 import { navItems, pageConfig, type RouteConfig } from "./config";
 import { adminFeatureFlagDefinitions } from "../data/featureFlagDefinitions";
@@ -56,6 +57,15 @@ const AppRoutes = () => {
   const navigate = useNavigate();
   const [featureFlags, setFeatureFlags] = useState(getDefaultFeatureFlags());
   const [apps, setApps] = useState<ApiApp[]>([]);
+  const [appsList, setAppsList] = useState<ApiApp[]>([]);
+  const [appsPagination, setAppsPagination] = useState<PaginationMeta>({
+    page: 1,
+    perPage: 25,
+    total: 0,
+    totalPages: 1,
+  });
+  const [appsPage, setAppsPage] = useState(1);
+  const [appsPerPage, setAppsPerPage] = useState(25);
   const [appIcons, setAppIcons] = useState<Record<string, string>>({});
   const [ingestNonce, setIngestNonce] = useState(0);
   const [storageUsage, setStorageUsage] = useState<StorageUsageUser[]>([]);
@@ -82,14 +92,62 @@ const AppRoutes = () => {
       return;
     }
     try {
-      const payload = await apiFetch<ApiApp[]>("/apps?limit=200", {
-        headers: { "x-team-id": activeTeamId },
-      });
-      setApps(Array.isArray(payload) ? payload : []);
+      const firstPage = await apiFetch<PaginatedResponse<ApiApp>>(
+        `/apps?page=1&perPage=100`,
+        {
+          headers: { "x-team-id": activeTeamId },
+        }
+      );
+      if (!firstPage?.items) {
+        setApps([]);
+        return;
+      }
+      const totalPages = firstPage.totalPages ?? 1;
+      if (totalPages <= 1) {
+        setApps(firstPage.items);
+        return;
+      }
+      const requests = Array.from({ length: totalPages - 1 }, (_, index) =>
+        apiFetch<PaginatedResponse<ApiApp>>(`/apps?page=${index + 2}&perPage=100`, {
+          headers: { "x-team-id": activeTeamId },
+        }).catch(() => null)
+      );
+      const responses = await Promise.all(requests);
+      const extraItems = responses.flatMap((response) => response?.items ?? []);
+      setApps([...firstPage.items, ...extraItems]);
     } catch {
       setApps([]);
     }
   }, [activeTeamId]);
+
+  const loadAppsPage = useCallback(async () => {
+    if (!activeTeamId) {
+      setAppsList([]);
+      setAppsPagination({ page: 1, perPage: appsPerPage, total: 0, totalPages: 1 });
+      return;
+    }
+    try {
+      const payload = await apiFetch<PaginatedResponse<ApiApp>>(
+        `/apps?page=${appsPage}&perPage=${appsPerPage}`,
+        {
+          headers: { "x-team-id": activeTeamId },
+        }
+      );
+      setAppsList(payload?.items ?? []);
+      setAppsPagination({
+        page: payload?.page ?? appsPage,
+        perPage: payload?.perPage ?? appsPerPage,
+        total: payload?.total ?? 0,
+        totalPages: payload?.totalPages ?? 1,
+      });
+      if (payload?.page && payload.page !== appsPage) {
+        setAppsPage(payload.page);
+      }
+    } catch {
+      setAppsList([]);
+      setAppsPagination({ page: appsPage, perPage: appsPerPage, total: 0, totalPages: 1 });
+    }
+  }, [activeTeamId, appsPage, appsPerPage]);
 
   useEffect(() => {
     let isMounted = true;
@@ -203,6 +261,15 @@ const AppRoutes = () => {
   }, [loadApps, ingestNonce, hasToken, activeTeamId]);
 
   useEffect(() => {
+    if (!hasToken || !activeTeamId) {
+      setAppsList([]);
+      setAppsPagination({ page: 1, perPage: appsPerPage, total: 0, totalPages: 1 });
+      return;
+    }
+    void loadAppsPage();
+  }, [loadAppsPage, hasToken, activeTeamId, ingestNonce, appsPerPage]);
+
+  useEffect(() => {
     let isMounted = true;
     if (!hasToken || !apps.length || !activeTeamId) {
       setAppIcons({});
@@ -220,10 +287,13 @@ const AppRoutes = () => {
         const app = queue.shift();
         if (!app) continue;
         try {
-          const builds = await apiFetch<ApiBuild[]>(`/builds?appId=${app.id}&limit=1`, {
-            headers: { "x-team-id": activeTeamId },
-          });
-          const latestBuild = Array.isArray(builds) ? builds[0] : null;
+          const builds = await apiFetch<PaginatedResponse<ApiBuild>>(
+            `/builds?appId=${app.id}&page=1&perPage=1`,
+            {
+              headers: { "x-team-id": activeTeamId },
+            }
+          );
+          const latestBuild = builds?.items?.[0] ?? null;
           if (!latestBuild) continue;
           const iconResponse = await apiFetch<ApiBuildIconResponse>(
             `/builds/${latestBuild.id}/icons`,
@@ -281,9 +351,15 @@ const AppRoutes = () => {
       path: "/apps",
       element: (
         <AppsRoute
-          apps={apps}
+          apps={appsList}
           appIcons={appIcons}
           onSelectApp={(appId) => navigate(`/apps/${appId}/builds`)}
+          pagination={appsPagination}
+          onPageChange={setAppsPage}
+          onPerPageChange={(perPage) => {
+            setAppsPerPage(perPage);
+            setAppsPage(1);
+          }}
         />
       ),
       navId: "apps",
@@ -476,16 +552,25 @@ const AppsRoute = ({
   apps,
   appIcons,
   onSelectApp,
+  pagination,
+  onPageChange,
+  onPerPageChange,
 }: {
   apps: ApiApp[];
   appIcons: Record<string, string>;
   onSelectApp: (appId: string) => void;
+  pagination: PaginationMeta;
+  onPageChange: (page: number) => void;
+  onPerPageChange: (perPage: number) => void;
 }) => {
   return (
     <AppsPage
       apps={apps}
       appIcons={appIcons}
       onSelectApp={(app) => onSelectApp(app.id)}
+      pagination={pagination}
+      onPageChange={onPageChange}
+      onPerPageChange={onPerPageChange}
     />
   );
 };
@@ -571,30 +656,52 @@ const LatestBuildsRoute = ({
   const [builds, setBuilds] = useState<ApiBuild[]>([]);
   const [buildIcons, setBuildIcons] = useState<Record<string, string>>({});
   const [buildPlatforms, setBuildPlatforms] = useState<Record<string, string>>({});
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
+  const [pagination, setPagination] = useState<PaginationMeta>({
+    page: 1,
+    perPage: 25,
+    total: 0,
+    totalPages: 1,
+  });
 
   useEffect(() => {
     let isMounted = true;
     if (!activeTeamId) {
       setBuilds([]);
+      setPagination({ page: 1, perPage, total: 0, totalPages: 1 });
       return () => {
         isMounted = false;
       };
     }
-    apiFetch<ApiBuild[]>("/builds", { headers: { "x-team-id": activeTeamId } })
+    apiFetch<PaginatedResponse<ApiBuild>>(
+      `/builds?page=${page}&perPage=${perPage}`,
+      { headers: { "x-team-id": activeTeamId } }
+    )
       .then((payload) => {
         if (isMounted) {
-          setBuilds(Array.isArray(payload) ? payload : []);
+          setBuilds(payload?.items ?? []);
+          setPagination({
+            page: payload?.page ?? page,
+            perPage: payload?.perPage ?? perPage,
+            total: payload?.total ?? 0,
+            totalPages: payload?.totalPages ?? 1,
+          });
+          if (payload?.page && payload.page !== page) {
+            setPage(payload.page);
+          }
         }
       })
       .catch(() => {
         if (isMounted) {
           setBuilds([]);
+          setPagination({ page, perPage, total: 0, totalPages: 1 });
         }
       });
     return () => {
       isMounted = false;
     };
-  }, [ingestNonce, activeTeamId]);
+  }, [ingestNonce, activeTeamId, page, perPage]);
 
   useEffect(() => {
     let isMounted = true;
@@ -649,6 +756,12 @@ const LatestBuildsRoute = ({
       buildIcons={buildIcons}
       buildPlatforms={buildPlatforms}
       onSelectBuild={(id) => navigate(`/builds/${id}`)}
+      pagination={pagination}
+      onPageChange={setPage}
+      onPerPageChange={(nextPerPage) => {
+        setPerPage(nextPerPage);
+        setPage(1);
+      }}
     />
   );
 };
@@ -669,34 +782,60 @@ const AppBuildsRoute = ({
   const [builds, setBuilds] = useState<ApiBuild[]>([]);
   const [buildIcons, setBuildIcons] = useState<Record<string, string>>({});
   const [buildPlatforms, setBuildPlatforms] = useState<Record<string, string>>({});
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
+  const [pagination, setPagination] = useState<PaginationMeta>({
+    page: 1,
+    perPage: 25,
+    total: 0,
+    totalPages: 1,
+  });
   const selectedApp = apps.find((app) => app.id === appId) ?? null;
   const appIcon = appId ? appIcons[appId] : undefined;
+
+  useEffect(() => {
+    setPage(1);
+  }, [appId]);
 
   useEffect(() => {
     let isMounted = true;
     if (!appId) {
       setBuilds([]);
+      setPagination({ page: 1, perPage, total: 0, totalPages: 1 });
       return () => {
         isMounted = false;
       };
     }
-    apiFetch<ApiBuild[]>(`/builds?appId=${appId}`, {
-      headers: { "x-team-id": activeTeamId },
-    })
+    apiFetch<PaginatedResponse<ApiBuild>>(
+      `/builds?appId=${appId}&page=${page}&perPage=${perPage}`,
+      {
+        headers: { "x-team-id": activeTeamId },
+      }
+    )
       .then((payload) => {
         if (isMounted) {
-          setBuilds(Array.isArray(payload) ? payload : []);
+          setBuilds(payload?.items ?? []);
+          setPagination({
+            page: payload?.page ?? page,
+            perPage: payload?.perPage ?? perPage,
+            total: payload?.total ?? 0,
+            totalPages: payload?.totalPages ?? 1,
+          });
+          if (payload?.page && payload.page !== page) {
+            setPage(payload.page);
+          }
         }
       })
       .catch(() => {
         if (isMounted) {
           setBuilds([]);
+          setPagination({ page, perPage, total: 0, totalPages: 1 });
         }
       });
     return () => {
       isMounted = false;
     };
-  }, [appId, ingestNonce, activeTeamId]);
+  }, [appId, ingestNonce, activeTeamId, page, perPage]);
 
   useEffect(() => {
     let isMounted = true;
@@ -754,6 +893,12 @@ const AppBuildsRoute = ({
       buildIcons={buildIcons}
       buildPlatforms={buildPlatforms}
       onSelectBuild={(id) => navigate(appId ? `/apps/${appId}/builds/${id}` : `/builds/${id}`)}
+      pagination={pagination}
+      onPageChange={setPage}
+      onPerPageChange={(nextPerPage) => {
+        setPerPage(nextPerPage);
+        setPage(1);
+      }}
     />
   );
 };

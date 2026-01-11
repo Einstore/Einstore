@@ -15,7 +15,9 @@ export type SearchBuildResult = {
   appIdentifier: string;
 };
 
+import type { PaginatedResponse } from "./pagination";
+
 export type SearchResponse = {
-  apps: SearchAppResult[];
-  builds: SearchBuildResult[];
+  apps: PaginatedResponse<SearchAppResult>;
+  builds: PaginatedResponse<SearchBuildResult>;
 };

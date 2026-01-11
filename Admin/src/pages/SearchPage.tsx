@@ -4,9 +4,11 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import AppAvatar from "../components/AppAvatar";
 import Icon from "../components/Icon";
 import Panel from "../components/Panel";
+import Pagination from "../components/Pagination";
 import { apiFetch } from "../lib/api";
 import type { ApiApp } from "../lib/apps";
 import { formatDateTime } from "../lib/apps";
+import type { PaginatedResponse } from "../lib/pagination";
 import type { SearchBuildResult, SearchResponse } from "../lib/search";
 
 type SearchPageProps = {
@@ -24,7 +26,15 @@ const SearchPage = ({ apps, appIcons, activeTeamId }: SearchPageProps) => {
   const [selectedAppId, setSelectedAppId] = useState(
     () => searchParams.get("appId") ?? ""
   );
-  const [results, setResults] = useState<SearchBuildResult[]>([]);
+  const [results, setResults] = useState<PaginatedResponse<SearchBuildResult>>({
+    items: [],
+    page: 1,
+    perPage: 25,
+    total: 0,
+    totalPages: 1,
+  });
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
   const [isLoading, setIsLoading] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -50,6 +60,10 @@ const SearchPage = ({ apps, appIcons, activeTeamId }: SearchPageProps) => {
   }, [isDropdownOpen]);
 
   useEffect(() => {
+    setPage(1);
+  }, [query, selectedAppId]);
+
+  useEffect(() => {
     const trimmed = query.trim();
     const params = new URLSearchParams();
     if (trimmed) {
@@ -64,7 +78,7 @@ const SearchPage = ({ apps, appIcons, activeTeamId }: SearchPageProps) => {
   useEffect(() => {
     const trimmed = query.trim();
     if (!activeTeamId || trimmed.length < MIN_QUERY_LENGTH) {
-      setResults([]);
+      setResults((current) => ({ ...current, items: [], total: 0, totalPages: 1 }));
       setIsLoading(false);
       return;
     }
@@ -72,7 +86,8 @@ const SearchPage = ({ apps, appIcons, activeTeamId }: SearchPageProps) => {
     const handle = window.setTimeout(() => {
       const params = new URLSearchParams();
       params.set("q", trimmed);
-      params.set("buildLimit", "50");
+      params.set("buildPage", String(page));
+      params.set("buildPerPage", String(perPage));
       if (selectedAppId) {
         params.set("appId", selectedAppId);
       }
@@ -81,19 +96,30 @@ const SearchPage = ({ apps, appIcons, activeTeamId }: SearchPageProps) => {
       })
         .then((payload) => {
           const deduped = new Map(
-            (payload?.builds ?? []).map((build) => [build.id, build])
+            (payload?.builds?.items ?? []).map((build) => [build.id, build])
           );
-          setResults(Array.from(deduped.values()));
+          const items = Array.from(deduped.values());
+          if (payload?.builds) {
+            setResults({ ...payload.builds, items });
+            if (payload.builds.page !== page) {
+              setPage(payload.builds.page);
+            }
+            if (payload.builds.perPage !== perPage) {
+              setPerPage(payload.builds.perPage);
+            }
+          } else {
+            setResults((current) => ({ ...current, items: [] }));
+          }
         })
         .catch(() => {
-          setResults([]);
+          setResults((current) => ({ ...current, items: [] }));
         })
         .finally(() => {
           setIsLoading(false);
         });
     }, 250);
     return () => window.clearTimeout(handle);
-  }, [activeTeamId, query, selectedAppId]);
+  }, [activeTeamId, query, selectedAppId, page, perPage]);
 
   return (
     <div className="space-y-6">
@@ -202,9 +228,9 @@ const SearchPage = ({ apps, appIcons, activeTeamId }: SearchPageProps) => {
             <span className="text-xs text-slate-400 dark:text-slate-500">Searching...</span>
           ) : null}
         </div>
-        {results.length ? (
+        {results.items.length ? (
           <div className="-mx-5 divide-y divide-slate-200 dark:divide-slate-700">
-            {results.map((build) => (
+            {results.items.map((build) => (
               <button
                 key={build.id}
                 type="button"
@@ -237,6 +263,17 @@ const SearchPage = ({ apps, appIcons, activeTeamId }: SearchPageProps) => {
               : "No builds found."}
           </p>
         )}
+        <Pagination
+          page={results.page}
+          totalPages={results.totalPages}
+          perPage={results.perPage}
+          total={results.total}
+          onPageChange={setPage}
+          onPerPageChange={(next) => {
+            setPerPage(next);
+            setPage(1);
+          }}
+        />
       </Panel>
     </div>
   );
