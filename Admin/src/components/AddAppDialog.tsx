@@ -36,7 +36,7 @@ const AddAppDialog = ({
       <Panel className="w-full max-w-lg space-y-6 p-6">
         <div>
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-            Add app build
+            Upload build
           </h3>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
             Upload an IPA or APK to start ingestion. App details will be read from the manifest.

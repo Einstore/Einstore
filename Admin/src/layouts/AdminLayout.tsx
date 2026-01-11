@@ -11,6 +11,7 @@ import type { NavItem } from "../components/Sidebar";
 import { apiFetch } from "../lib/api";
 import type { TeamSummary } from "../lib/teams";
 import type { SessionUser } from "../lib/session";
+import SidebarUploadDropzone from "../components/SidebarUploadDropzone";
 
 type AdminLayoutProps = {
   navItems: readonly NavItem[];
@@ -44,7 +45,7 @@ const AdminLayout = ({
   const navigate = useNavigate();
 
   const handleAction = (actionId: string) => {
-    if (actionId === "add-app") {
+    if (actionId === "add-app" || actionId === "upload-build") {
       setIsAddAppOpen(true);
     }
   };
@@ -82,6 +83,7 @@ const AdminLayout = ({
               onCreateTeam={onCreateTeam}
             />
           }
+          dropzone={<SidebarUploadDropzone onUpload={onUpload} />}
         />
       }
       isSidebarOpen={isSidebarOpen}

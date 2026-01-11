@@ -26,7 +26,7 @@ export const getSystemTheme = (): ThemeMode => {
 };
 
 export const getInitialTheme = (): ThemeMode => {
-  return getStoredTheme() ?? getSystemTheme();
+  return getStoredTheme() ?? "dark";
 };
 
 export const applyTheme = (theme: ThemeMode) => {

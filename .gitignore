@@ -6,3 +6,4 @@ node_modules/
 functions/**/.deployed
 functions/**/__deployer__.zip
 functions/**/package-lock.json
+/Admin/dist

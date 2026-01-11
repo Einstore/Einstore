@@ -391,6 +391,7 @@ model Team {
   prioritySupportAddOnCount Int                 @default(0)
   billingPeriodStart        DateTime?
   billingPeriodEnd          DateTime?
+  billingCycleStartAt       DateTime            @default(now())
   defaultCurrency           String?             @default("GBP")
   country                   String?
   timezone                  String?

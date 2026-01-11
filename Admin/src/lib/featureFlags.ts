@@ -1,22 +1,21 @@
 import { featureFlagDefinitions } from "@rafiki270/feature-flags";
 
 export type FeatureFlagKey =
-  | "admin.overview_metrics"
-  | "admin.pipeline_health"
-  | "admin.activity_stream"
-  | "admin.storage_usage"
-  | "admin.future_flags"
-  | "admin.security_posture"
-  | "admin.workspace_settings";
+  | "admin.overview_metrics";
 
 type FeatureFlagRecord = {
   key: string;
   defaultEnabled?: boolean;
 };
 
-const defaultFeatureFlags: Record<FeatureFlagKey, boolean> = featureFlagDefinitions.reduce(
-  (acc, flag) => {
-    acc[flag.key as FeatureFlagKey] = flag.defaultEnabled;
+const supportedKeys: FeatureFlagKey[] = [
+  "admin.overview_metrics",
+];
+
+const defaultFeatureFlags: Record<FeatureFlagKey, boolean> = supportedKeys.reduce(
+  (acc, key) => {
+    const definition = featureFlagDefinitions.find((flag) => flag.key === key);
+    acc[key] = definition?.defaultEnabled ?? false;
     return acc;
   },
   {} as Record<FeatureFlagKey, boolean>
@@ -24,11 +23,11 @@ const defaultFeatureFlags: Record<FeatureFlagKey, boolean> = featureFlagDefiniti
 
 export const buildFeatureFlagMap = (flags: FeatureFlagRecord[]) => {
   const map = { ...defaultFeatureFlags };
-  flags.forEach((flag) => {
-    if (Object.prototype.hasOwnProperty.call(map, flag.key)) {
+  flags
+    .filter((flag) => supportedKeys.includes(flag.key as FeatureFlagKey))
+    .forEach((flag) => {
       map[flag.key as FeatureFlagKey] = Boolean(flag.defaultEnabled);
-    }
-  });
+    });
   return map;
 };
 

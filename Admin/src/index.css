@@ -5,13 +5,159 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
-:root.dark {
-  color-scheme: dark;
+:root:not(.dark) {
+  color-scheme: light;
 }
 
 body {
   @apply bg-slate-50 text-slate-900 font-body;
+}
+
+.feature-flags-page button.h-8.rounded-full,
+.feature-flags-page button.h-9.rounded-full {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  width: 4.25rem;
+  padding: 0.25rem 0.75rem 0.25rem 0.25rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.feature-flags-page button.h-8.rounded-full::after,
+.feature-flags-page button.h-9.rounded-full::after {
+  content: "";
+  display: block;
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 9999px;
+  background: #ffffff;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  transform: translateX(0);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.feature-flags-page button.h-8.rounded-full.border-emerald-200,
+.feature-flags-page button.h-9.rounded-full.border-emerald-200 {
+  background: #10b981;
+  border-color: #10b981;
+  color: #ecfdf3;
+}
+
+.feature-flags-page button.h-8.rounded-full.border-emerald-200::after,
+.feature-flags-page button.h-9.rounded-full.border-emerald-200::after {
+  background: #ecfdf3;
+  transform: translateX(1.6rem);
+}
+
+.feature-flags-page button.h-8.rounded-full.border-slate-200,
+.feature-flags-page button.h-9.rounded-full.border-slate-200 {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.feature-flags-page button.h-8.rounded-full.border-slate-200::after,
+.feature-flags-page button.h-9.rounded-full.border-slate-200::after {
+  background: #f8fafc;
+  transform: translateX(0);
+}
+
+.dark .feature-flags-page button.h-8.rounded-full,
+.dark .feature-flags-page button.h-9.rounded-full {
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+.dark .feature-flags-page button.h-8.rounded-full.border-emerald-200,
+.dark .feature-flags-page button.h-9.rounded-full.border-emerald-200 {
+  background: #059669;
+  border-color: #059669;
+  color: #ecfdf3;
+}
+
+.dark .feature-flags-page button.h-8.rounded-full.border-slate-200,
+.dark .feature-flags-page button.h-9.rounded-full.border-slate-200 {
+  background: #1f2937;
+  color: #cbd5e1;
+}
+
+.dark .feature-flags-page button.h-8.rounded-full::after,
+.dark .feature-flags-page button.h-9.rounded-full::after {
+  background: #0f172a;
+}
+
+.feature-flags-page .bg-white,
+.feature-flags-page .border-slate-200 {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.dark .feature-flags-page .bg-white {
+  background-color: #0f172a;
+}
+
+.dark .feature-flags-page .border-slate-200 {
+  border-color: #1f2937;
+}
+
+.dark .feature-flags-page .text-slate-900,
+.dark .feature-flags-page .text-slate-700,
+.dark .feature-flags-page .text-slate-600 {
+  color: #e5e7eb;
+}
+
+.dark .feature-flags-page .text-slate-500,
+.dark .feature-flags-page .text-slate-400 {
+  color: #cbd5e1;
+}
+
+.api-keys-page .bg-white,
+.api-keys-page .border-slate-200 {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.dark .api-keys-page .bg-white {
+  background-color: #0f172a;
+}
+
+.dark .api-keys-page .border-slate-200 {
+  border-color: #1f2937;
+}
+
+.dark .api-keys-page .text-slate-900,
+.dark .api-keys-page .text-slate-700,
+.dark .api-keys-page .text-slate-600 {
+  color: #e5e7eb;
+}
+
+.dark .api-keys-page .text-slate-500,
+.dark .api-keys-page .text-slate-400 {
+  color: #cbd5e1;
+}
+
+.api-keys-page input {
+  background-color: #ffffff;
+}
+
+.dark .api-keys-page input {
+  background-color: #111827;
+  color: #e5e7eb;
+  border-color: #1f2937;
+}
+
+.dark .api-keys-page input::placeholder {
+  color: #94a3b8;
+}
+
+.dark .api-keys-page .bg-slate-50 {
+  background-color: #0b1220;
+}
+
+.dark .api-keys-page .text-slate-500 {
+  color: #cbd5e1;
 }

@@ -4,12 +4,13 @@ import type { BuildJob } from "../data/mock";
 
 type BuildQueueSectionProps = {
   jobs: BuildJob[];
+  onSelectBuild?: (id: string) => void;
 };
 
-const BuildQueueSection = ({ jobs }: BuildQueueSectionProps) => {
+const BuildQueueSection = ({ jobs, onSelectBuild }: BuildQueueSectionProps) => {
   return (
     <section className="space-y-6">
-      <BuildQueueList jobs={jobs} />
+      <BuildQueueList jobs={jobs} onSelect={onSelectBuild} />
     </section>
   );
 };

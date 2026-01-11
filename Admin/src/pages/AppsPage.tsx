@@ -11,10 +11,11 @@ import type { ApiApp } from "../lib/apps";
 
 type AppsPageProps = {
   apps: ApiApp[];
+  appIcons?: Record<string, string>;
   onSelectApp?: (app: ApiApp) => void;
 };
 
-const AppsPage = ({ apps, onSelectApp }: AppsPageProps) => {
+const AppsPage = ({ apps, appIcons, onSelectApp }: AppsPageProps) => {
   const [platform, setPlatform] = useState("all");
 
   return (
@@ -62,7 +63,7 @@ const AppsPage = ({ apps, onSelectApp }: AppsPageProps) => {
           <FilterPill label="Pending rollout" />
         </div>
       </Panel>
-      <AppsTable apps={apps} onSelectApp={onSelectApp} />
+      <AppsTable apps={apps} appIcons={appIcons} onSelectApp={onSelectApp} />
     </div>
   );
 };

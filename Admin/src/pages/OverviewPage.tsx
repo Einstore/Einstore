@@ -1,6 +1,5 @@
 import ActivitySection from "../sections/ActivitySection";
 import OverviewSection from "../sections/OverviewSection";
-import PipelineSection from "../sections/PipelineSection";
 import ReleasesSection from "../sections/ReleasesSection";
 import StorageSection from "../sections/StorageSection";
 import BuildQueueSection from "../sections/BuildQueueSection";
@@ -16,26 +15,22 @@ import type {
 
 type OverviewPageProps = {
   metrics: Metric[];
-  pipelineStages: PipelineStage[];
   apps: AppSummary[];
   buildQueue: BuildJob[];
   activity: ActivityItem[];
   storageBuckets: StorageBucket[];
   showMetrics?: boolean;
-  showPipeline?: boolean;
   showActivity?: boolean;
   showStorage?: boolean;
 };
 
 const OverviewPage = ({
   metrics,
-  pipelineStages,
   apps,
   buildQueue,
   activity,
   storageBuckets,
   showMetrics = false,
-  showPipeline = false,
   showActivity = false,
   showStorage = false,
 }: OverviewPageProps) => {
@@ -45,7 +40,6 @@ const OverviewPage = ({
   return (
     <>
       {showMetrics ? <OverviewSection metrics={metrics} /> : null}
-      {showPipeline ? <PipelineSection stages={pipelineStages} /> : null}
       <SplitLayout
         left={<ReleasesSection apps={apps} />}
         right={<BuildQueueSection jobs={buildQueue} />}

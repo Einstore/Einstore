@@ -9,10 +9,7 @@ type StorageSectionProps = {
 const StorageSection = ({ buckets }: StorageSectionProps) => {
   return (
     <section className="space-y-6">
-      <SectionHeader
-        title="Storage usage"
-        description="Capacity distribution across critical buckets."
-      />
+      <SectionHeader title="Storage usage" />
       <div className="grid grid-cols-12 gap-6">
         {buckets.map((bucket) => (
           <div key={bucket.id} className="col-span-12">

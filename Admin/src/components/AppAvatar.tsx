@@ -2,6 +2,7 @@ type AppAvatarProps = {
   name?: string | null;
   iconUrl?: string | null;
   size?: "sm" | "md" | "lg";
+  platform?: string | null;
 };
 
 const sizes = {
@@ -10,7 +11,7 @@ const sizes = {
   lg: "h-20 w-20 text-2xl",
 } as const;
 
-const AppAvatar = ({ name, iconUrl, size = "md" }: AppAvatarProps) => {
+const AppAvatar = ({ name, iconUrl, platform, size = "md" }: AppAvatarProps) => {
   const initials = name
     ? name
       .split(" ")
@@ -20,10 +21,15 @@ const AppAvatar = ({ name, iconUrl, size = "md" }: AppAvatarProps) => {
       .join("")
     : "";
 
+  const isAndroid = platform?.toLowerCase() === "android" || platform?.toLowerCase() === "wearos";
+  const isIos = platform?.toLowerCase() === "ios" || platform?.toLowerCase() === "tvos";
+
   if (iconUrl) {
     return (
       <span
-        className={`inline-flex ${sizes[size]} overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200 dark:bg-slate-700 dark:ring-slate-600`}
+        className={`inline-flex ${sizes[size]} overflow-hidden ${
+          isAndroid ? "rounded-full" : isIos ? "rounded-xl" : "rounded-full"
+        } bg-slate-100 ring-1 ring-slate-200 dark:bg-slate-700 dark:ring-slate-600`}
         aria-hidden="true"
       >
         <img src={iconUrl} alt="" className="h-full w-full object-cover" />

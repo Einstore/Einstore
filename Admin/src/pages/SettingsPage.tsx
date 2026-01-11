@@ -88,7 +88,7 @@ const SettingsPage = ({
       id: "api-keys",
       label: "API keys",
       content: hasTeam ? (
-        <div className="space-y-4">
+        <div className="space-y-4 api-keys-page">
           <SectionHeader
             title="API keys"
             description="Create keys for CI uploads. Keys are shown only once."

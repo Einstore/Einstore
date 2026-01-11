@@ -23,6 +23,7 @@ Team-scoped endpoints:
 - `/api-keys`, `/api-keys/:id`
 - `/ws`
 - `/usage/storage/users`
+- `/teams/stats`
 - `/builds/:id/ios/install-link`
 - `/builds/:id/ios/manifest`
 - `/builds/:id/ios/download`
@@ -65,6 +66,14 @@ Team-scoped endpoints:
 - Auth scope: Bearer (rafiki270/auth) + Team membership
 - Request schema: none
 - Response schema: `{ users: Array<{ userId: string, username: string, email: string | null, fullName: string | null, buildCount: number, totalBytes: number }> }`
+- Side effects: none
+- Platform relevance: all
+
+## GET /teams/stats
+- Purpose: Team-level storage and transfer stats
+- Auth scope: Bearer (rafiki270/auth) + Team membership
+- Request schema: none
+- Response schema: `{ billingCycleStartAt: string, totalStorageBytes: number, downloadsThisMonth: { from: string, eventCount: number, bytes: number }, uploadsInBillingCycle: { from: string, buildCount: number, appCount: number, bytes: number } }`
 - Side effects: none
 - Platform relevance: all
 

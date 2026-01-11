@@ -4,10 +4,11 @@ import { formatDate } from "../lib/apps";
 
 type AppsTableProps = {
   apps: ApiApp[];
+  appIcons?: Record<string, string>;
   onSelectApp?: (app: ApiApp) => void;
 };
 
-const AppsTable = ({ apps, onSelectApp }: AppsTableProps) => {
+const AppsTable = ({ apps, appIcons, onSelectApp }: AppsTableProps) => {
   return (
     <div className="rounded-xl bg-white p-5 shadow-sm dark:bg-slate-800">
       <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)] gap-4 border-b border-slate-200 pb-3 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:border-slate-700 dark:text-slate-400">
@@ -23,6 +24,8 @@ const AppsTable = ({ apps, onSelectApp }: AppsTableProps) => {
             identifier={app.identifier}
             updatedAt={formatDate(app.updatedAt)}
             createdAt={formatDate(app.createdAt)}
+            iconUrl={appIcons?.[app.id]}
+            platform={app.platform}
             onSelect={() => onSelectApp?.(app)}
           />
         ))}
