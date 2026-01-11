@@ -45,7 +45,7 @@ type NavItemConfig = NavItem & { superOnly?: boolean };
 const navItems: NavItemConfig[] = [
   { id: "overview", label: "Overview", icon: "overview" },
   { id: "apps", label: "Apps", icon: "apps", badge: "5" },
-  { id: "builds", label: "Builds", icon: "builds", badge: "2" },
+  { id: "builds", label: "Latest builds", icon: "builds", badge: "2" },
   {
     id: "flags",
     label: "Future flags",
