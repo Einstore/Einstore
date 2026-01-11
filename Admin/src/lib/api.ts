@@ -14,61 +14,139 @@ type ApiError = {
   message?: string;
 };
 
+type RefreshResponse = {
+  session?: {
+    accessToken: string;
+    refreshToken: string;
+  };
+};
+
+let refreshPromise: Promise<string | null> | null = null;
+
+const shouldRetryAuth = (payload: ApiError | null, status: number) =>
+  payload?.error === "token_expired" || status === 401;
+
+const refreshAccessToken = async (): Promise<string | null> => {
+  const refreshToken = localStorage.getItem("refreshToken");
+  if (!refreshToken) {
+    return null;
+  }
+  if (!refreshPromise) {
+    refreshPromise = fetch(`${API_BASE_URL}/auth/refresh`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ refreshToken }),
+    })
+      .then(async (response) => {
+        const text = await response.text();
+        const data = text ? (JSON.parse(text) as RefreshResponse) : null;
+        if (!response.ok || !data?.session?.accessToken) {
+          return null;
+        }
+        localStorage.setItem("accessToken", data.session.accessToken);
+        if (data.session.refreshToken) {
+          localStorage.setItem("refreshToken", data.session.refreshToken);
+        }
+        return data.session.accessToken;
+      })
+      .catch(() => null)
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+  return refreshPromise;
+};
+
 export async function apiFetch<T>(
   path: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = localStorage.getItem("accessToken");
-  const headers = new Headers(options.headers);
-  headers.set("Accept", "application/json");
-  if (options.body && !headers.has("Content-Type")) {
-    headers.set("Content-Type", "application/json");
+  const execute = async (overrideToken?: string | null) => {
+    const token = overrideToken ?? localStorage.getItem("accessToken");
+    const headers = new Headers(options.headers);
+    headers.set("Accept", "application/json");
+    if (options.body && !headers.has("Content-Type")) {
+      headers.set("Content-Type", "application/json");
+    }
+    if (token) {
+      headers.set("Authorization", `Bearer ${token}`);
+    }
+
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+      ...options,
+      headers,
+    });
+
+    if (response.status === 204) {
+      return { response, data: {} as T };
+    }
+
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : null;
+    return { response, data };
+  };
+
+  const initial = await execute();
+  if (initial.response.ok) {
+    return initial.data as T;
   }
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
+
+  const payload = (initial.data || {}) as ApiError;
+  if (shouldRetryAuth(payload, initial.response.status)) {
+    const refreshed = await refreshAccessToken();
+    if (refreshed) {
+      const retry = await execute(refreshed);
+      if (retry.response.ok) {
+        return retry.data as T;
+      }
+      const retryPayload = (retry.data || {}) as ApiError;
+      throw new Error(retryPayload.error || retryPayload.message || "Request failed");
+    }
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers,
-  });
-
-  if (response.status === 204) {
-    return {} as T;
-  }
-
-  const text = await response.text();
-  const data = text ? JSON.parse(text) : null;
-
-  if (!response.ok) {
-    const payload = (data || {}) as ApiError;
-    throw new Error(payload.error || payload.message || "Request failed");
-  }
-
-  return data as T;
+  throw new Error(payload.error || payload.message || "Request failed");
 }
 
 export async function apiUpload<T>(path: string, formData: FormData): Promise<T> {
-  const token = localStorage.getItem("accessToken");
-  const headers = new Headers();
-  headers.set("Accept", "application/json");
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
+  const execute = async (overrideToken?: string | null) => {
+    const token = overrideToken ?? localStorage.getItem("accessToken");
+    const headers = new Headers();
+    headers.set("Accept", "application/json");
+    if (token) {
+      headers.set("Authorization", `Bearer ${token}`);
+    }
+
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+      method: "POST",
+      headers,
+      body: formData,
+    });
+
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : null;
+    return { response, data };
+  };
+
+  const initial = await execute();
+  if (initial.response.ok) {
+    return initial.data as T;
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    method: "POST",
-    headers,
-    body: formData,
-  });
-
-  const text = await response.text();
-  const data = text ? JSON.parse(text) : null;
-
-  if (!response.ok) {
-    const payload = (data || {}) as ApiError;
-    throw new Error(payload.error || payload.message || "Upload failed");
+  const payload = (initial.data || {}) as ApiError;
+  if (shouldRetryAuth(payload, initial.response.status)) {
+    const refreshed = await refreshAccessToken();
+    if (refreshed) {
+      const retry = await execute(refreshed);
+      if (retry.response.ok) {
+        return retry.data as T;
+      }
+      const retryPayload = (retry.data || {}) as ApiError;
+      throw new Error(retryPayload.error || retryPayload.message || "Upload failed");
+    }
   }
 
-  return data as T;
+  throw new Error(payload.error || payload.message || "Upload failed");
 }
