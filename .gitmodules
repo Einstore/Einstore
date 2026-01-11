@@ -4,3 +4,6 @@
 [submodule "Libraries/feature-flags"]
 	path = Libraries/feature-flags
 	url = https://github.com/rafiki270/FeatureFlags.git
+[submodule "Libraries/teams"]
+	path = Libraries/teams
+	url = https://github.com/rafiki270/teams.git
