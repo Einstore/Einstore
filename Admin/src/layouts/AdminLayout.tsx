@@ -113,7 +113,15 @@ const AdminLayout = ({
         <div className="flex min-h-full flex-col">
           <Outlet />
           <p className="mt-10 text-center text-xs text-slate-500 dark:text-slate-400">
-            Made with love in Scotland. © {currentYear}
+            Made with love in Scotland. © {currentYear}{" "}
+            <a
+              href="https://www.unlikeotherai.com"
+              className="font-semibold text-slate-500 transition-colors hover:underline dark:text-slate-400"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Unlike Other AI
+            </a>
           </p>
         </div>
       </div>
