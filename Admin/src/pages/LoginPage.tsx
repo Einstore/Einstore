@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 import ActionButton from "../components/ActionButton";
-import { apiFetch } from "../lib/api";
+import { API_BASE_URL, apiFetch } from "../lib/api";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -35,7 +35,7 @@ const LoginPage = () => {
     setBusy(true);
     const successRedirect = `${window.location.origin}/login`;
     const failureRedirect = successRedirect;
-    const redirectUri = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8080"}/auth/oauth/${provider}/callback`;
+    const redirectUri = `${API_BASE_URL}/auth/oauth/${provider}/callback`;
     try {
       const response = await apiFetch<{ authorizeUrl: string }>(
         `/auth/oauth/${provider}/start?successRedirect=${encodeURIComponent(

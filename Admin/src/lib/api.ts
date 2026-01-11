@@ -1,4 +1,13 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+const resolveApiBaseUrl = () => {
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+  return import.meta.env.MODE === "development"
+    ? "http://localhost:8080"
+    : "https://api.einstore.pro";
+};
+
+export const API_BASE_URL = resolveApiBaseUrl();
 
 type ApiError = {
   error?: string;
