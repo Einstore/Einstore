@@ -15,4 +15,4 @@ Modern private app distribution platform for iOS + Android.
 
 ## Run (local)
 - `make launch` starts the API and Admin dev servers plus Caddy for local domains.
-- With DNS entries for `admin.local.einstore.pro`, `api.local.einstore.pro`, and `local.einstore.pro`, you can access the dev stack from other devices at `http://admin.local.einstore.pro` and `http://api.local.einstore.pro` (Caddy is required; override `DEV_*` vars in the Makefile if you need different ports).
+- With DNS entries for `admin.local.einstore.pro`, `api.local.einstore.pro`, and `local.einstore.pro`, you can access the dev stack from other devices at `https://admin.local.einstore.pro` and `https://api.local.einstore.pro` (Caddy terminates HTTPS with local certificates; override `DEV_*` vars in the Makefile if you need different ports).

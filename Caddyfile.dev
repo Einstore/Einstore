@@ -1,6 +1,6 @@
 {
-	auto_https off
 	admin off
+	local_certs
 }
 
 {$API_HOST:-api.local.einstore.pro} {
