@@ -6,10 +6,19 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const privateDir = path.resolve(__dirname, "..", "Private");
+const devHost = process.env.ADMIN_DEV_HOST || "0.0.0.0";
+const devPort = Number(process.env.ADMIN_DEV_PORT || 5173);
+const publicHost = process.env.ADMIN_PUBLIC_HOST || "localhost";
+const hmrClientPort = Number(process.env.ADMIN_DEV_CLIENT_PORT || devPort);
 
 export default defineConfig({
   server: {
-    port: 5173,
+    host: devHost === "true" ? true : devHost,
+    port: devPort,
+    hmr: {
+      host: publicHost,
+      clientPort: hmrClientPort,
+    },
     fs: {
       allow: [privateDir, path.resolve(__dirname)],
     },

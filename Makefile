@@ -5,6 +5,16 @@ APP_ID ?= afde427c-09c9-475a-851c-c7a618040891
 APP_ID_STAGING ?= <set-staging-app-id>
 MIGRATION_NAME ?= baseline
 MIGRATION_TEST_DB ?= einstore-test
+DEV_API_PORT ?= 8080
+DEV_ADMIN_PORT ?= 5173
+DEV_API_DOMAIN ?= api.local.einstore.pro
+DEV_ADMIN_DOMAIN ?= admin.local.einstore.pro
+DEV_WEB_DOMAIN ?= local.einstore.pro
+DEV_CADDYFILE ?= ./Caddyfile.dev
+DEV_CORS_ORIGINS ?= http://$(DEV_ADMIN_DOMAIN),http://$(DEV_WEB_DOMAIN),http://localhost:8081,http://localhost:5173
+DEV_VITE_API_BASE_URL ?= http://$(DEV_API_DOMAIN)
+DEV_INBOUND_EMAIL_DOMAIN ?= $(DEV_WEB_DOMAIN)
+DEV_ADMIN_CLIENT_PORT ?= 80
 
 ifeq ($(firstword $(MAKECMDGOALS)),migrate)
 MIGRATE_EXTRA := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
@@ -46,12 +56,41 @@ launch:
 			docker stop $$CONTAINERS; \
 		fi; \
 	fi; \
-	cd API && npm run dev & \
+	if ! command -v caddy >/dev/null 2>&1; then \
+		echo "Caddy is required for dev domain routing. Install it from https://caddyserver.com/docs/install." >&2; \
+		exit 1; \
+	fi; \
+	caddy validate --config $(DEV_CADDYFILE) --adapter caddyfile >/dev/null; \
+	API_PID=""; ADMIN_PID=""; CADDY_PID=""; \
+	cleanup() { \
+		[ -n "$$CADDY_PID" ] && kill "$$CADDY_PID" 2>/dev/null || true; \
+		[ -n "$$ADMIN_PID" ] && kill "$$ADMIN_PID" 2>/dev/null || true; \
+		[ -n "$$API_PID" ] && kill "$$API_PID" 2>/dev/null || true; \
+	}; \
+	trap 'cleanup' INT TERM EXIT; \
+	cd API && \
+		PORT=$(DEV_API_PORT) \
+		CORS_ORIGINS="$(DEV_CORS_ORIGINS)" \
+		INBOUND_EMAIL_DOMAIN="$(DEV_INBOUND_EMAIL_DOMAIN)" \
+		npm run dev & \
 	API_PID=$$!; \
-	cd Admin && npm run dev & \
+	cd Admin && \
+		ADMIN_DEV_PORT=$(DEV_ADMIN_PORT) \
+		ADMIN_DEV_HOST=0.0.0.0 \
+		ADMIN_PUBLIC_HOST=$(DEV_ADMIN_DOMAIN) \
+		ADMIN_DEV_CLIENT_PORT=$(DEV_ADMIN_CLIENT_PORT) \
+		VITE_API_BASE_URL=$(DEV_VITE_API_BASE_URL) \
+		npm run dev & \
 	ADMIN_PID=$$!; \
-	trap 'kill $$API_PID $$ADMIN_PID' INT TERM; \
-	wait $$API_PID $$ADMIN_PID
+	API_HOST=$(DEV_API_DOMAIN) \
+	API_PORT=$(DEV_API_PORT) \
+	ADMIN_HOST=$(DEV_ADMIN_DOMAIN) \
+	ADMIN_PORT=$(DEV_ADMIN_PORT) \
+	WEB_HOST=$(DEV_WEB_DOMAIN) \
+	caddy run --config $(DEV_CADDYFILE) --adapter caddyfile & \
+	CADDY_PID=$$!; \
+	wait $$API_PID $$ADMIN_PID $$CADDY_PID; \
+	trap - INT TERM EXIT
 
 migrate:
 	@if [ "$(MIGRATE_MODE)" = "test" ]; then \
