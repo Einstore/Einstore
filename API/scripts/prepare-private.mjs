@@ -210,8 +210,9 @@ const copyDir = async (source, destination) => {
 };
 
 const syncApiPrivateDir = async (modules) => {
-  await fs.rm(apiPrivateDir, { recursive: true, force: true });
   if (!modules.length) return [];
+
+  await fs.rm(apiPrivateDir, { recursive: true, force: true });
 
   const synced = [];
   for (const mod of modules) {
