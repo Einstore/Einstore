@@ -9,6 +9,7 @@ const configSchema = z.object({
   NODE_ENV: z.string().default("development"),
   INBOUND_EMAIL_DOMAIN: z.string().default("local.einstore"),
   CORS_ORIGINS: z.string().optional(),
+  UPLOAD_MAX_BYTES: z.coerce.number().default(8 * 1024 * 1024 * 1024),
 });
 
 export type AppConfig = z.infer<typeof configSchema>;

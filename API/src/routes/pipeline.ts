@@ -68,14 +68,32 @@ export async function pipelineRoutes(app: FastifyInstance) {
     const uploadName = `${crypto.randomUUID()}${extension}`;
     const filePath = path.join(uploadDir, uploadName);
 
-    await pipeline(part.file, fs.createWriteStream(filePath));
-
-    if (extension === ".apk") {
-      const result = await ingestAndroidApk(filePath, teamId);
-      return reply.status(201).send({ status: "ingested", result });
+    try {
+      await pipeline(part.file, fs.createWriteStream(filePath));
+    } catch (error) {
+      await fs.promises.rm(filePath, { force: true });
+      throw error;
     }
 
-    const result = await ingestIosIpa(filePath, teamId);
-    return reply.status(201).send({ status: "ingested", result });
+    if (part.file.truncated) {
+      await fs.promises.rm(filePath, { force: true });
+      return reply.status(413).send({ error: "file_too_large" });
+    }
+
+    try {
+      if (extension === ".apk") {
+        const result = await ingestAndroidApk(filePath, teamId);
+        return reply.status(201).send({ status: "ingested", result });
+      }
+
+      const result = await ingestIosIpa(filePath, teamId);
+      return reply.status(201).send({ status: "ingested", result });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (message.includes("end of central directory record signature not found")) {
+        return reply.status(400).send({ error: "invalid_archive" });
+      }
+      throw error;
+    }
   });
 }

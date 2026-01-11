@@ -13,7 +13,11 @@ const corsOrigins = config.CORS_ORIGINS
 app.register(cors, {
   origin: corsOrigins.length ? corsOrigins : true,
 });
-app.register(multipart);
+app.register(multipart, {
+  limits: {
+    fileSize: config.UPLOAD_MAX_BYTES,
+  },
+});
 
 app.addHook("onClose", async () => {
   await prisma.$disconnect();
