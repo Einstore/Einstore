@@ -406,6 +406,7 @@ const AppRoutes = () => {
           activeTeamId={activeTeamId}
         />
       ),
+      navId: "apps",
     },
     {
       id: "build-detail",
