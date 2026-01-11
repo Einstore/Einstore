@@ -1,7 +1,10 @@
 databases:
-- engine: PG
+- cluster_name: einstore
+  db_name: defaultdb
+  db_user: doadmin
+  engine: PG
   name: db
-  version: "17"
+  production: true
 domains:
 - domain: einstore.pro
   type: PRIMARY
