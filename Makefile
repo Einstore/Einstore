@@ -60,6 +60,10 @@ launch:
 		echo "Caddy is required for dev domain routing. Install it from https://caddyserver.com/docs/install." >&2; \
 		exit 1; \
 	fi; \
+	if pgrep -x caddy >/dev/null 2>&1; then \
+		echo "Another caddy instance is already running; stop it before running 'make launch' to avoid port conflicts." >&2; \
+		exit 1; \
+	fi; \
 	caddy validate --config $(DEV_CADDYFILE) --adapter caddyfile >/dev/null; \
 	API_PID=""; ADMIN_PID=""; CADDY_PID=""; \
 	cleanup() { \
