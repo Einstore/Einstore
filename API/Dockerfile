@@ -42,12 +42,15 @@ ENV AAPT_PATH=/usr/local/bin/aapt2
 
 WORKDIR /app
 
-# Build auth submodule dependency
+# Build auth + teams submodule dependencies
 COPY Libraries/rafiki-auth ./Libraries/rafiki-auth
+COPY Libraries/teams ./Libraries/teams
 WORKDIR /app/Libraries/rafiki-auth
 RUN npm install && npm run build
+WORKDIR /app/Libraries/teams
+RUN npm install && npm run build
 
-# Copy feature flags dependency
+# Copy feature flags dependency (no build step)
 WORKDIR /app
 COPY Libraries/feature-flags ./Libraries/feature-flags
 
@@ -59,6 +62,13 @@ RUN npm install
 COPY API/prisma ./prisma
 COPY API/tsconfig.json ./
 COPY API/src ./src
+
+RUN rm -rf node_modules/@unlikeother/auth/dist \
+  && mkdir -p node_modules/@unlikeother/auth/dist \
+  && cp -R /app/Libraries/rafiki-auth/dist/* node_modules/@unlikeother/auth/dist/
+RUN rm -rf node_modules/@rafiki270/teams/dist \
+  && mkdir -p node_modules/@rafiki270/teams/dist \
+  && cp -R /app/Libraries/teams/dist/* node_modules/@rafiki270/teams/dist/
 
 RUN npm run prisma:generate
 RUN npm run build
