@@ -85,6 +85,9 @@ vi.mock("../../auth/guard.js", () => ({
   requireAuth: async (request: { auth?: { user?: { id: string } } }) => {
     request.auth = { user: { id: "user-1" } };
   },
+  requireSuperUser: async (request: { auth?: { user?: { id: string } } }) => {
+    request.auth = { user: { id: "user-1" } };
+  },
 }));
 
 const authServiceMock = {
@@ -188,6 +191,8 @@ describe("routes", () => {
 
     prismaMock.target.create.mockResolvedValue({ id: ids.targetId });
     prismaMock.target.findMany.mockResolvedValue([{ id: ids.targetId }]);
+
+    prismaMock.user.findUnique.mockResolvedValue({ isSuperUser: false });
 
     prismaMock.variant.create.mockResolvedValue({ id: "variant-1" });
     prismaMock.variant.findMany.mockResolvedValue([{ id: "variant-1" }]);

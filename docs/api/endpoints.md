@@ -54,7 +54,7 @@ All endpoints return JSON. Authenticated endpoints require `Authorization: Beare
 - Purpose: Validate access token
 - Auth scope: Public (handled by rafiki270/auth)
 - Request schema: none (uses Authorization header)
-- Response schema: `{ userId: string, username: string, email?: string | null, name?: string | null, avatarUrl?: string | null, status: string }`
+- Response schema: `{ userId: string, username: string, email?: string | null, name?: string | null, avatarUrl?: string | null, status: string, isSuperUser: boolean }`
 - Side effects: none
 - Platform relevance: all
 
@@ -395,7 +395,7 @@ All endpoints return JSON. Authenticated endpoints require `Authorization: Beare
 
 ## POST /feature-flags
 - Purpose: Create/ensure feature flag
-- Auth scope: Bearer (rafiki270/auth)
+- Auth scope: Bearer (super user)
 - Request schema: `{ key: string, description?: string, defaultEnabled?: boolean, metadata?: object }`
 - Response schema: `FeatureFlag`
 - Side effects: Creates or updates FeatureFlag
@@ -411,7 +411,7 @@ All endpoints return JSON. Authenticated endpoints require `Authorization: Beare
 
 ## GET /feature-flags/{key}
 - Purpose: Fetch feature flag with overrides
-- Auth scope: Bearer (rafiki270/auth)
+- Auth scope: Bearer (super user)
 - Request schema: path `{ key: string }`
 - Response schema: `FeatureFlag & { overrides: FeatureFlagOverride[] }`
 - Side effects: none
@@ -419,7 +419,7 @@ All endpoints return JSON. Authenticated endpoints require `Authorization: Beare
 
 ## PATCH /feature-flags/{key}
 - Purpose: Update feature flag
-- Auth scope: Bearer (rafiki270/auth)
+- Auth scope: Bearer (super user)
 - Request schema: `{ description?: string|null, defaultEnabled?: boolean, metadata?: object|null }`
 - Response schema: `FeatureFlag`
 - Side effects: Updates FeatureFlag
@@ -427,7 +427,7 @@ All endpoints return JSON. Authenticated endpoints require `Authorization: Beare
 
 ## DELETE /feature-flags/{key}
 - Purpose: Delete feature flag
-- Auth scope: Bearer (rafiki270/auth)
+- Auth scope: Bearer (super user)
 - Request schema: path `{ key: string }`
 - Response schema: `FeatureFlag`
 - Side effects: Deletes FeatureFlag and overrides
@@ -435,7 +435,7 @@ All endpoints return JSON. Authenticated endpoints require `Authorization: Beare
 
 ## POST /feature-flags/{key}/overrides
 - Purpose: Create/update feature flag override
-- Auth scope: Bearer (rafiki270/auth)
+- Auth scope: Bearer (super user)
 - Request schema: `{ scope: string, targetKey?: string|null, enabled: boolean, rolloutPercentage?: number, metadata?: object }`
 - Response schema: `FeatureFlagOverride`
 - Side effects: Creates or updates override
@@ -443,7 +443,7 @@ All endpoints return JSON. Authenticated endpoints require `Authorization: Beare
 
 ## GET /feature-flags/{key}/overrides
 - Purpose: List feature flag overrides
-- Auth scope: Bearer (rafiki270/auth)
+- Auth scope: Bearer (super user)
 - Request schema: query `{ scope?: string, targetKey?: string }`
 - Response schema: `FeatureFlagOverride[]`
 - Side effects: none

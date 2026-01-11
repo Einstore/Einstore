@@ -78,6 +78,9 @@
           },
           "status": {
             "type": "string"
+          },
+          "isSuperUser": {
+            "type": "boolean"
           }
         }
       },
@@ -1094,6 +1097,7 @@
     "/feature-flags": {
       "post": {
         "summary": "Create or ensure feature flag",
+        "description": "Super user only.",
         "security": [
           {
             "bearerAuth": []
@@ -1166,6 +1170,7 @@
     "/feature-flags/{key}": {
       "get": {
         "summary": "Get feature flag by key",
+        "description": "Super user only.",
         "security": [
           {
             "bearerAuth": []
@@ -1186,6 +1191,7 @@
       },
       "patch": {
         "summary": "Update feature flag",
+        "description": "Super user only.",
         "security": [
           {
             "bearerAuth": []
@@ -1229,6 +1235,7 @@
       },
       "delete": {
         "summary": "Delete feature flag",
+        "description": "Super user only.",
         "security": [
           {
             "bearerAuth": []
@@ -1251,6 +1258,7 @@
     "/feature-flags/{key}/overrides": {
       "post": {
         "summary": "Create or update feature flag override",
+        "description": "Super user only.",
         "security": [
           {
             "bearerAuth": []
@@ -1304,6 +1312,7 @@
       },
       "get": {
         "summary": "List feature flag overrides",
+        "description": "Super user only.",
         "security": [
           {
             "bearerAuth": []

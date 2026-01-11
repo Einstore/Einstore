@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
-import { requireAuth } from "../auth/guard.js";
+import { requireAuth, requireSuperUser } from "../auth/guard.js";
 import { ensureFeatureFlag, isFeatureFlagEnabled } from "@rafiki270/feature-flags";
 
 const listQuerySchema = z.object({
@@ -41,7 +41,7 @@ const evaluateQuerySchema = z.object({
 });
 
 export async function featureFlagRoutes(app: FastifyInstance) {
-  app.post("/feature-flags", { preHandler: requireAuth }, async (request, reply) => {
+  app.post("/feature-flags", { preHandler: requireSuperUser }, async (request, reply) => {
     const parsed = createFlagSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(400).send({ error: "Invalid payload" });
@@ -69,7 +69,7 @@ export async function featureFlagRoutes(app: FastifyInstance) {
     return reply.send(items);
   });
 
-  app.get("/feature-flags/:key", { preHandler: requireAuth }, async (request, reply) => {
+  app.get("/feature-flags/:key", { preHandler: requireSuperUser }, async (request, reply) => {
     const key = (request.params as { key: string }).key;
     const record = await prisma.featureFlag.findUnique({
       where: { key },
@@ -81,7 +81,7 @@ export async function featureFlagRoutes(app: FastifyInstance) {
     return reply.send(record);
   });
 
-  app.patch("/feature-flags/:key", { preHandler: requireAuth }, async (request, reply) => {
+  app.patch("/feature-flags/:key", { preHandler: requireSuperUser }, async (request, reply) => {
     const key = (request.params as { key: string }).key;
     const parsed = updateFlagSchema.safeParse(request.body);
     if (!parsed.success) {
@@ -100,7 +100,7 @@ export async function featureFlagRoutes(app: FastifyInstance) {
     return reply.send(updated);
   });
 
-  app.delete("/feature-flags/:key", { preHandler: requireAuth }, async (request, reply) => {
+  app.delete("/feature-flags/:key", { preHandler: requireSuperUser }, async (request, reply) => {
     const key = (request.params as { key: string }).key;
     try {
       const deleted = await prisma.featureFlag.delete({ where: { key } });
@@ -113,7 +113,10 @@ export async function featureFlagRoutes(app: FastifyInstance) {
     }
   });
 
-  app.post("/feature-flags/:key/overrides", { preHandler: requireAuth }, async (request, reply) => {
+  app.post(
+    "/feature-flags/:key/overrides",
+    { preHandler: requireSuperUser },
+    async (request, reply) => {
     const key = (request.params as { key: string }).key;
     const parsed = createOverrideSchema.safeParse(request.body);
     if (!parsed.success) {
@@ -146,7 +149,10 @@ export async function featureFlagRoutes(app: FastifyInstance) {
     return reply.status(201).send(record);
   });
 
-  app.get("/feature-flags/:key/overrides", { preHandler: requireAuth }, async (request, reply) => {
+  app.get(
+    "/feature-flags/:key/overrides",
+    { preHandler: requireSuperUser },
+    async (request, reply) => {
     const key = (request.params as { key: string }).key;
     const parsed = overrideQuerySchema.safeParse(request.query);
     if (!parsed.success) {

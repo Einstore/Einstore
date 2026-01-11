@@ -191,7 +191,11 @@ export async function authRoutes(app: FastifyInstance) {
     const token = header.replace("Bearer ", "").trim();
     try {
       const session = await authService.getSession(token);
-      return reply.send(session);
+      const user = await prisma.user.findUnique({
+        where: { id: session.userId },
+        select: { isSuperUser: true },
+      });
+      return reply.send({ ...session, isSuperUser: Boolean(user?.isSuperUser) });
     } catch (err) {
       const authErr = asAuthError(err, "token_invalid");
       return reply.status(401).send({ error: authErr.code, message: authErr.message });

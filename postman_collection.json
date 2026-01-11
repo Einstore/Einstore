@@ -1314,6 +1314,7 @@
     },
     {
       "name": "Create Feature Flag",
+      "description": "Super user only.",
       "request": {
         "method": "POST",
         "header": [
@@ -1398,6 +1399,7 @@
     },
     {
       "name": "Get Feature Flag",
+      "description": "Super user only.",
       "request": {
         "method": "GET",
         "header": [
@@ -1437,6 +1439,7 @@
     },
     {
       "name": "Update Feature Flag",
+      "description": "Super user only.",
       "request": {
         "method": "PATCH",
         "header": [
@@ -1480,6 +1483,7 @@
     },
     {
       "name": "Delete Feature Flag",
+      "description": "Super user only.",
       "request": {
         "method": "DELETE",
         "header": [
@@ -1519,6 +1523,7 @@
     },
     {
       "name": "Create Feature Flag Override",
+      "description": "Super user only.",
       "request": {
         "method": "POST",
         "header": [
@@ -1563,6 +1568,7 @@
     },
     {
       "name": "List Feature Flag Overrides",
+      "description": "Super user only.",
       "request": {
         "method": "GET",
         "header": [

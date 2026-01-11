@@ -37,9 +37,12 @@ import {
 } from "../lib/featureFlags";
 import type { ApiApp, ApiBuild } from "../lib/apps";
 import { isTeamAdmin, type TeamMember, type TeamSummary } from "../lib/teams";
+import type { NavItem } from "../components/Sidebar";
 import RequireAuth from "./RequireAuth";
 
-const navItems = [
+type NavItemConfig = NavItem & { superOnly?: boolean };
+
+const navItems: NavItemConfig[] = [
   { id: "overview", label: "Overview", icon: "overview" },
   { id: "apps", label: "Apps", icon: "apps", badge: "5" },
   { id: "builds", label: "Builds", icon: "builds", badge: "2" },
@@ -48,6 +51,7 @@ const navItems = [
     label: "Future flags",
     icon: "flags",
     featureFlag: "admin.future_flags",
+    superOnly: true,
   },
   {
     id: "pipelines",
@@ -120,6 +124,7 @@ type RouteConfig = {
   navId?: string;
   featureFlag?: FeatureFlagKey;
   adminOnly?: boolean;
+  superOnly?: boolean;
 };
 
 const AppRoutes = () => {
@@ -131,6 +136,7 @@ const AppRoutes = () => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [apps, setApps] = useState<ApiApp[]>([]);
   const [ingestNonce, setIngestNonce] = useState(0);
+  const [isSuperUser, setIsSuperUser] = useState(false);
 
   const activeTeam = useMemo(
     () => (activeTeamId ? teams.find((team) => team.id === activeTeamId) || null : null),
@@ -138,6 +144,29 @@ const AppRoutes = () => {
   );
   const isAdmin = isTeamAdmin(activeTeam?.memberRole);
   const isSaas = import.meta.env.VITE_SAAS === "true";
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      setIsSuperUser(false);
+      return;
+    }
+    let isMounted = true;
+    apiFetch<{ isSuperUser?: boolean }>("/auth/session")
+      .then((payload) => {
+        if (isMounted) {
+          setIsSuperUser(Boolean(payload?.isSuperUser));
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setIsSuperUser(false);
+        }
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [location.pathname]);
 
   const loadApps = useCallback(async () => {
     try {
@@ -272,6 +301,7 @@ const AppRoutes = () => {
       element: <FutureFlagsPage />,
       navId: "flags",
       featureFlag: "admin.future_flags",
+      superOnly: true,
     },
     {
       id: "pipelines",
@@ -307,12 +337,15 @@ const AppRoutes = () => {
   const visibleNavItems = useMemo(
     () =>
       navItems.filter((item) => {
+        if (item.superOnly && !isSuperUser) {
+          return false;
+        }
         if (item.id === "settings" && !isAdmin) {
           return false;
         }
         return !item.featureFlag || featureFlags[item.featureFlag];
       }),
-    [featureFlags, isAdmin]
+    [featureFlags, isAdmin, isSuperUser]
   );
 
   const activeRoute = useMemo(() => {
@@ -369,7 +402,8 @@ const AppRoutes = () => {
         {routes.map((route) => {
           const shouldHide =
             (route.featureFlag && !featureFlags[route.featureFlag]) ||
-            (route.adminOnly && !isAdmin);
+            (route.adminOnly && !isAdmin) ||
+            (route.superOnly && !isSuperUser);
 
           return (
             <Route
