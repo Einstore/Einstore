@@ -1,0 +1,1 @@
+web: npm run prisma:ensure-schema && if [ "$RUN_PRISMA_DEPLOY" = "true" ]; then npm run prisma:deploy; fi && npm run start

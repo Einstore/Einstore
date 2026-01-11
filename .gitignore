@@ -3,6 +3,7 @@
 /storage/
 /API/storage/
 API/.env
+scripts/app-platform.env
 API/Private/
 node_modules/
 functions/**/.deployed

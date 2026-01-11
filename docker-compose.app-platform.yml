@@ -1,0 +1,83 @@
+version: "3.9"
+
+services:
+  do-db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: einstore
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - app-platform-pgdata:/var/lib/postgresql/data
+    networks:
+      - app-platform
+
+  do-api-build:
+    build:
+      context: .
+      dockerfile: docker/app-platform-node-20.Dockerfile
+    working_dir: /workspace/API
+    user: "${DOCKER_UID:-1000}:${DOCKER_GID:-1000}"
+    volumes:
+      - ./:/workspace
+    environment:
+      NPM_CONFIG_INSTALL_LINKS: "false"
+      BILLING_DEPLOY_KEY: ${BILLING_DEPLOY_KEY:-}
+    command: bash -lc "npm ci && npm run do:build"
+    networks:
+      - app-platform
+
+  do-api-run:
+    build:
+      context: .
+      dockerfile: docker/app-platform-node-20.Dockerfile
+    working_dir: /workspace/API
+    user: "${DOCKER_UID:-1000}:${DOCKER_GID:-1000}"
+    volumes:
+      - ./:/workspace
+    env_file:
+      - ${APP_PLATFORM_ENV_FILE:-./scripts/app-platform.env}
+    depends_on:
+      - do-db
+    command: bash -lc "npm run prisma:ensure-schema && if [ \"$RUN_PRISMA_DEPLOY\" = \"true\" ]; then npm run prisma:deploy; fi && npm run start"
+    ports:
+      - "8080:8080"
+    networks:
+      - app-platform
+
+  do-admin-build:
+    build:
+      context: .
+      dockerfile: docker/app-platform-node-20.Dockerfile
+    working_dir: /workspace/Admin
+    user: "${DOCKER_UID:-1000}:${DOCKER_GID:-1000}"
+    volumes:
+      - ./:/workspace
+    env_file:
+      - ${APP_PLATFORM_ENV_FILE:-./scripts/app-platform.env}
+    environment:
+      BILLING_DEPLOY_KEY: ${BILLING_DEPLOY_KEY:-}
+    command: bash -lc "if [ -n \"$BILLING_DEPLOY_KEY\" ]; then mkdir -p ~/.ssh && echo \"$BILLING_DEPLOY_KEY\" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa && ssh-keyscan github.com >> ~/.ssh/known_hosts && mkdir -p ../Private && git clone git@github.com:Einstore/Billing.git ../Private/billing; fi && npm install && npm run build"
+    networks:
+      - app-platform
+
+  do-web-build:
+    build:
+      context: .
+      dockerfile: docker/app-platform-node-20.Dockerfile
+    working_dir: /workspace/Web
+    user: "${DOCKER_UID:-1000}:${DOCKER_GID:-1000}"
+    volumes:
+      - ./:/workspace
+    command: bash -lc "echo \"Web has no build_command in app.yaml; skipping build.\""
+    networks:
+      - app-platform
+
+volumes:
+  app-platform-pgdata:
+
+networks:
+  app-platform:
+    name: einstore-app-platform
