@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { requireSuperUser } from "../auth/guard.js";
-import { ensureFeatureFlag, isFeatureFlagEnabled, listFeatureFlags, resolveFeatureFlagDefaults, } from "../lib/featureFlags.js";
+import { ensureFeatureFlag, isFeatureFlagEnabled, listFeatureFlags, resolveFeatureFlagDefaults, } from "@rafiki270/feature-flags";
 const listQuerySchema = z.object({
     limit: z.coerce.number().int().positive().max(200).default(20),
     offset: z.coerce.number().int().nonnegative().default(0),
