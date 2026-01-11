@@ -13,12 +13,18 @@ export type SessionUser = {
   isSuperUser?: boolean;
 };
 
+export type BadgeCounts = {
+  apps: number;
+  builds: number;
+};
+
 export const useSessionState = (refreshKey?: string) => {
   const [hasToken, setHasToken] = useState(Boolean(localStorage.getItem("accessToken")));
   const [me, setMe] = useState<SessionUser | null>(null);
   const [teams, setTeams] = useState<TeamSummary[]>([]);
   const [activeTeamId, setActiveTeamId] = useState("");
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [badges, setBadges] = useState<BadgeCounts>({ apps: 0, builds: 0 });
 
   useEffect(() => {
     setHasToken(Boolean(localStorage.getItem("accessToken")));
@@ -50,6 +56,7 @@ export const useSessionState = (refreshKey?: string) => {
     if (!hasToken) {
       setTeams([]);
       setActiveTeamId("");
+      setBadges({ apps: 0, builds: 0 });
       return;
     }
     let isMounted = true;
@@ -72,6 +79,7 @@ export const useSessionState = (refreshKey?: string) => {
         if (isMounted) {
           setTeams([]);
           setActiveTeamId("");
+          setBadges({ apps: 0, builds: 0 });
         }
       });
     return () => {
@@ -85,6 +93,63 @@ export const useSessionState = (refreshKey?: string) => {
   );
 
   const isAdmin = isTeamAdmin(activeTeam?.memberRole);
+
+  useEffect(() => {
+    if (!hasToken || !activeTeam?.id) {
+      setBadges({ apps: 0, builds: 0 });
+      return;
+    }
+    let isMounted = true;
+    apiFetch<{ badges: BadgeCounts }>("/badges", {
+      headers: {
+        "x-team-id": activeTeam.id,
+      },
+    })
+      .then((payload) => {
+        if (isMounted) {
+          setBadges(payload?.badges ?? { apps: 0, builds: 0 });
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setBadges({ apps: 0, builds: 0 });
+        }
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [hasToken, activeTeam?.id]);
+
+  useEffect(() => {
+    if (!hasToken || !activeTeam?.id) {
+      return;
+    }
+    const accessToken = localStorage.getItem("accessToken");
+    if (!accessToken) {
+      return;
+    }
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+    const wsBase = baseUrl.startsWith("https://")
+      ? baseUrl.replace("https://", "wss://")
+      : baseUrl.replace("http://", "ws://");
+    const wsUrl = new URL("/ws", wsBase);
+    wsUrl.searchParams.set("accessToken", accessToken);
+    wsUrl.searchParams.set("teamId", activeTeam.id);
+    const socket = new WebSocket(wsUrl.toString());
+    socket.onmessage = (event) => {
+      try {
+        const payload = JSON.parse(event.data);
+        if (payload?.type === "badges.updated" && payload.badges) {
+          setBadges(payload.badges);
+        }
+      } catch {
+        return;
+      }
+    };
+    return () => {
+      socket.close();
+    };
+  }, [hasToken, activeTeam?.id]);
 
   useEffect(() => {
     if (!activeTeam?.id || !isAdmin || !hasToken) {
@@ -156,6 +221,7 @@ export const useSessionState = (refreshKey?: string) => {
     activeTeam,
     isAdmin,
     teamMembers,
+    badges,
     selectTeam,
     createTeam,
   };

@@ -47,7 +47,7 @@ Team-scoped endpoints:
 ## GET /ws
 - Purpose: WebSocket for real-time badge updates
 - Auth scope: Bearer (rafiki270/auth) + Team membership
-- Request schema: none (uses Authorization header and optional `x-team-id`)
+- Request schema: none (uses `Authorization` header when available, otherwise `accessToken` query param; `x-team-id` header or `teamId` query param for team context)
 - Response schema: WebSocket messages like `{ type: "badges.updated", badges: { apps: number, builds: number } }`
 - Side effects: none
 - Platform relevance: all

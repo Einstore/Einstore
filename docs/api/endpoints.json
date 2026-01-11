@@ -537,6 +537,24 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/TeamIdHeader"
+          },
+          {
+            "name": "accessToken",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Access token for websocket auth (browser fallback when Authorization header cannot be set)."
+          },
+          {
+            "name": "teamId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Team context for websocket auth (browser fallback when x-team-id header cannot be set)."
           }
         ]
       }

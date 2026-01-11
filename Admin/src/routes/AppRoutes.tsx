@@ -44,8 +44,8 @@ type NavItemConfig = NavItem & { superOnly?: boolean };
 
 const navItems: NavItemConfig[] = [
   { id: "overview", label: "Overview", icon: "overview" },
-  { id: "apps", label: "Apps", icon: "apps", badge: "5" },
-  { id: "builds", label: "Latest builds", icon: "builds", badge: "2" },
+  { id: "apps", label: "Apps", icon: "apps" },
+  { id: "builds", label: "Latest builds", icon: "builds" },
   {
     id: "flags",
     label: "Future flags",
@@ -142,6 +142,7 @@ const AppRoutes = () => {
     isAdmin,
     selectTeam,
     createTeam,
+    badges,
   } = useSessionState(location.pathname);
   const isSaas = import.meta.env.VITE_SAAS === "true";
 
@@ -266,19 +267,26 @@ const AppRoutes = () => {
     },
   ];
 
-  const visibleNavItems = useMemo(
-    () =>
-      navItems.filter((item) => {
-        if (item.superOnly && !isSuperUser) {
-          return false;
-        }
-        if (item.id === "settings" && !isAdmin) {
-          return false;
-        }
-        return !item.featureFlag || featureFlags[item.featureFlag];
-      }),
-    [featureFlags, isAdmin, isSuperUser]
-  );
+  const visibleNavItems = useMemo(() => {
+    const withBadges = navItems.map((item) => {
+      if (item.id === "apps") {
+        return { ...item, badge: badges.apps ? String(badges.apps) : undefined };
+      }
+      if (item.id === "builds") {
+        return { ...item, badge: badges.builds ? String(badges.builds) : undefined };
+      }
+      return item;
+    });
+    return withBadges.filter((item) => {
+      if (item.superOnly && !isSuperUser) {
+        return false;
+      }
+      if (item.id === "settings" && !isAdmin) {
+        return false;
+      }
+      return !item.featureFlag || featureFlags[item.featureFlag];
+    });
+  }, [featureFlags, isAdmin, isSuperUser, badges.apps, badges.builds]);
 
   const activeRoute = useMemo(() => {
     const match = routes.find((route) => matchPath(route.path, location.pathname));
