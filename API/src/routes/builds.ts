@@ -65,6 +65,7 @@ export async function buildRoutes(app: FastifyInstance) {
         storageKind: input.storageKind,
         storagePath: input.storagePath,
         sizeBytes: input.sizeBytes,
+        createdByUserId: request.auth?.user.id,
       },
     });
 

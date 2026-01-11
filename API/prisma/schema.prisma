@@ -47,6 +47,11 @@ enum StorageKind {
   s3
 }
 
+enum BuildEventKind {
+  download
+  install
+}
+
 enum UserStatus {
   active
   disabled
@@ -122,6 +127,7 @@ model Build {
   storageKind   StorageKind
   storagePath   String
   sizeBytes     Int
+  createdByUserId String?
 
   version       Version  @relation(fields: [versionId], references: [id])
   targets       Target[]
@@ -129,8 +135,11 @@ model Build {
   modules       Module[]
   artifacts     ComplianceArtifact[]
   signing       SigningIdentity?
+  createdByUser User?    @relation("BuildCreatedBy", fields: [createdByUserId], references: [id])
+  events        BuildEvent[]
 
   @@index([versionId])
+  @@index([createdByUserId])
 }
 
 model Target {
@@ -272,6 +281,8 @@ model User {
   createdTeams        Team[]               @relation("TeamOwner")
   lastActiveTeam      Team?                @relation("LastActiveTeam", fields: [lastActiveTeamId], references: [id])
   userTeamSettings    UserTeamSetting[]
+  createdBuilds       Build[]             @relation("BuildCreatedBy")
+  buildEvents         BuildEvent[]
 }
 
 model Credential {
@@ -376,6 +387,7 @@ model Team {
   members         TeamMember[]
   userTeamSettings UserTeamSetting[]
   apps            App[]
+  buildEvents     BuildEvent[]
 }
 
 model TeamMember {
@@ -406,4 +418,28 @@ model UserTeamSetting {
   @@unique([userId, teamId, key])
   @@index([teamId])
   @@index([userId])
+}
+
+model BuildEvent {
+  id         String        @id @default(uuid())
+  buildId    String
+  teamId     String
+  userId     String?
+  kind       BuildEventKind
+  platform   PlatformKind?
+  targetId   String?
+  deviceId   String?
+  ip         String?
+  userAgent  String?
+  metadata   Json?
+  createdAt  DateTime      @default(now())
+
+  build      Build         @relation(fields: [buildId], references: [id], onDelete: Cascade)
+  team       Team          @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user       User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([buildId])
+  @@index([teamId])
+  @@index([userId])
+  @@index([kind])
 }

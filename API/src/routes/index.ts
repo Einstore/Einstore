@@ -16,6 +16,8 @@ import { authRoutes } from "./auth.js";
 import { featureFlagRoutes } from "./featureFlags.js";
 import { badgeRoutes } from "./badges.js";
 import { realtimeRoutes } from "./realtime.js";
+import { usageRoutes } from "./usage.js";
+import { buildEventRoutes } from "./build-events.js";
 import { registerTeamRoutes, registerUserTeamSettingsRoutes } from "@rafiki270/teams";
 import { prisma } from "../lib/prisma.js";
 import { loadConfig } from "../lib/config.js";
@@ -46,4 +48,6 @@ export async function registerRoutes(app: FastifyInstance) {
     requireAuth,
   });
   await registerUserTeamSettingsRoutes(app, { prisma, requireAuth });
+  await app.register(usageRoutes);
+  await app.register(buildEventRoutes);
 }

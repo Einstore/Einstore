@@ -208,7 +208,11 @@ export type IosIngestResult = {
   targets: IosTarget[];
 };
 
-export async function ingestIosIpa(filePath: string, teamId: string): Promise<IosIngestResult> {
+export async function ingestIosIpa(
+  filePath: string,
+  teamId: string,
+  createdByUserId?: string,
+): Promise<IosIngestResult> {
   if (!fs.existsSync(filePath)) {
     throw new Error("IPA not found");
   }
@@ -317,6 +321,7 @@ export async function ingestIosIpa(filePath: string, teamId: string): Promise<Io
       storageKind: "local",
       storagePath: filePath,
       sizeBytes: stats.size,
+      createdByUserId,
     },
   });
 

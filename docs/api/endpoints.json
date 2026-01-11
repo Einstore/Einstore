@@ -559,6 +559,26 @@
         ]
       }
     },
+    "/usage/storage/users": {
+      "get": {
+        "summary": "Storage usage by user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usage"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
+      }
+    },
     "/auth/register": {
       "post": {
         "summary": "Register user",
@@ -1058,6 +1078,114 @@
         "responses": {
           "200": {
             "description": "Build"
+          }
+        }
+      }
+    },
+    "/builds/{id}/downloads": {
+      "post": {
+        "summary": "Record build download",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      },
+      "get": {
+        "summary": "List build downloads",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List"
+          }
+        }
+      }
+    },
+    "/builds/{id}/installs": {
+      "post": {
+        "summary": "Record build install",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      },
+      "get": {
+        "summary": "List build installs",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List"
           }
         }
       }

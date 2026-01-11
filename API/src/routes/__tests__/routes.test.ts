@@ -21,6 +21,7 @@ const prismaMock = {
     findMany: vi.fn(),
     findFirst: vi.fn(),
     findUnique: vi.fn(),
+    groupBy: vi.fn(),
   },
   target: {
     create: vi.fn(),
@@ -40,6 +41,10 @@ const prismaMock = {
     findMany: vi.fn(),
   },
   complianceArtifact: {
+    create: vi.fn(),
+    findMany: vi.fn(),
+  },
+  buildEvent: {
     create: vi.fn(),
     findMany: vi.fn(),
   },
@@ -218,6 +223,13 @@ describe("routes", () => {
     prismaMock.build.findMany.mockResolvedValue([{ id: ids.buildId }]);
     prismaMock.build.findFirst.mockResolvedValue({ id: ids.buildId });
     prismaMock.build.findUnique.mockResolvedValue({ id: ids.buildId });
+    prismaMock.build.groupBy.mockResolvedValue([
+      {
+        createdByUserId: "user-1",
+        _count: { _all: 2 },
+        _sum: { sizeBytes: 2048 },
+      },
+    ]);
 
     prismaMock.target.create.mockResolvedValue({ id: ids.targetId });
     prismaMock.target.findMany.mockResolvedValue([{ id: ids.targetId }]);
@@ -236,6 +248,8 @@ describe("routes", () => {
 
     prismaMock.complianceArtifact.create.mockResolvedValue({ id: "artifact-1" });
     prismaMock.complianceArtifact.findMany.mockResolvedValue([{ id: "artifact-1" }]);
+    prismaMock.buildEvent.create.mockResolvedValue({ id: "event-1" });
+    prismaMock.buildEvent.findMany.mockResolvedValue([{ id: "event-1" }]);
 
     ingestAndroidMock.mockResolvedValue({ buildId: "build-android" });
     ingestIosMock.mockResolvedValue({ buildId: "build-ios" });
@@ -485,6 +499,59 @@ describe("routes", () => {
     expect(prismaMock.build.findFirst).toHaveBeenCalledWith(
       expect.objectContaining({ where: { id: ids.buildId, version: { app: { teamId: "team-1" } } } }),
     );
+    expect(prismaMock.build.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ createdByUserId: "user-1" }),
+      }),
+    );
+  });
+
+  it("build download events endpoints", async () => {
+    const createResponse = await postJson(`/builds/${ids.buildId}/downloads`, {
+      platform: "ios",
+      targetId: "target-1",
+      deviceId: "device-1",
+    });
+    expect(createResponse.statusCode).toBe(201);
+    const listResponse = await app.inject({
+      method: "GET",
+      url: `/builds/${ids.buildId}/downloads`,
+      headers: { authorization: "Bearer token" },
+    });
+    expect(listResponse.statusCode).toBe(200);
+    expect(prismaMock.buildEvent.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { buildId: ids.buildId, teamId: "team-1", kind: "download" } }),
+    );
+  });
+
+  it("build install events endpoints", async () => {
+    const createResponse = await postJson(`/builds/${ids.buildId}/installs`, {
+      platform: "android",
+      targetId: "target-2",
+      deviceId: "device-2",
+    });
+    expect(createResponse.statusCode).toBe(201);
+    const listResponse = await app.inject({
+      method: "GET",
+      url: `/builds/${ids.buildId}/installs`,
+      headers: { authorization: "Bearer token" },
+    });
+    expect(listResponse.statusCode).toBe(200);
+    expect(prismaMock.buildEvent.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { buildId: ids.buildId, teamId: "team-1", kind: "install" } }),
+    );
+  });
+
+  it("storage usage endpoint", async () => {
+    const response = await app.inject({
+      method: "GET",
+      url: "/usage/storage/users",
+      headers: { authorization: "Bearer token" },
+    });
+    expect(response.statusCode).toBe(200);
+    const payload = response.json();
+    expect(Array.isArray(payload.users)).toBe(true);
+    expect(prismaMock.build.groupBy).toHaveBeenCalled();
   });
 
   it("targets endpoints", async () => {
@@ -630,13 +697,13 @@ describe("routes", () => {
       { authorization: "Bearer token" }
     );
     expect(apkResponse.statusCode).toBe(201);
-    expect(ingestAndroidMock).toHaveBeenCalledWith("/tmp/app.apk", "team-1");
+    expect(ingestAndroidMock).toHaveBeenCalledWith("/tmp/app.apk", "team-1", "user-1");
     const ipaResponse = await postJson(
       "/ingest",
       { filePath: "/tmp/app.ipa", kind: "ipa" },
       { authorization: "Bearer token" }
     );
     expect(ipaResponse.statusCode).toBe(201);
-    expect(ingestIosMock).toHaveBeenCalledWith("/tmp/app.ipa", "team-1");
+    expect(ingestIosMock).toHaveBeenCalledWith("/tmp/app.ipa", "team-1", "user-1");
   });
 });

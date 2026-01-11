@@ -44,7 +44,7 @@ describe("ingestAndroidApk", () => {
   });
 
   it("extracts android metadata and icon bitmap", async () => {
-    const result = await ingestAndroidApk(apkPath, "team-test");
+    const result = await ingestAndroidApk(apkPath, "team-test", "user-1");
     expect(result.appName).toBe("GPTeen");
     expect(result.packageName).toBe("ai.unlikeother.gpteen");
     expect(result.versionName).toBe("1.11.12");
@@ -52,6 +52,11 @@ describe("ingestAndroidApk", () => {
     expect(prismaMock.app.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { teamId_identifier: { teamId: "team-test", identifier: "ai.unlikeother.gpteen" } },
+      }),
+    );
+    expect(prismaMock.build.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ createdByUserId: "user-1" }),
       }),
     );
     expect(result.iconBitmap?.path).toBeTruthy();

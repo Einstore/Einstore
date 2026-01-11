@@ -42,7 +42,7 @@ describe("ingestIosIpa", () => {
   });
 
   it("extracts ios metadata and icon bitmap", async () => {
-    const result = await ingestIosIpa(ipaPath, "team-test");
+    const result = await ingestIosIpa(ipaPath, "team-test", "user-1");
     expect(result.appName).toBe("GPTeen");
     expect(result.identifier).toBe("ai.pocketpal");
     expect(result.version).toBe("1.11.12");
@@ -50,6 +50,11 @@ describe("ingestIosIpa", () => {
     expect(prismaMock.app.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { teamId_identifier: { teamId: "team-test", identifier: "ai.pocketpal" } },
+      }),
+    );
+    expect(prismaMock.build.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ createdByUserId: "user-1" }),
       }),
     );
     expect(result.targets.length).toBeGreaterThan(0);

@@ -30,14 +30,15 @@ export async function pipelineRoutes(app: FastifyInstance) {
       return reply.status(403).send({ error: "team_required", message: "Team context required" });
     }
 
+    const userId = request.auth?.user.id;
     if (payload.kind === "apk") {
-      const result = await ingestAndroidApk(payload.filePath, teamId);
+      const result = await ingestAndroidApk(payload.filePath, teamId, userId);
       await broadcastBadgesUpdate(teamId).catch(() => undefined);
       return reply.status(201).send({ status: "ingested", result });
     }
 
     if (payload.kind === "ipa") {
-      const result = await ingestIosIpa(payload.filePath, teamId);
+      const result = await ingestIosIpa(payload.filePath, teamId, userId);
       await broadcastBadgesUpdate(teamId).catch(() => undefined);
       return reply.status(201).send({ status: "ingested", result });
     }
@@ -83,14 +84,15 @@ export async function pipelineRoutes(app: FastifyInstance) {
       return reply.status(413).send({ error: "file_too_large" });
     }
 
+    const userId = request.auth?.user.id;
     try {
       if (extension === ".apk") {
-        const result = await ingestAndroidApk(filePath, teamId);
+        const result = await ingestAndroidApk(filePath, teamId, userId);
         await broadcastBadgesUpdate(teamId).catch(() => undefined);
         return reply.status(201).send({ status: "ingested", result });
       }
 
-      const result = await ingestIosIpa(filePath, teamId);
+      const result = await ingestIosIpa(filePath, teamId, userId);
       await broadcastBadgesUpdate(teamId).catch(() => undefined);
       return reply.status(201).send({ status: "ingested", result });
     } catch (error) {

@@ -201,6 +201,7 @@ export type AndroidIngestResult = {
 export async function ingestAndroidApk(
   filePath: string,
   teamId: string,
+  createdByUserId?: string,
 ): Promise<AndroidIngestResult> {
   if (!fs.existsSync(filePath)) {
     throw new Error("APK not found");
@@ -305,6 +306,7 @@ export async function ingestAndroidApk(
       storageKind: "local",
       storagePath: filePath,
       sizeBytes: stats.size,
+      createdByUserId,
     },
   });
 

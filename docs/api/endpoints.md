@@ -9,6 +9,8 @@ Team-scoped endpoints:
 - `/apps`, `/apps/:id`
 - `/versions`, `/versions/:id`
 - `/builds`, `/builds/:id`
+- `/builds/:id/downloads`
+- `/builds/:id/installs`
 - `/targets`
 - `/variants`
 - `/modules`
@@ -19,6 +21,7 @@ Team-scoped endpoints:
 - `/ingest`, `/ingest/upload`
 - `/badges`
 - `/ws`
+- `/usage/storage/users`
 
 ## GET /health
 - Purpose: Health check
@@ -49,6 +52,46 @@ Team-scoped endpoints:
 - Auth scope: Bearer (rafiki270/auth) + Team membership
 - Request schema: none (uses `Authorization` header when available, otherwise `accessToken` query param; `x-team-id` header or `teamId` query param for team context)
 - Response schema: WebSocket messages like `{ type: "badges.updated", badges: { apps: number, builds: number } }`
+- Side effects: none
+- Platform relevance: all
+
+## GET /usage/storage/users
+- Purpose: Storage usage by user for the active team
+- Auth scope: Bearer (rafiki270/auth) + Team membership
+- Request schema: none
+- Response schema: `{ users: Array<{ userId: string, username: string, email: string | null, fullName: string | null, buildCount: number, totalBytes: number }> }`
+- Side effects: none
+- Platform relevance: all
+
+## POST /builds/{id}/downloads
+- Purpose: Record a build download event
+- Auth scope: Bearer (rafiki270/auth) + Team membership
+- Request schema: `{ platform?: PlatformKind, targetId?: string, deviceId?: string, metadata?: object }`
+- Response schema: `BuildEvent`
+- Side effects: Creates a build event record (download)
+- Platform relevance: all
+
+## GET /builds/{id}/downloads
+- Purpose: List build download events
+- Auth scope: Bearer (rafiki270/auth) + Team membership
+- Request schema: query `{ limit?: number, offset?: number }`
+- Response schema: `BuildEvent[]`
+- Side effects: none
+- Platform relevance: all
+
+## POST /builds/{id}/installs
+- Purpose: Record a build install event
+- Auth scope: Bearer (rafiki270/auth) + Team membership
+- Request schema: `{ platform?: PlatformKind, targetId?: string, deviceId?: string, metadata?: object }`
+- Response schema: `BuildEvent`
+- Side effects: Creates a build event record (install)
+- Platform relevance: all
+
+## GET /builds/{id}/installs
+- Purpose: List build install events
+- Auth scope: Bearer (rafiki270/auth) + Team membership
+- Request schema: query `{ limit?: number, offset?: number }`
+- Response schema: `BuildEvent[]`
 - Side effects: none
 - Platform relevance: all
 
