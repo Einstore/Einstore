@@ -403,7 +403,7 @@ All endpoints return JSON. Authenticated endpoints require `Authorization: Beare
 
 ## GET /feature-flags
 - Purpose: List feature flags
-- Auth scope: Bearer (rafiki270/auth)
+- Auth scope: Bearer (super user)
 - Request schema: query `{ limit?: number, offset?: number }`
 - Response schema: `FeatureFlag[]`
 - Side effects: none
@@ -451,7 +451,7 @@ All endpoints return JSON. Authenticated endpoints require `Authorization: Beare
 
 ## GET /feature-flags/{key}/evaluate
 - Purpose: Evaluate flag for scope/target
-- Auth scope: Bearer (rafiki270/auth)
+- Auth scope: Bearer (super user)
 - Request schema: query `{ scope?: string, targetKey?: string }`
 - Response schema: `{ key: string, enabled: boolean }`
 - Side effects: Auto-creates missing flag via feature flag library

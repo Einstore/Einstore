@@ -56,7 +56,7 @@ export async function featureFlagRoutes(app: FastifyInstance) {
     return reply.status(201).send(created);
   });
 
-  app.get("/feature-flags", { preHandler: requireAuth }, async (request, reply) => {
+  app.get("/feature-flags", { preHandler: requireSuperUser }, async (request, reply) => {
     const parsed = listQuerySchema.safeParse(request.query);
     if (!parsed.success) {
       return reply.status(400).send({ error: "Invalid query" });
@@ -178,7 +178,10 @@ export async function featureFlagRoutes(app: FastifyInstance) {
     return reply.send(overrides);
   });
 
-  app.get("/feature-flags/:key/evaluate", { preHandler: requireAuth }, async (request, reply) => {
+  app.get(
+    "/feature-flags/:key/evaluate",
+    { preHandler: requireSuperUser },
+    async (request, reply) => {
     const key = (request.params as { key: string }).key;
     const parsed = evaluateQuerySchema.safeParse(request.query);
     if (!parsed.success) {

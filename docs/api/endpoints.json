@@ -1145,6 +1145,7 @@
       },
       "get": {
         "summary": "List feature flags",
+        "description": "Super user only.",
         "security": [
           {
             "bearerAuth": []
@@ -1338,6 +1339,7 @@
     "/feature-flags/{key}/evaluate": {
       "get": {
         "summary": "Evaluate feature flag",
+        "description": "Super user only.",
         "security": [
           {
             "bearerAuth": []

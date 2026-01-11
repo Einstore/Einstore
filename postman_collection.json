@@ -1361,6 +1361,7 @@
     },
     {
       "name": "List Feature Flags",
+      "description": "Super user only.",
       "request": {
         "method": "GET",
         "header": [
@@ -1609,6 +1610,7 @@
     },
     {
       "name": "Evaluate Feature Flag",
+      "description": "Super user only.",
       "request": {
         "method": "GET",
         "header": [
