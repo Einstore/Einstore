@@ -36,7 +36,7 @@ import {
   type FeatureFlagKey,
 } from "../lib/featureFlags";
 import type { ApiApp, ApiBuild } from "../lib/apps";
-import { isTeamAdmin, type TeamMember, type TeamSummary } from "../lib/teams";
+import { useSessionState } from "../lib/session";
 import type { NavItem } from "../components/Sidebar";
 import RequireAuth from "./RequireAuth";
 
@@ -131,46 +131,18 @@ const AppRoutes = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [featureFlags, setFeatureFlags] = useState(getDefaultFeatureFlags());
-  const [teams, setTeams] = useState<TeamSummary[]>([]);
-  const [activeTeamId, setActiveTeamId] = useState("");
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [apps, setApps] = useState<ApiApp[]>([]);
   const [ingestNonce, setIngestNonce] = useState(0);
-  const [isSuperUser, setIsSuperUser] = useState(false);
-  const [hasToken, setHasToken] = useState(Boolean(localStorage.getItem("accessToken")));
-
-  const activeTeam = useMemo(
-    () => (activeTeamId ? teams.find((team) => team.id === activeTeamId) || null : null),
-    [teams, activeTeamId]
-  );
-  const isAdmin = isTeamAdmin(activeTeam?.memberRole);
+  const {
+    hasToken,
+    isSuperUser,
+    teams,
+    activeTeamId,
+    teamMembers,
+    isAdmin,
+    selectTeam,
+  } = useSessionState(location.pathname);
   const isSaas = import.meta.env.VITE_SAAS === "true";
-
-  useEffect(() => {
-    setHasToken(Boolean(localStorage.getItem("accessToken")));
-  }, [location.pathname]);
-
-  useEffect(() => {
-    if (!hasToken) {
-      setIsSuperUser(false);
-      return;
-    }
-    let isMounted = true;
-    apiFetch<{ isSuperUser?: boolean }>("/auth/session")
-      .then((payload) => {
-        if (isMounted) {
-          setIsSuperUser(Boolean(payload?.isSuperUser));
-        }
-      })
-      .catch(() => {
-        if (isMounted) {
-          setIsSuperUser(false);
-        }
-      });
-    return () => {
-      isMounted = false;
-    };
-  }, [hasToken, location.pathname]);
 
   const loadApps = useCallback(async () => {
     try {
@@ -211,64 +183,6 @@ const AppRoutes = () => {
     void loadApps();
   }, [loadApps, ingestNonce, hasToken]);
 
-  useEffect(() => {
-    let isMounted = true;
-    if (!hasToken) {
-      setTeams([]);
-      setActiveTeamId("");
-      return () => undefined;
-    }
-    apiFetch<{ teams: TeamSummary[] }>("/teams")
-      .then((payload) => {
-        if (!isMounted) return;
-        const list = Array.isArray(payload?.teams) ? payload.teams : [];
-        setTeams(list);
-        setActiveTeamId((current) => {
-          if (list.length === 0) {
-            return "";
-          }
-          if (current && list.some((team) => team.id === current)) {
-            return current;
-          }
-          return list[0].id;
-        });
-      })
-      .catch(() => {
-        if (isMounted) {
-          setTeams([]);
-          setActiveTeamId("");
-        }
-      });
-    return () => {
-      isMounted = false;
-    };
-  }, [hasToken]);
-
-  useEffect(() => {
-    if (!activeTeam?.id || !isAdmin || !hasToken) {
-      setTeamMembers([]);
-      return;
-    }
-    let isMounted = true;
-    apiFetch<{ users: TeamMember[] }>(`/teams/${activeTeam.id}/users`, {
-      headers: {
-        "x-team-id": activeTeam.id,
-      },
-    })
-      .then((payload) => {
-        if (isMounted) {
-          setTeamMembers(Array.isArray(payload?.users) ? payload.users : []);
-        }
-      })
-      .catch(() => {
-        if (isMounted) {
-          setTeamMembers([]);
-        }
-      });
-    return () => {
-      isMounted = false;
-    };
-  }, [activeTeam?.id, isAdmin]);
 
   const routes: RouteConfig[] = [
     {
@@ -371,18 +285,6 @@ const AppRoutes = () => {
   }, [routes, location.pathname]);
 
   const page = pageConfig[activeRoute.id];
-  const handleTeamChange = (teamId: string) => {
-    setActiveTeamId(teamId);
-    if (!teamId) {
-      return;
-    }
-    apiFetch<{ activeTeamId: string }>(`/teams/${teamId}/select`, {
-      method: "POST",
-      headers: {
-        "x-team-id": teamId,
-      },
-    }).catch(() => undefined);
-  };
 
   const handleIngest = useCallback(
     async (file: File) => {
@@ -407,7 +309,7 @@ const AppRoutes = () => {
               breadcrumbs={page.breadcrumbs}
               title={page.title}
               actions={page.actions}
-              onTeamChange={handleTeamChange}
+              onTeamChange={selectTeam}
               activeTeamId={activeTeamId}
               teams={teams}
               onUpload={handleIngest}
