@@ -27,7 +27,6 @@ const mapUser = (user: {
   fullName: user.fullName ?? null,
   avatarUrl: user.avatarUrl ?? null,
   status: user.status,
-  isSuperUser: user.isSuperUser,
   createdAt: user.createdAt,
   updatedAt: user.updatedAt,
 });
