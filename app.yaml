@@ -100,7 +100,7 @@ services:
     value: "false"
   github:
     branch: main
-    deploy_on_push: true
+    deploy_on_push: false
     repo: Einstore/Einstore
   health_check:
     http_path: /health
@@ -113,7 +113,7 @@ services:
 static_sites:
 - github:
     branch: main
-    deploy_on_push: true
+    deploy_on_push: false
     repo: Einstore/Einstore
   index_document: index.html
   name: web
@@ -126,7 +126,7 @@ static_sites:
     value: https://api.einstore.pro
   github:
     branch: main
-    deploy_on_push: true
+    deploy_on_push: false
     repo: Einstore/Einstore
   name: admin
   output_dir: dist
