@@ -2,6 +2,8 @@ import { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { authService } from "../auth/service.js";
 import { asAuthError } from "@unlikeother/auth";
+import { deriveInboxBaseForUser, normalizeTeamSlug, slugify } from "@rafiki270/teams";
+import { prisma } from "../lib/prisma.js";
 
 const registerSchema = z.object({
   username: z.string().min(3),
@@ -48,6 +50,85 @@ const getContext = (request: { ip?: string; headers: { [key: string]: string | s
   userAgent: typeof request.headers["user-agent"] === "string" ? request.headers["user-agent"] : undefined,
 });
 
+const resolvePersonalTeamName = (user: { fullName: string | null; username: string; email: string | null }) => {
+  const fullName = user.fullName?.trim();
+  if (fullName) {
+    return `${fullName}'s team`;
+  }
+  const username = user.username.trim();
+  if (username) {
+    return `${username}'s team`;
+  }
+  const emailLocal = user.email?.split("@")[0]?.trim();
+  if (emailLocal) {
+    return `${emailLocal}'s team`;
+  }
+  return "Personal team";
+};
+
+const ensureUniqueSlug = async (base: string) => {
+  const root = base || "team";
+  let candidate = root;
+  let suffix = 1;
+  while (await prisma.team.findUnique({ where: { slug: candidate } })) {
+    candidate = `${root}-${suffix}`;
+    suffix += 1;
+  }
+  return candidate;
+};
+
+const ensurePersonalTeam = async (userId: string) => {
+  const membership = await prisma.teamMember.findFirst({
+    where: { userId },
+    orderBy: { createdAt: "asc" },
+  });
+  if (membership) {
+    return;
+  }
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    return;
+  }
+
+  const teamName = resolvePersonalTeamName(user);
+  const slugBase = normalizeTeamSlug(slugify(teamName));
+  const slug = await ensureUniqueSlug(slugBase);
+  const inboxBase = deriveInboxBaseForUser({
+    email: user.email ?? null,
+    fullName: user.fullName ?? null,
+    username: user.username,
+  });
+  const now = new Date();
+
+  await prisma.$transaction(async (tx) => {
+    const team = await tx.team.create({
+      data: {
+        name: teamName,
+        slug,
+        inboxBase,
+        createdByUserId: user.id,
+        createdAt: now,
+        updatedAt: now,
+      },
+    });
+    await tx.teamMember.create({
+      data: { teamId: team.id, userId: user.id, role: "owner", createdAt: now },
+    });
+    await tx.user.update({
+      where: { id: user.id },
+      data: { lastActiveTeamId: team.id },
+    });
+  });
+};
+
+const ensurePersonalTeamFromSession = async (session?: { accessToken?: string }) => {
+  if (!session?.accessToken) {
+    return;
+  }
+  const authSession = await authService.getSession(session.accessToken);
+  await ensurePersonalTeam(authSession.userId);
+};
+
 export async function authRoutes(app: FastifyInstance) {
   app.post("/auth/register", async (request, reply) => {
     const parsed = registerSchema.safeParse(request.body);
@@ -56,6 +137,7 @@ export async function authRoutes(app: FastifyInstance) {
     }
     try {
       const result = await authService.register(parsed.data, getContext(request));
+      await ensurePersonalTeam(result.userId).catch(() => undefined);
       return reply.status(201).send(result);
     } catch (err) {
       const authErr = asAuthError(err, "validation_failed");
@@ -70,6 +152,7 @@ export async function authRoutes(app: FastifyInstance) {
     }
     try {
       const result = await authService.login(parsed.data, getContext(request));
+      await ensurePersonalTeam(result.userId).catch(() => undefined);
       return reply.send(result);
     } catch (err) {
       const authErr = asAuthError(err, "invalid_credentials");
@@ -193,6 +276,7 @@ export async function authRoutes(app: FastifyInstance) {
     }
     try {
       const result = await authService.oauthExchange(parsed.data, getContext(request));
+      await ensurePersonalTeamFromSession(result.session).catch(() => undefined);
       return reply.send(result);
     } catch (err) {
       const authErr = asAuthError(err, "oauth_error");

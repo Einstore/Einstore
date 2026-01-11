@@ -37,7 +37,10 @@ ingress:
 name: einstore
 region: lon
 services:
-- build_command: npm --prefix ../Libraries/rafiki-auth install && npm --prefix ../Libraries/rafiki-auth run build && npm install --install-links=false --force && npm run prisma:generate && npm run build
+- build_command: npm --prefix ../Libraries/rafiki-auth install && npm --prefix ../Libraries/rafiki-auth
+    run build && npm --prefix ../Libraries/teams install && npm --prefix ../Libraries/teams
+    run build && npm install --install-links=false --force && npm run prisma:generate
+    && npm run build
   envs:
   - key: DATABASE_URL
     scope: RUN_TIME
@@ -62,10 +65,11 @@ services:
     value: EV[1:fd8+yzvlF7vd/05qq7ueHFaR8LnDLrkA:uiX2d/K07pldbBnahamt9GTCG1JVajRQWN3TLyyXv1DYeXpuNvWCauJ3yuF/FJNCfkdJEyqRup6L4pM=]
   - key: GOOGLE_CLIENT_ID
     scope: RUN_TIME
+    value: a687a311a-f512-414b-8749-40095cfea1c0
   - key: GOOGLE_CLIENT_SECRET
     scope: RUN_TIME
     type: SECRET
-    value: EV[1:r+aT/9VF1eX87sQmFuxMuU92jIOyqVh2:aOE+tZp6TLCR6QL3EbkQ9w==]
+    value: EV[1:RoV+5uqFbX6cOQuedxDhGdP1hhE2L6se:Ejx3ciqP+Wn1HJuE8RBU2xPIEefHNXjtEjVasdGTuRgkwyc7M0pw6q1lj7MZeB5gJQfMF/cepgHiOgNZrDP3p4D0+PKF92fHyPGUpxDHmG4L8QfxacX8]
   - key: GOOGLE_REDIRECT_URI
     scope: RUN_TIME
   - key: AUTH_JWT_SECRET
