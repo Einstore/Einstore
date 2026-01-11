@@ -37,7 +37,12 @@ ingress:
 name: einstore
 region: lon
 services:
-- build_command: npm run prisma:generate && npm run build
+- build_command: npm --prefix ../Libraries/rafiki-auth install && npm --prefix ../Libraries/rafiki-auth
+    run build && rm -rf node_modules/@unlikeother/auth/dist && mkdir -p node_modules/@unlikeother/auth/dist
+    && cp -R ../Libraries/rafiki-auth/dist/* node_modules/@unlikeother/auth/dist/ && npm --prefix
+    ../Libraries/teams install && npm --prefix ../Libraries/teams run build && rm -rf node_modules/@rafiki270/teams/dist
+    && mkdir -p node_modules/@rafiki270/teams/dist && cp -R ../Libraries/teams/dist/* node_modules/@rafiki270/teams/dist/
+    && npm run prisma:generate && npm run build
   envs:
   - key: DATABASE_URL
     scope: RUN_TIME
