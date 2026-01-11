@@ -1,17 +1,18 @@
 {
 	auto_https off
 	admin off
+	http_port {$DEV_HTTP_PORT}
 }
 
-{$API_HOST:-api.local.einstore.pro} {
-	reverse_proxy 127.0.0.1:{$API_PORT:-8080}
+{$API_HOST} {
+	reverse_proxy 127.0.0.1:{$API_PORT}
 }
 
-{$ADMIN_HOST:-admin.local.einstore.pro} {
-	reverse_proxy 127.0.0.1:{$ADMIN_PORT:-5173}
+{$ADMIN_HOST} {
+	reverse_proxy 127.0.0.1:{$ADMIN_PORT}
 }
 
-{$WEB_HOST:-local.einstore.pro} {
+{$WEB_HOST} {
 	root * Web
 	encode gzip
 	try_files {path} /index.html

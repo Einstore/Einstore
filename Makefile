@@ -15,6 +15,7 @@ DEV_CORS_ORIGINS ?= http://$(DEV_ADMIN_DOMAIN),http://$(DEV_WEB_DOMAIN),http://l
 DEV_VITE_API_BASE_URL ?= http://$(DEV_API_DOMAIN)
 DEV_INBOUND_EMAIL_DOMAIN ?= $(DEV_WEB_DOMAIN)
 DEV_ADMIN_CLIENT_PORT ?= 80
+DEV_HTTP_PORT ?= 80
 
 ifeq ($(firstword $(MAKECMDGOALS)),migrate)
 MIGRATE_EXTRA := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
@@ -91,6 +92,7 @@ launch:
 	ADMIN_HOST=$(DEV_ADMIN_DOMAIN) \
 	ADMIN_PORT=$(DEV_ADMIN_PORT) \
 	WEB_HOST=$(DEV_WEB_DOMAIN) \
+	DEV_HTTP_PORT=$(DEV_HTTP_PORT) \
 	caddy run --config $(DEV_CADDYFILE) --adapter caddyfile & \
 	CADDY_PID=$$!; \
 	wait $$API_PID $$ADMIN_PID $$CADDY_PID; \
