@@ -78,15 +78,6 @@ const AdminLayout = ({
               onCreateTeam={onCreateTeam}
             />
           }
-          dropzone={
-            <FileDropzone
-              label="Quick upload"
-              helper="Drop a build to start ingestion."
-              onFileSelect={handleQuickUpload}
-              disabled={quickUploadBusy}
-              statusMessage={quickUploadStatus || undefined}
-            />
-          }
         />
       }
     >
