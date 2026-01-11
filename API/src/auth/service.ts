@@ -27,17 +27,21 @@ const buildOAuthProviders = async () => {
     process.env.APPLE_KEY_ID &&
     process.env.APPLE_PRIVATE_KEY_PEM
   ) {
-    const clientSecret = await createAppleClientSecret({
-      clientId: process.env.APPLE_CLIENT_ID,
-      teamId: process.env.APPLE_TEAM_ID,
-      keyId: process.env.APPLE_KEY_ID,
-      privateKeyPem: process.env.APPLE_PRIVATE_KEY_PEM,
-    });
-    providers.apple = new AppleOAuthProvider({
-      clientId: process.env.APPLE_CLIENT_ID,
-      clientSecret,
-      redirectUri: process.env.APPLE_REDIRECT_URI,
-    });
+    try {
+      const clientSecret = await createAppleClientSecret({
+        clientId: process.env.APPLE_CLIENT_ID,
+        teamId: process.env.APPLE_TEAM_ID,
+        keyId: process.env.APPLE_KEY_ID,
+        privateKeyPem: process.env.APPLE_PRIVATE_KEY_PEM,
+      });
+      providers.apple = new AppleOAuthProvider({
+        clientId: process.env.APPLE_CLIENT_ID,
+        clientSecret,
+        redirectUri: process.env.APPLE_REDIRECT_URI,
+      });
+    } catch (error) {
+      console.error("Apple OAuth disabled: invalid APPLE_PRIVATE_KEY_PEM.", error);
+    }
   }
 
   return providers;
