@@ -2,6 +2,7 @@
 /dev/
 /storage/
 /API/storage/
+API/.env
 node_modules/
 functions/**/.deployed
 functions/**/__deployer__.zip
@@ -12,3 +13,4 @@ API/src/private/registry.ts
 Admin/src/private/routes.generated.tsx
 Private/*
 !Private/README.md
+API/.env
