@@ -155,9 +155,6 @@ const LoginPage = () => {
             </div>
           ) : null}
 
-          <div className="mt-6 rounded-xl bg-sand p-4 text-xs text-ink/60">
-            Need access? Contact support.
-          </div>
         </div>
       </main>
     </div>
