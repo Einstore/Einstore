@@ -37,13 +37,7 @@ ingress:
 name: einstore
 region: lon
 services:
-- build_command: npm --prefix ../Libraries/rafiki-auth install && npm --prefix ../Libraries/rafiki-auth
-    run build && npm --prefix ../Libraries/teams install && npm --prefix ../Libraries/teams
-    run build && npm install --install-links=false --force && rm -rf node_modules/@unlikeother/auth
-    node_modules/@rafiki270/teams && AUTH_TGZ=$(npm --prefix ../Libraries/rafiki-auth
-    pack --silent --pack-destination /tmp) && TEAMS_TGZ=$(npm --prefix ../Libraries/teams
-    pack --silent --pack-destination /tmp) && npm install --install-links=false --force
-    /tmp/$AUTH_TGZ /tmp/$TEAMS_TGZ && npm run prisma:generate && npm run build
+- build_command: npm run prisma:generate && npm run build
   envs:
   - key: DATABASE_URL
     scope: RUN_TIME
@@ -91,6 +85,9 @@ services:
   - key: AUTH_ACCESS_TTL_MINUTES
     scope: RUN_TIME
     value: "15"
+  - key: NPM_CONFIG_INSTALL_LINKS
+    scope: BUILD_TIME
+    value: "false"
   github:
     branch: main
     deploy_on_push: true
