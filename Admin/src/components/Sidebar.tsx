@@ -30,13 +30,20 @@ const Sidebar = ({
 }: SidebarProps) => {
   return (
     <aside className="flex h-screen w-64 min-w-64 flex-col border-r border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
-      <div className="px-6 py-6">
-        <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-          Einstore
-        </p>
-        <p className="mt-1 text-base font-semibold text-slate-900 dark:text-slate-100">
-          Admin
-        </p>
+      <div className="flex items-center gap-3 px-6 py-6">
+        <img
+          src="/brand/einstore-icon-1024.png"
+          alt="Einstore"
+          className="h-10 w-10 rounded-lg"
+        />
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+            Einstore
+          </p>
+          <p className="mt-1 text-base font-semibold text-slate-900 dark:text-slate-100">
+            Admin
+          </p>
+        </div>
       </div>
 
       {teamSwitcher ? <div className="px-4">{teamSwitcher}</div> : null}
