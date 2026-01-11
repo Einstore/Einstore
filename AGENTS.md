@@ -24,7 +24,7 @@ postgresql://postgres@localhost:5432/einstore?schema=public
 - `API/`: Node.js + Fastify + Prisma + Postgres.
 - `Admin/`: React + Tailwind (CSR). Build all UI pieces as reusable components.
 - `Web/`: React + Tailwind (CSR).
-- `Libraries/`: external submodules. Do not edit submodule contents unless explicitly requested.
+- `Libraries/`: first-party packages (feature flags, api-keys, auth, teams). You may modify them to improve/shared code. Each library must keep its own `AGENTS.md`, `CHANGELOG.md`, and docs/usage current. When upgrading a library, bump version (patch/minor as appropriate), update the changelog, and create a GitHub release with `gh release create`.
 - `dev/`: legacy reference (gitignored).
 - Reusable code for feature flags, api keys, teams, and auth must live inside their respective `Libraries/` packages. Do not implement reusable package logic inside `API/`, `Admin/`, or `Web/`.
 
