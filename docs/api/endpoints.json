@@ -1183,7 +1183,7 @@
     "/builds/{id}/icons": {
       "get": {
         "summary": "List build icons",
-        "description": "Lists extracted icon images for build targets.",
+        "description": "Lists extracted icon images for build targets and includes inline data URLs.",
         "security": [
           {
             "bearerAuth": []

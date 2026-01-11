@@ -51,6 +51,11 @@ const resolveIconPath = (iconPath: string) => {
   return resolved;
 };
 
+const readIconDataUrl = async (filePath: string) => {
+  const buffer = await fs.promises.readFile(filePath);
+  return `data:image/png;base64,${buffer.toString("base64")}`;
+};
+
 const extractIconBitmap = (metadata: unknown): IconBitmap | null => {
   if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) return null;
   const iconBitmap = (metadata as Record<string, unknown>).iconBitmap;
@@ -227,28 +232,31 @@ export async function buildRoutes(app: FastifyInstance) {
       return reply.status(404).send({ error: "Not found" });
     }
     const baseUrl = resolveBaseUrl(request);
-    const items = record.targets.flatMap((target) => {
-      const iconBitmap = extractIconBitmap(target.metadata);
-      if (!iconBitmap) return [];
-      const resolved = resolveIconPath(iconBitmap.path);
-      if (!resolved || !fs.existsSync(resolved)) return [];
-      return [
-        {
-          targetId: target.id,
-          bundleId: target.bundleId,
-          platform: target.platform,
-          role: target.role,
-          iconBitmap: {
-            width: iconBitmap.width,
-            height: iconBitmap.height,
-            sizeBytes: iconBitmap.sizeBytes,
-            sourcePath: iconBitmap.sourcePath,
-          },
-          url: `${baseUrl}/builds/${record.id}/icons/${target.id}`,
-          contentType: "image/png",
-        },
-      ];
-    });
+    const items = (
+      await Promise.all(
+        record.targets.map(async (target) => {
+          const iconBitmap = extractIconBitmap(target.metadata);
+          if (!iconBitmap) return null;
+          const resolved = resolveIconPath(iconBitmap.path);
+          if (!resolved || !fs.existsSync(resolved)) return null;
+          return {
+            targetId: target.id,
+            bundleId: target.bundleId,
+            platform: target.platform,
+            role: target.role,
+            iconBitmap: {
+              width: iconBitmap.width,
+              height: iconBitmap.height,
+              sizeBytes: iconBitmap.sizeBytes,
+              sourcePath: iconBitmap.sourcePath,
+            },
+            url: `${baseUrl}/builds/${record.id}/icons/${target.id}`,
+            contentType: "image/png",
+            dataUrl: await readIconDataUrl(resolved),
+          };
+        }),
+      )
+    ).filter((item): item is NonNullable<typeof item> => Boolean(item));
     return reply.send({ buildId: record.id, items });
   });
 

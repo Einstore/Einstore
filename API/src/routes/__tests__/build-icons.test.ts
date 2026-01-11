@@ -106,6 +106,7 @@ describe("GET /builds/:id/icons", () => {
     const payload = JSON.parse(response.body);
     expect(payload.items).toHaveLength(1);
     expect(payload.items[0].url).toContain("/builds/build-1/icons/target-1");
+    expect(payload.items[0].dataUrl).toMatch(/^data:image\/png;base64,/);
   });
 
   it("streams the icon image", async () => {

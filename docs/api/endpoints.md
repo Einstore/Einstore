@@ -419,7 +419,7 @@ Team-scoped endpoints:
 - Purpose: List extracted icon images for build targets
 - Auth scope: Bearer (rafiki270/auth)
 - Request schema: path `{ id: string }`
-- Response schema: `{ buildId: string, items: { targetId: string, bundleId: string, platform: string, role: string, iconBitmap: { width?: number, height?: number, sizeBytes?: number, sourcePath?: string }, url: string, contentType: string }[] }`
+- Response schema: `{ buildId: string, items: { targetId: string, bundleId: string, platform: string, role: string, iconBitmap: { width?: number, height?: number, sizeBytes?: number, sourcePath?: string }, url: string, contentType: string, dataUrl: string }[] }`
 - Side effects: none
 - Platform relevance: ios, android
 
