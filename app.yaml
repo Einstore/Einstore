@@ -48,7 +48,7 @@ services:
   - key: DATABASE_URL
     scope: RUN_TIME
     type: SECRET
-    value: EV[1:LM67ZaHgoYR8Yhn6gmpjiEtr7Q3t7C7Q:gvjcmk/1mCbn37Qk5dVy/I3Y9uiw3AaeOzO3wXQEYRupLp5fHuB29yKgQsxTGDl4BE0vJ4cK3PuriKmTzlkMiXo6vZ/OU7kBWHOQSxOQSNFkP+WG3hclnN289Zjmzk4K1PaPKEe608WDYi3TMYdXGkHU0r65y2gGH44a/0GlMdUxmZCOW+aEy8/obv+naznF7BtPko9LFRQW1z9jDxP+DCis8no=]
+    value: ${db.DATABASE_URL}
   - key: SPACES_ENDPOINT
     scope: RUN_TIME
     value: https://lon1.digitaloceanspaces.com
