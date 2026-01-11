@@ -10,6 +10,7 @@ postgresql://postgres@localhost:5432/einstore?schema=public
 
 - Keep `postman_collection.json` in the repo root up to date.
 - Keep all docs in `docs/` up to date with API and behavior changes.
+- Always debug DigitalOcean/App Platform issues with `doctl` first.
 
 ## Before You Start
 
