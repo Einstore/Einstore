@@ -84,11 +84,6 @@ const AdminLayout = ({
               statusMessage={quickUploadStatus || undefined}
             />
           }
-          footer={
-            <div className="rounded-lg bg-slate-100 p-4 text-sm text-slate-500 dark:bg-slate-700 dark:text-slate-300">
-              Next checkpoint: SOC2 evidence export due in 2 days.
-            </div>
-          }
         />
       }
     >
