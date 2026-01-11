@@ -10,6 +10,7 @@ postgresql://postgres@localhost:5432/einstore?schema=public
 
 - Keep `postman_collection.json` in the repo root up to date.
 - Keep all docs in `docs/` up to date with API and behavior changes.
+- Alert system usage: see `docs/alerts.md`.
 - Always debug DigitalOcean/App Platform issues with `doctl` first.
 
 ## Before You Start
@@ -24,6 +25,7 @@ postgresql://postgres@localhost:5432/einstore?schema=public
 - `Web/`: React + Tailwind (CSR).
 - `Libraries/`: external submodules. Do not edit submodule contents unless explicitly requested.
 - `dev/`: legacy reference (gitignored).
+ - Reusable code for feature flags, teams, and auth must live inside their respective `Libraries/` packages. Do not implement reusable package logic inside `API/`, `Admin/`, or `Web/`.
 
 ## UI Conventions
 

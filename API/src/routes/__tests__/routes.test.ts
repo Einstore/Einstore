@@ -174,10 +174,14 @@ vi.mock("../../lib/resolve/android.js", () => ({
 
 const ensureFeatureFlagMock = vi.fn();
 const isFeatureFlagEnabledMock = vi.fn();
+const listFeatureFlagsMock = vi.fn();
+const resolveFeatureFlagDefaultsMock = vi.fn();
 
 vi.mock("@rafiki270/feature-flags", () => ({
   ensureFeatureFlag: ensureFeatureFlagMock,
   isFeatureFlagEnabled: isFeatureFlagEnabledMock,
+  listFeatureFlags: listFeatureFlagsMock,
+  resolveFeatureFlagDefaults: resolveFeatureFlagDefaultsMock,
 }));
 
 vi.mock("@rafiki270/teams", () => ({
@@ -320,6 +324,12 @@ describe("routes", () => {
 
     ensureFeatureFlagMock.mockResolvedValue({ id: "flag-1", key: "beta.feature" });
     isFeatureFlagEnabledMock.mockResolvedValue(true);
+    listFeatureFlagsMock.mockResolvedValue([{ id: "flag-1", key: "beta.feature" }]);
+    resolveFeatureFlagDefaultsMock.mockReturnValue({
+      key: "beta.feature",
+      description: "Beta feature",
+      defaultEnabled: false,
+    });
 
     const team = {
       id: "team-1",

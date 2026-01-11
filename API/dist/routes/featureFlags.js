@@ -1,8 +1,7 @@
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { requireSuperUser } from "../auth/guard.js";
-import { ensureFeatureFlag, isFeatureFlagEnabled } from "@rafiki270/feature-flags";
-import { featureFlagDefinitions, resolveFeatureFlagDefaults, } from "../lib/feature-flag-definitions.js";
+import { ensureFeatureFlag, isFeatureFlagEnabled, listFeatureFlags, resolveFeatureFlagDefaults, } from "@rafiki270/feature-flags";
 const listQuerySchema = z.object({
     limit: z.coerce.number().int().positive().max(200).default(20),
     offset: z.coerce.number().int().nonnegative().default(0),
@@ -51,14 +50,9 @@ export async function featureFlagRoutes(app) {
         if (!parsed.success) {
             return reply.status(400).send({ error: "Invalid query" });
         }
-        await Promise.all(featureFlagDefinitions.map((flag) => ensureFeatureFlag(prisma, flag.key, {
-            description: flag.description,
-            defaultEnabled: flag.defaultEnabled,
-        })));
-        const items = await prisma.featureFlag.findMany({
-            skip: parsed.data.offset,
-            take: parsed.data.limit,
-            orderBy: { createdAt: "desc" },
+        const items = await listFeatureFlags(prisma, {
+            offset: parsed.data.offset,
+            limit: parsed.data.limit,
         });
         return reply.send(items);
     });
