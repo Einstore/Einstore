@@ -1,10 +1,20 @@
 import Foundation
+import UIKit
 
 public enum EinstoreTrackingError: Error {
   case invalidPayload
   case invalidResponse
   case requestFailed(statusCode: Int)
   case missingUrl
+  case serviceDisabled(String)
+}
+
+public enum EinstoreService: String, CaseIterable {
+  case analytics
+  case errors
+  case distribution
+  case devices
+  case usage
 }
 
 public protocol EinstoreLaunchStorage {
@@ -53,39 +63,65 @@ public final class UserDefaultsDeviceIdProvider: EinstoreDeviceIdProvider {
 public struct EinstoreTrackingConfig {
   public let downloadUrl: URL?
   public let launchUrl: URL?
+  public let eventUrl: URL?
   public let headers: [String: String]
   public let platform: String
   public let targetId: String?
   public let deviceId: String?
   public let metadata: [String: Any]?
   public let launchKey: String?
+  public let services: [EinstoreService]
+  public let distributionInfo: [String: Any]
+  public let deviceInfo: [String: Any]
 
   public init(
     downloadUrl: URL? = nil,
     launchUrl: URL? = nil,
+    eventUrl: URL? = nil,
     headers: [String: String] = [:],
     platform: String = "ios",
     targetId: String? = nil,
     deviceId: String? = nil,
     metadata: [String: Any]? = nil,
-    launchKey: String? = nil
+    launchKey: String? = nil,
+    services: [EinstoreService] = EinstoreService.allCases,
+    distributionInfo: [String: Any] = [:],
+    deviceInfo: [String: Any] = [:]
   ) {
     self.downloadUrl = downloadUrl
     self.launchUrl = launchUrl
+    self.eventUrl = eventUrl
     self.headers = headers
     self.platform = platform
     self.targetId = targetId
     self.deviceId = deviceId
     self.metadata = metadata
     self.launchKey = launchKey
+    self.services = services
+    self.distributionInfo = distributionInfo
+    self.deviceInfo = deviceInfo
   }
 }
 
 public final class EinstoreTracker {
+  private struct AnalyticsEvent {
+    let name: String
+    let properties: [String: Any]
+  }
+
+  private struct ErrorInfo {
+    let message: String
+    let stackTrace: String?
+    let properties: [String: Any]
+  }
+
   private let config: EinstoreTrackingConfig
   private let session: URLSession
   private let deviceIdProvider: EinstoreDeviceIdProvider
   private let launchStorage: EinstoreLaunchStorage
+  private var sessionId: String
+  private var sessionStart: Date
+  private var userProperties: [String: Any]
 
   public init(
     config: EinstoreTrackingConfig,
@@ -97,14 +133,34 @@ public final class EinstoreTracker {
     self.session = session
     self.deviceIdProvider = deviceIdProvider
     self.launchStorage = launchStorage
+    self.sessionId = UUID().uuidString
+    self.sessionStart = Date()
+    self.userProperties = [:]
+  }
+
+  public func startNewSession() {
+    sessionId = UUID().uuidString
+    sessionStart = Date()
+  }
+
+  public func setUserProperties(_ properties: [String: Any]) {
+    for (key, value) in properties {
+      userProperties[key] = value
+    }
   }
 
   public func trackDownload(completion: ((Result<Void, Error>) -> Void)? = nil) {
-    track(url: config.downloadUrl, completion: completion)
+    track(url: config.downloadUrl, requiredService: .distribution, completion: completion)
   }
 
   public func trackLaunch(completion: ((Result<Void, Error>) -> Void)? = nil) {
-    track(url: config.launchUrl, completion: completion)
+    startNewSession()
+    track(
+      url: config.launchUrl,
+      event: AnalyticsEvent(name: "app_launch", properties: [:]),
+      requiredService: .analytics,
+      completion: completion
+    )
   }
 
   public func trackLaunchOnce(completion: ((Result<Void, Error>) -> Void)? = nil) {
@@ -114,12 +170,54 @@ public final class EinstoreTracker {
       return
     }
 
-    track(url: config.launchUrl) { [launchStorage] result in
+    trackLaunch { [launchStorage] result in
       if case .success = result {
         launchStorage.markLaunched(key: key)
       }
       completion?(result)
     }
+  }
+
+  public func trackScreenView(
+    screenName: String,
+    properties: [String: Any] = [:],
+    completion: ((Result<Void, Error>) -> Void)? = nil
+  ) {
+    var payload = properties
+    payload["screen"] = screenName
+    track(
+      url: config.eventUrl ?? config.launchUrl,
+      event: AnalyticsEvent(name: "screen_view", properties: payload),
+      requiredService: .analytics,
+      completion: completion
+    )
+  }
+
+  public func trackEvent(
+    name: String,
+    properties: [String: Any] = [:],
+    completion: ((Result<Void, Error>) -> Void)? = nil
+  ) {
+    track(
+      url: config.eventUrl ?? config.launchUrl,
+      event: AnalyticsEvent(name: name, properties: properties),
+      requiredService: .analytics,
+      completion: completion
+    )
+  }
+
+  public func trackError(
+    message: String,
+    stackTrace: String? = nil,
+    properties: [String: Any] = [:],
+    completion: ((Result<Void, Error>) -> Void)? = nil
+  ) {
+    track(
+      url: config.eventUrl ?? config.launchUrl,
+      errorInfo: ErrorInfo(message: message, stackTrace: stackTrace, properties: properties),
+      requiredService: .errors,
+      completion: completion
+    )
   }
 
   private func resolveLaunchKey() -> String {
@@ -138,20 +236,30 @@ public final class EinstoreTracker {
     return deviceIdProvider.deviceId()
   }
 
-  private func track(url: URL?, completion: ((Result<Void, Error>) -> Void)?) {
+  private func track(
+    url: URL?,
+    event: AnalyticsEvent? = nil,
+    errorInfo: ErrorInfo? = nil,
+    requiredService: EinstoreService? = nil,
+    completion: ((Result<Void, Error>) -> Void)?
+  ) {
     guard let url else {
       completion?(.failure(EinstoreTrackingError.missingUrl))
       return
     }
+    if let requiredService, !isServiceEnabled(requiredService) {
+      completion?(.failure(EinstoreTrackingError.serviceDisabled(requiredService.rawValue)))
+      return
+    }
     do {
-      let payload = try buildPayload()
+      let payload = try buildPayload(event: event, errorInfo: errorInfo)
       send(url: url, payload: payload, completion: completion)
     } catch {
       completion?(.failure(error))
     }
   }
 
-  private func buildPayload() throws -> [String: Any] {
+  private func buildPayload(event: AnalyticsEvent?, errorInfo: ErrorInfo?) throws -> [String: Any] {
     var payload: [String: Any] = ["platform": config.platform]
     if let deviceId = resolveDeviceId() {
       payload["deviceId"] = deviceId
@@ -159,13 +267,131 @@ public final class EinstoreTracker {
     if let targetId = config.targetId {
       payload["targetId"] = targetId
     }
-    if let metadata = config.metadata {
+
+    var metadata: [String: Any] = [:]
+    metadata["services"] = config.services.map { $0.rawValue }
+
+    if isServiceEnabled(.analytics) {
+      var analytics: [String: Any] = [:]
+      if let event {
+        analytics["event"] = ["name": event.name, "properties": event.properties]
+      }
+      if !userProperties.isEmpty {
+        analytics["userProperties"] = userProperties
+      }
+      let session = sessionPayload()
+      if !session.isEmpty {
+        analytics["session"] = session
+      }
+      if !analytics.isEmpty {
+        metadata["analytics"] = analytics
+      }
+    }
+
+    if isServiceEnabled(.errors), let errorInfo {
+      var errorPayload: [String: Any] = ["message": errorInfo.message]
+      if let stackTrace = errorInfo.stackTrace {
+        errorPayload["stackTrace"] = stackTrace
+      }
+      if !errorInfo.properties.isEmpty {
+        errorPayload["properties"] = errorInfo.properties
+      }
+      metadata["errors"] = errorPayload
+    }
+
+    if isServiceEnabled(.distribution) {
+      let distribution = distributionPayload()
+      if !distribution.isEmpty {
+        metadata["distribution"] = distribution
+      }
+    }
+
+    if isServiceEnabled(.devices) {
+      let deviceInfo = devicePayload()
+      if !deviceInfo.isEmpty {
+        metadata["device"] = deviceInfo
+      }
+    }
+
+    if isServiceEnabled(.usage) {
+      metadata["usage"] = usagePayload()
+    }
+
+    if let custom = config.metadata, !custom.isEmpty {
+      metadata["custom"] = custom
+    }
+
+    if !metadata.isEmpty {
       payload["metadata"] = metadata
     }
+
     guard JSONSerialization.isValidJSONObject(payload) else {
       throw EinstoreTrackingError.invalidPayload
     }
     return payload
+  }
+
+  private func sessionPayload() -> [String: Any] {
+    let durationMs = Int(Date().timeIntervalSince(sessionStart) * 1000)
+    return [
+      "id": sessionId,
+      "startedAt": isoString(from: sessionStart),
+      "durationMs": durationMs,
+    ]
+  }
+
+  private func usagePayload() -> [String: Any] {
+    let now = Date()
+    let offsetMinutes = TimeZone.current.secondsFromGMT(for: now) / 60
+    return [
+      "timestamp": isoString(from: now),
+      "timeZone": TimeZone.current.identifier,
+      "timeZoneOffsetMinutes": offsetMinutes,
+      "locale": Locale.current.identifier,
+      "sessionId": sessionId,
+      "sessionDurationMs": Int(now.timeIntervalSince(sessionStart) * 1000),
+    ]
+  }
+
+  private func distributionPayload() -> [String: Any] {
+    var payload = config.distributionInfo
+    mergeIfMissing(key: "appVersion", into: &payload, value: appVersion())
+    mergeIfMissing(key: "buildNumber", into: &payload, value: buildNumber())
+    return payload
+  }
+
+  private func devicePayload() -> [String: Any] {
+    var payload = config.deviceInfo
+    mergeIfMissing(key: "model", into: &payload, value: UIDevice.current.model)
+    mergeIfMissing(key: "manufacturer", into: &payload, value: "Apple")
+    mergeIfMissing(key: "osVersion", into: &payload, value: UIDevice.current.systemVersion)
+    mergeIfMissing(key: "locale", into: &payload, value: Locale.current.identifier)
+    mergeIfMissing(key: "appVersion", into: &payload, value: appVersion())
+    mergeIfMissing(key: "buildNumber", into: &payload, value: buildNumber())
+    return payload
+  }
+
+  private func appVersion() -> String? {
+    Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+  }
+
+  private func buildNumber() -> String? {
+    Bundle.main.infoDictionary?["CFBundleVersion"] as? String
+  }
+
+  private func mergeIfMissing(key: String, into payload: inout [String: Any], value: String?) {
+    guard payload[key] == nil, let value else {
+      return
+    }
+    payload[key] = value
+  }
+
+  private func isServiceEnabled(_ service: EinstoreService) -> Bool {
+    config.services.contains(service)
+  }
+
+  private func isoString(from date: Date) -> String {
+    ISO8601DateFormatter().string(from: date)
   }
 
   private func send(

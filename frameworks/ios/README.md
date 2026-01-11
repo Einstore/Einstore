@@ -1,6 +1,6 @@
 # Einstore iOS Tracking
 
-Lightweight Swift package for recording app download and launch events against the Einstore API.
+Swift package for recording app downloads, launches, and analytics events against the Einstore API.
 
 ## Install
 - Add the Swift package at `frameworks/ios/EinstoreTracking`.
@@ -17,6 +17,7 @@ let tracker = EinstoreTracker(
       "Authorization": "Bearer USER_TOKEN",
       "X-Team-Id": "TEAM_ID",
     ],
+    services: [.analytics, .distribution, .devices, .usage],
     targetId: "ios-app"
   )
 )
@@ -24,7 +25,16 @@ let tracker = EinstoreTracker(
 tracker.trackLaunchOnce()
 ```
 
+## Services
+Pass the sections you want to track via `services`:
+- `.analytics`: app launches, sessions, screen views, custom events, user properties.
+- `.errors`: handled exceptions that you explicitly log.
+- `.distribution`: install source and version rollout metadata.
+- `.devices`: model, manufacturer, OS version, locale, app version.
+- `.usage`: time, time zone, session duration (country/region inferred by API).
+
 ## Notes
-- If you use the iOS install link flow, downloads are already recorded by the `/builds/:id/ios/download` endpoint.
+- Crashes are not tracked yet.
+- If you use the iOS install link flow, downloads are already recorded by `/builds/:id/ios/download`.
 - Point `launchUrl` at `/builds/:id/ios/installs/track?token=...` when using install tokens.
-- If you use `/builds/:id/downloads` or `/builds/:id/installs`, the endpoint requires auth headers.
+- `eventUrl` can override where analytics/errors events are posted (defaults to `launchUrl`).

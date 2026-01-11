@@ -1,23 +1,42 @@
 package com.einstore.tracking
 
 import android.content.Context
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
+import org.json.JSONArray
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.Locale
 import java.util.UUID
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
+enum class EinstoreService(val key: String) {
+  ANALYTICS("analytics"),
+  ERRORS("errors"),
+  DISTRIBUTION("distribution"),
+  DEVICES("devices"),
+  USAGE("usage");
+
+  companion object {
+    fun defaults(): Set<EinstoreService> = values().toSet()
+  }
+}
+
 data class EinstoreTrackingConfig(
   val downloadUrl: String? = null,
   val launchUrl: String? = null,
+  val eventUrl: String? = null,
   val headers: Map<String, String> = emptyMap(),
   val platform: String = "android",
   val targetId: String? = null,
   val deviceId: String? = null,
   val metadata: Map<String, Any?> = emptyMap(),
+  val services: Set<EinstoreService> = EinstoreService.defaults(),
+  val distributionInfo: Map<String, Any?> = emptyMap(),
+  val deviceInfo: Map<String, Any?> = emptyMap(),
   val launchKey: String? = null
 )
 
@@ -26,15 +45,36 @@ class EinstoreTracker(
   private val config: EinstoreTrackingConfig,
   private val executor: Executor = Executors.newSingleThreadExecutor()
 ) {
+  private data class AnalyticsEvent(val name: String, val properties: Map<String, Any?>)
+  private data class ErrorInfo(val message: String, val stackTrace: String?, val properties: Map<String, Any?>)
+
   private val appContext = context.applicationContext
   private val preferences = appContext.getSharedPreferences("einstore_tracking", Context.MODE_PRIVATE)
+  private var sessionId = UUID.randomUUID().toString()
+  private var sessionStartMs = System.currentTimeMillis()
+  private val userProperties = mutableMapOf<String, Any?>()
+
+  fun startNewSession() {
+    sessionId = UUID.randomUUID().toString()
+    sessionStartMs = System.currentTimeMillis()
+  }
+
+  fun setUserProperties(properties: Map<String, Any?>) {
+    userProperties.putAll(properties)
+  }
 
   fun trackDownload(callback: ((Result<Unit>) -> Unit)? = null) {
-    trackAsync(config.downloadUrl, callback)
+    trackAsync(config.downloadUrl, requiredService = EinstoreService.DISTRIBUTION, callback = callback)
   }
 
   fun trackLaunch(callback: ((Result<Unit>) -> Unit)? = null) {
-    trackAsync(config.launchUrl, callback)
+    startNewSession()
+    trackAsync(
+      config.launchUrl,
+      event = AnalyticsEvent("app_launch", emptyMap()),
+      requiredService = EinstoreService.ANALYTICS,
+      callback = callback
+    )
   }
 
   fun trackLaunchOnce(callback: ((Result<Unit>) -> Unit)? = null) {
@@ -43,7 +83,7 @@ class EinstoreTracker(
       callback?.invoke(Result.success(Unit))
       return
     }
-    trackAsync(config.launchUrl) { result ->
+    trackLaunch { result ->
       if (result.isSuccess) {
         preferences.edit().putBoolean(key, true).apply()
       }
@@ -51,19 +91,71 @@ class EinstoreTracker(
     }
   }
 
-  private fun trackAsync(url: String?, callback: ((Result<Unit>) -> Unit)?) {
+  fun trackScreenView(
+    screenName: String,
+    properties: Map<String, Any?> = emptyMap(),
+    callback: ((Result<Unit>) -> Unit)? = null
+  ) {
+    val payload = properties.toMutableMap()
+    payload["screen"] = screenName
+    trackAsync(
+      config.eventUrl ?: config.launchUrl,
+      event = AnalyticsEvent("screen_view", payload),
+      requiredService = EinstoreService.ANALYTICS,
+      callback = callback
+    )
+  }
+
+  fun trackEvent(
+    name: String,
+    properties: Map<String, Any?> = emptyMap(),
+    callback: ((Result<Unit>) -> Unit)? = null
+  ) {
+    trackAsync(
+      config.eventUrl ?: config.launchUrl,
+      event = AnalyticsEvent(name, properties),
+      requiredService = EinstoreService.ANALYTICS,
+      callback = callback
+    )
+  }
+
+  fun trackError(
+    message: String,
+    stackTrace: String? = null,
+    properties: Map<String, Any?> = emptyMap(),
+    callback: ((Result<Unit>) -> Unit)? = null
+  ) {
+    trackAsync(
+      config.eventUrl ?: config.launchUrl,
+      errorInfo = ErrorInfo(message, stackTrace, properties),
+      requiredService = EinstoreService.ERRORS,
+      callback = callback
+    )
+  }
+
+  private fun trackAsync(
+    url: String?,
+    event: AnalyticsEvent? = null,
+    errorInfo: ErrorInfo? = null,
+    requiredService: EinstoreService? = null,
+    callback: ((Result<Unit>) -> Unit)?
+  ) {
     if (url.isNullOrBlank()) {
       callback?.invoke(Result.failure(IllegalStateException("Tracking URL is required")))
       return
     }
+    if (requiredService != null && !config.services.contains(requiredService)) {
+      callback?.invoke(Result.failure(IllegalStateException("Service ${requiredService.key} is disabled")))
+      return
+    }
     executor.execute {
-      callback?.invoke(post(url))
+      callback?.invoke(post(url, event, errorInfo))
     }
   }
 
-  private fun post(url: String): Result<Unit> {
+  private fun post(url: String, event: AnalyticsEvent?, errorInfo: ErrorInfo?): Result<Unit> {
     return try {
-      val payload = buildPayload()
+      val payload = buildPayload(event, errorInfo)
       val connection = URL(url).openConnection() as HttpURLConnection
       connection.requestMethod = "POST"
       connection.doOutput = true
@@ -87,15 +179,134 @@ class EinstoreTracker(
     }
   }
 
-  private fun buildPayload(): String {
-    val payload = JSONObject()
-    payload.put("platform", config.platform)
-    resolveDeviceId()?.let { payload.put("deviceId", it) }
-    config.targetId?.let { payload.put("targetId", it) }
-    if (config.metadata.isNotEmpty()) {
-      payload.put("metadata", JSONObject(config.metadata))
+  private fun buildPayload(event: AnalyticsEvent?, errorInfo: ErrorInfo?): String {
+    val root = JSONObject()
+    root.put("platform", config.platform)
+    resolveDeviceId()?.let { root.put("deviceId", it) }
+    config.targetId?.let { root.put("targetId", it) }
+
+    val metadata = JSONObject()
+    metadata.put("services", JSONArray(config.services.map { it.key }))
+
+    if (config.services.contains(EinstoreService.ANALYTICS)) {
+      val analytics = JSONObject()
+      if (event != null) {
+        analytics.put("event", JSONObject().apply {
+          put("name", event.name)
+          if (event.properties.isNotEmpty()) {
+            put("properties", mapToJson(event.properties))
+          }
+        })
+      }
+      if (userProperties.isNotEmpty()) {
+        analytics.put("userProperties", mapToJson(userProperties))
+      }
+      analytics.put("session", sessionPayload())
+      if (analytics.length() > 0) {
+        metadata.put("analytics", analytics)
+      }
     }
-    return payload.toString()
+
+    if (config.services.contains(EinstoreService.ERRORS) && errorInfo != null) {
+      val errorPayload = JSONObject().apply {
+        put("message", errorInfo.message)
+        if (!errorInfo.stackTrace.isNullOrBlank()) {
+          put("stackTrace", errorInfo.stackTrace)
+        }
+        if (errorInfo.properties.isNotEmpty()) {
+          put("properties", mapToJson(errorInfo.properties))
+        }
+      }
+      metadata.put("errors", errorPayload)
+    }
+
+    if (config.services.contains(EinstoreService.DISTRIBUTION)) {
+      val distribution = distributionPayload()
+      if (distribution.length() > 0) {
+        metadata.put("distribution", distribution)
+      }
+    }
+
+    if (config.services.contains(EinstoreService.DEVICES)) {
+      val device = devicePayload()
+      if (device.length() > 0) {
+        metadata.put("device", device)
+      }
+    }
+
+    if (config.services.contains(EinstoreService.USAGE)) {
+      metadata.put("usage", usagePayload())
+    }
+
+    if (config.metadata.isNotEmpty()) {
+      metadata.put("custom", mapToJson(config.metadata))
+    }
+
+    if (metadata.length() > 0) {
+      root.put("metadata", metadata)
+    }
+
+    return root.toString()
+  }
+
+  private fun sessionPayload(): JSONObject {
+    val durationMs = System.currentTimeMillis() - sessionStartMs
+    return JSONObject().apply {
+      put("id", sessionId)
+      put("startedAt", isoTimestamp(sessionStartMs))
+      put("durationMs", durationMs)
+    }
+  }
+
+  private fun usagePayload(): JSONObject {
+    val now = System.currentTimeMillis()
+    val offsetMinutes = (java.util.TimeZone.getDefault().getOffset(now) / 60000)
+    return JSONObject().apply {
+      put("timestamp", isoTimestamp(now))
+      put("timeZone", java.util.TimeZone.getDefault().id)
+      put("timeZoneOffsetMinutes", offsetMinutes)
+      put("locale", Locale.getDefault().toLanguageTag())
+      put("sessionId", sessionId)
+      put("sessionDurationMs", now - sessionStartMs)
+    }
+  }
+
+  private fun distributionPayload(): JSONObject {
+    val payload = mutableMapOf<String, Any?>()
+    payload.putAll(config.distributionInfo)
+    val packageInfo = resolvePackageInfo()
+    if (payload["appVersion"] == null) {
+      payload["appVersion"] = packageInfo?.versionName
+    }
+    if (payload["buildNumber"] == null) {
+      payload["buildNumber"] = resolveVersionCode(packageInfo)
+    }
+    return mapToJson(payload)
+  }
+
+  private fun devicePayload(): JSONObject {
+    val payload = mutableMapOf<String, Any?>()
+    payload.putAll(config.deviceInfo)
+    if (payload["model"] == null) {
+      payload["model"] = Build.MODEL
+    }
+    if (payload["manufacturer"] == null) {
+      payload["manufacturer"] = Build.MANUFACTURER
+    }
+    if (payload["osVersion"] == null) {
+      payload["osVersion"] = Build.VERSION.RELEASE
+    }
+    if (payload["locale"] == null) {
+      payload["locale"] = Locale.getDefault().toLanguageTag()
+    }
+    val packageInfo = resolvePackageInfo()
+    if (payload["appVersion"] == null) {
+      payload["appVersion"] = packageInfo?.versionName
+    }
+    if (payload["buildNumber"] == null) {
+      payload["buildNumber"] = resolveVersionCode(packageInfo)
+    }
+    return mapToJson(payload)
   }
 
   private fun resolveDeviceId(): String? {
@@ -116,20 +327,53 @@ class EinstoreTracker(
       return config.launchKey
     }
     val packageName = appContext.packageName
-    val packageInfo = try {
-      appContext.packageManager.getPackageInfo(packageName, 0)
+    val packageInfo = resolvePackageInfo()
+    val versionName = packageInfo?.versionName ?: "0"
+    val versionCode = resolveVersionCode(packageInfo) ?: "0"
+    return "einstore.launch.$packageName.$versionName.$versionCode"
+  }
+
+  private fun resolvePackageInfo(): PackageInfo? {
+    return try {
+      appContext.packageManager.getPackageInfo(appContext.packageName, 0)
     } catch (_: PackageManager.NameNotFoundException) {
       null
     }
-    val versionName = packageInfo?.versionName ?: "0"
-    val versionCode = if (packageInfo == null) {
-      "0"
-    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+  }
+
+  private fun resolveVersionCode(packageInfo: PackageInfo?): String? {
+    packageInfo ?: return null
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
       packageInfo.longVersionCode.toString()
     } else {
       @Suppress("DEPRECATION")
       packageInfo.versionCode.toString()
     }
-    return "einstore.launch.$packageName.$versionName.$versionCode"
+  }
+
+  private fun mapToJson(map: Map<String, Any?>): JSONObject {
+    val json = JSONObject()
+    for ((key, value) in map) {
+      if (value == null) {
+        continue
+      }
+      when (value) {
+        is Map<*, *> -> {
+          @Suppress("UNCHECKED_CAST")
+          json.put(key, mapToJson(value as Map<String, Any?>))
+        }
+        is List<*> -> {
+          json.put(key, JSONArray(value))
+        }
+        else -> json.put(key, value)
+      }
+    }
+    return json
+  }
+
+  private fun isoTimestamp(value: Long): String {
+    val formatter = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
+    formatter.timeZone = java.util.TimeZone.getTimeZone("UTC")
+    return formatter.format(java.util.Date(value))
   }
 }
