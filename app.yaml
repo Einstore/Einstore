@@ -48,7 +48,7 @@ services:
   - key: DATABASE_URL
     scope: RUN_TIME
     type: SECRET
-    value: ${db.DATABASE_URL}
+    value: ${db.DATABASE_URL}&schema=einstore
   - key: SPACES_ENDPOINT
     scope: RUN_TIME
     value: https://lon1.digitaloceanspaces.com
@@ -108,7 +108,7 @@ services:
   instance_count: 1
   instance_size_slug: apps-s-1vcpu-0.5gb
   name: api
-  run_command: npm run prisma:deploy && npm run start
+  run_command: npm run prisma:ensure-schema && npm run prisma:deploy && npm run start
   source_dir: /API
 static_sites:
 - github:

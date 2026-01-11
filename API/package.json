@@ -10,7 +10,8 @@
     "test:unit": "vitest run",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:deploy": "prisma migrate deploy"
+    "prisma:deploy": "prisma migrate deploy",
+    "prisma:ensure-schema": "echo \"CREATE SCHEMA IF NOT EXISTS einstore;\" | prisma db execute --stdin"
   },
   "dependencies": {
     "@devicefarmer/adbkit-apkreader": "^3.2.4",
