@@ -4,11 +4,11 @@ import { Outlet, useNavigate } from "react-router-dom";
 import ActionButton from "../components/ActionButton";
 import AddAppDialog from "../components/AddAppDialog";
 import AppShell from "../components/AppShell";
-import FileDropzone from "../components/FileDropzone";
 import Sidebar from "../components/Sidebar";
 import TeamSwitcher from "../components/TeamSwitcher";
 import Topbar from "../components/Topbar";
 import type { NavItem } from "../components/Sidebar";
+import { apiFetch } from "../lib/api";
 import type { TeamSummary } from "../lib/teams";
 
 type AdminLayoutProps = {
@@ -37,8 +37,7 @@ const AdminLayout = ({
   onUpload,
 }: AdminLayoutProps) => {
   const [isAddAppOpen, setIsAddAppOpen] = useState(false);
-  const [quickUploadStatus, setQuickUploadStatus] = useState("");
-  const [quickUploadBusy, setQuickUploadBusy] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleAction = (actionId: string) => {
@@ -47,20 +46,22 @@ const AdminLayout = ({
     }
   };
 
-  const handleQuickUpload = async (file: File | null) => {
-    if (!file || quickUploadBusy) {
-      return;
+  const handleLogout = async () => {
+    const refreshToken = localStorage.getItem("refreshToken");
+    if (refreshToken) {
+      await apiFetch("/auth/logout", {
+        method: "POST",
+        body: JSON.stringify({ refreshToken }),
+      }).catch(() => undefined);
     }
-    setQuickUploadBusy(true);
-    setQuickUploadStatus("Uploading build...");
-    try {
-      await onUpload(file);
-      setQuickUploadStatus("Build ingested.");
-    } catch (err) {
-      setQuickUploadStatus(err instanceof Error ? err.message : "Upload failed.");
-    } finally {
-      setQuickUploadBusy(false);
-    }
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    navigate("/login");
+  };
+
+  const handleNavSelect = (id: string) => {
+    navigate(`/${id}`);
+    setIsSidebarOpen(false);
   };
 
   return (
@@ -69,7 +70,7 @@ const AdminLayout = ({
         <Sidebar
           items={navItems as NavItem[]}
           activeId={activeNavId}
-          onSelect={(id) => navigate(`/${id}`)}
+          onSelect={handleNavSelect}
           teamSwitcher={
             <TeamSwitcher
               teams={teams}
@@ -80,10 +81,14 @@ const AdminLayout = ({
           }
         />
       }
+      isSidebarOpen={isSidebarOpen}
+      onSidebarClose={() => setIsSidebarOpen(false)}
     >
       <Topbar
         title={title}
         breadcrumbs={breadcrumbs}
+        onToggleSidebar={() => setIsSidebarOpen((current) => !current)}
+        onLogout={handleLogout}
         actions={
           <>
             {actions.map((action) => (

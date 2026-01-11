@@ -1,4 +1,5 @@
 import {
+  faBars,
   faBarsProgress,
   faBoxesStacked,
   faBell,
@@ -38,6 +39,7 @@ const icons = {
   chevronDown: faChevronDown,
   plus: faPlus,
   sun: faSun,
+  menu: faBars,
 } as const;
 
 export type IconName = keyof typeof icons;
