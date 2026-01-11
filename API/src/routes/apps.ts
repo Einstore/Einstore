@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { requireTeam } from "../auth/guard.js";
+import { broadcastBadgesUpdate } from "../lib/realtime.js";
 
 const createAppSchema = z.object({
   name: z.string().min(1),
@@ -24,6 +25,7 @@ export async function appRoutes(app: FastifyInstance) {
       return reply.status(403).send({ error: "team_required", message: "Team context required" });
     }
     const created = await prisma.app.create({ data: { ...parsed.data, teamId } });
+    await broadcastBadgesUpdate(teamId).catch(() => undefined);
     return reply.status(201).send(created);
   });
 

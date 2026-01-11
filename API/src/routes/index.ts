@@ -14,6 +14,8 @@ import { storageRoutes } from "./storage.js";
 import { pipelineRoutes } from "./pipeline.js";
 import { authRoutes } from "./auth.js";
 import { featureFlagRoutes } from "./featureFlags.js";
+import { badgeRoutes } from "./badges.js";
+import { realtimeRoutes } from "./realtime.js";
 import { registerTeamRoutes, registerUserTeamSettingsRoutes } from "@rafiki270/teams";
 import { prisma } from "../lib/prisma.js";
 import { loadConfig } from "../lib/config.js";
@@ -34,6 +36,8 @@ export async function registerRoutes(app: FastifyInstance) {
   await app.register(resolveRoutes);
   await app.register(storageRoutes);
   await app.register(pipelineRoutes);
+  await app.register(badgeRoutes);
+  await app.register(realtimeRoutes);
   await app.register(authRoutes);
   await app.register(featureFlagRoutes);
   await registerTeamRoutes(app, {

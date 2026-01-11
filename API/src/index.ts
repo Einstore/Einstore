@@ -1,6 +1,7 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import multipart from "@fastify/multipart";
+import websocket from "@fastify/websocket";
 import { loadConfig } from "./lib/config.js";
 import { prisma } from "./lib/prisma.js";
 import { registerRoutes } from "./routes/index.js";
@@ -18,6 +19,7 @@ app.register(multipart, {
     fileSize: config.UPLOAD_MAX_BYTES,
   },
 });
+app.register(websocket);
 
 app.addHook("onClose", async () => {
   await prisma.$disconnect();

@@ -7,6 +7,7 @@ import path from "node:path";
 import { ingestAndroidApk } from "../lib/ingest/android.js";
 import { ingestIosIpa } from "../lib/ingest/ios.js";
 import { requireTeam } from "../auth/guard.js";
+import { broadcastBadgesUpdate } from "../lib/realtime.js";
 
 const ingestSchema = z.object({
   buildId: z.string().uuid().optional(),
@@ -31,11 +32,13 @@ export async function pipelineRoutes(app: FastifyInstance) {
 
     if (payload.kind === "apk") {
       const result = await ingestAndroidApk(payload.filePath, teamId);
+      await broadcastBadgesUpdate(teamId).catch(() => undefined);
       return reply.status(201).send({ status: "ingested", result });
     }
 
     if (payload.kind === "ipa") {
       const result = await ingestIosIpa(payload.filePath, teamId);
+      await broadcastBadgesUpdate(teamId).catch(() => undefined);
       return reply.status(201).send({ status: "ingested", result });
     }
 
@@ -83,10 +86,12 @@ export async function pipelineRoutes(app: FastifyInstance) {
     try {
       if (extension === ".apk") {
         const result = await ingestAndroidApk(filePath, teamId);
+        await broadcastBadgesUpdate(teamId).catch(() => undefined);
         return reply.status(201).send({ status: "ingested", result });
       }
 
       const result = await ingestIosIpa(filePath, teamId);
+      await broadcastBadgesUpdate(teamId).catch(() => undefined);
       return reply.status(201).send({ status: "ingested", result });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);

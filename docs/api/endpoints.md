@@ -17,6 +17,8 @@ Team-scoped endpoints:
 - `/storage`
 - `/resolve-install`
 - `/ingest`, `/ingest/upload`
+- `/badges`
+- `/ws`
 
 ## GET /health
 - Purpose: Health check
@@ -31,6 +33,22 @@ Team-scoped endpoints:
 - Auth scope: None
 - Request schema: none
 - Response schema: `{ "name": string, "version": string }`
+- Side effects: none
+- Platform relevance: all
+
+## GET /badges
+- Purpose: Fetch navigation badge counts for the active team
+- Auth scope: Bearer (rafiki270/auth) + Team membership
+- Request schema: none
+- Response schema: `{ badges: { apps: number, builds: number } }`
+- Side effects: none
+- Platform relevance: all
+
+## GET /ws
+- Purpose: WebSocket for real-time badge updates
+- Auth scope: Bearer (rafiki270/auth) + Team membership
+- Request schema: none (uses Authorization header and optional `x-team-id`)
+- Response schema: WebSocket messages like `{ type: "badges.updated", badges: { apps: number, builds: number } }`
 - Side effects: none
 - Platform relevance: all
 

@@ -501,6 +501,46 @@
         }
       }
     },
+    "/badges": {
+      "get": {
+        "summary": "Badge counts",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Badges"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
+      }
+    },
+    "/ws": {
+      "get": {
+        "summary": "Realtime websocket",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "Switching Protocols"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
+      }
+    },
     "/auth/register": {
       "post": {
         "summary": "Register user",

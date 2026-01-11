@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { requireTeam } from "../auth/guard.js";
 import { requireAppForTeam } from "../lib/team-access.js";
+import { broadcastBadgesUpdate } from "../lib/realtime.js";
 
 const createBuildSchema = z.object({
   appIdentifier: z.string().min(1),
@@ -67,6 +68,7 @@ export async function buildRoutes(app: FastifyInstance) {
       },
     });
 
+    await broadcastBadgesUpdate(teamId).catch(() => undefined);
     return reply.status(201).send(build);
   });
 
