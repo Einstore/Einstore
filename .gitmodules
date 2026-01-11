@@ -1,6 +1,6 @@
 [submodule "Libraries/rafiki-auth"]
 	path = Libraries/rafiki-auth
-	url = git@github.com:rafiki270/auth.git
+	url = https://github.com/rafiki270/auth.git
 [submodule "Libraries/feature-flags"]
 	path = Libraries/feature-flags
-	url = git@github.com:rafiki270/FeatureFlags.git
+	url = https://github.com/rafiki270/FeatureFlags.git
