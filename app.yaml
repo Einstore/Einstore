@@ -34,6 +34,33 @@ ingress:
         exact: einstore.pro
       path:
         prefix: /
+jobs:
+- build_command: if [ -n "$BILLING_DEPLOY_KEY" ]; then mkdir -p ~/.ssh && echo "$BILLING_DEPLOY_KEY"
+    > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa && ssh-keyscan github.com >> ~/.ssh/known_hosts
+    && mkdir -p ../Private && git clone git@github.com:Einstore/Billing.git ../Private/billing;
+    fi && npm install
+  envs:
+  - key: DATABASE_URL
+    scope: RUN_TIME
+    type: SECRET
+    value: EV[1:1trs2VkhpvGhCzNDc6Wws/iag2w1Jqnv:TJ2Ghn0Yj0Obzb6K25q35SzQ9aT8mWS7qh/mWUIz7pzmP6BuFU0rxYzvMMxNHvAgQc/UhiTDr//RHng7JcA9hcwKuT9zUIrJvXYj0CvBpsxpvFoGDWIkQTaCVVewxrMJftc23OLbAM/EQicSmk5mutSWBQ2VLvtthMMt+2fXZFHzBlq8xHIFaaMx+rUMxY2zz+VaSCRrVDBlzNwvkXbVwtFwOrg=]
+  - key: BILLING_DEPLOY_KEY
+    scope: BUILD_TIME
+    type: SECRET
+    value: EV[1:fecdPnNxziuuXXbcaoeYAcEJDmmsgNlo:HPrZimVW0X9njalAeyeFBXqxiR620+vT3TPznPyGN5zqKWJ1jdo8P0yXm13n4kPnF1lEIvEoFIv0cEeVdzEbBBxTvstrAWPHzPA0cVk0nVV8uw7GXitukMgsVntUoy3VZsGd5P9DPr0dEy07OkwPgVWh4lM7DnI9t5SOF5aqWfV/Oueh+re8CdhqQmfsMQbyszmVqY4WmmpEwLFIdxrrdEfwkSTPGf79hxSGXXZU4MoJYtWUa2Y87dUBLqrZ61g+0m4A3AWvmX+fynThJNvYyrBnYRE84f+FHZxZkAidXLZ1Ct+dtJzkxyK0gv6674uBwgvrGhGCqXlaGcszoSl85XFVafkrj4j4nmthGIK7qHNReyZpHGaPmDguvElNgsUTAISQDo5yxXki8VWMN+t8bSGbHnt8A0jB83OWAgopU1ZM2v8ErCazjiDJitc6T6fT6zzm+Bp03+I5eP4mvkFxJB/Mvh1bjV3jKhj3hF2lrz25Q4wFm+IEY63QCgxfzyKhd9eLEAOFCLLjfzw2vppt1HQNum5nMmjQ0lja01nMh8og2YxDdECw5pNSlw==]
+  - key: NPM_CONFIG_INSTALL_LINKS
+    scope: BUILD_TIME
+    value: "false"
+  environment_slug: node-js
+  github:
+    branch: main
+    repo: Einstore/Einstore
+  instance_count: 1
+  instance_size_slug: apps-s-1vcpu-0.5gb
+  kind: PRE_DEPLOY
+  name: prisma-migrate
+  run_command: npm run prisma:deploy
+  source_dir: /API
 name: einstore
 region: lon
 services:
@@ -51,7 +78,7 @@ services:
   - key: DATABASE_URL
     scope: RUN_TIME
     type: SECRET
-    value: EV[1:c7/Ha6DXFwzrkJqnv5rQHESF+s9wnIPl:VO+5oq+tIWYpSdbzU4fC5gniBUx9TW2c/94GohkR5kh6RZo+gX5CPT1cqyXkRM3IsBA=]
+    value: EV[1:1trs2VkhpvGhCzNDc6Wws/iag2w1Jqnv:TJ2Ghn0Yj0Obzb6K25q35SzQ9aT8mWS7qh/mWUIz7pzmP6BuFU0rxYzvMMxNHvAgQc/UhiTDr//RHng7JcA9hcwKuT9zUIrJvXYj0CvBpsxpvFoGDWIkQTaCVVewxrMJftc23OLbAM/EQicSmk5mutSWBQ2VLvtthMMt+2fXZFHzBlq8xHIFaaMx+rUMxY2zz+VaSCRrVDBlzNwvkXbVwtFwOrg=]
   - key: SPACES_ENDPOINT
     scope: RUN_TIME
     value: https://lon1.digitaloceanspaces.com
@@ -118,7 +145,7 @@ services:
   instance_count: 1
   instance_size_slug: apps-s-1vcpu-0.5gb
   name: api
-  run_command: npm run prisma:ensure-schema && npm run prisma:deploy && npm run start
+  run_command: npm run start
   source_dir: /API
 static_sites:
 - github:
