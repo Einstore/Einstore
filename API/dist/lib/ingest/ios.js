@@ -1,8 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import plist from "plist";
+import bplistParser from "bplist-parser";
 import { prisma } from "../prisma.js";
 import { listZipEntries, readZipEntries, scanZipEntries } from "../zip.js";
+import { extractIosEntitlements, } from "./ios-entitlements.js";
 const readPngDimensions = (buffer) => {
     if (buffer.length < 24)
         return null;
@@ -119,7 +121,17 @@ const extractBestIcon = async (filePath, targetRoot, entries, outputDir, info) =
         sizeBytes: resolved.size,
     };
 };
-const parsePlist = (buffer) => plist.parse(buffer.toString("utf8"));
+const parsePlist = (buffer) => {
+    const header = buffer.subarray(0, 6).toString("utf8");
+    if (header === "bplist") {
+        const parsed = bplistParser.parseBuffer(buffer);
+        return (parsed[0] ?? {});
+    }
+    const text = buffer.toString("utf8").trim();
+    if (!text)
+        return {};
+    return plist.parse(text);
+};
 const normalizeJson = (value) => JSON.parse(JSON.stringify(value ?? null));
 const resolveRole = (extensionPoint) => {
     if (!extensionPoint)
@@ -157,6 +169,7 @@ export async function ingestIosIpa(filePath, teamId, createdByUserId) {
         throw new Error("No app bundles found in IPA");
     }
     const targets = [];
+    const targetRootsByBundleId = new Map();
     const plistPaths = targetRoots.map((root) => `${root}Info.plist`);
     const plistBuffers = await readZipEntries(filePath, new Set(plistPaths));
     for (const root of targetRoots) {
@@ -191,6 +204,7 @@ export async function ingestIosIpa(filePath, teamId, createdByUserId) {
         const role = resolveRole(extensionPoint);
         const iconOutputDir = path.resolve(process.cwd(), "storage", "ingest", sanitizePathSegment(bundleId));
         const iconBitmap = await extractBestIcon(filePath, root, entryNames, iconOutputDir, info);
+        targetRootsByBundleId.set(bundleId, root);
         targets.push({
             name,
             bundleId,
@@ -209,6 +223,10 @@ export async function ingestIosIpa(filePath, teamId, createdByUserId) {
     if (!mainTarget) {
         throw new Error("Unable to determine primary app target");
     }
+    const mainTargetRoot = targetRootsByBundleId.get(mainTarget.bundleId);
+    const entitlementsInfo = mainTargetRoot
+        ? await extractIosEntitlements(filePath, entryNames, mainTargetRoot)
+        : { distribution: { kind: "broken", reason: "main_target_root_missing" } };
     const resolvedAppName = mainTarget.name;
     const resolvedVersion = mainTarget.version || "1.0.0";
     const resolvedBuild = mainTarget.build || "1";
@@ -273,6 +291,21 @@ export async function ingestIosIpa(filePath, teamId, createdByUserId) {
             }),
         },
     });
+    await prisma.complianceArtifact.create({
+        data: {
+            buildId: build.id,
+            kind: "entitlements",
+            storageKind: "local",
+            storagePath: filePath,
+            metadata: normalizeJson({
+                distribution: entitlementsInfo.distribution,
+                entitlements: entitlementsInfo.entitlements,
+                entitlementsSource: entitlementsInfo.entitlementsSource,
+                provisioningProfile: entitlementsInfo.provisioningProfile,
+                provisioningProfileSource: entitlementsInfo.provisioningProfileSource,
+            }),
+        },
+    });
     return {
         appId: appRecord.id,
         versionId: versionRecord.id,
@@ -282,5 +315,6 @@ export async function ingestIosIpa(filePath, teamId, createdByUserId) {
         version: resolvedVersion,
         buildNumber: resolvedBuild,
         targets,
+        distribution: entitlementsInfo.distribution,
     };
 }

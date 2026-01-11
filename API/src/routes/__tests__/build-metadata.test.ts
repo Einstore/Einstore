@@ -1,10 +1,8 @@
 import Fastify from "fastify";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { registerRoutes } from "../index.js";
-
-const prismaMock = {
+const prismaMock = vi.hoisted(() => ({
   build: { findFirst: vi.fn() },
-};
+}));
 
 vi.mock("../../lib/prisma.js", () => ({
   prisma: prismaMock,
@@ -38,6 +36,23 @@ vi.mock("../../lib/config.js", () => ({
     UPLOAD_MAX_BYTES: 0,
   }),
 }));
+
+vi.mock("../../auth/service.js", () => ({
+  authService: {
+    register: vi.fn(),
+    login: vi.fn(),
+    refresh: vi.fn(),
+    logout: vi.fn(),
+    getSession: vi.fn(),
+    requestPasswordReset: vi.fn(),
+    resetPassword: vi.fn(),
+    oauthStart: vi.fn(),
+    oauthCallback: vi.fn(),
+    oauthExchange: vi.fn(),
+  },
+}));
+
+const { registerRoutes } = await import("../index.js");
 
 describe("GET /builds/:id/metadata", () => {
   const app = Fastify();

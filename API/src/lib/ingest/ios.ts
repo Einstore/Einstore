@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import plist from "plist";
+import bplistParser from "bplist-parser";
 import { Prisma, PlatformKind, TargetRole } from "@prisma/client";
 import { prisma } from "../prisma.js";
 import { listZipEntries, readZipEntries, scanZipEntries } from "../zip.js";
@@ -160,7 +161,16 @@ const extractBestIcon = async (
   };
 };
 
-const parsePlist = (buffer: Buffer) => plist.parse(buffer.toString("utf8")) as Record<string, unknown>;
+const parsePlist = (buffer: Buffer) => {
+  const header = buffer.subarray(0, 6).toString("utf8");
+  if (header === "bplist") {
+    const parsed = bplistParser.parseBuffer(buffer);
+    return (parsed[0] ?? {}) as Record<string, unknown>;
+  }
+  const text = buffer.toString("utf8").trim();
+  if (!text) return {};
+  return plist.parse(text) as Record<string, unknown>;
+};
 
 const normalizeJson = (value: unknown) => JSON.parse(JSON.stringify(value ?? null));
 
