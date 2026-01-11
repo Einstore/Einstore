@@ -1,3 +1,5 @@
+import { featureFlagDefinitions } from "@rafiki270/feature-flags";
+
 export type FeatureFlagKey =
   | "admin.overview_metrics"
   | "admin.pipeline_health"
@@ -12,15 +14,13 @@ type FeatureFlagRecord = {
   defaultEnabled?: boolean;
 };
 
-const defaultFeatureFlags: Record<FeatureFlagKey, boolean> = {
-  "admin.overview_metrics": false,
-  "admin.pipeline_health": false,
-  "admin.activity_stream": false,
-  "admin.storage_usage": false,
-  "admin.future_flags": true,
-  "admin.security_posture": false,
-  "admin.workspace_settings": false,
-};
+const defaultFeatureFlags: Record<FeatureFlagKey, boolean> = featureFlagDefinitions.reduce(
+  (acc, flag) => {
+    acc[flag.key as FeatureFlagKey] = flag.defaultEnabled;
+    return acc;
+  },
+  {} as Record<FeatureFlagKey, boolean>
+);
 
 export const buildFeatureFlagMap = (flags: FeatureFlagRecord[]) => {
   const map = { ...defaultFeatureFlags };

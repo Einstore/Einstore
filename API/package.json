@@ -22,7 +22,7 @@
     "@fastify/multipart": "^8.3.0",
     "@fastify/websocket": "^8.3.1",
     "@prisma/client": "^6.16.1",
-    "@rafiki270/feature-flags": "git+https://github.com/rafiki270/FeatureFlags.git#970e3ba",
+    "@rafiki270/feature-flags": "git+https://github.com/rafiki270/FeatureFlags.git#77bdd69",
     "@rafiki270/teams": "git+https://github.com/rafiki270/teams.git#935a199",
     "@unlikeother/auth": "git+https://github.com/rafiki270/auth.git#37724a16ae7835fa24533f1b03df61a0b6e38af1",
     "apk-parser3": "^0.1.7",
