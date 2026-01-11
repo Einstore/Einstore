@@ -14,7 +14,7 @@ const createVariantSchema = z.object({
 
 const listQuerySchema = z.object({
   buildId: z.string().uuid(),
-  limit: z.coerce.number().int().positive().max(100).default(100),
+  limit: z.coerce.number().int().positive().max(200).default(100),
   offset: z.coerce.number().int().nonnegative().default(0),
 });
 

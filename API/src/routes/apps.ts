@@ -9,7 +9,7 @@ const createAppSchema = z.object({
 });
 
 const listQuerySchema = z.object({
-  limit: z.coerce.number().int().positive().max(100).default(20),
+  limit: z.coerce.number().int().positive().max(200).default(20),
   offset: z.coerce.number().int().nonnegative().default(0),
 });
 

@@ -16,7 +16,7 @@ const createTargetSchema = z.object({
 
 const listQuerySchema = z.object({
   buildId: z.string().uuid(),
-  limit: z.coerce.number().int().positive().max(100).default(50),
+  limit: z.coerce.number().int().positive().max(200).default(50),
   offset: z.coerce.number().int().nonnegative().default(0),
 });
 
