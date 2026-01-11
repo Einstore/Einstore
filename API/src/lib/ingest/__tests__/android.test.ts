@@ -44,11 +44,16 @@ describe("ingestAndroidApk", () => {
   });
 
   it("extracts android metadata and icon bitmap", async () => {
-    const result = await ingestAndroidApk(apkPath);
+    const result = await ingestAndroidApk(apkPath, "team-test");
     expect(result.appName).toBe("GPTeen");
     expect(result.packageName).toBe("ai.unlikeother.gpteen");
     expect(result.versionName).toBe("1.11.12");
     expect(result.versionCode).toBe("121");
+    expect(prismaMock.app.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { teamId_identifier: { teamId: "team-test", identifier: "ai.unlikeother.gpteen" } },
+      }),
+    );
     expect(result.iconBitmap?.path).toBeTruthy();
     expect(result.iconBitmap?.width).toBeGreaterThan(0);
     expect(result.iconBitmap?.height).toBeGreaterThan(0);

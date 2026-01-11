@@ -3,7 +3,7 @@ import path from "node:path";
 import plist from "plist";
 import { Prisma, PlatformKind, TargetRole } from "@prisma/client";
 import { prisma } from "../prisma.js";
-import { listZipEntries, readZipEntries } from "../zip.js";
+import { listZipEntries, readZipEntries, scanZipEntries } from "../zip.js";
 
 type IconBitmap = {
   sourcePath: string;
@@ -82,20 +82,17 @@ const extractBestIcon = async (
     | { entryName: string; width: number; height: number; size: number; buffer: Buffer }
     | null = null;
 
-  const pickFromBuffers = async (entryNames: string[]) => {
+  const pickFromEntries = async (entryNames: string[]) => {
     if (!entryNames.length) return;
-    const buffers = await readZipEntries(filePath, new Set(entryNames));
-    for (const entryName of entryNames) {
-      const buffer = buffers.get(entryName);
-      if (!buffer) continue;
+    const wanted = new Set(entryNames);
+    await scanZipEntries(filePath, (entryName) => wanted.has(entryName), async (entryName, buffer) => {
       const dimensions = readPngDimensions(buffer);
-      if (!dimensions) continue;
+      if (!dimensions) return;
       const size = buffer.length;
       if (
         !best ||
         dimensions.width * dimensions.height > best.width * best.height ||
-        (dimensions.width * dimensions.height === best.width * best.height &&
-          size > best.size)
+        (dimensions.width * dimensions.height === best.width * best.height && size > best.size)
       ) {
         best = {
           entryName,
@@ -105,7 +102,7 @@ const extractBestIcon = async (
           buffer,
         };
       }
-    }
+    });
   };
 
   if (candidates.length) {
@@ -118,7 +115,7 @@ const extractBestIcon = async (
         candidateEntries.push(entry);
       }
     }
-    await pickFromBuffers(candidateEntries);
+    await pickFromEntries(candidateEntries);
   }
 
   if (!best) {
@@ -129,12 +126,12 @@ const extractBestIcon = async (
         (lower.includes("appicon") || lower.includes("icon") || lower.includes("launcher"))
       );
     });
-    await pickFromBuffers(fallbackEntries);
+    await pickFromEntries(fallbackEntries);
   }
 
   if (!best) {
     const allPngEntries = targetEntries.filter((entry) => entry.toLowerCase().endsWith(".png"));
-    await pickFromBuffers(allPngEntries);
+    await pickFromEntries(allPngEntries);
   }
 
   if (!best) return null;
@@ -211,7 +208,7 @@ export type IosIngestResult = {
   targets: IosTarget[];
 };
 
-export async function ingestIosIpa(filePath: string): Promise<IosIngestResult> {
+export async function ingestIosIpa(filePath: string, teamId: string): Promise<IosIngestResult> {
   if (!fs.existsSync(filePath)) {
     throw new Error("IPA not found");
   }
@@ -296,9 +293,9 @@ export async function ingestIosIpa(filePath: string): Promise<IosIngestResult> {
   const resolvedBuild = mainTarget.build || "1";
 
   const appRecord = await prisma.app.upsert({
-    where: { identifier: mainTarget.bundleId },
+    where: { teamId_identifier: { teamId, identifier: mainTarget.bundleId } },
     update: { name: resolvedAppName },
-    create: { identifier: mainTarget.bundleId, name: resolvedAppName },
+    create: { identifier: mainTarget.bundleId, name: resolvedAppName, teamId },
   });
 
   const versionRecord = await prisma.version.upsert({

@@ -6,7 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { ingestAndroidApk } from "../lib/ingest/android.js";
 import { ingestIosIpa } from "../lib/ingest/ios.js";
-import { requireAuth } from "../auth/guard.js";
+import { requireTeam } from "../auth/guard.js";
 
 const ingestSchema = z.object({
   buildId: z.string().uuid().optional(),
@@ -18,20 +18,24 @@ type IngestRequest = z.infer<typeof ingestSchema>;
 const allowedUploadExtensions = new Set([".apk", ".ipa"]);
 
 export async function pipelineRoutes(app: FastifyInstance) {
-  app.post("/ingest", { preHandler: requireAuth }, async (request, reply) => {
+  app.post("/ingest", { preHandler: requireTeam }, async (request, reply) => {
     const parsed = ingestSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(400).send({ error: "Invalid payload" });
     }
     const payload: IngestRequest = parsed.data;
+    const teamId = request.team?.id;
+    if (!teamId) {
+      return reply.status(403).send({ error: "team_required", message: "Team context required" });
+    }
 
     if (payload.kind === "apk") {
-      const result = await ingestAndroidApk(payload.filePath);
+      const result = await ingestAndroidApk(payload.filePath, teamId);
       return reply.status(201).send({ status: "ingested", result });
     }
 
     if (payload.kind === "ipa") {
-      const result = await ingestIosIpa(payload.filePath);
+      const result = await ingestIosIpa(payload.filePath, teamId);
       return reply.status(201).send({ status: "ingested", result });
     }
 
@@ -41,13 +45,17 @@ export async function pipelineRoutes(app: FastifyInstance) {
     });
   });
 
-  app.post("/ingest/upload", { preHandler: requireAuth }, async (request, reply) => {
+  app.post("/ingest/upload", { preHandler: requireTeam }, async (request, reply) => {
     if (!request.isMultipart()) {
       return reply.status(400).send({ error: "multipart_required" });
     }
     const part = await request.file();
     if (!part) {
       return reply.status(400).send({ error: "missing_file" });
+    }
+    const teamId = request.team?.id;
+    if (!teamId) {
+      return reply.status(403).send({ error: "team_required", message: "Team context required" });
     }
 
     const extension = path.extname(part.filename ?? "").toLowerCase();
@@ -63,11 +71,11 @@ export async function pipelineRoutes(app: FastifyInstance) {
     await pipeline(part.file, fs.createWriteStream(filePath));
 
     if (extension === ".apk") {
-      const result = await ingestAndroidApk(filePath);
+      const result = await ingestAndroidApk(filePath, teamId);
       return reply.status(201).send({ status: "ingested", result });
     }
 
-    const result = await ingestIosIpa(filePath);
+    const result = await ingestIosIpa(filePath, teamId);
     return reply.status(201).send({ status: "ingested", result });
   });
 }

@@ -86,3 +86,61 @@ export async function readZipEntries(
     });
   });
 }
+
+export async function scanZipEntries(
+  filePath: string,
+  shouldRead: (entryName: string) => boolean,
+  onEntry: (entryName: string, buffer: Buffer) => Promise<void> | void,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    yauzl.open(filePath, { lazyEntries: true }, (err, zipfile) => {
+      if (err || !zipfile) {
+        reject(err ?? new Error("Unable to open zip file"));
+        return;
+      }
+
+      const closeWithError = (error: unknown) => {
+        zipfile.close();
+        reject(error instanceof Error ? error : new Error(String(error)));
+      };
+
+      zipfile.readEntry();
+      zipfile.on("entry", (entry) => {
+        const name = entry.fileName;
+        if (name.endsWith("/") || !shouldRead(name)) {
+          zipfile.readEntry();
+          return;
+        }
+
+        zipfile.openReadStream(entry, (streamErr, stream) => {
+          if (streamErr || !stream) {
+            closeWithError(streamErr ?? new Error("Unable to read zip entry"));
+            return;
+          }
+          const chunks: Buffer[] = [];
+          stream.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
+          stream.on("end", async () => {
+            try {
+              await onEntry(name, Buffer.concat(chunks));
+              zipfile.readEntry();
+            } catch (error) {
+              closeWithError(error);
+            }
+          });
+          stream.on("error", (streamError) => {
+            closeWithError(streamError);
+          });
+        });
+      });
+
+      zipfile.on("end", () => {
+        zipfile.close();
+        resolve();
+      });
+      zipfile.on("error", (error) => {
+        zipfile.close();
+        reject(error);
+      });
+    });
+  });
+}

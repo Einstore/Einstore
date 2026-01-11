@@ -46,3 +46,37 @@ export async function requireSuperUser(request: FastifyRequest, reply: FastifyRe
       .send({ error: "forbidden", message: "Super user access required" });
   }
 }
+
+export async function requireTeam(request: FastifyRequest, reply: FastifyReply) {
+  await requireAuth(request, reply);
+  if (reply.sent) {
+    return;
+  }
+  const userId = request.auth?.user.id;
+  if (!userId) {
+    return reply.status(401).send({ error: "token_invalid", message: "Missing access token" });
+  }
+
+  const headerTeamId = request.headers["x-team-id"];
+  const teamId = typeof headerTeamId === "string" && headerTeamId.trim()
+    ? headerTeamId.trim()
+    : (await prisma.user.findUnique({
+        where: { id: userId },
+        select: { lastActiveTeamId: true },
+      }))?.lastActiveTeamId;
+
+  if (!teamId) {
+    return reply.status(403).send({ error: "team_required", message: "Team context required" });
+  }
+
+  const membership = await prisma.teamMember.findUnique({
+    where: { teamId_userId: { teamId, userId } },
+    include: { team: true },
+  });
+  if (!membership) {
+    return reply.status(403).send({ error: "forbidden", message: "Team access denied" });
+  }
+
+  request.team = membership.team;
+  request.teamMember = membership;
+}

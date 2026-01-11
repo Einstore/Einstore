@@ -86,12 +86,17 @@ enum OverviewStatsPeriod {
 
 model App {
   id        String   @id @default(uuid())
+  teamId    String
   name      String
-  identifier String  @unique
+  identifier String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   versions  Version[]
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, identifier])
+  @@index([teamId])
 }
 
 model Version {
@@ -370,6 +375,7 @@ model Team {
   lastActiveUsers User[]            @relation("LastActiveTeam")
   members         TeamMember[]
   userTeamSettings UserTeamSetting[]
+  apps            App[]
 }
 
 model TeamMember {

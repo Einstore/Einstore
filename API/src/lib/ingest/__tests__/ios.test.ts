@@ -16,8 +16,7 @@ vi.mock("../../prisma.js", () => ({
 
 const { ingestIosIpa } = await import("../ios.js");
 
-const ipaPath =
-  "/System/Volumes/Data/.internal/projects/Projects/GPTeen/ios/build_simulator/PocketPal-sim.ipa";
+const ipaPath = path.resolve(process.cwd(), "tests", "app-debug.ipa");
 
 const isPng = (filePath: string) => {
   const buffer = fs.readFileSync(filePath);
@@ -43,11 +42,16 @@ describe("ingestIosIpa", () => {
   });
 
   it("extracts ios metadata and icon bitmap", async () => {
-    const result = await ingestIosIpa(ipaPath);
+    const result = await ingestIosIpa(ipaPath, "team-test");
     expect(result.appName).toBe("GPTeen");
     expect(result.identifier).toBe("ai.pocketpal");
     expect(result.version).toBe("1.11.12");
     expect(result.buildNumber).toBe("121");
+    expect(prismaMock.app.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { teamId_identifier: { teamId: "team-test", identifier: "ai.pocketpal" } },
+      }),
+    );
     expect(result.targets.length).toBeGreaterThan(0);
     const mainTarget = result.targets[0];
     expect(mainTarget.supportedDevices).toContain("iphone");

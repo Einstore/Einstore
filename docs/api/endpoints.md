@@ -2,6 +2,22 @@
 
 All endpoints return JSON. Authenticated endpoints require `Authorization: Bearer <token>` issued by `rafiki270/auth`.
 
+## Team scoping
+Team-scoped endpoints require `x-team-id` (a Team ID you belong to). If omitted, the API falls back to your `lastActiveTeamId`. Responses are restricted to that team.
+
+Team-scoped endpoints:
+- `/apps`, `/apps/:id`
+- `/versions`, `/versions/:id`
+- `/builds`, `/builds/:id`
+- `/targets`
+- `/variants`
+- `/modules`
+- `/capabilities`
+- `/artifacts`
+- `/storage`
+- `/resolve-install`
+- `/ingest`, `/ingest/upload`
+
 ## GET /health
 - Purpose: Health check
 - Auth scope: None

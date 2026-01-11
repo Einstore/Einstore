@@ -1,7 +1,8 @@
 import { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
-import { requireAuth } from "../auth/guard.js";
+import { requireTeam } from "../auth/guard.js";
+import { requireBuildForTeam } from "../lib/team-access.js";
 
 const createModuleSchema = z.object({
   buildId: z.string().uuid(),
@@ -17,10 +18,18 @@ const listQuerySchema = z.object({
 });
 
 export async function moduleRoutes(app: FastifyInstance) {
-  app.post("/modules", { preHandler: requireAuth }, async (request, reply) => {
+  app.post("/modules", { preHandler: requireTeam }, async (request, reply) => {
     const parsed = createModuleSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(400).send({ error: "Invalid payload" });
+    }
+    const teamId = request.team?.id;
+    if (!teamId) {
+      return reply.status(403).send({ error: "team_required", message: "Team context required" });
+    }
+    const build = await requireBuildForTeam(teamId, parsed.data.buildId);
+    if (!build) {
+      return reply.status(404).send({ error: "Not found" });
     }
     const module = await prisma.module.create({
       data: {
@@ -33,13 +42,17 @@ export async function moduleRoutes(app: FastifyInstance) {
     return reply.status(201).send(module);
   });
 
-  app.get("/modules", { preHandler: requireAuth }, async (request, reply) => {
+  app.get("/modules", { preHandler: requireTeam }, async (request, reply) => {
     const parsed = listQuerySchema.safeParse(request.query);
     if (!parsed.success) {
       return reply.status(400).send({ error: "Invalid query" });
     }
+    const teamId = request.team?.id;
+    if (!teamId) {
+      return reply.status(403).send({ error: "team_required", message: "Team context required" });
+    }
     const items = await prisma.module.findMany({
-      where: { buildId: parsed.data.buildId },
+      where: { buildId: parsed.data.buildId, build: { version: { app: { teamId } } } },
       skip: parsed.data.offset,
       take: parsed.data.limit,
       orderBy: { name: "asc" },

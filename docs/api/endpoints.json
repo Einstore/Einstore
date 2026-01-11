@@ -467,6 +467,17 @@
           "value": {}
         }
       }
+    },
+    "parameters": {
+      "TeamIdHeader": {
+        "name": "x-team-id",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "description": "Active team context. Required for team-scoped endpoints."
+      }
     }
   },
   "paths": {
@@ -797,7 +808,12 @@
           "201": {
             "description": "Created"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
       },
       "get": {
         "summary": "List apps",
@@ -810,7 +826,12 @@
           "200": {
             "description": "List"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
       }
     },
     "/apps/{id}": {
@@ -829,6 +850,9 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
           }
         ],
         "responses": {
@@ -860,7 +884,12 @@
           "201": {
             "description": "Created"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
       },
       "get": {
         "summary": "List versions",
@@ -873,7 +902,12 @@
           "200": {
             "description": "List"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
       }
     },
     "/versions/{id}": {
@@ -892,6 +926,9 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
           }
         ],
         "responses": {
@@ -913,7 +950,12 @@
           "201": {
             "description": "Created"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
       },
       "get": {
         "summary": "List builds",
@@ -926,7 +968,12 @@
           "200": {
             "description": "List"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
       }
     },
     "/builds/{id}": {
@@ -945,6 +992,9 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
           }
         ],
         "responses": {
@@ -966,7 +1016,12 @@
           "201": {
             "description": "Created"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
       },
       "get": {
         "summary": "List targets",
@@ -979,7 +1034,12 @@
           "200": {
             "description": "List"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
       }
     },
     "/variants": {
@@ -994,7 +1054,12 @@
           "201": {
             "description": "Created"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
       },
       "get": {
         "summary": "List variants",
@@ -1007,7 +1072,12 @@
           "200": {
             "description": "List"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
       }
     },
     "/modules": {
@@ -1022,7 +1092,12 @@
           "201": {
             "description": "Created"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
       },
       "get": {
         "summary": "List modules",
@@ -1035,7 +1110,12 @@
           "200": {
             "description": "List"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
       }
     },
     "/capabilities": {
@@ -1050,7 +1130,12 @@
           "201": {
             "description": "Created"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
       },
       "get": {
         "summary": "List capabilities",
@@ -1063,7 +1148,12 @@
           "200": {
             "description": "List"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
       }
     },
     "/artifacts": {
@@ -1078,7 +1168,12 @@
           "201": {
             "description": "Created"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
       },
       "get": {
         "summary": "List compliance artifacts",
@@ -1091,7 +1186,12 @@
           "200": {
             "description": "List"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
       }
     },
     "/feature-flags": {
@@ -1592,7 +1692,12 @@
           "501": {
             "description": "Not implemented"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
       }
     },
     "/ingest/upload": {
@@ -1626,7 +1731,12 @@
           "201": {
             "description": "Ingested"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
       }
     },
     "/resolve-install": {
@@ -1637,7 +1747,12 @@
           "200": {
             "description": "Resolver response"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
       }
     },
     "/storage": {
@@ -1647,7 +1762,12 @@
           "200": {
             "description": "Storage config"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
       },
       "post": {
         "summary": "Set storage config",
@@ -1655,7 +1775,12 @@
           "200": {
             "description": "Storage config"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ]
       }
     },
     "/teams": {

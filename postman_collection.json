@@ -41,6 +41,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "body": {
@@ -78,6 +82,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "body": {
@@ -114,6 +122,10 @@
           {
             "key": "Authorization",
             "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "body": {
@@ -130,6 +142,8 @@
           "listen": "test",
           "script": {
             "exec": [
+              "const list = pm.response.json()?.teams || pm.response.json() || [];",
+              "if (Array.isArray(list) && list.length) { pm.environment.set('teamId', list[0].id); }",
               "pm.test('List teams ok', function () {",
               "  pm.expect(pm.response.code).to.equal(200);",
               "});"
@@ -144,6 +158,10 @@
           {
             "key": "Authorization",
             "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "url": "{{baseUrl}}/teams"
@@ -502,6 +520,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "url": {
@@ -602,6 +624,10 @@
           {
             "key": "Authorization",
             "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "body": {
@@ -638,6 +664,10 @@
           {
             "key": "Authorization",
             "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "body": {
@@ -674,6 +704,10 @@
           {
             "key": "Authorization",
             "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "body": {
@@ -710,6 +744,10 @@
           {
             "key": "Authorization",
             "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "body": {
@@ -744,6 +782,10 @@
           {
             "key": "Authorization",
             "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "body": {
@@ -778,6 +820,10 @@
           {
             "key": "Authorization",
             "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "body": {
@@ -812,6 +858,10 @@
           {
             "key": "Authorization",
             "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "body": {
@@ -846,6 +896,10 @@
           {
             "key": "Authorization",
             "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "body": {
@@ -867,6 +921,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "url": {
@@ -905,6 +963,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "url": {
@@ -944,6 +1006,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "url": {
@@ -988,6 +1054,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "url": {
@@ -1027,6 +1097,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "url": {
@@ -1065,6 +1139,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "url": {
@@ -1104,6 +1182,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "url": {
@@ -1148,6 +1230,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "url": {
@@ -1192,6 +1278,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "url": {
@@ -1236,6 +1326,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "url": {
@@ -1280,6 +1374,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "url": {
@@ -1325,6 +1423,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "url": {
@@ -1372,6 +1474,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "url": {
@@ -1411,6 +1517,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "url": {
@@ -1451,6 +1561,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "url": {
@@ -1495,6 +1609,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "url": {
@@ -1535,6 +1653,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "url": {
@@ -1580,6 +1702,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "url": {
@@ -1621,6 +1747,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "url": {
@@ -1682,7 +1812,16 @@
       "name": "Get Storage",
       "request": {
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
+          }
+        ],
         "url": {
           "raw": "{{baseUrl}}/storage",
           "host": [
@@ -1715,6 +1854,14 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "body": {
@@ -1766,6 +1913,14 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "body": {
@@ -1807,6 +1962,14 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "body": {
@@ -1824,6 +1987,10 @@
           {
             "key": "Authorization",
             "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "body": {
@@ -1847,11 +2014,19 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
           }
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"filePath\": \"/System/Volumes/Data/.internal/projects/Projects/GPTeen/ios/build_simulator/PocketPal-sim.ipa\",\n  \"kind\": \"ipa\"\n}"
+          "raw": "{\n  \"filePath\": \"/System/Volumes/Data/.internal/projects/Projects/Einstore/API/tests/app-debug.ipa\",\n  \"kind\": \"ipa\"\n}"
         },
         "url": {
           "raw": "{{baseUrl}}/ingest",
@@ -2133,6 +2308,110 @@
               "  pm.expect(pm.response.code).to.equal(200);",
               "});"
             ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Team Isolation",
+      "item": [
+        {
+          "name": "Login Secondary User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.environment.set('secondaryAccessToken', json.session.accessToken);",
+                  "pm.environment.set('secondaryRefreshToken', json.session.refreshToken);",
+                  "pm.test('Secondary login ok', function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{secondaryAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"{{secondaryUsername}}\",\n  \"password\": \"StrongPass123!\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "List Teams (Secondary)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const list = pm.response.json()?.teams || pm.response.json() || [];",
+                  "if (Array.isArray(list) && list.length) { pm.environment.set('secondaryTeamId', list[0].id); }",
+                  "pm.test('Secondary teams ok', function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{secondaryAccessToken}}"
+              },
+              {
+                "key": "x-team-id",
+                "value": "{{secondaryTeamId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/teams"
+          }
+        },
+        {
+          "name": "Cross-team Apps Forbidden",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Cross-team access forbidden', function () {",
+                  "  pm.expect([401, 403, 404]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{secondaryAccessToken}}"
+              },
+              {
+                "key": "x-team-id",
+                "value": "{{teamId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/apps"
           }
         }
       ]

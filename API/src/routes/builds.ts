@@ -1,7 +1,8 @@
 import { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
-import { requireAuth } from "../auth/guard.js";
+import { requireTeam } from "../auth/guard.js";
+import { requireAppForTeam } from "../lib/team-access.js";
 
 const createBuildSchema = z.object({
   appIdentifier: z.string().min(1),
@@ -24,17 +25,21 @@ const listQuerySchema = z.object({
 type CreateBuildInput = z.infer<typeof createBuildSchema>;
 
 export async function buildRoutes(app: FastifyInstance) {
-  app.post("/builds", { preHandler: requireAuth }, async (request, reply) => {
+  app.post("/builds", { preHandler: requireTeam }, async (request, reply) => {
     const parsed = createBuildSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(400).send({ error: "Invalid payload" });
     }
     const input: CreateBuildInput = parsed.data;
+    const teamId = request.team?.id;
+    if (!teamId) {
+      return reply.status(403).send({ error: "team_required", message: "Team context required" });
+    }
 
     const appRecord = await prisma.app.upsert({
-      where: { identifier: input.appIdentifier },
+      where: { teamId_identifier: { teamId, identifier: input.appIdentifier } },
       update: { name: input.appName },
-      create: { identifier: input.appIdentifier, name: input.appName },
+      create: { identifier: input.appIdentifier, name: input.appName, teamId },
     });
 
     const versionRecord = await prisma.version.upsert({
@@ -65,22 +70,27 @@ export async function buildRoutes(app: FastifyInstance) {
     return reply.status(201).send(build);
   });
 
-  app.get("/builds", { preHandler: requireAuth }, async (request, reply) => {
+  app.get("/builds", { preHandler: requireTeam }, async (request, reply) => {
     const parsed = listQuerySchema.safeParse(request.query);
     if (!parsed.success) {
       return reply.status(400).send({ error: "Invalid query" });
     }
-    const where: { versionId?: string } = {};
+    const teamId = request.team?.id;
+    if (!teamId) {
+      return reply.status(403).send({ error: "team_required", message: "Team context required" });
+    }
+    const where: { versionId?: string; version?: { app?: { teamId: string } } } = {
+      version: { app: { teamId } },
+    };
     if (parsed.data.versionId) {
       where.versionId = parsed.data.versionId;
     } else if (parsed.data.appId) {
-      const versions = await prisma.version.findMany({
-        where: { appId: parsed.data.appId },
-        select: { id: true },
-      });
-      const ids = versions.map((version) => version.id);
+      const appRecord = await requireAppForTeam(teamId, parsed.data.appId);
+      if (!appRecord) {
+        return reply.send([]);
+      }
       const items = await prisma.build.findMany({
-        where: { versionId: { in: ids } },
+        where: { version: { appId: parsed.data.appId, app: { teamId } } },
         skip: parsed.data.offset,
         take: parsed.data.limit,
         orderBy: { createdAt: "desc" },
@@ -97,10 +107,14 @@ export async function buildRoutes(app: FastifyInstance) {
     return reply.send(items);
   });
 
-  app.get("/builds/:id", { preHandler: requireAuth }, async (request, reply) => {
+  app.get("/builds/:id", { preHandler: requireTeam }, async (request, reply) => {
+    const teamId = request.team?.id;
+    if (!teamId) {
+      return reply.status(403).send({ error: "team_required", message: "Team context required" });
+    }
     const id = (request.params as { id: string }).id;
-    const record = await prisma.build.findUnique({
-      where: { id },
+    const record = await prisma.build.findFirst({
+      where: { id, version: { app: { teamId } } },
       include: { targets: true, variants: true, modules: true, artifacts: true, signing: true },
     });
     if (!record) {

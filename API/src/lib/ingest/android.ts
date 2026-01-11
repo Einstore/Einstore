@@ -5,7 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import ApkReader from "@devicefarmer/adbkit-apkreader";
 import { prisma } from "../prisma.js";
-import { listZipEntries, readZipEntries } from "../zip.js";
+import { listZipEntries, scanZipEntries } from "../zip.js";
 
 const parseMatch = (line: string, key: string): string | undefined => {
   const match = line.match(new RegExp(`${key}='([^']+)'`));
@@ -99,10 +99,18 @@ const readPngDimensions = (buffer: Buffer) => {
   return { width, height };
 };
 
-const extractBestIconBitmap = async (apkPath: string, outputDir: string) => {
-  const entries = await listZipEntries(apkPath);
+const extractBestIconBitmap = async (
+  apkPath: string,
+  outputDir: string,
+  iconEntries?: string[],
+) => {
+  let entries = iconEntries?.filter((name) => name.toLowerCase().endsWith(".png")) ?? [];
+  if (!entries.length) {
+    const zipEntries = await listZipEntries(apkPath);
+    entries = zipEntries.filter((name) => name.startsWith("res/") && name.endsWith(".png"));
+  }
+
   const candidates = entries
-    .filter((name) => name.startsWith("res/") && name.endsWith(".png"))
     .map((name) => {
       const lower = name.toLowerCase();
       const filename = lower.split("/").pop() || "";
@@ -118,33 +126,31 @@ const extractBestIconBitmap = async (apkPath: string, outputDir: string) => {
     | { name: string; score: number; width: number; height: number; size: number; buffer: Buffer }
     | null = null;
 
-  const buffers = await readZipEntries(
+  const candidateScores = new Map(candidates.map((candidate) => [candidate.name, candidate.score]));
+  await scanZipEntries(
     apkPath,
-    new Set(candidates.map((candidate) => candidate.name)),
+    (entryName) => candidateScores.has(entryName),
+    async (entryName, buffer) => {
+      const dimensions = readPngDimensions(buffer);
+      if (!dimensions) return;
+      const size = buffer.length;
+      const score = candidateScores.get(entryName) ?? 0;
+      if (
+        !best ||
+        dimensions.width * dimensions.height > best.width * best.height ||
+        (dimensions.width * dimensions.height === best.width * best.height && score > best.score)
+      ) {
+        best = {
+          name: entryName,
+          score,
+          width: dimensions.width,
+          height: dimensions.height,
+          size,
+          buffer,
+        };
+      }
+    },
   );
-
-  for (const candidate of candidates) {
-    const buffer = buffers.get(candidate.name);
-    if (!buffer) continue;
-    const dimensions = readPngDimensions(buffer);
-    if (!dimensions) continue;
-    const size = buffer.length;
-    if (
-      !best ||
-      dimensions.width * dimensions.height > best.width * best.height ||
-      (dimensions.width * dimensions.height === best.width * best.height &&
-        candidate.score > best.score)
-    ) {
-      best = {
-        name: candidate.name,
-        score: candidate.score,
-        width: dimensions.width,
-        height: dimensions.height,
-        size,
-        buffer,
-      };
-    }
-  }
 
   if (!best) return null;
 
@@ -186,7 +192,10 @@ export type AndroidIngestResult = {
   };
 };
 
-export async function ingestAndroidApk(filePath: string): Promise<AndroidIngestResult> {
+export async function ingestAndroidApk(
+  filePath: string,
+  teamId: string,
+): Promise<AndroidIngestResult> {
   if (!fs.existsSync(filePath)) {
     throw new Error("APK not found");
   }
@@ -266,9 +275,9 @@ export async function ingestAndroidApk(filePath: string): Promise<AndroidIngestR
   };
 
   const appRecord = await prisma.app.upsert({
-    where: { identifier: packageName },
+    where: { teamId_identifier: { teamId, identifier: packageName } },
     update: { name: resolvedAppNameNormalized },
-    create: { identifier: packageName, name: resolvedAppNameNormalized },
+    create: { identifier: packageName, name: resolvedAppNameNormalized, teamId },
   });
 
   const versionRecord = await prisma.version.upsert({
@@ -294,7 +303,11 @@ export async function ingestAndroidApk(filePath: string): Promise<AndroidIngestR
   });
 
   const iconOutputDir = path.resolve(process.cwd(), "storage", "ingest", build.id);
-  const iconBitmap = await extractBestIconBitmap(filePath, iconOutputDir);
+  const iconBitmap = await extractBestIconBitmap(
+    filePath,
+    iconOutputDir,
+    icons.map((icon) => icon.path),
+  );
 
   const target = await prisma.target.create({
     data: {

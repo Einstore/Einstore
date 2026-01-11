@@ -5,23 +5,27 @@ const prismaMock = {
   app: {
     create: vi.fn(),
     findMany: vi.fn(),
+    findFirst: vi.fn(),
     findUnique: vi.fn(),
     upsert: vi.fn(),
   },
   version: {
     create: vi.fn(),
     findMany: vi.fn(),
+    findFirst: vi.fn(),
     findUnique: vi.fn(),
     upsert: vi.fn(),
   },
   build: {
     create: vi.fn(),
     findMany: vi.fn(),
+    findFirst: vi.fn(),
     findUnique: vi.fn(),
   },
   target: {
     create: vi.fn(),
     findMany: vi.fn(),
+    findFirst: vi.fn(),
   },
   variant: {
     create: vi.fn(),
@@ -88,6 +92,10 @@ vi.mock("../../auth/guard.js", () => ({
   requireSuperUser: async (request: { auth?: { user?: { id: string } } }) => {
     request.auth = { user: { id: "user-1" } };
   },
+  requireTeam: async (request: { auth?: { user?: { id: string } }; team?: { id: string } }) => {
+    request.auth = { user: { id: "user-1" } };
+    request.team = { id: "team-1" } as { id: string };
+  },
 }));
 
 const authServiceMock = {
@@ -130,6 +138,25 @@ const isFeatureFlagEnabledMock = vi.fn();
 vi.mock("@rafiki270/feature-flags", () => ({
   ensureFeatureFlag: ensureFeatureFlagMock,
   isFeatureFlagEnabled: isFeatureFlagEnabledMock,
+}));
+
+vi.mock("@rafiki270/teams", () => ({
+  registerTeamRoutes: async (app: { get: Function; post: Function }) => {
+    app.get("/teams", async () => []);
+    app.post("/teams", async (_request: unknown, reply: { status: (code: number) => { send: (value: unknown) => void } }) =>
+      reply.status(201).send({ id: "team-1" }),
+    );
+    app.get("/teams/:teamId", async () => ({ id: "team-1" }));
+    app.post("/teams/:teamId/select", async () => ({ id: "team-1" }));
+    app.get("/teams/:teamId/users", async () => []);
+  },
+  registerUserTeamSettingsRoutes: async (app: { get: Function; put: Function }) => {
+    app.get("/user-team-settings/:key", async () => ({ value: null }));
+    app.put("/user-team-settings/:key", async () => ({ ok: true }));
+  },
+  deriveInboxBaseForUser: () => "inbox",
+  normalizeTeamSlug: (value: string) => value,
+  slugify: (value: string) => value,
 }));
 
 const { registerRoutes } = await import("../index.js");
@@ -177,20 +204,24 @@ describe("routes", () => {
 
     prismaMock.app.create.mockResolvedValue({ id: ids.appId });
     prismaMock.app.findMany.mockResolvedValue([{ id: ids.appId }]);
+    prismaMock.app.findFirst.mockResolvedValue({ id: ids.appId });
     prismaMock.app.findUnique.mockResolvedValue({ id: ids.appId });
     prismaMock.app.upsert.mockResolvedValue({ id: ids.appId });
 
     prismaMock.version.create.mockResolvedValue({ id: ids.versionId });
     prismaMock.version.findMany.mockResolvedValue([{ id: ids.versionId }]);
+    prismaMock.version.findFirst.mockResolvedValue({ id: ids.versionId });
     prismaMock.version.findUnique.mockResolvedValue({ id: ids.versionId });
     prismaMock.version.upsert.mockResolvedValue({ id: ids.versionId });
 
     prismaMock.build.create.mockResolvedValue({ id: ids.buildId });
     prismaMock.build.findMany.mockResolvedValue([{ id: ids.buildId }]);
+    prismaMock.build.findFirst.mockResolvedValue({ id: ids.buildId });
     prismaMock.build.findUnique.mockResolvedValue({ id: ids.buildId });
 
     prismaMock.target.create.mockResolvedValue({ id: ids.targetId });
     prismaMock.target.findMany.mockResolvedValue([{ id: ids.targetId }]);
+    prismaMock.target.findFirst.mockResolvedValue({ id: ids.targetId });
 
     prismaMock.user.findUnique.mockResolvedValue({ isSuperUser: false });
 
@@ -402,6 +433,12 @@ describe("routes", () => {
     expect(listResponse.statusCode).toBe(200);
     const getResponse = await app.inject({ method: "GET", url: `/apps/${ids.appId}` });
     expect(getResponse.statusCode).toBe(200);
+    expect(prismaMock.app.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { teamId: "team-1" } }),
+    );
+    expect(prismaMock.app.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: ids.appId, teamId: "team-1" } }),
+    );
   });
 
   it("versions endpoints", async () => {
@@ -411,6 +448,12 @@ describe("routes", () => {
     expect(listResponse.statusCode).toBe(200);
     const getResponse = await app.inject({ method: "GET", url: `/versions/${ids.versionId}` });
     expect(getResponse.statusCode).toBe(200);
+    expect(prismaMock.version.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { appId: ids.appId, app: { teamId: "team-1" } } }),
+    );
+    expect(prismaMock.version.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: ids.versionId, app: { teamId: "team-1" } } }),
+    );
   });
 
   it("builds endpoints", async () => {
@@ -429,6 +472,19 @@ describe("routes", () => {
     expect(listResponse.statusCode).toBe(200);
     const getResponse = await app.inject({ method: "GET", url: `/builds/${ids.buildId}` });
     expect(getResponse.statusCode).toBe(200);
+    expect(prismaMock.app.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { teamId_identifier: { teamId: "team-1", identifier: "com.example.app" } },
+      }),
+    );
+    expect(prismaMock.build.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { version: { appId: ids.appId, app: { teamId: "team-1" } } },
+      }),
+    );
+    expect(prismaMock.build.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: ids.buildId, version: { app: { teamId: "team-1" } } } }),
+    );
   });
 
   it("targets endpoints", async () => {
@@ -441,6 +497,11 @@ describe("routes", () => {
     expect(createResponse.statusCode).toBe(201);
     const listResponse = await app.inject({ method: "GET", url: `/targets?buildId=${ids.buildId}` });
     expect(listResponse.statusCode).toBe(200);
+    expect(prismaMock.target.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { buildId: ids.buildId, build: { version: { app: { teamId: "team-1" } } } },
+      }),
+    );
   });
 
   it("variants endpoints", async () => {
@@ -453,6 +514,11 @@ describe("routes", () => {
     expect(createResponse.statusCode).toBe(201);
     const listResponse = await app.inject({ method: "GET", url: `/variants?buildId=${ids.buildId}` });
     expect(listResponse.statusCode).toBe(200);
+    expect(prismaMock.variant.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { buildId: ids.buildId, build: { version: { app: { teamId: "team-1" } } } },
+      }),
+    );
   });
 
   it("modules endpoints", async () => {
@@ -465,6 +531,11 @@ describe("routes", () => {
     expect(createResponse.statusCode).toBe(201);
     const listResponse = await app.inject({ method: "GET", url: `/modules?buildId=${ids.buildId}` });
     expect(listResponse.statusCode).toBe(200);
+    expect(prismaMock.module.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { buildId: ids.buildId, build: { version: { app: { teamId: "team-1" } } } },
+      }),
+    );
   });
 
   it("capabilities endpoints", async () => {
@@ -479,6 +550,11 @@ describe("routes", () => {
       url: `/capabilities?targetId=${ids.targetId}`,
     });
     expect(listResponse.statusCode).toBe(200);
+    expect(prismaMock.capability.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { targetId: ids.targetId, target: { build: { version: { app: { teamId: "team-1" } } } } },
+      }),
+    );
   });
 
   it("artifacts endpoints", async () => {
@@ -491,6 +567,11 @@ describe("routes", () => {
     expect(createResponse.statusCode).toBe(201);
     const listResponse = await app.inject({ method: "GET", url: `/artifacts?buildId=${ids.buildId}` });
     expect(listResponse.statusCode).toBe(200);
+    expect(prismaMock.complianceArtifact.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { buildId: ids.buildId, build: { version: { app: { teamId: "team-1" } } } },
+      }),
+    );
   });
 
   it("feature flags endpoints", async () => {
@@ -537,6 +618,9 @@ describe("routes", () => {
       device: { platform: "android", osVersion: "34", abi: "arm64-v8a", density: "480" },
     });
     expect(response.statusCode).toBe(200);
+    expect(prismaMock.build.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: ids.buildId, version: { app: { teamId: "team-1" } } } }),
+    );
   });
 
   it("POST /ingest (apk + ipa)", async () => {
@@ -546,11 +630,13 @@ describe("routes", () => {
       { authorization: "Bearer token" }
     );
     expect(apkResponse.statusCode).toBe(201);
+    expect(ingestAndroidMock).toHaveBeenCalledWith("/tmp/app.apk", "team-1");
     const ipaResponse = await postJson(
       "/ingest",
       { filePath: "/tmp/app.ipa", kind: "ipa" },
       { authorization: "Bearer token" }
     );
     expect(ipaResponse.statusCode).toBe(201);
+    expect(ingestIosMock).toHaveBeenCalledWith("/tmp/app.ipa", "team-1");
   });
 });
