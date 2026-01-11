@@ -69,7 +69,6 @@ const navItems: NavItemConfig[] = [
     id: "settings",
     label: "Settings",
     icon: "settings",
-    featureFlag: "admin.workspace_settings",
   },
 ] as const;
 
@@ -112,6 +111,11 @@ const pageConfig = {
     title: "Team settings",
     breadcrumbs: [{ label: "Workspace" }, { label: "Settings" }],
     actions: [{ id: "save-settings", label: "Save changes", variant: "primary" }],
+  },
+  "api-keys": {
+    title: "API keys",
+    breadcrumbs: [{ label: "Workspace" }, { label: "API keys" }],
+    actions: [],
   },
 };
 
@@ -262,7 +266,21 @@ const AppRoutes = () => {
         />
       ),
       navId: "settings",
-      featureFlag: "admin.workspace_settings",
+      adminOnly: true,
+    },
+    {
+      id: "api-keys",
+      path: "/api-keys",
+      element: (
+        <SettingsPage
+          teams={teams}
+          activeTeamId={activeTeamId}
+          teamMembers={teamMembers}
+          isSaas={isSaas}
+          initialTab="api-keys"
+        />
+      ),
+      navId: "api-keys",
       adminOnly: true,
     },
   ];
@@ -281,7 +299,7 @@ const AppRoutes = () => {
       if (item.superOnly && !isSuperUser) {
         return false;
       }
-      if (item.id === "settings" && !isAdmin) {
+      if ((item.id === "settings" || item.id === "api-keys") && !isAdmin) {
         return false;
       }
       return !item.featureFlag || featureFlags[item.featureFlag];
