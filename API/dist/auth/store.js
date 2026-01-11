@@ -3,8 +3,8 @@ const mapUser = (user) => ({
     id: user.id,
     username: user.username,
     email: user.email ?? null,
-    fullName: null,
-    avatarUrl: null,
+    fullName: user.fullName ?? null,
+    avatarUrl: user.avatarUrl ?? null,
     status: user.status,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
@@ -15,6 +15,8 @@ export class PrismaAuthStore {
             data: {
                 username: input.username,
                 email: input.email ?? null,
+                fullName: input.fullName ?? null,
+                avatarUrl: input.avatarUrl ?? null,
                 status: input.status ?? "active",
                 createdAt: input.now,
                 updatedAt: input.now,
@@ -27,6 +29,8 @@ export class PrismaAuthStore {
             data: {
                 username: input.username,
                 email: input.email ?? null,
+                fullName: input.fullName ?? null,
+                avatarUrl: input.avatarUrl ?? null,
                 status: input.status ?? "active",
                 createdAt: input.now,
                 updatedAt: input.now,

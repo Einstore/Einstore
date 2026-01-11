@@ -8,7 +8,16 @@ export async function requireAuth(request, reply) {
     const token = header.replace("Bearer ", "").trim();
     try {
         const session = await authService.getSession(token);
-        request.auth = session;
+        request.auth = {
+            user: {
+                id: session.userId,
+                username: session.username,
+                email: session.email ?? null,
+                name: session.name ?? null,
+                avatarUrl: session.avatarUrl ?? null,
+                status: session.status,
+            },
+        };
     }
     catch (err) {
         const authErr = asAuthError(err, "token_invalid");

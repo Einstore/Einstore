@@ -5,6 +5,7 @@ const configSchema = z.object({
     DATABASE_URL: z.string().min(1),
     PORT: z.coerce.number().default(8080),
     NODE_ENV: z.string().default("development"),
+    INBOUND_EMAIL_DOMAIN: z.string().default("local.einstore"),
 });
 export function loadConfig() {
     const parsed = configSchema.safeParse(process.env);

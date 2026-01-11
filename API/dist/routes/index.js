@@ -13,7 +13,12 @@ import { storageRoutes } from "./storage.js";
 import { pipelineRoutes } from "./pipeline.js";
 import { authRoutes } from "./auth.js";
 import { featureFlagRoutes } from "./featureFlags.js";
+import { registerTeamRoutes, registerUserTeamSettingsRoutes } from "@rafiki270/teams";
+import { prisma } from "../lib/prisma.js";
+import { loadConfig } from "../lib/config.js";
+import { requireAuth } from "../auth/guard.js";
 export async function registerRoutes(app) {
+    const config = loadConfig();
     await app.register(healthRoutes);
     await app.register(infoRoutes);
     await app.register(buildRoutes);
@@ -29,4 +34,10 @@ export async function registerRoutes(app) {
     await app.register(pipelineRoutes);
     await app.register(authRoutes);
     await app.register(featureFlagRoutes);
+    await registerTeamRoutes(app, {
+        prisma,
+        inboundEmailDomain: config.INBOUND_EMAIL_DOMAIN,
+        requireAuth,
+    });
+    await registerUserTeamSettingsRoutes(app, { prisma, requireAuth });
 }
