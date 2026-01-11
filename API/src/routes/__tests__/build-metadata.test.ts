@@ -13,6 +13,18 @@ vi.mock("../../auth/guard.js", () => ({
     request.team = { id: "team-1" };
     request.auth = { user: { id: "user-1" } };
   },
+  requireTeamOrApiKey: async (
+    request: { team?: { id: string }; auth?: { user?: { id: string } } },
+  ) => {
+    request.team = { id: "team-1" };
+    request.auth = { user: { id: "user-1" } };
+  },
+  requireTeamAdmin: async (
+    request: { team?: { id: string }; auth?: { user?: { id: string } } },
+  ) => {
+    request.team = { id: "team-1" };
+    request.auth = { user: { id: "user-1" } };
+  },
   requireAuth: async (request: { auth?: { user?: { id: string } } }) => {
     request.auth = { user: { id: "user-1" } };
   },

@@ -2,12 +2,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import Fastify from "fastify";
-import { registerRoutes } from "../index.js";
-
-const prismaMock = {
+const prismaMock = vi.hoisted(() => ({
   build: { findFirst: vi.fn() },
   target: { findFirst: vi.fn() },
-};
+}));
 
 vi.mock("../../lib/prisma.js", () => ({
   prisma: prismaMock,
@@ -15,6 +13,18 @@ vi.mock("../../lib/prisma.js", () => ({
 
 vi.mock("../../auth/guard.js", () => ({
   requireTeam: async (request: { team?: { id: string }; auth?: { user?: { id: string } } }) => {
+    request.team = { id: "team-1" };
+    request.auth = { user: { id: "user-1" } };
+  },
+  requireTeamOrApiKey: async (
+    request: { team?: { id: string }; auth?: { user?: { id: string } } },
+  ) => {
+    request.team = { id: "team-1" };
+    request.auth = { user: { id: "user-1" } };
+  },
+  requireTeamAdmin: async (
+    request: { team?: { id: string }; auth?: { user?: { id: string } } },
+  ) => {
     request.team = { id: "team-1" };
     request.auth = { user: { id: "user-1" } };
   },
@@ -41,6 +51,23 @@ vi.mock("../../lib/config.js", () => ({
     UPLOAD_MAX_BYTES: 0,
   }),
 }));
+
+vi.mock("../../auth/service.js", () => ({
+  authService: {
+    register: vi.fn(),
+    login: vi.fn(),
+    refresh: vi.fn(),
+    logout: vi.fn(),
+    getSession: vi.fn(),
+    requestPasswordReset: vi.fn(),
+    resetPassword: vi.fn(),
+    oauthStart: vi.fn(),
+    oauthCallback: vi.fn(),
+    oauthExchange: vi.fn(),
+  },
+}));
+
+const { registerRoutes } = await import("../index.js");
 
 const PNG_BASE64 =
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAOaX2zQAAAAASUVORK5CYII=";

@@ -61,6 +61,13 @@ const prismaMock = {
     findFirst: vi.fn(),
     update: vi.fn(),
   },
+  apiKey: {
+    create: vi.fn(),
+    findMany: vi.fn(),
+    findFirst: vi.fn(),
+    findUnique: vi.fn(),
+    update: vi.fn(),
+  },
   user: {
     findUnique: vi.fn(),
     update: vi.fn(),
@@ -97,9 +104,32 @@ vi.mock("../../auth/guard.js", () => ({
   requireSuperUser: async (request: { auth?: { user?: { id: string } } }) => {
     request.auth = { user: { id: "user-1" } };
   },
-  requireTeam: async (request: { auth?: { user?: { id: string } }; team?: { id: string } }) => {
+  requireTeam: async (request: {
+    auth?: { user?: { id: string } };
+    team?: { id: string };
+    teamMember?: { role: string };
+  }) => {
     request.auth = { user: { id: "user-1" } };
     request.team = { id: "team-1" } as { id: string };
+    request.teamMember = { role: "owner" };
+  },
+  requireTeamAdmin: async (request: {
+    auth?: { user?: { id: string } };
+    team?: { id: string };
+    teamMember?: { role: string };
+  }) => {
+    request.auth = { user: { id: "user-1" } };
+    request.team = { id: "team-1" } as { id: string };
+    request.teamMember = { role: "owner" };
+  },
+  requireTeamOrApiKey: async (request: {
+    auth?: { user?: { id: string } };
+    team?: { id: string };
+    teamMember?: { role: string };
+  }) => {
+    request.auth = { user: { id: "user-1" } };
+    request.team = { id: "team-1" } as { id: string };
+    request.teamMember = { role: "owner" };
   },
 }));
 
@@ -129,6 +159,11 @@ vi.mock("../../lib/ingest/android.js", () => ({
 
 vi.mock("../../lib/ingest/ios.js", () => ({
   ingestIosIpa: ingestIosMock,
+}));
+
+vi.mock("../../lib/zip.js", () => ({
+  ensureZipReadable: vi.fn().mockResolvedValue(undefined),
+  isInvalidArchiveError: vi.fn(() => false),
 }));
 
 const resolveAndroidMock = vi.fn();
