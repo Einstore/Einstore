@@ -12,6 +12,7 @@ import {
   faHouse,
   faKey,
   faLock,
+  faListUl,
   faMagnifyingGlass,
   faMoon,
   faPlus,
@@ -36,6 +37,7 @@ const icons = {
   globe: faGlobe,
   moon: faMoon,
   grid: faGrip,
+  list: faListUl,
   user: faCircleUser,
   chevronDown: faChevronDown,
   plus: faPlus,
@@ -52,6 +54,20 @@ type IconProps = {
 };
 
 const Icon = ({ name, className }: IconProps) => {
+  if (name === "globe") {
+    return (
+      <span className={[className, "text-base leading-none"].filter(Boolean).join(" ")} aria-hidden="true">
+        🇬🇧
+      </span>
+    );
+  }
+  if (name === "flags") {
+    return (
+      <span className={[className, "text-base leading-none"].filter(Boolean).join(" ")} aria-hidden="true">
+        🚩
+      </span>
+    );
+  }
   return <FontAwesomeIcon icon={icons[name]} className={className} />;
 };
 

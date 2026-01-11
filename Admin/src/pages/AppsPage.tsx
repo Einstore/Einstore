@@ -1,12 +1,8 @@
 import { useState } from "react";
 
 import AppsTable from "../components/AppsTable";
-import FilterPill from "../components/FilterPill";
-import IconSelectField from "../components/IconSelectField";
+import Icon from "../components/Icon";
 import Panel from "../components/Panel";
-import SearchField from "../components/SearchField";
-import SectionHeader from "../components/SectionHeader";
-import SelectField from "../components/SelectField";
 import type { ApiApp } from "../lib/apps";
 
 type AppsPageProps = {
@@ -17,53 +13,59 @@ type AppsPageProps = {
 
 const AppsPage = ({ apps, appIcons, onSelectApp }: AppsPageProps) => {
   const [platform, setPlatform] = useState("all");
+  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+
+  const filteredApps =
+    platform === "all"
+      ? apps
+      : apps.filter((app) => app.platform?.toLowerCase() === platform);
 
   return (
     <div className="space-y-6">
-      <Panel className="space-y-6">
-        <div className="grid grid-cols-12 gap-6">
-          <div className="col-span-12 md:col-span-6 xl:col-span-4">
-            <SearchField
-              id="app-search"
-              label="Search apps"
-              placeholder="Search by name or team"
-            />
+      <Panel>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              Filters
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              {[
+                { id: "all", label: "All" },
+                { id: "ios", label: "iOS", icon: "ios" },
+                { id: "android", label: "Android", icon: "android" },
+              ].map((option) => {
+                const isActive = platform === option.id;
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => setPlatform(option.id)}
+                    className={`flex h-11 items-center gap-2 rounded-lg border px-4 text-sm font-medium transition-colors ${
+                      isActive
+                        ? "border-indigo-500 bg-indigo-50 text-indigo-600 dark:border-indigo-400/60 dark:bg-indigo-500/20 dark:text-indigo-300"
+                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                    }`}
+                    aria-pressed={isActive}
+                  >
+                    {option.icon ? <Icon name={option.icon} className="h-4 w-4" /> : null}
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-          <div className="col-span-12 md:col-span-6 xl:col-span-4">
-            <IconSelectField
-              id="platform-filter"
-              label="Platform"
-              value={platform}
-              onChange={setPlatform}
-              options={[
-                { value: "all", label: "All platforms" },
-                { value: "ios", label: "iOS", icon: "ios" },
-                { value: "android", label: "Android", icon: "android" },
-              ]}
-            />
-          </div>
-          <div className="col-span-12 md:col-span-6 xl:col-span-4">
-            <SelectField
-              id="status-filter"
-              label="Status"
-              options={[
-                { value: "all", label: "All statuses" },
-                { value: "live", label: "Live" },
-                { value: "review", label: "In review" },
-                { value: "paused", label: "Paused" },
-              ]}
-              value="all"
-            />
-          </div>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <FilterPill label="All" active />
-          <FilterPill label="Needs review" />
-          <FilterPill label="Expiring certs" />
-          <FilterPill label="Pending rollout" />
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+            Apps
+          </p>
         </div>
       </Panel>
-      <AppsTable apps={apps} appIcons={appIcons} onSelectApp={onSelectApp} />
+      <AppsTable
+        apps={filteredApps}
+        appIcons={appIcons}
+        onSelectApp={onSelectApp}
+        viewMode={viewMode}
+        onViewChange={setViewMode}
+      />
     </div>
   );
 };

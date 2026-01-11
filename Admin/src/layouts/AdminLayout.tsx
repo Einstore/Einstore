@@ -43,6 +43,7 @@ const AdminLayout = ({
   const [isAddAppOpen, setIsAddAppOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
+  const currentYear = new Date().getFullYear();
 
   const handleAction = (actionId: string) => {
     if (actionId === "add-app" || actionId === "upload-build") {
@@ -109,7 +110,12 @@ const AdminLayout = ({
         }
       />
       <div className="flex-1 overflow-y-auto p-6">
-        <Outlet />
+        <div className="flex min-h-full flex-col">
+          <Outlet />
+          <p className="mt-10 text-center text-xs text-slate-500 dark:text-slate-400">
+            Made with love in Scotland. © {currentYear}
+          </p>
+        </div>
       </div>
       <AddAppDialog
         isOpen={isAddAppOpen}

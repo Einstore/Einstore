@@ -6,8 +6,8 @@ type AppAvatarProps = {
 };
 
 const sizes = {
-  sm: "h-7 w-7 text-xs",
-  md: "h-8 w-8 text-sm",
+  sm: "h-10 w-10 text-base",
+  md: "h-11 w-11 text-xl",
   lg: "h-20 w-20 text-2xl",
 } as const;
 
@@ -24,11 +24,13 @@ const AppAvatar = ({ name, iconUrl, platform, size = "md" }: AppAvatarProps) => 
   const isAndroid = platform?.toLowerCase() === "android" || platform?.toLowerCase() === "wearos";
   const isIos = platform?.toLowerCase() === "ios" || platform?.toLowerCase() === "tvos";
 
+  const shapeClass = isAndroid ? "rounded-full" : "rounded-lg";
+
   if (iconUrl) {
     return (
       <span
         className={`inline-flex ${sizes[size]} overflow-hidden ${
-          isAndroid ? "rounded-full" : isIos ? "rounded-xl" : "rounded-full"
+          isIos ? "rounded-lg" : shapeClass
         } bg-slate-100 ring-1 ring-slate-200 dark:bg-slate-700 dark:ring-slate-600`}
         aria-hidden="true"
       >

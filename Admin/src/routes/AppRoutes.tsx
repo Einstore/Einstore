@@ -559,6 +559,7 @@ const LatestBuildsRoute = ({
   const [builds, setBuilds] = useState<ApiBuild[]>([]);
   const [buildIcons, setBuildIcons] = useState<Record<string, string>>({});
   const [buildPlatforms, setBuildPlatforms] = useState<Record<string, string>>({});
+  const [buildPlatforms, setBuildPlatforms] = useState<Record<string, string>>({});
 
   useEffect(() => {
     let isMounted = true;
@@ -588,6 +589,7 @@ const LatestBuildsRoute = ({
     let isMounted = true;
     if (!builds.length) {
       setBuildIcons({});
+      setBuildPlatforms({});
       return () => {
         isMounted = false;
       };
