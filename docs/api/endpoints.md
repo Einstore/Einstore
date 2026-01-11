@@ -20,6 +20,7 @@ Team-scoped endpoints:
 - `/resolve-install`
 - `/ingest`, `/ingest/upload`
 - `/badges`
+- `/api-keys`, `/api-keys/:id`
 - `/ws`
 - `/usage/storage/users`
 - `/builds/:id/ios/install-link`
@@ -65,6 +66,30 @@ Team-scoped endpoints:
 - Request schema: none
 - Response schema: `{ users: Array<{ userId: string, username: string, email: string | null, fullName: string | null, buildCount: number, totalBytes: number }> }`
 - Side effects: none
+- Platform relevance: all
+
+## GET /api-keys
+- Purpose: List API keys for the active team (admin/owner only)
+- Auth scope: Bearer (rafiki270/auth) + Team admin membership
+- Request schema: none
+- Response schema: `{ apiKeys: Array<{ id: string, name: string, prefix: string, createdAt: string, lastUsedAt: string | null, revokedAt: string | null, expiresAt: string | null, createdBy: { id: string, name: string | null, email: string | null, username: string } | null }> }`
+- Side effects: none
+- Platform relevance: all
+
+## POST /api-keys
+- Purpose: Create a new API key for CI uploads (admin/owner only)
+- Auth scope: Bearer (rafiki270/auth) + Team admin membership
+- Request schema: `{ name: string, expiresAt?: string }`
+- Response schema: `{ apiKey: { id: string, name: string, prefix: string, createdAt: string, lastUsedAt: string | null, revokedAt: string | null, expiresAt: string | null, createdBy: { id: string, name: string | null, email: string | null, username: string } | null }, token: string }`
+- Side effects: Stores a hashed API key; token returned once
+- Platform relevance: all
+
+## DELETE /api-keys/{id}
+- Purpose: Revoke an API key (admin/owner only)
+- Auth scope: Bearer (rafiki270/auth) + Team admin membership
+- Request schema: none
+- Response schema: `{ revoked: true }`
+- Side effects: Marks the key revoked; CI uploads will stop
 - Platform relevance: all
 
 ## POST /builds/{id}/downloads
@@ -390,6 +415,22 @@ Team-scoped endpoints:
   - iOS Info.plist fields live in `targets[].metadata.info`; entitlements in `artifactsByKind.entitlements`.
   - Android permissions live in `artifactsByKind.permissions`.
 
+## GET /builds/{id}/icons
+- Purpose: List extracted icon images for build targets
+- Auth scope: Bearer (rafiki270/auth)
+- Request schema: path `{ id: string }`
+- Response schema: `{ buildId: string, items: { targetId: string, bundleId: string, platform: string, role: string, iconBitmap: { width?: number, height?: number, sizeBytes?: number, sourcePath?: string }, url: string, contentType: string }[] }`
+- Side effects: none
+- Platform relevance: ios, android
+
+## GET /builds/{id}/icons/{targetId}
+- Purpose: Fetch the extracted icon image for a target
+- Auth scope: Bearer (rafiki270/auth)
+- Request schema: path `{ id: string, targetId: string }`
+- Response schema: `image/png`
+- Side effects: none
+- Platform relevance: ios, android
+
 ## POST /targets
 - Purpose: Create target
 - Auth scope: Bearer (rafiki270/auth)
@@ -503,7 +544,7 @@ Team-scoped endpoints:
 
 ## POST /ingest
 - Purpose: Ingest build metadata from IPA/APK
-- Auth scope: Bearer (rafiki270/auth)
+- Auth scope: Bearer (rafiki270/auth) or `x-api-key` (CI uploads)
 - Request schema: `{ filePath: string, kind: "ipa"|"apk"|"aab" }`
 - Response schema: `{ status: string, result: object }`
 - Side effects: Parses file, creates/updates App/Version/Build/Target/Artifacts
@@ -514,7 +555,7 @@ Team-scoped endpoints:
 
 ## POST /ingest/upload
 - Purpose: Upload and ingest an IPA/APK in one step
-- Auth scope: Bearer (rafiki270/auth)
+- Auth scope: Bearer (rafiki270/auth) or `x-api-key` (CI uploads)
 - Request schema: multipart form with `file`
 - Response schema: `{ status: string, result: object }`
 - Side effects: Stores upload on the server, then ingests metadata
