@@ -143,6 +143,19 @@ export async function iosInstallRoutes(app: FastifyInstance) {
     );
     let downloadUrl = `${baseUrl}/builds/${build.id}/ios/download?token=${downloadToken}`;
     if (build.storageKind === "s3") {
+      await prisma.buildEvent.create({
+        data: {
+          buildId: build.id,
+          teamId: payload.teamId,
+          userId: payload.userId,
+          kind: BuildEventKind.download,
+          platform: PlatformKind.ios,
+          ip: request.ip,
+          userAgent: typeof request.headers["user-agent"] === "string"
+            ? request.headers["user-agent"]
+            : undefined,
+        },
+      });
       const bucket = process.env.SPACES_BUCKET;
       if (!bucket) {
         return reply.status(500).send({ error: "storage_not_configured" });

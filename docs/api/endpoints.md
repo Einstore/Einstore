@@ -81,7 +81,7 @@ Team-scoped endpoints:
 - Purpose: Storage usage by user for the active team
 - Auth scope: Bearer (rafiki270/auth) + Team membership
 - Request schema: none
-- Response schema: `{ users: Array<{ userId: string, username: string, email: string | null, fullName: string | null, buildCount: number, totalBytes: number }> }`
+- Response schema: `{ users: Array<{ userId: string, username: string, email: string | null, fullName: string | null, buildCount: number, totalBytes: number, downloadCount: number, downloadBytes: number }> }`
 - Side effects: none
 - Platform relevance: all
 
@@ -162,7 +162,7 @@ Team-scoped endpoints:
 - Auth scope: Presigned token (query `token`)
 - Request schema: query `{ token: string }`
 - Response schema: plist XML
-- Side effects: none
+- Side effects: Records a download event for S3/Spaces builds when generating the signed IPA URL
 - Platform relevance: iOS
 
 ## GET /builds/{id}/ios/download
@@ -170,7 +170,7 @@ Team-scoped endpoints:
 - Auth scope: Presigned token (query `token`)
 - Request schema: query `{ token: string }`
 - Response schema: binary stream or redirect
-- Side effects: Records a download event
+- Side effects: Records a download event for local storage builds
 - Platform relevance: iOS
 
 ## POST /builds/{id}/ios/installs/track

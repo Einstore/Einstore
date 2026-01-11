@@ -47,6 +47,7 @@ const prismaMock = {
   buildEvent: {
     create: vi.fn(),
     findMany: vi.fn(),
+    groupBy: vi.fn(),
   },
   featureFlag: {
     create: vi.fn(),

@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../lib/prisma.js";
+import { BuildEventKind } from "@prisma/client";
 import { requireTeam } from "../auth/guard.js";
 
 type StorageUsage = {
@@ -9,6 +10,8 @@ type StorageUsage = {
   fullName: string | null;
   buildCount: number;
   totalBytes: number;
+  downloadCount: number;
+  downloadBytes: number;
 };
 
 export async function usageRoutes(app: FastifyInstance) {
@@ -33,6 +36,34 @@ export async function usageRoutes(app: FastifyInstance) {
       _sum: { sizeBytes: true },
     });
 
+    const downloadRows = await prisma.buildEvent.groupBy({
+      by: ["userId", "buildId"],
+      where: {
+        teamId,
+        kind: BuildEventKind.download,
+        userId: { not: null },
+      },
+      _count: { _all: true },
+    });
+
+    const downloadBuildIds = downloadRows.map((row) => row.buildId);
+    const downloadBuildSizes = downloadBuildIds.length
+      ? await prisma.build.findMany({
+          where: { id: { in: downloadBuildIds } },
+          select: { id: true, sizeBytes: true },
+        })
+      : [];
+    const sizeByBuildId = new Map(downloadBuildSizes.map((row) => [row.id, row.sizeBytes]));
+    const downloadMap = new Map<string, { count: number; bytes: number }>();
+    for (const row of downloadRows) {
+      if (!row.userId) continue;
+      const sizeBytes = sizeByBuildId.get(row.buildId) ?? 0;
+      const entry = downloadMap.get(row.userId) ?? { count: 0, bytes: 0 };
+      entry.count += row._count._all;
+      entry.bytes += sizeBytes * row._count._all;
+      downloadMap.set(row.userId, entry);
+    }
+
     const usageMap = new Map(
       usageRows
         .filter((row) => row.createdByUserId)
@@ -47,6 +78,7 @@ export async function usageRoutes(app: FastifyInstance) {
 
     const results: StorageUsage[] = members.map((member) => {
       const usage = usageMap.get(member.userId) ?? { buildCount: 0, totalBytes: 0 };
+      const downloads = downloadMap.get(member.userId) ?? { count: 0, bytes: 0 };
       return {
         userId: member.userId,
         username: member.user.username,
@@ -54,6 +86,8 @@ export async function usageRoutes(app: FastifyInstance) {
         fullName: member.user.fullName ?? null,
         buildCount: usage.buildCount,
         totalBytes: usage.totalBytes,
+        downloadCount: downloads.count,
+        downloadBytes: downloads.bytes,
       };
     });
 
