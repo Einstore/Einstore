@@ -13,6 +13,7 @@ import AdminLayout from "../layouts/AdminLayout";
 import AppsPage from "../pages/AppsPage";
 import BuildsPage from "../pages/BuildsPage";
 import FutureFlagsPage from "../pages/FutureFlagsPage";
+import LoginPage from "../pages/LoginPage";
 import OverviewPage from "../pages/OverviewPage";
 import PipelinesPage from "../pages/PipelinesPage";
 import SecurityPage from "../pages/SecurityPage";
@@ -37,6 +38,7 @@ import {
   getDefaultFeatureFlags,
   type FeatureFlagKey,
 } from "../lib/featureFlags";
+import RequireAuth from "./RequireAuth";
 
 const navItems = [
   { id: "overview", label: "Overview", icon: "overview" },
@@ -247,17 +249,20 @@ const AppRoutes = () => {
 
   return (
     <Routes>
+      <Route path="/login" element={<LoginPage />} />
       <Route
         element={
-          <AdminLayout
-            navItems={visibleNavItems}
-            activeNavId={activeRoute.navId ?? activeRoute.id}
-            breadcrumbs={page.breadcrumbs}
-            title={page.title}
-            actions={page.actions}
-            onTeamChange={setActiveTeamId}
-            activeTeamId={activeTeamId}
-          />
+          <RequireAuth>
+            <AdminLayout
+              navItems={visibleNavItems}
+              activeNavId={activeRoute.navId ?? activeRoute.id}
+              breadcrumbs={page.breadcrumbs}
+              title={page.title}
+              actions={page.actions}
+              onTeamChange={setActiveTeamId}
+              activeTeamId={activeTeamId}
+            />
+          </RequireAuth>
         }
       >
         <Route path="/" element={<Navigate to="/overview" replace />} />

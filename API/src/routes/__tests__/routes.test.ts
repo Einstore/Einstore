@@ -70,6 +70,9 @@ const authServiceMock = {
   getSession: vi.fn(),
   requestPasswordReset: vi.fn(),
   resetPassword: vi.fn(),
+  oauthStart: vi.fn(),
+  oauthCallback: vi.fn(),
+  oauthExchange: vi.fn(),
 };
 
 vi.mock("../../auth/service.js", () => ({
@@ -137,6 +140,12 @@ describe("routes", () => {
     authServiceMock.getSession.mockResolvedValue({ user: { id: "user-1" } });
     authServiceMock.requestPasswordReset.mockResolvedValue({ token: "reset-token" });
     authServiceMock.resetPassword.mockResolvedValue({ status: "ok" });
+    authServiceMock.oauthStart.mockResolvedValue({ authorizeUrl: "https://example.com/auth" });
+    authServiceMock.oauthCallback.mockResolvedValue({
+      status: "redirect",
+      redirectUrl: "https://admin.local/login?authCode=oauth-code",
+    });
+    authServiceMock.oauthExchange.mockResolvedValue({ session: { accessToken: "token", refreshToken: "refresh" } });
 
     prismaMock.app.create.mockResolvedValue({ id: ids.appId });
     prismaMock.app.findMany.mockResolvedValue([{ id: ids.appId }]);
@@ -232,6 +241,18 @@ describe("routes", () => {
     expect(resetConfirm.statusCode).toBe(200);
     const logoutResponse = await postJson("/auth/logout", { refreshToken: "refresh" });
     expect(logoutResponse.statusCode).toBe(200);
+    const oauthStartResponse = await app.inject({
+      method: "GET",
+      url: "/auth/oauth/google/start?redirectUri=http://api.local/cb&successRedirect=http://app.local/login&failureRedirect=http://app.local/login",
+    });
+    expect(oauthStartResponse.statusCode).toBe(200);
+    const oauthCallbackResponse = await app.inject({
+      method: "GET",
+      url: "/auth/oauth/google/callback?state=state&code=code",
+    });
+    expect(oauthCallbackResponse.statusCode).toBe(302);
+    const oauthExchangeResponse = await postJson("/auth/oauth/exchange", { authCode: "oauth-code" });
+    expect(oauthExchangeResponse.statusCode).toBe(200);
   });
 
   it("apps endpoints", async () => {

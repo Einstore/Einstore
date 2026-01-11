@@ -31,6 +31,18 @@ const resetConfirmSchema = z.object({
   newPassword: z.string().min(8),
 });
 
+const oauthStartSchema = z.object({
+  redirectUri: z.string().url(),
+  successRedirect: z.string().url(),
+  failureRedirect: z.string().url(),
+  codeChallenge: z.string().optional(),
+  codeVerifier: z.string().optional(),
+});
+
+const oauthExchangeSchema = z.object({
+  authCode: z.string().min(1),
+});
+
 const getContext = (request: { ip?: string; headers: { [key: string]: string | string[] | undefined } }) => ({
   ip: request.ip,
   userAgent: typeof request.headers["user-agent"] === "string" ? request.headers["user-agent"] : undefined,
@@ -125,6 +137,65 @@ export async function authRoutes(app: FastifyInstance) {
       return reply.send(result);
     } catch (err) {
       const authErr = asAuthError(err, "validation_failed");
+      return reply.status(400).send({ error: authErr.code, message: authErr.message });
+    }
+  });
+
+  app.get("/auth/oauth/:provider/start", async (request, reply) => {
+    const provider = (request.params as { provider: string }).provider;
+    const parsed = oauthStartSchema.safeParse(request.query);
+    if (!parsed.success) {
+      return reply.status(400).send({ error: "Invalid query" });
+    }
+    try {
+      const result = await authService.oauthStart({
+        provider: provider as "google" | "apple",
+        redirectUri: parsed.data.redirectUri,
+        successRedirect: parsed.data.successRedirect,
+        failureRedirect: parsed.data.failureRedirect,
+        codeChallenge: parsed.data.codeChallenge,
+        codeVerifier: parsed.data.codeVerifier,
+      });
+      return reply.send({ authorizeUrl: result.authorizeUrl });
+    } catch (err) {
+      const authErr = asAuthError(err, "oauth_error");
+      return reply.status(400).send({ error: authErr.code, message: authErr.message });
+    }
+  });
+
+  app.get("/auth/oauth/:provider/callback", async (request, reply) => {
+    const provider = (request.params as { provider: string }).provider;
+    const query = request.query as {
+      state?: string;
+      code?: string;
+      error?: string;
+      error_description?: string;
+    };
+    try {
+      const result = await authService.oauthCallback({
+        provider: provider as "google" | "apple",
+        state: query.state ?? "",
+        code: query.code,
+        error: query.error,
+        errorDescription: query.error_description,
+      });
+      return reply.redirect(result.redirectUrl);
+    } catch (err) {
+      const authErr = asAuthError(err, "oauth_error");
+      return reply.status(400).send({ error: authErr.code, message: authErr.message });
+    }
+  });
+
+  app.post("/auth/oauth/exchange", async (request, reply) => {
+    const parsed = oauthExchangeSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return reply.status(400).send({ error: "Invalid payload" });
+    }
+    try {
+      const result = await authService.oauthExchange(parsed.data, getContext(request));
+      return reply.send(result);
+    } catch (err) {
+      const authErr = asAuthError(err, "oauth_error");
       return reply.status(400).send({ error: authErr.code, message: authErr.message });
     }
   });

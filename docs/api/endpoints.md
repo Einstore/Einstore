@@ -74,6 +74,30 @@ All endpoints return JSON. Authenticated endpoints require `Authorization: Beare
 - Side effects: Updates credential
 - Platform relevance: all
 
+## GET /auth/oauth/{provider}/start
+- Purpose: Start OAuth login (Google/Apple)
+- Auth scope: Public (handled by rafiki270/auth)
+- Request schema: query `{ redirectUri: string, successRedirect: string, failureRedirect: string, codeChallenge?: string, codeVerifier?: string }`
+- Response schema: `{ authorizeUrl: string }`
+- Side effects: Issues OAuth state token
+- Platform relevance: all
+
+## GET /auth/oauth/{provider}/callback
+- Purpose: Handle OAuth callback and redirect to the app
+- Auth scope: Public (handled by rafiki270/auth)
+- Request schema: query `{ state: string, code?: string, error?: string, error_description?: string }`
+- Response schema: Redirect (302) to success/failure URL
+- Side effects: Creates auth code
+- Platform relevance: all
+
+## POST /auth/oauth/exchange
+- Purpose: Exchange OAuth auth code for session
+- Auth scope: Public (handled by rafiki270/auth)
+- Request schema: `{ authCode: string }`
+- Response schema: `{ session: { accessToken: string, refreshToken: string, expiresIn: number } }`
+- Side effects: Creates session
+- Platform relevance: all
+
 ## POST /apps
 - Purpose: Create app
 - Auth scope: Bearer (rafiki270/auth)

@@ -494,6 +494,69 @@
         }
       }
     },
+    "/auth/oauth/{provider}/start": {
+      "get": {
+        "summary": "Start OAuth login",
+        "requestBody": {
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OAuth start",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "authorizeUrl": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/oauth/{provider}/callback": {
+      "get": {
+        "summary": "OAuth callback",
+        "responses": {
+          "302": {
+            "description": "Redirect"
+          }
+        }
+      }
+    },
+    "/auth/oauth/exchange": {
+      "post": {
+        "summary": "Exchange OAuth auth code",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "authCode": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "authCode"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Session"
+          }
+        }
+      }
+    },
     "/apps": {
       "post": {
         "summary": "Create app",

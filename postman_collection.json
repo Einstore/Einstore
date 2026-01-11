@@ -1529,6 +1529,134 @@
       ]
     },
     {
+      "name": "Auth OAuth Start (Google)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/auth/oauth/google/start?redirectUri={{baseUrl}}/auth/oauth/google/callback&successRedirect={{adminBaseUrl}}/login&failureRedirect={{adminBaseUrl}}/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "oauth",
+            "google",
+            "start"
+          ],
+          "query": [
+            {
+              "key": "redirectUri",
+              "value": "{{baseUrl}}/auth/oauth/google/callback"
+            },
+            {
+              "key": "successRedirect",
+              "value": "{{adminBaseUrl}}/login"
+            },
+            {
+              "key": "failureRedirect",
+              "value": "{{adminBaseUrl}}/login"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('OAuth start ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth OAuth Callback (Google)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/auth/oauth/google/callback?state={{oauthState}}&code={{oauthCode}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "oauth",
+            "google",
+            "callback"
+          ],
+          "query": [
+            {
+              "key": "state",
+              "value": "{{oauthState}}"
+            },
+            {
+              "key": "code",
+              "value": "{{oauthCode}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('OAuth callback redirect', function () {",
+              "  pm.expect([302, 303]).to.include(pm.response.code);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth OAuth Exchange",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"authCode\": \"{{authCode}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/oauth/exchange",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "oauth",
+            "exchange"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('OAuth exchange ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
       "name": "Auth Logout",
       "request": {
         "method": "POST",
