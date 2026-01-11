@@ -122,9 +122,15 @@ const extractBestIconBitmap = async (
       return { name, score };
     });
 
-  let best:
-    | { name: string; score: number; width: number; height: number; size: number; buffer: Buffer }
-    | null = null;
+  type IconCandidate = {
+    name: string;
+    score: number;
+    width: number;
+    height: number;
+    size: number;
+    buffer: Buffer;
+  };
+  let best: IconCandidate | null = null;
 
   const candidateScores = new Map(candidates.map((candidate) => [candidate.name, candidate.score]));
   await scanZipEntries(
@@ -153,17 +159,17 @@ const extractBestIconBitmap = async (
   );
 
   if (!best) return null;
-
+  const resolved = best as IconCandidate;
   fs.mkdirSync(outputDir, { recursive: true });
-  const fileName = `icon-${best.width}x${best.height}.png`;
+  const fileName = `icon-${resolved.width}x${resolved.height}.png`;
   const filePath = path.join(outputDir, fileName);
-  fs.writeFileSync(filePath, best.buffer);
+  fs.writeFileSync(filePath, resolved.buffer);
   return {
-    sourcePath: best.name,
+    sourcePath: resolved.name,
     path: filePath,
-    width: best.width,
-    height: best.height,
-    sizeBytes: best.size,
+    width: resolved.width,
+    height: resolved.height,
+    sizeBytes: resolved.size,
   };
 };
 
