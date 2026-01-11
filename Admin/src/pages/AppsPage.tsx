@@ -3,15 +3,27 @@ import { useState } from "react";
 import AppsTable from "../components/AppsTable";
 import Icon from "../components/Icon";
 import Panel from "../components/Panel";
+import Pagination from "../components/Pagination";
 import type { ApiApp } from "../lib/apps";
+import type { PaginationMeta } from "../lib/pagination";
 
 type AppsPageProps = {
   apps: ApiApp[];
   appIcons?: Record<string, string>;
   onSelectApp?: (app: ApiApp) => void;
+  pagination: PaginationMeta;
+  onPageChange: (page: number) => void;
+  onPerPageChange: (perPage: number) => void;
 };
 
-const AppsPage = ({ apps, appIcons, onSelectApp }: AppsPageProps) => {
+const AppsPage = ({
+  apps,
+  appIcons,
+  onSelectApp,
+  pagination,
+  onPageChange,
+  onPerPageChange,
+}: AppsPageProps) => {
   const [platform, setPlatform] = useState("all");
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
 
@@ -65,6 +77,14 @@ const AppsPage = ({ apps, appIcons, onSelectApp }: AppsPageProps) => {
         onSelectApp={onSelectApp}
         viewMode={viewMode}
         onViewChange={setViewMode}
+      />
+      <Pagination
+        page={pagination.page}
+        totalPages={pagination.totalPages}
+        perPage={pagination.perPage}
+        total={pagination.total}
+        onPageChange={onPageChange}
+        onPerPageChange={onPerPageChange}
       />
     </div>
   );

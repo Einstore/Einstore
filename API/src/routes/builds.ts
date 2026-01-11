@@ -6,6 +6,7 @@ import { prisma } from "../lib/prisma.js";
 import { requireTeam } from "../auth/guard.js";
 import { requireAppForTeam } from "../lib/team-access.js";
 import { broadcastBadgesUpdate } from "../lib/realtime.js";
+import { buildPaginationMeta, resolvePagination } from "../lib/pagination.js";
 
 const groupArtifactsByKind = <T extends { kind: string; createdAt: Date }>(items: T[]) => {
   const grouped: Record<string, T[]> = {};
@@ -86,8 +87,10 @@ const createBuildSchema = z.object({
 const listQuerySchema = z.object({
   appId: z.string().uuid().optional(),
   versionId: z.string().uuid().optional(),
-  limit: z.coerce.number().int().positive().max(200).default(20),
-  offset: z.coerce.number().int().nonnegative().default(0),
+  page: z.coerce.number().int().positive().optional(),
+  perPage: z.coerce.number().int().positive().max(100).optional(),
+  limit: z.coerce.number().int().positive().max(200).optional(),
+  offset: z.coerce.number().int().nonnegative().optional(),
 });
 
 type CreateBuildInput = z.infer<typeof createBuildSchema>;
@@ -149,7 +152,13 @@ export async function buildRoutes(app: FastifyInstance) {
     if (!teamId) {
       return reply.status(403).send({ error: "team_required", message: "Team context required" });
     }
-    const where: { versionId?: string; version?: { app?: { teamId: string } } } = {
+    const pagination = resolvePagination({
+      page: parsed.data.page,
+      perPage: parsed.data.perPage,
+      limit: parsed.data.limit,
+      offset: parsed.data.offset,
+    });
+    const where: { versionId?: string; version?: { app?: { teamId: string; id?: string } } } = {
       version: { app: { teamId } },
     };
     if (parsed.data.versionId) {
@@ -157,24 +166,34 @@ export async function buildRoutes(app: FastifyInstance) {
     } else if (parsed.data.appId) {
       const appRecord = await requireAppForTeam(teamId, parsed.data.appId);
       if (!appRecord) {
-        return reply.send([]);
+        const meta = buildPaginationMeta({
+          page: pagination.page,
+          perPage: pagination.perPage,
+          total: 0,
+        });
+        return reply.send({ items: [], ...meta });
       }
-      const items = await prisma.build.findMany({
-        where: { version: { appId: parsed.data.appId, app: { teamId } } },
-        skip: parsed.data.offset,
-        take: parsed.data.limit,
-        orderBy: { createdAt: "desc" },
-      });
-      return reply.send(items);
+      where.version = { app: { teamId, id: parsed.data.appId } };
     }
 
-    const items = await prisma.build.findMany({
-      where,
-      skip: parsed.data.offset,
-      take: parsed.data.limit,
-      orderBy: { createdAt: "desc" },
+    const [total, items] = await prisma.$transaction([
+      prisma.build.count({ where }),
+      prisma.build.findMany({
+        where,
+        skip: pagination.offset,
+        take: pagination.perPage,
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
+    const meta = buildPaginationMeta({
+      page: pagination.page,
+      perPage: pagination.perPage,
+      total,
     });
-    return reply.send(items);
+    return reply.send({
+      items,
+      ...meta,
+    });
   });
 
   app.get("/builds/:id", { preHandler: requireTeam }, async (request, reply) => {

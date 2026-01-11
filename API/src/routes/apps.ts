@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { requireTeam } from "../auth/guard.js";
 import { broadcastBadgesUpdate } from "../lib/realtime.js";
+import { buildPaginationMeta, resolvePagination } from "../lib/pagination.js";
 
 const createAppSchema = z.object({
   name: z.string().min(1),
@@ -10,8 +11,10 @@ const createAppSchema = z.object({
 });
 
 const listQuerySchema = z.object({
-  limit: z.coerce.number().int().positive().max(200).default(20),
-  offset: z.coerce.number().int().nonnegative().default(0),
+  page: z.coerce.number().int().positive().optional(),
+  perPage: z.coerce.number().int().positive().max(100).optional(),
+  limit: z.coerce.number().int().positive().max(200).optional(),
+  offset: z.coerce.number().int().nonnegative().optional(),
 });
 
 export async function appRoutes(app: FastifyInstance) {
@@ -38,13 +41,30 @@ export async function appRoutes(app: FastifyInstance) {
     if (!teamId) {
       return reply.status(403).send({ error: "team_required", message: "Team context required" });
     }
-    const items = await prisma.app.findMany({
-      where: { teamId },
-      skip: parsed.data.offset,
-      take: parsed.data.limit,
-      orderBy: { createdAt: "desc" },
+    const pagination = resolvePagination({
+      page: parsed.data.page,
+      perPage: parsed.data.perPage,
+      limit: parsed.data.limit,
+      offset: parsed.data.offset,
     });
-    return reply.send(items);
+    const [total, items] = await prisma.$transaction([
+      prisma.app.count({ where: { teamId } }),
+      prisma.app.findMany({
+        where: { teamId },
+        skip: pagination.offset,
+        take: pagination.perPage,
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
+    const meta = buildPaginationMeta({
+      page: pagination.page,
+      perPage: pagination.perPage,
+      total,
+    });
+    return reply.send({
+      items,
+      ...meta,
+    });
   });
 
   app.get("/apps/:id", { preHandler: requireTeam }, async (request, reply) => {

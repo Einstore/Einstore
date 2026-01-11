@@ -19,10 +19,13 @@ import { usageRoutes } from "./usage.js";
 import { buildEventRoutes } from "./build-events.js";
 import { iosInstallRoutes } from "./ios-install.js";
 import { apiKeyRoutes } from "./api-keys.js";
+import { teamStatsRoutes } from "./team-stats.js";
+import { settingsRoutes } from "./settings.js";
 import { registerTeamRoutes, registerUserTeamSettingsRoutes } from "@rafiki270/teams";
 import { prisma } from "../lib/prisma.js";
 import { loadConfig } from "../lib/config.js";
-import { requireAuth } from "../auth/guard.js";
+import { requireAuth, requireTeam } from "../auth/guard.js";
+import { privateApiPlugins } from "../private/registry.js";
 export async function registerRoutes(app) {
     const config = loadConfig();
     await app.register(healthRoutes);
@@ -48,8 +51,15 @@ export async function registerRoutes(app) {
         requireAuth,
     });
     await registerUserTeamSettingsRoutes(app, { prisma, requireAuth });
+    await app.register(teamStatsRoutes);
     await app.register(usageRoutes);
     await app.register(buildEventRoutes);
     await app.register(iosInstallRoutes);
     await app.register(apiKeyRoutes);
+    await app.register(settingsRoutes);
+    for (const plugin of privateApiPlugins) {
+        if (typeof plugin.register !== "function")
+            continue;
+        await plugin.register(app, { prisma, requireAuth, requireTeam });
+    }
 }

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
-import { requireSuperUser } from "../auth/guard.js";
+import { requireAuth, requireSuperUser } from "../auth/guard.js";
 import { ensureFeatureFlag, isFeatureFlagEnabled, listFeatureFlags, resolveFeatureFlagDefaults, } from "@rafiki270/feature-flags";
 const listQuerySchema = z.object({
     limit: z.coerce.number().int().positive().max(200).default(20),
@@ -16,6 +16,16 @@ const updateFlagSchema = z.object({
     description: z.string().min(1).nullable().optional(),
     defaultEnabled: z.boolean().optional(),
     metadata: z.any().nullable().optional(),
+});
+const discoverSchema = z.object({
+    flags: z
+        .array(z.object({
+        key: z.string().min(1),
+        description: z.string().optional(),
+        defaultEnabled: z.boolean().optional(),
+        metadata: z.any().optional(),
+    }))
+        .nonempty(),
 });
 const createOverrideSchema = z.object({
     scope: z.string().min(1),
@@ -159,5 +169,18 @@ export async function featureFlagRoutes(app) {
             defaultEnabled: defaults?.defaultEnabled ?? false,
         });
         return reply.send({ key, enabled });
+    });
+    app.post("/feature-flags/discover", { preHandler: requireAuth }, async (request, reply) => {
+        const parsed = discoverSchema.safeParse(request.body);
+        if (!parsed.success) {
+            return reply.status(400).send({ error: "Invalid payload" });
+        }
+        const results = await Promise.allSettled(parsed.data.flags.map((flag) => ensureFeatureFlag(prisma, flag.key, {
+            description: flag.description,
+            defaultEnabled: flag.defaultEnabled ?? false,
+            metadata: flag.metadata,
+        })));
+        const created = results.filter((r) => r.status === "fulfilled").length;
+        return reply.status(201).send({ created });
     });
 }
