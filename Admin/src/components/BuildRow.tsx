@@ -8,7 +8,7 @@ export type BuildRowProps = {
 
 const BuildRow = ({ name, buildNumber, size, createdAt, storageKind }: BuildRowProps) => {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-ink/10 py-4 text-sm last:border-b-0">
+    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-ink/5 py-4 text-sm last:border-b-0">
       <div>
         <p className="font-semibold text-ink">{name}</p>
         <p className="text-ink/60">Build #{buildNumber}</p>

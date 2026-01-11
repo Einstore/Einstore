@@ -61,10 +61,8 @@ const FileDropzone = ({
         {helper ? <p className="text-xs text-ink/50">{helper}</p> : null}
       </div>
       <div
-        className={`flex flex-col items-center justify-center gap-3 rounded-3xl border-2 border-dashed p-6 text-sm transition ${
-          isDragging
-            ? "border-ink bg-ink/5"
-            : "border-ink/20 bg-white/70"
+        className={`flex flex-col items-center justify-center gap-3 rounded-2xl bg-white p-6 text-sm shadow-card transition-all duration-200 ease-out ${
+          isDragging ? "scale-[0.99]" : ""
         } ${disabled ? "pointer-events-none opacity-60" : ""}`}
         onDragEnter={(event) => {
           if (disabled) return;

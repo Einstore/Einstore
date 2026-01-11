@@ -1,6 +1,7 @@
 import {
   faBarsProgress,
   faBoxesStacked,
+  faBell,
   faFlag,
   faGear,
   faHouse,
@@ -17,6 +18,7 @@ const icons = {
   security: faLock,
   settings: faGear,
   flags: faFlag,
+  bell: faBell,
 } as const;
 
 export type IconName = keyof typeof icons;

@@ -9,7 +9,7 @@ type AuditRowProps = {
 
 const AuditRow = ({ title, owner, time, status }: AuditRowProps) => {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-ink/10 py-4 text-sm last:border-b-0">
+    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-ink/5 py-4 text-sm last:border-b-0">
       <div>
         <p className="font-semibold text-ink">{title}</p>
         <p className="text-ink/60">Owner: {owner}</p>

@@ -96,27 +96,25 @@ const LoginPage = () => {
   }, [authCode, navigate, redirectTarget]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-sand text-ink">
-      <div className="pointer-events-none absolute -top-20 right-10 h-72 w-72 rounded-full bg-mist/70 blur-3xl" />
-      <div className="pointer-events-none absolute bottom-0 left-0 h-80 w-80 -translate-x-1/2 rounded-full bg-coral/20 blur-3xl" />
-
-      <main className="mx-auto flex min-h-screen max-w-5xl flex-col items-center justify-center px-6 py-16">
-        <div className="w-full max-w-md rounded-[32px] border border-ink/10 bg-white/80 p-8 shadow-float backdrop-blur">
+    <div className="min-h-screen bg-sand text-ink">
+      <main className="mx-auto flex min-h-screen max-w-[420px] flex-col items-center justify-center px-6 py-16">
+        <div className="w-full rounded-2xl bg-white p-8 shadow-card">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-ink text-sand">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-mint text-ink">
               E
             </div>
             <div>
-              <p className="text-sm uppercase tracking-[0.2em] text-ink/50">
+              <p className="text-xs uppercase tracking-[0.2em] text-ink/50">
                 Einstore
               </p>
-              <p className="text-lg font-display text-ink">Admin</p>
+              <p className="text-base font-semibold text-ink">Admin</p>
             </div>
           </div>
 
-          <h1 className="mt-6 text-3xl font-display text-ink">Sign in</h1>
+          <h1 className="mt-6 text-2xl font-semibold text-ink">Sign in</h1>
           <p className="mt-2 text-sm text-ink/60">
-            Use Google or Apple. If you don’t have an account yet, one will be created on login. We only request your email.
+            Use Google or Apple. If you don’t have an account yet, one will be
+            created on login. We only request your email.
           </p>
 
           <div className="mt-6 space-y-3">
@@ -124,7 +122,7 @@ const LoginPage = () => {
               type="button"
               disabled={busy}
               onClick={() => startOAuth("google")}
-              className="flex h-11 w-full items-center justify-center gap-3 rounded-2xl border border-ink/20 bg-white text-sm font-semibold text-ink transition hover:border-ink disabled:opacity-60"
+              className="flex h-11 w-full items-center justify-center gap-3 rounded-full bg-white text-sm font-semibold text-ink shadow-card transition-all duration-200 ease-out hover:-translate-y-0.5 disabled:opacity-60"
             >
               <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink/10 text-xs font-semibold">
                 G
@@ -136,7 +134,7 @@ const LoginPage = () => {
                 type="button"
                 disabled={busy}
                 onClick={() => startOAuth("apple")}
-                className="flex h-11 w-full items-center justify-center gap-3 rounded-2xl border border-ink/20 bg-white text-sm font-semibold text-ink transition hover:border-ink disabled:opacity-60"
+                className="flex h-11 w-full items-center justify-center gap-3 rounded-full bg-white text-sm font-semibold text-ink shadow-card transition-all duration-200 ease-out hover:-translate-y-0.5 disabled:opacity-60"
               >
                 <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink/10 text-xs font-semibold">
                   A
@@ -147,17 +145,17 @@ const LoginPage = () => {
           </div>
 
           {status ? (
-            <div className="mt-4 rounded-2xl border border-ink/10 bg-sand/80 p-3 text-xs text-ink/70" aria-live="polite">
+            <div className="mt-4 rounded-xl bg-sand p-3 text-xs text-ink/70" aria-live="polite">
               {status}
             </div>
           ) : null}
           {error ? (
-            <div className="mt-3 rounded-2xl border border-coral/40 bg-coral/10 p-3 text-xs text-coral" aria-live="polite">
+            <div className="mt-3 rounded-xl bg-coral/10 p-3 text-xs text-coral" aria-live="polite">
               {error}
             </div>
           ) : null}
 
-          <div className="mt-6 rounded-2xl border border-ink/10 bg-sand/70 p-4 text-xs text-ink/60">
+          <div className="mt-6 rounded-xl bg-sand p-4 text-xs text-ink/60">
             Need access? Contact your workspace admin to be provisioned.
           </div>
         </div>

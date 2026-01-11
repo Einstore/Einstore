@@ -8,7 +8,7 @@ type BuildQueueListProps = {
 
 const BuildQueueList = ({ jobs }: BuildQueueListProps) => {
   return (
-    <div className="rounded-3xl border border-ink/10 bg-white/70 p-6 shadow-float backdrop-blur">
+    <div className="rounded-2xl bg-white p-4 shadow-card">
       {jobs.map((job) => (
         <BuildRow
           key={job.id}

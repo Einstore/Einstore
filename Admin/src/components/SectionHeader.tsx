@@ -10,9 +10,9 @@ const SectionHeader = ({ title, description, actions }: SectionHeaderProps) => {
   return (
     <div className="flex flex-wrap items-center justify-between gap-4">
       <div>
-        <h2 className="font-display text-2xl text-ink">{title}</h2>
+        <h2 className="font-display text-lg text-ink">{title}</h2>
         {description ? (
-          <p className="mt-2 max-w-2xl text-sm text-ink/70">
+          <p className="mt-2 max-w-2xl text-sm text-ink/60">
             {description}
           </p>
         ) : null}

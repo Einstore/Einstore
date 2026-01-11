@@ -11,13 +11,13 @@ type CheckboxFieldProps = {
 const CheckboxField = ({ id, label, checked, onChange, hint }: CheckboxFieldProps) => {
   return (
     <FormField label={label} htmlFor={id} hint={hint}>
-      <label className="flex items-center gap-3 text-sm text-ink/70">
+      <label className="flex items-center gap-3 text-sm text-ink/60">
         <input
           id={id}
           type="checkbox"
           checked={checked}
           onChange={(event) => onChange(event.target.checked)}
-          className="h-4 w-4 rounded border-ink/30 text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30"
+          className="h-4 w-4 rounded border-ink/20 text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20"
         />
         Default enabled
       </label>

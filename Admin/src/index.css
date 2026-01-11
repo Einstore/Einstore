@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -13,6 +13,6 @@ body {
 }
 
 ::selection {
-  background: #e0704f;
-  color: #151318;
+  background: #c8f7a1;
+  color: #111827;
 }

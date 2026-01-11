@@ -85,7 +85,7 @@ const AdminLayout = ({
             />
           }
           footer={
-            <div className="rounded-2xl border border-ink/10 bg-sand p-4 text-sm text-ink/70">
+            <div className="rounded-2xl bg-sand p-4 text-sm text-ink/60">
               Next checkpoint: SOC2 evidence export due in 2 days.
             </div>
           }

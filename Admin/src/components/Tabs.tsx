@@ -21,10 +21,10 @@ const Tabs = ({ items, activeId, onChange }: TabsProps) => {
             key={item.id}
             type="button"
             onClick={() => onChange(item.id)}
-            className={`h-11 rounded-full px-5 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 ${
+            className={`h-11 rounded-full px-5 text-sm font-semibold transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20 ${
               activeId === item.id
-                ? "bg-ink text-sand"
-                : "border border-ink/15 text-ink/70 hover:border-ink"
+                ? "bg-mint text-ink shadow-card"
+                : "bg-white text-ink/60 shadow-card"
             }`}
           >
             {item.label}

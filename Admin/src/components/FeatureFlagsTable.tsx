@@ -20,8 +20,8 @@ const FeatureFlagsTable = ({
 }: FeatureFlagsTableProps) => {
   return (
     <Panel className="p-0">
-      <div className="flex items-center justify-between border-b border-ink/10 px-6 py-4">
-        <h2 className="text-lg font-semibold text-ink">Future flags</h2>
+      <div className="flex items-center justify-between border-b border-ink/5 px-6 py-4">
+        <h2 className="text-base font-semibold text-ink">Future flags</h2>
         {isLoading ? <span className="text-sm text-ink/60">Loading…</span> : null}
       </div>
       {!flags.length && !isLoading ? (
@@ -32,7 +32,7 @@ const FeatureFlagsTable = ({
       {flags.length ? (
         <div className="overflow-x-auto">
           <table className="min-w-full text-left text-sm">
-            <thead className="text-xs uppercase tracking-wide text-ink/50">
+            <thead className="text-xs uppercase tracking-wide text-ink/40">
               <tr>
                 <th className="px-6 py-3">Key</th>
                 <th className="px-6 py-3">Description</th>
@@ -40,7 +40,7 @@ const FeatureFlagsTable = ({
                 <th className="px-6 py-3">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-ink/10">
+            <tbody className="divide-y divide-ink/5">
               {flags.map((flag) => (
                 <tr key={flag.id} className="bg-white">
                   <td className="px-6 py-4 font-semibold text-ink">

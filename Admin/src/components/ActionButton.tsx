@@ -7,9 +7,9 @@ type ActionButtonProps = {
 };
 
 const variantStyles = {
-  primary: "bg-ink text-sand hover:bg-ink/90",
-  outline: "border border-ink/20 text-ink hover:border-ink",
-  danger: "bg-coral text-ink hover:bg-coral/90",
+  primary: "bg-ink text-white shadow-card hover:-translate-y-0.5",
+  outline: "bg-white text-ink shadow-card hover:-translate-y-0.5",
+  danger: "bg-coral text-white shadow-card hover:-translate-y-0.5",
 } as const;
 
 const ActionButton = ({
@@ -24,7 +24,7 @@ const ActionButton = ({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`h-11 rounded-full px-5 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 disabled:cursor-not-allowed disabled:opacity-60 ${
+      className={`h-11 rounded-full px-5 text-sm font-semibold transition-all duration-200 ease-out active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 disabled:cursor-not-allowed disabled:opacity-60 ${
         variantStyles[variant]
       }`}
     >

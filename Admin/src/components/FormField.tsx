@@ -12,12 +12,12 @@ const FormField = ({ label, htmlFor, hint, children }: FormFieldProps) => {
     <div className="space-y-2">
       <label
         htmlFor={htmlFor}
-        className="text-xs font-semibold uppercase tracking-wide text-ink/60"
+        className="text-xs font-medium uppercase tracking-wide text-ink/50"
       >
         {label}
       </label>
       {children}
-      {hint ? <p className="text-xs text-ink/50">{hint}</p> : null}
+      {hint ? <p className="text-xs text-ink/40">{hint}</p> : null}
     </div>
   );
 };
