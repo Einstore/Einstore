@@ -1,6 +1,7 @@
 /docker-compose.override.yaml
 /dev/
 /storage/
+/API/storage/
 node_modules/
 functions/**/.deployed
 functions/**/__deployer__.zip
