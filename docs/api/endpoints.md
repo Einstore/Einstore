@@ -510,6 +510,7 @@ Team-scoped endpoints:
 - Platform relevance: ios, android
 - Notes:
   - iOS: extracts entitlements/provisioning profile and stores an `entitlements` artifact with `distribution` = adhoc | appstore | enterprise | none | broken.
+  - Errors: `400 invalid_archive` when the IPA/APK is not a valid zip archive.
 
 ## POST /ingest/upload
 - Purpose: Upload and ingest an IPA/APK in one step
@@ -518,6 +519,8 @@ Team-scoped endpoints:
 - Response schema: `{ status: string, result: object }`
 - Side effects: Stores upload on the server, then ingests metadata
 - Platform relevance: ios, android
+- Notes:
+  - Errors: `400 invalid_archive` when the IPA/APK is not a valid zip archive.
 
 ## POST /feature-flags
 - Purpose: Create/ensure feature flag

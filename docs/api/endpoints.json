@@ -1797,7 +1797,7 @@
     "/ingest": {
       "post": {
         "summary": "Queue ingestion",
-        "description": "iOS: extracts entitlements/provisioning profile and stores an entitlements artifact with distribution = adhoc | appstore | enterprise | none | broken.",
+        "description": "iOS: extracts entitlements/provisioning profile and stores an entitlements artifact with distribution = adhoc | appstore | enterprise | none | broken. Returns 400 invalid_archive when the IPA/APK is not a valid zip archive.",
         "security": [
           {
             "bearerAuth": []
@@ -2031,6 +2031,7 @@
     "/ingest/upload": {
       "post": {
         "summary": "Upload and ingest build",
+        "description": "Returns 400 invalid_archive when the IPA/APK is not a valid zip archive.",
         "security": [
           {
             "bearerAuth": []

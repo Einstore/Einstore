@@ -6,6 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { ingestAndroidApk } from "../lib/ingest/android.js";
 import { ingestIosIpa } from "../lib/ingest/ios.js";
+import { ensureZipReadable, isInvalidArchiveError } from "../lib/zip.js";
 import { requireTeam } from "../auth/guard.js";
 import { broadcastBadgesUpdate } from "../lib/realtime.js";
 
@@ -32,12 +33,28 @@ export async function pipelineRoutes(app: FastifyInstance) {
 
     const userId = request.auth?.user.id;
     if (payload.kind === "apk") {
+      try {
+        await ensureZipReadable(payload.filePath);
+      } catch (error) {
+        if (isInvalidArchiveError(error)) {
+          return reply.status(400).send({ error: "invalid_archive" });
+        }
+        throw error;
+      }
       const result = await ingestAndroidApk(payload.filePath, teamId, userId);
       await broadcastBadgesUpdate(teamId).catch(() => undefined);
       return reply.status(201).send({ status: "ingested", result });
     }
 
     if (payload.kind === "ipa") {
+      try {
+        await ensureZipReadable(payload.filePath);
+      } catch (error) {
+        if (isInvalidArchiveError(error)) {
+          return reply.status(400).send({ error: "invalid_archive" });
+        }
+        throw error;
+      }
       const result = await ingestIosIpa(payload.filePath, teamId, userId);
       await broadcastBadgesUpdate(teamId).catch(() => undefined);
       return reply.status(201).send({ status: "ingested", result });
@@ -86,6 +103,15 @@ export async function pipelineRoutes(app: FastifyInstance) {
 
     const userId = request.auth?.user.id;
     try {
+      await ensureZipReadable(filePath);
+    } catch (error) {
+      if (isInvalidArchiveError(error)) {
+        await fs.promises.rm(filePath, { force: true });
+        return reply.status(400).send({ error: "invalid_archive" });
+      }
+      throw error;
+    }
+    try {
       if (extension === ".apk") {
         const result = await ingestAndroidApk(filePath, teamId, userId);
         await broadcastBadgesUpdate(teamId).catch(() => undefined);
@@ -96,8 +122,7 @@ export async function pipelineRoutes(app: FastifyInstance) {
       await broadcastBadgesUpdate(teamId).catch(() => undefined);
       return reply.status(201).send({ status: "ingested", result });
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      if (message.includes("end of central directory record signature not found")) {
+      if (isInvalidArchiveError(error)) {
         return reply.status(400).send({ error: "invalid_archive" });
       }
       throw error;
