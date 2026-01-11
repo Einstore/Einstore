@@ -108,7 +108,7 @@ services:
   instance_count: 1
   instance_size_slug: apps-s-1vcpu-0.5gb
   name: api
-  run_command: npm run start
+  run_command: npm run prisma:deploy && npm run start
   source_dir: /API
 static_sites:
 - github:
