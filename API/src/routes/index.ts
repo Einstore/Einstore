@@ -61,7 +61,7 @@ export async function registerRoutes(app: FastifyInstance) {
   await app.register(settingsRoutes);
 
   for (const plugin of privateApiPlugins) {
-    if (!plugin.register) continue;
+    if (typeof plugin.register !== "function") continue;
     await plugin.register(app, { prisma, requireAuth, requireTeam });
   }
 }
