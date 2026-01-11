@@ -12,3 +12,5 @@ API/src/private/registry.ts
 Admin/src/private/routes.generated.tsx
 Private/*
 !Private/README.md
+!Private/billing/
+!Private/billing/**

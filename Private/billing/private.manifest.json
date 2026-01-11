@@ -1,0 +1,15 @@
+{
+  "id": "billing",
+  "name": "Billing",
+  "api": { "entry": "./api/index.js" },
+  "ui": {
+    "routePath": "/billing",
+    "component": "./ui/Route.tsx",
+    "menu": { "label": "Billing", "icon": "settings" },
+    "page": {
+      "title": "Billing",
+      "breadcrumbs": [{ "label": "Billing" }],
+      "actions": []
+    }
+  }
+}
