@@ -387,8 +387,8 @@ Optional tracking metadata shared by download/install endpoints.
 ## GET /apps
 - Purpose: List apps
 - Auth scope: Bearer (rafiki270/auth)
-- Request schema: query `{ page?: number, perPage?: number, limit?: number, offset?: number }`
-- Response schema: `{ items: App[], page: number, perPage: number, total: number, totalPages: number }`
+- Request schema: query `{ page?: number, perPage?: number, limit?: number, offset?: number, platform?: PlatformKind }`
+- Response schema: `{ items: Array<App & { platform?: PlatformKind | null }>, page: number, perPage: number, total: number, totalPages: number }`
 - Side effects: none
 - Platform relevance: all
 

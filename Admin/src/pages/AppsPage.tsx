@@ -12,6 +12,8 @@ type AppsPageProps = {
   apps: ApiApp[];
   appIcons?: Record<string, string>;
   onSelectApp?: (app: ApiApp) => void;
+  platform: string;
+  onPlatformChange: (platform: string) => void;
   pagination: PaginationMeta;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
@@ -22,18 +24,14 @@ const AppsPage = ({
   apps,
   appIcons,
   onSelectApp,
+  platform,
+  onPlatformChange,
   pagination,
   onPageChange,
   onPerPageChange,
   onUpload,
 }: AppsPageProps) => {
-  const [platform, setPlatform] = useState("all");
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
-
-  const filteredApps =
-    platform === "all"
-      ? apps
-      : apps.filter((app) => app.platform?.toLowerCase() === platform);
 
   return (
     <div className="space-y-6">
@@ -54,7 +52,7 @@ const AppsPage = ({
                   <button
                     key={option.id}
                     type="button"
-                    onClick={() => setPlatform(option.id)}
+                    onClick={() => onPlatformChange(option.id)}
                     className={`flex h-11 items-center gap-2 rounded-lg border px-4 text-sm font-medium transition-colors ${
                       isActive
                         ? "border-indigo-500 bg-indigo-50 text-indigo-600 dark:border-indigo-400/60 dark:bg-indigo-500/20 dark:text-indigo-300"
@@ -77,7 +75,7 @@ const AppsPage = ({
       {apps.length ? (
         <>
           <AppsTable
-            apps={filteredApps}
+            apps={apps}
             appIcons={appIcons}
             onSelectApp={onSelectApp}
             viewMode={viewMode}

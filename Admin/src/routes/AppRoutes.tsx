@@ -66,6 +66,7 @@ const AppRoutes = () => {
   });
   const [appsPage, setAppsPage] = useState(1);
   const [appsPerPage, setAppsPerPage] = useState(25);
+  const [appsPlatform, setAppsPlatform] = useState("all");
   const [appIcons, setAppIcons] = useState<Record<string, string>>({});
   const [ingestNonce, setIngestNonce] = useState(0);
   const [storageUsage, setStorageUsage] = useState<StorageUsageUser[]>([]);
@@ -127,8 +128,9 @@ const AppRoutes = () => {
       return;
     }
     try {
+      const platformQuery = appsPlatform !== "all" ? `&platform=${appsPlatform}` : "";
       const payload = await apiFetch<PaginatedResponse<ApiApp>>(
-        `/apps?page=${appsPage}&perPage=${appsPerPage}`,
+        `/apps?page=${appsPage}&perPage=${appsPerPage}${platformQuery}`,
         {
           headers: { "x-team-id": activeTeamId },
         }
@@ -147,7 +149,7 @@ const AppRoutes = () => {
       setAppsList([]);
       setAppsPagination({ page: appsPage, perPage: appsPerPage, total: 0, totalPages: 1 });
     }
-  }, [activeTeamId, appsPage, appsPerPage]);
+  }, [activeTeamId, appsPage, appsPerPage, appsPlatform]);
 
   useEffect(() => {
     let isMounted = true;
@@ -365,6 +367,11 @@ const AppRoutes = () => {
           apps={appsList}
           appIcons={appIcons}
           onSelectApp={(appId) => navigate(`/apps/${appId}/builds`)}
+          platform={appsPlatform}
+          onPlatformChange={(nextPlatform) => {
+            setAppsPlatform(nextPlatform);
+            setAppsPage(1);
+          }}
           pagination={appsPagination}
           onPageChange={setAppsPage}
           onPerPageChange={(perPage) => {
@@ -560,6 +567,8 @@ const AppsRoute = ({
   apps,
   appIcons,
   onSelectApp,
+  platform,
+  onPlatformChange,
   pagination,
   onPageChange,
   onPerPageChange,
@@ -568,6 +577,8 @@ const AppsRoute = ({
   apps: ApiApp[];
   appIcons: Record<string, string>;
   onSelectApp: (appId: string) => void;
+  platform: string;
+  onPlatformChange: (platform: string) => void;
   pagination: PaginationMeta;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
@@ -578,6 +589,8 @@ const AppsRoute = ({
       apps={apps}
       appIcons={appIcons}
       onSelectApp={(app) => onSelectApp(app.id)}
+      platform={platform}
+      onPlatformChange={onPlatformChange}
       pagination={pagination}
       onPageChange={onPageChange}
       onPerPageChange={onPerPageChange}

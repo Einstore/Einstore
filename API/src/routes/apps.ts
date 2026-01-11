@@ -4,6 +4,7 @@ import { prisma } from "../lib/prisma.js";
 import { requireTeam } from "../auth/guard.js";
 import { broadcastBadgesUpdate } from "../lib/realtime.js";
 import { buildPaginationMeta, resolvePagination } from "../lib/pagination.js";
+import { PlatformKind } from "@prisma/client";
 
 const createAppSchema = z.object({
   name: z.string().min(1),
@@ -15,6 +16,7 @@ const listQuerySchema = z.object({
   perPage: z.coerce.number().int().positive().max(100).optional(),
   limit: z.coerce.number().int().positive().max(200).optional(),
   offset: z.coerce.number().int().nonnegative().optional(),
+  platform: z.nativeEnum(PlatformKind).optional(),
 });
 
 export async function appRoutes(app: FastifyInstance) {
@@ -47,22 +49,57 @@ export async function appRoutes(app: FastifyInstance) {
       limit: parsed.data.limit,
       offset: parsed.data.offset,
     });
+    const where = parsed.data.platform
+      ? {
+          teamId,
+          versions: {
+            some: {
+              builds: { some: { targets: { some: { platform: parsed.data.platform } } } },
+            },
+          },
+        }
+      : { teamId };
     const [total, items] = await prisma.$transaction([
-      prisma.app.count({ where: { teamId } }),
+      prisma.app.count({ where }),
       prisma.app.findMany({
-        where: { teamId },
+        where,
         skip: pagination.offset,
         take: pagination.perPage,
         orderBy: { createdAt: "desc" },
       }),
     ]);
+    const appIds = items.map((item) => item.id);
+    const builds = appIds.length
+      ? await prisma.build.findMany({
+          where: { version: { appId: { in: appIds } } },
+          select: {
+            createdAt: true,
+            version: { select: { appId: true } },
+            targets: { select: { platform: true, role: true } },
+          },
+          orderBy: { createdAt: "desc" },
+        })
+      : [];
+    const buildList = Array.isArray(builds) ? builds : [];
+    const appPlatformMap = new Map<string, PlatformKind>();
+    for (const build of buildList) {
+      const appId = build.version.appId;
+      if (appPlatformMap.has(appId)) continue;
+      const target = build.targets.find((entry) => entry.role === "app") ?? build.targets[0];
+      if (target?.platform) {
+        appPlatformMap.set(appId, target.platform);
+      }
+    }
     const meta = buildPaginationMeta({
       page: pagination.page,
       perPage: pagination.perPage,
       total,
     });
     return reply.send({
-      items,
+      items: items.map((item) => ({
+        ...item,
+        platform: appPlatformMap.get(item.id) ?? null,
+      })),
       ...meta,
     });
   });
