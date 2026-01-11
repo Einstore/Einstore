@@ -7,3 +7,8 @@ functions/**/.deployed
 functions/**/__deployer__.zip
 functions/**/package-lock.json
 /Admin/dist
+API/prisma/generated/
+API/src/private/registry.ts
+Admin/src/private/routes.generated.tsx
+Private/*
+!Private/README.md

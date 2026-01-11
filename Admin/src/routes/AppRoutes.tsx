@@ -41,6 +41,11 @@ import {
 import { useSessionState } from "../lib/session";
 import RequireAuth from "./RequireAuth";
 import { navItems, pageConfig, type RouteConfig } from "./config";
+import {
+  privateNavItems,
+  privatePageConfig,
+  privateRoutes,
+} from "../private/routes.generated";
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -151,7 +156,7 @@ const AppRoutes = () => {
   }, [apps, hasToken]);
 
 
-  const routes: RouteConfig[] = [
+  const coreRoutes: RouteConfig[] = [
     {
       id: "overview",
       path: "/overview",
@@ -242,8 +247,16 @@ const AppRoutes = () => {
     },
   ];
 
+  const routes: RouteConfig[] = [...coreRoutes, ...privateRoutes];
+
   const visibleNavItems = useMemo(() => {
-    const withBadges = navItems.map((item) => {
+    const sortedPrivate = [...privateNavItems].sort((a, b) => a.label.localeCompare(b.label));
+    const settingsIndex = navItems.findIndex((item) => item.id === "settings");
+    const beforeSettings = settingsIndex >= 0 ? navItems.slice(0, settingsIndex) : navItems;
+    const afterSettings = settingsIndex >= 0 ? navItems.slice(settingsIndex) : [];
+    const merged = [...beforeSettings, ...sortedPrivate, ...afterSettings];
+
+    const withBadges = merged.map((item) => {
       if (item.id === "apps") {
         return { ...item, badge: badges.apps ? String(badges.apps) : undefined };
       }
@@ -253,7 +266,13 @@ const AppRoutes = () => {
       return item;
     });
     return withBadges.filter((item) => {
+      if (item.featureFlag && !featureFlags[item.featureFlag]) {
+        return false;
+      }
       if (item.superOnly && !isSuperUser) {
+        return false;
+      }
+      if (item.adminOnly && !isAdmin) {
         return false;
       }
       if ((item.id === "settings" || item.id === "api-keys") && !isAdmin) {
@@ -270,7 +289,10 @@ const AppRoutes = () => {
     return match ?? routes[0];
   }, [routes, location.pathname]);
 
-  const page = pageConfig[activeRoute.id];
+  const page =
+    pageConfig[activeRoute.id as keyof typeof pageConfig] ??
+    privatePageConfig[activeRoute.id] ??
+    pageConfig.overview;
 
   const handleIngest = useCallback(
     async (file: File) => {

@@ -1,10 +1,18 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { transform } from "esbuild";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const privateDir = path.resolve(__dirname, "..", "Private");
 
 export default defineConfig({
   server: {
     port: 5173,
+    fs: {
+      allow: [privateDir, path.resolve(__dirname)],
+    },
   },
   optimizeDeps: {
     esbuildOptions: {

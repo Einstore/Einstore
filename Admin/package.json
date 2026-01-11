@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "node ../scripts/prepare-private.mjs && vite",
+    "build": "node ../scripts/prepare-private.mjs && vite build",
     "postbuild": "cp dist/index.html dist/404.html",
     "preview": "vite preview"
   },

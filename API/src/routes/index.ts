@@ -24,7 +24,8 @@ import { teamStatsRoutes } from "./team-stats.js";
 import { registerTeamRoutes, registerUserTeamSettingsRoutes } from "@rafiki270/teams";
 import { prisma } from "../lib/prisma.js";
 import { loadConfig } from "../lib/config.js";
-import { requireAuth } from "../auth/guard.js";
+import { requireAuth, requireTeam } from "../auth/guard.js";
+import { privateApiPlugins } from "../private/registry.js";
 
 export async function registerRoutes(app: FastifyInstance) {
   const config = loadConfig();
@@ -56,4 +57,9 @@ export async function registerRoutes(app: FastifyInstance) {
   await app.register(buildEventRoutes);
   await app.register(iosInstallRoutes);
   await app.register(apiKeyRoutes);
+
+  for (const plugin of privateApiPlugins) {
+    if (!plugin.register) continue;
+    await plugin.register(app, { prisma, requireAuth, requireTeam });
+  }
 }

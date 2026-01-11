@@ -4,15 +4,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc -p tsconfig.json",
+    "dev": "npm run private:prepare && tsx watch src/index.ts",
+    "build": "npm run private:prepare && tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "test:unit": "node scripts/run-unit-tests.mjs",
-    "postinstall": "prisma generate",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:deploy": "prisma migrate deploy",
-    "prisma:ensure-schema": "if [ \"$ENABLE_SCHEMA_CREATE\" = \"true\" ]; then echo \"CREATE SCHEMA IF NOT EXISTS einstore;\" | prisma db execute --stdin --schema prisma/schema.prisma; else echo \"Skipping schema creation (ENABLE_SCHEMA_CREATE not set)\"; fi"
+    "postinstall": "npm run prisma:generate",
+    "private:prepare": "node ../scripts/prepare-private.mjs",
+    "prisma:generate": "npm run private:prepare && prisma generate --schema prisma/generated/schema.prisma",
+    "prisma:migrate": "npm run private:prepare && prisma migrate dev --schema prisma/generated/schema.prisma",
+    "prisma:deploy": "npm run private:prepare && prisma migrate deploy --schema prisma/generated/schema.prisma",
+    "prisma:ensure-schema": "npm run private:prepare && if [ \"$ENABLE_SCHEMA_CREATE\" = \"true\" ]; then echo \"CREATE SCHEMA IF NOT EXISTS einstore;\" | prisma db execute --stdin --schema prisma/generated/schema.prisma; else echo \"Skipping schema creation (ENABLE_SCHEMA_CREATE not set)\"; fi"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.966.0",

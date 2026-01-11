@@ -3,7 +3,7 @@ import type { ReactElement } from "react";
 import type { NavItem } from "../components/Sidebar";
 import type { FeatureFlagKey } from "../lib/featureFlags";
 
-export type NavItemConfig = NavItem & { superOnly?: boolean };
+export type NavItemConfig = NavItem & { superOnly?: boolean; adminOnly?: boolean };
 
 export const navItems: NavItemConfig[] = [
   { id: "overview", label: "Overview", icon: "overview" },
@@ -61,8 +61,10 @@ export const pageConfig = {
 
 export type PageKey = keyof typeof pageConfig;
 
+export type PageConfigEntry = (typeof pageConfig)[PageKey];
+
 export type RouteConfig = {
-  id: PageKey;
+  id: PageKey | string;
   path: string;
   element: ReactElement;
   navId?: string;
