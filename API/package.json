@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",
-    "postinstall": "npm --prefix ../Libraries/teams install && npm --prefix ../Libraries/teams run build && npm --prefix ../Libraries/rafiki-auth install && npm --prefix ../Libraries/rafiki-auth run build",
     "start": "node dist/index.js",
     "test:unit": "vitest run",
     "prisma:generate": "prisma generate",
