@@ -1,5 +1,5 @@
 type AppAvatarProps = {
-  name: string;
+  name?: string | null;
   size?: "sm" | "md";
 };
 
@@ -10,11 +10,13 @@ const sizes = {
 
 const AppAvatar = ({ name, size = "md" }: AppAvatarProps) => {
   const initials = name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? "")
-    .join("");
+    ? name
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? "")
+      .join("")
+    : "";
 
   return (
     <span
