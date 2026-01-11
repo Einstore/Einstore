@@ -10,6 +10,7 @@ const devHost = process.env.ADMIN_DEV_HOST || "0.0.0.0";
 const devPort = Number(process.env.ADMIN_DEV_PORT || 5173);
 const publicHost = process.env.ADMIN_PUBLIC_HOST || "localhost";
 const hmrClientPort = Number(process.env.ADMIN_DEV_CLIENT_PORT || devPort);
+const hmrProtocol = process.env.ADMIN_DEV_HMR_PROTOCOL || "wss";
 
 export default defineConfig({
   server: {
@@ -18,6 +19,7 @@ export default defineConfig({
     hmr: {
       host: publicHost,
       clientPort: hmrClientPort,
+      protocol: hmrProtocol,
     },
     fs: {
       allow: [privateDir, path.resolve(__dirname)],
