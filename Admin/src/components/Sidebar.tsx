@@ -30,21 +30,24 @@ const Sidebar = ({
 }: SidebarProps) => {
   return (
     <aside className="flex h-screen w-64 min-w-64 flex-col border-r border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
-      <div className="flex items-center gap-3 px-6 py-6">
+      <button
+        type="button"
+        className="flex w-full items-center gap-4 px-6 py-6 text-left"
+        onClick={() => onSelect?.("overview")}
+        aria-label="Go to overview"
+      >
         <img
           src="/brand/einstore-icon-1024.png"
           alt="Einstore"
-          className="h-10 w-10 rounded-lg"
+          className="h-20 w-20 rounded-xl"
         />
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+          <p className="text-2xl font-semibold uppercase tracking-wide text-slate-900 dark:text-slate-100">
             Einstore
           </p>
-          <p className="mt-1 text-base font-semibold text-slate-900 dark:text-slate-100">
-            Admin
-          </p>
+          <p className="mt-0.5 text-xs text-slate-400">Admin</p>
         </div>
-      </div>
+      </button>
 
       {teamSwitcher ? <div className="px-4">{teamSwitcher}</div> : null}
 
