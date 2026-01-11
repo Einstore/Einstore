@@ -177,7 +177,7 @@ const isFeatureFlagEnabledMock = vi.fn();
 const listFeatureFlagsMock = vi.fn();
 const resolveFeatureFlagDefaultsMock = vi.fn();
 
-vi.mock("@rafiki270/feature-flags", () => ({
+vi.mock("../../lib/featureFlags.js", () => ({
   ensureFeatureFlag: ensureFeatureFlagMock,
   isFeatureFlagEnabled: isFeatureFlagEnabledMock,
   listFeatureFlags: listFeatureFlagsMock,

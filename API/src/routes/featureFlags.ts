@@ -7,7 +7,7 @@ import {
   isFeatureFlagEnabled,
   listFeatureFlags,
   resolveFeatureFlagDefaults,
-} from "@rafiki270/feature-flags";
+} from "../lib/featureFlags.js";
 
 const listQuerySchema = z.object({
   limit: z.coerce.number().int().positive().max(200).default(20),
