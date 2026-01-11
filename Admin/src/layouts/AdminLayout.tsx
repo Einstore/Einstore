@@ -9,7 +9,7 @@ import Sidebar from "../components/Sidebar";
 import TeamSwitcher from "../components/TeamSwitcher";
 import Topbar from "../components/Topbar";
 import type { NavItem } from "../components/Sidebar";
-import { teams } from "../data/mock";
+import type { TeamSummary } from "../lib/teams";
 
 type AdminLayoutProps = {
   navItems: readonly NavItem[];
@@ -19,6 +19,8 @@ type AdminLayoutProps = {
   actions: { id: string; label: string; variant?: "primary" | "outline" }[];
   onTeamChange: (teamId: string) => void;
   activeTeamId: string;
+  teams: TeamSummary[];
+  onUpload: (file: File) => Promise<void>;
 };
 
 const AdminLayout = ({
@@ -29,13 +31,33 @@ const AdminLayout = ({
   actions,
   onTeamChange,
   activeTeamId,
+  teams,
+  onUpload,
 }: AdminLayoutProps) => {
   const [isAddAppOpen, setIsAddAppOpen] = useState(false);
+  const [quickUploadStatus, setQuickUploadStatus] = useState("");
+  const [quickUploadBusy, setQuickUploadBusy] = useState(false);
   const navigate = useNavigate();
 
   const handleAction = (actionId: string) => {
     if (actionId === "add-app") {
       setIsAddAppOpen(true);
+    }
+  };
+
+  const handleQuickUpload = async (file: File | null) => {
+    if (!file || quickUploadBusy) {
+      return;
+    }
+    setQuickUploadBusy(true);
+    setQuickUploadStatus("Uploading build...");
+    try {
+      await onUpload(file);
+      setQuickUploadStatus("Build ingested.");
+    } catch (err) {
+      setQuickUploadStatus(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setQuickUploadBusy(false);
     }
   };
 
@@ -57,7 +79,9 @@ const AdminLayout = ({
             <FileDropzone
               label="Quick upload"
               helper="Drop a build to start ingestion."
-              onFileSelect={() => undefined}
+              onFileSelect={handleQuickUpload}
+              disabled={quickUploadBusy}
+              statusMessage={quickUploadStatus || undefined}
             />
           }
           footer={
@@ -85,7 +109,11 @@ const AdminLayout = ({
         }
       />
       <Outlet />
-      <AddAppDialog isOpen={isAddAppOpen} onClose={() => setIsAddAppOpen(false)} />
+      <AddAppDialog
+        isOpen={isAddAppOpen}
+        onClose={() => setIsAddAppOpen(false)}
+        onUpload={onUpload}
+      />
     </AppShell>
   );
 };

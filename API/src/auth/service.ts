@@ -5,13 +5,14 @@ import {
   GoogleOAuthProvider,
   buildAuthConfigFromEnv,
   createAppleClientSecret,
+  type OAuthProvider,
 } from "@unlikeother/auth";
 import { PrismaAuthStore } from "./store.js";
 
 const store = new PrismaAuthStore();
 
 const buildOAuthProviders = async () => {
-  const providers: Partial<Record<"google" | "apple", unknown>> = {};
+  const providers: Partial<Record<"google" | "apple", OAuthProvider>> = {};
   if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     providers.google = new GoogleOAuthProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,

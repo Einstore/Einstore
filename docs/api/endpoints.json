@@ -55,6 +55,32 @@
           }
         }
       },
+      "AuthSessionInfo": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "avatarUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
       "App": {
         "type": "object",
         "properties": {
@@ -464,6 +490,7 @@
     "/auth/register": {
       "post": {
         "summary": "Register user",
+        "description": "Creates a personal team if the user has no team membership yet.",
         "requestBody": {
           "required": true,
           "content": {
@@ -506,6 +533,7 @@
     "/auth/login": {
       "post": {
         "summary": "Login",
+        "description": "Ensures a personal team exists for first-time logins.",
         "requestBody": {
           "required": true,
           "content": {
@@ -608,7 +636,14 @@
         ],
         "responses": {
           "200": {
-            "description": "Session"
+            "description": "Session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthSessionInfo"
+                }
+              }
+            }
           }
         }
       }
@@ -711,6 +746,7 @@
     "/auth/oauth/exchange": {
       "post": {
         "summary": "Exchange OAuth auth code",
+        "description": "Creates a session and ensures a personal team exists for first-time logins.",
         "requestBody": {
           "required": true,
           "content": {
@@ -1323,6 +1359,11 @@
     "/ingest": {
       "post": {
         "summary": "Queue ingestion",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1539,6 +1580,40 @@
           },
           "501": {
             "description": "Not implemented"
+          }
+        }
+      }
+    },
+    "/ingest/upload": {
+      "post": {
+        "summary": "Upload and ingest build",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ingested"
           }
         }
       }

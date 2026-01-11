@@ -158,11 +158,11 @@ describe("routes", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    authServiceMock.register.mockResolvedValue({ user: { id: "user-1" }, session: {} });
-    authServiceMock.login.mockResolvedValue({ user: { id: "user-1" }, session: { accessToken: "token" } });
+    authServiceMock.register.mockResolvedValue({ userId: "user-1", session: {} });
+    authServiceMock.login.mockResolvedValue({ userId: "user-1", session: { accessToken: "token" } });
     authServiceMock.refresh.mockResolvedValue({ session: { accessToken: "token", refreshToken: "refresh" } });
     authServiceMock.logout.mockResolvedValue({ revoked: true });
-    authServiceMock.getSession.mockResolvedValue({ user: { id: "user-1" } });
+    authServiceMock.getSession.mockResolvedValue({ userId: "user-1", username: "tester", status: "active" });
     authServiceMock.requestPasswordReset.mockResolvedValue({ token: "reset-token" });
     authServiceMock.resetPassword.mockResolvedValue({ status: "ok" });
     authServiceMock.oauthStart.mockResolvedValue({ authorizeUrl: "https://example.com/auth" });
@@ -535,9 +535,17 @@ describe("routes", () => {
   });
 
   it("POST /ingest (apk + ipa)", async () => {
-    const apkResponse = await postJson("/ingest", { filePath: "/tmp/app.apk", kind: "apk" });
+    const apkResponse = await postJson(
+      "/ingest",
+      { filePath: "/tmp/app.apk", kind: "apk" },
+      { authorization: "Bearer token" }
+    );
     expect(apkResponse.statusCode).toBe(201);
-    const ipaResponse = await postJson("/ingest", { filePath: "/tmp/app.ipa", kind: "ipa" });
+    const ipaResponse = await postJson(
+      "/ingest",
+      { filePath: "/tmp/app.ipa", kind: "ipa" },
+      { authorization: "Bearer token" }
+    );
     expect(ipaResponse.statusCode).toBe(201);
   });
 });

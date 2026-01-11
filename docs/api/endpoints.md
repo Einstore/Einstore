@@ -23,7 +23,7 @@ All endpoints return JSON. Authenticated endpoints require `Authorization: Beare
 - Auth scope: Public (handled by rafiki270/auth)
 - Request schema: `{ username: string, password: string, email?: string }`
 - Response schema: `{ userId: string, session: { accessToken: string, refreshToken: string, expiresIn: number } }`
-- Side effects: Creates user, credential, session
+- Side effects: Creates user, credential, session; ensures a personal team on first login
 - Platform relevance: all
 
 ## POST /auth/login
@@ -31,7 +31,7 @@ All endpoints return JSON. Authenticated endpoints require `Authorization: Beare
 - Auth scope: Public (handled by rafiki270/auth)
 - Request schema: `{ identifier: string, password: string }`
 - Response schema: `{ userId: string, session: { accessToken: string, refreshToken: string, expiresIn: number } }`
-- Side effects: Creates session
+- Side effects: Creates session; ensures a personal team on first login
 - Platform relevance: all
 
 ## POST /auth/refresh
@@ -54,7 +54,7 @@ All endpoints return JSON. Authenticated endpoints require `Authorization: Beare
 - Purpose: Validate access token
 - Auth scope: Public (handled by rafiki270/auth)
 - Request schema: none (uses Authorization header)
-- Response schema: `{ user: { id: string } }`
+- Response schema: `{ userId: string, username: string, email?: string | null, name?: string | null, avatarUrl?: string | null, status: string }`
 - Side effects: none
 - Platform relevance: all
 
@@ -95,7 +95,7 @@ All endpoints return JSON. Authenticated endpoints require `Authorization: Beare
 - Auth scope: Public (handled by rafiki270/auth)
 - Request schema: `{ authCode: string }`
 - Response schema: `{ session: { accessToken: string, refreshToken: string, expiresIn: number } }`
-- Side effects: Creates session
+- Side effects: Creates session; ensures a personal team on first login
 - Platform relevance: all
 
 ## GET /teams
@@ -383,6 +383,14 @@ All endpoints return JSON. Authenticated endpoints require `Authorization: Beare
 - Request schema: `{ filePath: string, kind: "ipa"|"apk"|"aab" }`
 - Response schema: `{ status: string, result: object }`
 - Side effects: Parses file, creates/updates App/Version/Build/Target/Artifacts
+- Platform relevance: ios, android
+
+## POST /ingest/upload
+- Purpose: Upload and ingest an IPA/APK in one step
+- Auth scope: Bearer (rafiki270/auth)
+- Request schema: multipart form with `file`
+- Response schema: `{ status: string, result: object }`
+- Side effects: Stores upload on the server, then ingests metadata
 - Platform relevance: ios, android
 
 ## POST /feature-flags

@@ -5,10 +5,10 @@ import SectionHeader from "../components/SectionHeader";
 import Tabs from "../components/Tabs";
 import TeamMembersTable from "../components/TeamMembersTable";
 import TextInput from "../components/TextInput";
-import type { Team, TeamMember } from "../data/mock";
+import type { TeamMember, TeamSummary } from "../lib/teams";
 
 type SettingsPageProps = {
-  teams: Team[];
+  teams: TeamSummary[];
   activeTeamId: string;
   teamMembers: TeamMember[];
   isSaas: boolean;
@@ -25,12 +25,13 @@ const SettingsPage = ({
     () => teams.find((team) => team.id === activeTeamId) || teams[0],
     [teams, activeTeamId]
   );
+  const hasTeam = Boolean(activeTeam);
 
   const tabs = [
     {
       id: "team",
       label: "Team",
-      content: (
+      content: hasTeam ? (
         <Panel className="space-y-6">
           <TextInput
             id="team-name"
@@ -45,12 +46,16 @@ const SettingsPage = ({
             placeholder="team-slug"
           />
         </Panel>
+      ) : (
+        <Panel>
+          <p className="text-sm text-ink/60">No team is available yet.</p>
+        </Panel>
       ),
     },
     {
       id: "users",
       label: "Users",
-      content: (
+      content: hasTeam ? (
         <div className="space-y-4">
           <SectionHeader
             title="Team members"
@@ -58,6 +63,10 @@ const SettingsPage = ({
           />
           <TeamMembersTable members={teamMembers} />
         </div>
+      ) : (
+        <Panel>
+          <p className="text-sm text-ink/60">Invite teammates once you have a team.</p>
+        </Panel>
       ),
     },
   ];

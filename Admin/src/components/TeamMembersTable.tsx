@@ -1,4 +1,14 @@
-import type { TeamMember } from "../data/mock";
+import type { TeamMember } from "../lib/teams";
+
+const roleLabel = (role: TeamMember["role"]) => {
+  if (role === "owner") {
+    return "Owner";
+  }
+  if (role === "admin") {
+    return "Admin";
+  }
+  return "User";
+};
 
 const TeamMembersTable = ({ members }: { members: TeamMember[] }) => {
   return (
@@ -16,7 +26,7 @@ const TeamMembersTable = ({ members }: { members: TeamMember[] }) => {
           >
             <div className="font-semibold text-ink">{member.name}</div>
             <div className="text-ink/60">{member.email}</div>
-            <div className="text-ink/60">{member.role}</div>
+            <div className="text-ink/60">{roleLabel(member.role)}</div>
           </div>
         ))}
       </div>

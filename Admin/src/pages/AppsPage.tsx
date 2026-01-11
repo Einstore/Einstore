@@ -4,11 +4,11 @@ import Panel from "../components/Panel";
 import SearchField from "../components/SearchField";
 import SectionHeader from "../components/SectionHeader";
 import SelectField from "../components/SelectField";
-import type { AppSummary } from "../data/mock";
+import type { ApiApp } from "../lib/apps";
 
 type AppsPageProps = {
-  apps: AppSummary[];
-  onSelectApp?: (app: AppSummary) => void;
+  apps: ApiApp[];
+  onSelectApp?: (app: ApiApp) => void;
 };
 
 const AppsPage = ({ apps, onSelectApp }: AppsPageProps) => {

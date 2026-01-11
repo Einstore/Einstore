@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactElement } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactElement } from "react";
 import {
   Navigate,
   Route,
@@ -20,24 +20,23 @@ import SecurityPage from "../pages/SecurityPage";
 import SettingsPage from "../pages/SettingsPage";
 import {
   activity,
-  apps,
   buildQueue,
-  currentUser,
   metrics,
+  apps as overviewApps,
   pipelineAlerts,
   pipelineStages,
   securityAudits,
   securityPolicies,
   storageBuckets,
-  teamMembers,
-  teams,
 } from "../data/mock";
-import { apiFetch } from "../lib/api";
+import { apiFetch, apiUpload } from "../lib/api";
 import {
   buildFeatureFlagMap,
   getDefaultFeatureFlags,
   type FeatureFlagKey,
 } from "../lib/featureFlags";
+import type { ApiApp, ApiBuild } from "../lib/apps";
+import { isTeamAdmin, type TeamMember, type TeamSummary } from "../lib/teams";
 import RequireAuth from "./RequireAuth";
 
 const navItems = [
@@ -127,10 +126,27 @@ const AppRoutes = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [featureFlags, setFeatureFlags] = useState(getDefaultFeatureFlags());
-  const [activeTeamId, setActiveTeamId] = useState("team-all");
+  const [teams, setTeams] = useState<TeamSummary[]>([]);
+  const [activeTeamId, setActiveTeamId] = useState("");
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [apps, setApps] = useState<ApiApp[]>([]);
+  const [ingestNonce, setIngestNonce] = useState(0);
 
-  const isAdmin = currentUser.role === "admin";
+  const activeTeam = useMemo(
+    () => (activeTeamId ? teams.find((team) => team.id === activeTeamId) || null : null),
+    [teams, activeTeamId]
+  );
+  const isAdmin = isTeamAdmin(activeTeam?.memberRole);
   const isSaas = import.meta.env.VITE_SAAS === "true";
+
+  const loadApps = useCallback(async () => {
+    try {
+      const payload = await apiFetch<ApiApp[]>("/apps?limit=200");
+      setApps(Array.isArray(payload) ? payload : []);
+    } catch {
+      setApps([]);
+    }
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -150,6 +166,64 @@ const AppRoutes = () => {
     };
   }, []);
 
+  useEffect(() => {
+    void loadApps();
+  }, [loadApps, ingestNonce]);
+
+  useEffect(() => {
+    let isMounted = true;
+    apiFetch<{ teams: TeamSummary[] }>("/teams")
+      .then((payload) => {
+        if (!isMounted) return;
+        const list = Array.isArray(payload?.teams) ? payload.teams : [];
+        setTeams(list);
+        setActiveTeamId((current) => {
+          if (list.length === 0) {
+            return "";
+          }
+          if (current && list.some((team) => team.id === current)) {
+            return current;
+          }
+          return list[0].id;
+        });
+      })
+      .catch(() => {
+        if (isMounted) {
+          setTeams([]);
+          setActiveTeamId("");
+        }
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!activeTeam?.id || !isAdmin) {
+      setTeamMembers([]);
+      return;
+    }
+    let isMounted = true;
+    apiFetch<{ users: TeamMember[] }>(`/teams/${activeTeam.id}/users`, {
+      headers: {
+        "x-team-id": activeTeam.id,
+      },
+    })
+      .then((payload) => {
+        if (isMounted) {
+          setTeamMembers(Array.isArray(payload?.users) ? payload.users : []);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setTeamMembers([]);
+        }
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [activeTeam?.id, isAdmin]);
+
   const routes: RouteConfig[] = [
     {
       id: "overview",
@@ -158,7 +232,7 @@ const AppRoutes = () => {
         <OverviewPage
           metrics={metrics}
           pipelineStages={pipelineStages}
-          apps={apps}
+          apps={overviewApps}
           buildQueue={buildQueue}
           activity={activity}
           storageBuckets={storageBuckets}
@@ -175,6 +249,7 @@ const AppRoutes = () => {
       path: "/apps",
       element: (
         <AppsRoute
+          apps={apps}
           onSelectApp={(appId) => navigate(`/apps/${appId}/builds`)}
         />
       ),
@@ -183,13 +258,13 @@ const AppRoutes = () => {
     {
       id: "builds",
       path: "/builds",
-      element: <BuildsRoute />,
+      element: <BuildsRoute apps={apps} ingestNonce={ingestNonce} />,
       navId: "builds",
     },
     {
       id: "builds",
       path: "/apps/:appId/builds",
-      element: <BuildsRoute />,
+      element: <BuildsRoute apps={apps} ingestNonce={ingestNonce} />,
     },
     {
       id: "flags",
@@ -219,7 +294,7 @@ const AppRoutes = () => {
         <SettingsPage
           teams={teams}
           activeTeamId={activeTeamId}
-          teamMembers={teamMembers[activeTeamId] ?? []}
+          teamMembers={teamMembers}
           isSaas={isSaas}
         />
       ),
@@ -246,6 +321,29 @@ const AppRoutes = () => {
   }, [routes, location.pathname]);
 
   const page = pageConfig[activeRoute.id];
+  const handleTeamChange = (teamId: string) => {
+    setActiveTeamId(teamId);
+    if (!teamId) {
+      return;
+    }
+    apiFetch<{ activeTeamId: string }>(`/teams/${teamId}/select`, {
+      method: "POST",
+      headers: {
+        "x-team-id": teamId,
+      },
+    }).catch(() => undefined);
+  };
+
+  const handleIngest = useCallback(
+    async (file: File) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      await apiUpload("/ingest/upload", formData);
+      await loadApps();
+      setIngestNonce((current) => current + 1);
+    },
+    [loadApps]
+  );
 
   return (
     <Routes>
@@ -259,8 +357,10 @@ const AppRoutes = () => {
               breadcrumbs={page.breadcrumbs}
               title={page.title}
               actions={page.actions}
-              onTeamChange={setActiveTeamId}
+              onTeamChange={handleTeamChange}
               activeTeamId={activeTeamId}
+              teams={teams}
+              onUpload={handleIngest}
             />
           </RequireAuth>
         }
@@ -285,21 +385,47 @@ const AppRoutes = () => {
   );
 };
 
-const AppsRoute = ({ onSelectApp }: { onSelectApp: (appId: string) => void }) => {
+const AppsRoute = ({
+  apps,
+  onSelectApp,
+}: {
+  apps: ApiApp[];
+  onSelectApp: (appId: string) => void;
+}) => {
   return <AppsPage apps={apps} onSelectApp={(app) => onSelectApp(app.id)} />;
 };
 
-const BuildsRoute = () => {
+const BuildsRoute = ({
+  apps,
+  ingestNonce,
+}: {
+  apps: ApiApp[];
+  ingestNonce: number;
+}) => {
   const { appId } = useParams();
+  const [builds, setBuilds] = useState<ApiBuild[]>([]);
   const selectedApp = apps.find((app) => app.id === appId) ?? null;
 
-  return (
-    <BuildsPage
-      builds={buildQueue}
-      selectedAppId={appId ?? null}
-      selectedAppName={selectedApp?.name ?? null}
-    />
-  );
+  useEffect(() => {
+    let isMounted = true;
+    const query = appId ? `/builds?appId=${appId}` : "/builds";
+    apiFetch<ApiBuild[]>(query)
+      .then((payload) => {
+        if (isMounted) {
+          setBuilds(Array.isArray(payload) ? payload : []);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setBuilds([]);
+        }
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [appId, ingestNonce]);
+
+  return <BuildsPage builds={builds} selectedAppName={selectedApp?.name ?? null} />;
 };
 
 export default AppRoutes;
