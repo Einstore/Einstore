@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(UIKit)
 import UIKit
+#endif
 
 public enum EinstoreTrackingError: Error {
   case invalidPayload
@@ -362,9 +364,11 @@ public final class EinstoreTracker {
 
   private func devicePayload() -> [String: Any] {
     var payload = config.deviceInfo
+    #if canImport(UIKit)
     mergeIfMissing(key: "model", into: &payload, value: UIDevice.current.model)
     mergeIfMissing(key: "manufacturer", into: &payload, value: "Apple")
     mergeIfMissing(key: "osVersion", into: &payload, value: UIDevice.current.systemVersion)
+    #endif
     mergeIfMissing(key: "locale", into: &payload, value: Locale.current.identifier)
     mergeIfMissing(key: "appVersion", into: &payload, value: appVersion())
     mergeIfMissing(key: "buildNumber", into: &payload, value: buildNumber())

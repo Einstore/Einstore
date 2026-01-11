@@ -9,5 +9,9 @@ let package = Package(
   ],
   targets: [
     .target(name: "EinstoreTracking"),
+    .testTarget(
+      name: "EinstoreTrackingTests",
+      dependencies: ["EinstoreTracking"]
+    ),
   ]
 )
