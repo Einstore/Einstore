@@ -1,4 +1,5 @@
 import BuildQueueList from "../components/BuildQueueList";
+import EmptyUploadDropzone from "../components/EmptyUploadDropzone";
 import Panel from "../components/Panel";
 import Pagination from "../components/Pagination";
 import type { ApiBuild } from "../lib/apps";
@@ -12,6 +13,7 @@ type BuildsPageProps = {
   pagination: PaginationMeta;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
+  onUpload: (file: File) => Promise<void>;
 };
 
 const BuildsPage = ({
@@ -22,6 +24,7 @@ const BuildsPage = ({
   pagination,
   onPageChange,
   onPerPageChange,
+  onUpload,
 }: BuildsPageProps) => {
   return (
     <div className="space-y-6">
@@ -39,20 +42,26 @@ const BuildsPage = ({
           </Panel>
         </div>
       </div>
-      <BuildQueueList
-        jobs={builds}
-        icons={buildIcons}
-        platforms={buildPlatforms}
-        onSelect={onSelectBuild}
-      />
-      <Pagination
-        page={pagination.page}
-        totalPages={pagination.totalPages}
-        perPage={pagination.perPage}
-        total={pagination.total}
-        onPageChange={onPageChange}
-        onPerPageChange={onPerPageChange}
-      />
+      {builds.length ? (
+        <>
+          <BuildQueueList
+            jobs={builds}
+            icons={buildIcons}
+            platforms={buildPlatforms}
+            onSelect={onSelectBuild}
+          />
+          <Pagination
+            page={pagination.page}
+            totalPages={pagination.totalPages}
+            perPage={pagination.perPage}
+            total={pagination.total}
+            onPageChange={onPageChange}
+            onPerPageChange={onPerPageChange}
+          />
+        </>
+      ) : (
+        <EmptyUploadDropzone onUpload={onUpload} />
+      )}
     </div>
   );
 };

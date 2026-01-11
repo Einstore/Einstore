@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import AppsTable from "../components/AppsTable";
+import EmptyUploadDropzone from "../components/EmptyUploadDropzone";
 import Icon from "../components/Icon";
 import Panel from "../components/Panel";
 import Pagination from "../components/Pagination";
@@ -14,6 +15,7 @@ type AppsPageProps = {
   pagination: PaginationMeta;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
+  onUpload: (file: File) => Promise<void>;
 };
 
 const AppsPage = ({
@@ -23,6 +25,7 @@ const AppsPage = ({
   pagination,
   onPageChange,
   onPerPageChange,
+  onUpload,
 }: AppsPageProps) => {
   const [platform, setPlatform] = useState("all");
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
@@ -71,21 +74,27 @@ const AppsPage = ({
           </p>
         </div>
       </Panel>
-      <AppsTable
-        apps={filteredApps}
-        appIcons={appIcons}
-        onSelectApp={onSelectApp}
-        viewMode={viewMode}
-        onViewChange={setViewMode}
-      />
-      <Pagination
-        page={pagination.page}
-        totalPages={pagination.totalPages}
-        perPage={pagination.perPage}
-        total={pagination.total}
-        onPageChange={onPageChange}
-        onPerPageChange={onPerPageChange}
-      />
+      {apps.length ? (
+        <>
+          <AppsTable
+            apps={filteredApps}
+            appIcons={appIcons}
+            onSelectApp={onSelectApp}
+            viewMode={viewMode}
+            onViewChange={setViewMode}
+          />
+          <Pagination
+            page={pagination.page}
+            totalPages={pagination.totalPages}
+            perPage={pagination.perPage}
+            total={pagination.total}
+            onPageChange={onPageChange}
+            onPerPageChange={onPerPageChange}
+          />
+        </>
+      ) : (
+        <EmptyUploadDropzone onUpload={onUpload} />
+      )}
     </div>
   );
 };

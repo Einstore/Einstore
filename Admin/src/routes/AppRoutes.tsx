@@ -360,6 +360,7 @@ const AppRoutes = () => {
             setAppsPerPage(perPage);
             setAppsPage(1);
           }}
+          onUpload={handleIngest}
         />
       ),
       navId: "apps",
@@ -367,7 +368,13 @@ const AppRoutes = () => {
     {
       id: "builds",
       path: "/builds",
-      element: <LatestBuildsRoute ingestNonce={ingestNonce} activeTeamId={activeTeamId} />,
+      element: (
+        <LatestBuildsRoute
+          ingestNonce={ingestNonce}
+          activeTeamId={activeTeamId}
+          onUpload={handleIngest}
+        />
+      ),
       navId: "builds",
     },
     {
@@ -556,6 +563,7 @@ const AppsRoute = ({
   pagination,
   onPageChange,
   onPerPageChange,
+  onUpload,
 }: {
   apps: ApiApp[];
   appIcons: Record<string, string>;
@@ -563,6 +571,7 @@ const AppsRoute = ({
   pagination: PaginationMeta;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
+  onUpload: (file: File) => Promise<void>;
 }) => {
   return (
     <AppsPage
@@ -572,6 +581,7 @@ const AppsRoute = ({
       pagination={pagination}
       onPageChange={onPageChange}
       onPerPageChange={onPerPageChange}
+      onUpload={onUpload}
     />
   );
 };
@@ -649,9 +659,11 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
 const LatestBuildsRoute = ({
   ingestNonce,
   activeTeamId,
+  onUpload,
 }: {
   ingestNonce: number;
   activeTeamId: string;
+  onUpload: (file: File) => Promise<void>;
 }) => {
   const navigate = useNavigate();
   const [builds, setBuilds] = useState<ApiBuild[]>([]);
@@ -763,6 +775,7 @@ const LatestBuildsRoute = ({
         setPerPage(nextPerPage);
         setPage(1);
       }}
+      onUpload={onUpload}
     />
   );
 };
