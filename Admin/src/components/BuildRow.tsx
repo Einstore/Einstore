@@ -3,7 +3,7 @@ export type BuildRowProps = {
   buildNumber: string;
   size: string;
   createdAt: string;
-  storageKind: string;
+  storageKind?: string | null;
 };
 
 const BuildRow = ({ name, buildNumber, size, createdAt, storageKind }: BuildRowProps) => {
@@ -14,7 +14,7 @@ const BuildRow = ({ name, buildNumber, size, createdAt, storageKind }: BuildRowP
         <p className="text-ink/60">Build #{buildNumber}</p>
       </div>
       <div className="flex items-center gap-4">
-        <p className="text-ink/60">{storageKind.toUpperCase()}</p>
+        <p className="text-ink/60">{storageKind ? storageKind.toUpperCase() : "—"}</p>
         <p className="text-ink/60">{size}</p>
         <p className="text-ink/50">{createdAt}</p>
       </div>

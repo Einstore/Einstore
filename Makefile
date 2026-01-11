@@ -28,6 +28,13 @@ endif
 
 launch:
 	@set -e; \
+	if command -v docker >/dev/null 2>&1; then \
+		CONTAINERS=$$(docker ps -q --filter "name=einstore"); \
+		if [ -n "$$CONTAINERS" ]; then \
+			echo "Stopping running einstore containers..."; \
+			docker stop $$CONTAINERS; \
+		fi; \
+	fi; \
 	cd API && npm run dev & \
 	API_PID=$$!; \
 	cd Admin && npm run dev & \

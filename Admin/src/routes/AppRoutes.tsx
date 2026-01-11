@@ -137,6 +137,7 @@ const AppRoutes = () => {
   const [apps, setApps] = useState<ApiApp[]>([]);
   const [ingestNonce, setIngestNonce] = useState(0);
   const [isSuperUser, setIsSuperUser] = useState(false);
+  const [hasToken, setHasToken] = useState(Boolean(localStorage.getItem("accessToken")));
 
   const activeTeam = useMemo(
     () => (activeTeamId ? teams.find((team) => team.id === activeTeamId) || null : null),
@@ -146,8 +147,11 @@ const AppRoutes = () => {
   const isSaas = import.meta.env.VITE_SAAS === "true";
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
+    setHasToken(Boolean(localStorage.getItem("accessToken")));
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!hasToken) {
       setIsSuperUser(false);
       return;
     }
@@ -166,7 +170,7 @@ const AppRoutes = () => {
     return () => {
       isMounted = false;
     };
-  }, [location.pathname]);
+  }, [hasToken, location.pathname]);
 
   const loadApps = useCallback(async () => {
     try {
@@ -179,6 +183,10 @@ const AppRoutes = () => {
 
   useEffect(() => {
     let isMounted = true;
+    if (!hasToken) {
+      setFeatureFlags(getDefaultFeatureFlags());
+      return () => undefined;
+    }
     apiFetch<{ key: string; defaultEnabled?: boolean }[]>("/feature-flags")
       .then((flags) => {
         if (isMounted) {
@@ -193,14 +201,23 @@ const AppRoutes = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [hasToken]);
 
   useEffect(() => {
+    if (!hasToken) {
+      setApps([]);
+      return;
+    }
     void loadApps();
-  }, [loadApps, ingestNonce]);
+  }, [loadApps, ingestNonce, hasToken]);
 
   useEffect(() => {
     let isMounted = true;
+    if (!hasToken) {
+      setTeams([]);
+      setActiveTeamId("");
+      return () => undefined;
+    }
     apiFetch<{ teams: TeamSummary[] }>("/teams")
       .then((payload) => {
         if (!isMounted) return;
@@ -225,10 +242,10 @@ const AppRoutes = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [hasToken]);
 
   useEffect(() => {
-    if (!activeTeam?.id || !isAdmin) {
+    if (!activeTeam?.id || !isAdmin || !hasToken) {
       setTeamMembers([]);
       return;
     }
