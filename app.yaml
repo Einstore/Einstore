@@ -75,6 +75,7 @@ services:
     value: EV[1:C1D3zmPY+iDYiNPQJJiYaIeS0oXor+Ee:UcAOXGSBDw4PTceFJbdPVZ6kgPmgmkmUS/BUeA8W9bhbn4iM0KU1Fm1h0Hn3+RDcQYGi]
   - key: GOOGLE_REDIRECT_URI
     scope: RUN_TIME
+    value: https://api.einstore.pro/auth/oauth/google/callback
   - key: AUTH_JWT_SECRET
     scope: RUN_TIME
     type: SECRET
