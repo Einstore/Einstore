@@ -131,12 +131,6 @@ export const metrics: Metric[] = [
     delta: "+1.2%",
     trend: "up",
   },
-  {
-    label: "Policy issues",
-    value: "3",
-    delta: "0",
-    trend: "flat",
-  },
 ];
 
 export const apps: AppSummary[] = [

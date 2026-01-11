@@ -1,4 +1,4 @@
-import { featureFlagDefinitions } from "@rafiki270/feature-flags";
+import { adminFeatureFlagDefinitions } from "../data/featureFlagDefinitions";
 
 export type FeatureFlagKey =
   | "admin.overview_metrics";
@@ -14,7 +14,7 @@ const supportedKeys: FeatureFlagKey[] = [
 
 const defaultFeatureFlags: Record<FeatureFlagKey, boolean> = supportedKeys.reduce(
   (acc, key) => {
-    const definition = featureFlagDefinitions.find((flag) => flag.key === key);
+    const definition = adminFeatureFlagDefinitions.find((flag) => flag.key === key);
     acc[key] = definition?.defaultEnabled ?? false;
     return acc;
   },

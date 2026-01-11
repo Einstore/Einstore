@@ -27,7 +27,6 @@ import {
   pipelineStages,
   securityAudits,
   securityPolicies,
-  storageBuckets,
 } from "../data/mock";
 import { apiFetch, apiUpload } from "../lib/api";
 import { buildFeatureFlagMap, getDefaultFeatureFlags } from "../lib/featureFlags";
@@ -38,9 +37,13 @@ import {
   type ApiBuildIconResponse,
   type ApiBuildMetadata,
 } from "../lib/apps";
+import { enableAnalytics, trackPageView } from "../lib/analytics";
 import { useSessionState } from "../lib/session";
 import RequireAuth from "./RequireAuth";
 import { navItems, pageConfig, type RouteConfig } from "./config";
+import { adminFeatureFlagDefinitions } from "../data/featureFlagDefinitions";
+import type { StorageUsageResponse, StorageUsageUser } from "../types/usage";
+import type { AnalyticsSettings } from "../types/settings";
 import {
   privateNavItems,
   privatePageConfig,
@@ -54,6 +57,10 @@ const AppRoutes = () => {
   const [apps, setApps] = useState<ApiApp[]>([]);
   const [appIcons, setAppIcons] = useState<Record<string, string>>({});
   const [ingestNonce, setIngestNonce] = useState(0);
+  const [storageUsage, setStorageUsage] = useState<StorageUsageUser[]>([]);
+  const [storageUsageTotalBytes, setStorageUsageTotalBytes] = useState(0);
+  const [isLoadingStorageUsage, setIsLoadingStorageUsage] = useState(false);
+  const [analyticsKey, setAnalyticsKey] = useState<string | null>(null);
   const {
     hasToken,
     isSuperUser,
@@ -69,13 +76,19 @@ const AppRoutes = () => {
   const isSaas = import.meta.env.VITE_SAAS === "true";
 
   const loadApps = useCallback(async () => {
+    if (!activeTeamId) {
+      setApps([]);
+      return;
+    }
     try {
-      const payload = await apiFetch<ApiApp[]>("/apps?limit=200");
+      const payload = await apiFetch<ApiApp[]>("/apps?limit=200", {
+        headers: { "x-team-id": activeTeamId },
+      });
       setApps(Array.isArray(payload) ? payload : []);
     } catch {
       setApps([]);
     }
-  }, []);
+  }, [activeTeamId]);
 
   useEffect(() => {
     let isMounted = true;
@@ -83,15 +96,49 @@ const AppRoutes = () => {
       setFeatureFlags(getDefaultFeatureFlags());
       return () => undefined;
     }
-    apiFetch<{ key: string; defaultEnabled?: boolean }[]>("/feature-flags")
-      .then((flags) => {
-        if (isMounted) {
-          setFeatureFlags(buildFeatureFlagMap(Array.isArray(flags) ? flags : []));
+    apiFetch("/feature-flags/discover", {
+      method: "POST",
+      body: JSON.stringify({ flags: adminFeatureFlagDefinitions }),
+    })
+      .catch(() => undefined)
+      .finally(() => {
+        apiFetch<{ key: string; defaultEnabled?: boolean }[]>("/feature-flags")
+          .then((flags) => {
+            if (isMounted) {
+              setFeatureFlags(buildFeatureFlagMap(Array.isArray(flags) ? flags : []));
+            }
+          })
+          .catch(() => {
+            if (isMounted) {
+              setFeatureFlags(getDefaultFeatureFlags());
+            }
+          });
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [activeTeamId, hasToken]);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (!hasToken) {
+      setAnalyticsKey(null);
+      return () => {
+        isMounted = false;
+      };
+    }
+    apiFetch<AnalyticsSettings>("/settings/analytics")
+      .then((payload) => {
+        if (!isMounted) return;
+        const key = payload?.gaMeasurementId ?? null;
+        setAnalyticsKey(key);
+        if (key) {
+          enableAnalytics(key);
         }
       })
       .catch(() => {
         if (isMounted) {
-          setFeatureFlags(getDefaultFeatureFlags());
+          setAnalyticsKey(null);
         }
       });
     return () => {
@@ -100,16 +147,63 @@ const AppRoutes = () => {
   }, [hasToken]);
 
   useEffect(() => {
-    if (!hasToken) {
+    let isMounted = true;
+    if (!hasToken || !activeTeamId) {
+      setStorageUsage([]);
+      setStorageUsageTotalBytes(0);
+      setIsLoadingStorageUsage(false);
+      return () => {
+        isMounted = false;
+      };
+    }
+    setIsLoadingStorageUsage(true);
+    apiFetch<StorageUsageResponse>("/usage/storage/users", {
+      headers: {
+        "x-team-id": activeTeamId,
+      },
+    })
+      .then((payload) => {
+        if (!isMounted) return;
+        const users = Array.isArray(payload?.users) ? payload.users : [];
+        setStorageUsage(users);
+        setStorageUsageTotalBytes(
+          users.reduce((sum, user) => sum + (user.totalBytes ?? 0), 0)
+        );
+      })
+      .catch(() => {
+        if (isMounted) {
+          setStorageUsage([]);
+          setStorageUsageTotalBytes(0);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsLoadingStorageUsage(false);
+        }
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [activeTeamId, hasToken, ingestNonce]);
+
+  useEffect(() => {
+    if (analyticsKey) {
+      enableAnalytics(analyticsKey);
+      trackPageView(location.pathname + location.search);
+    }
+  }, [analyticsKey, location.pathname, location.search]);
+
+  useEffect(() => {
+    if (!hasToken || !activeTeamId) {
       setApps([]);
       return;
     }
     void loadApps();
-  }, [loadApps, ingestNonce, hasToken]);
+  }, [loadApps, ingestNonce, hasToken, activeTeamId]);
 
   useEffect(() => {
     let isMounted = true;
-    if (!hasToken || !apps.length) {
+    if (!hasToken || !apps.length || !activeTeamId) {
       setAppIcons({});
       return () => {
         isMounted = false;
@@ -125,11 +219,16 @@ const AppRoutes = () => {
         const app = queue.shift();
         if (!app) continue;
         try {
-          const builds = await apiFetch<ApiBuild[]>(`/builds?appId=${app.id}&limit=1`);
+          const builds = await apiFetch<ApiBuild[]>(`/builds?appId=${app.id}&limit=1`, {
+            headers: { "x-team-id": activeTeamId },
+          });
           const latestBuild = Array.isArray(builds) ? builds[0] : null;
           if (!latestBuild) continue;
           const iconResponse = await apiFetch<ApiBuildIconResponse>(
-            `/builds/${latestBuild.id}/icons`
+            `/builds/${latestBuild.id}/icons`,
+            {
+              headers: { "x-team-id": activeTeamId },
+            }
           );
           const icon = pickPrimaryIcon(iconResponse?.items);
           const iconPath = icon?.dataUrl ?? icon?.url;
@@ -153,7 +252,7 @@ const AppRoutes = () => {
     return () => {
       isMounted = false;
     };
-  }, [apps, hasToken]);
+  }, [apps, hasToken, activeTeamId]);
 
 
   const coreRoutes: RouteConfig[] = [
@@ -166,7 +265,9 @@ const AppRoutes = () => {
           apps={overviewApps}
           buildQueue={buildQueue}
           activity={activity}
-          storageBuckets={storageBuckets}
+          storageUsage={storageUsage}
+          storageTotalBytes={storageUsageTotalBytes}
+          isStorageLoading={isLoadingStorageUsage}
           showMetrics={featureFlags["admin.overview_metrics"]}
           showActivity
           showStorage
@@ -189,24 +290,31 @@ const AppRoutes = () => {
     {
       id: "builds",
       path: "/builds",
-      element: <LatestBuildsRoute ingestNonce={ingestNonce} />,
+      element: <LatestBuildsRoute ingestNonce={ingestNonce} activeTeamId={activeTeamId} />,
       navId: "builds",
     },
     {
       id: "builds",
       path: "/apps/:appId/builds",
-      element: <AppBuildsRoute apps={apps} appIcons={appIcons} ingestNonce={ingestNonce} />,
+      element: (
+        <AppBuildsRoute
+          apps={apps}
+          appIcons={appIcons}
+          ingestNonce={ingestNonce}
+          activeTeamId={activeTeamId}
+        />
+      ),
     },
     {
       id: "build-detail",
       path: "/builds/:buildId",
-      element: <BuildDetailRoute />,
+      element: <BuildDetailRoute activeTeamId={activeTeamId} />,
       navId: "builds",
     },
     {
       id: "build-detail",
       path: "/apps/:appId/builds/:buildId",
-      element: <BuildDetailRoute />,
+      element: <BuildDetailRoute activeTeamId={activeTeamId} />,
       navId: "builds",
     },
     {
@@ -225,6 +333,8 @@ const AppRoutes = () => {
           activeTeamId={activeTeamId}
           teamMembers={teamMembers}
           isSaas={isSaas}
+          isSuperUser={isSuperUser}
+          onAnalyticsKeySaved={setAnalyticsKey}
         />
       ),
       navId: "settings",
@@ -239,6 +349,8 @@ const AppRoutes = () => {
           activeTeamId={activeTeamId}
           teamMembers={teamMembers}
           isSaas={isSaas}
+          isSuperUser={isSuperUser}
+          onAnalyticsKeySaved={setAnalyticsKey}
           initialTab="api-keys"
         />
       ),
@@ -366,7 +478,7 @@ const AppsRoute = ({
   );
 };
 
-const BuildDetailRoute = () => {
+const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
   const { buildId } = useParams();
   const [build, setBuild] = useState<ApiBuildMetadata | null>(null);
   const [iconUrl, setIconUrl] = useState<string | null>(null);
@@ -385,7 +497,9 @@ const BuildDetailRoute = () => {
       };
     }
     setIsLoading(true);
-    apiFetch<ApiBuildMetadata>(`/builds/${buildId}/metadata`)
+    apiFetch<ApiBuildMetadata>(`/builds/${buildId}/metadata`, {
+      headers: { "x-team-id": activeTeamId },
+    })
       .then((payload) => {
         if (!isMounted) return;
         setBuild(payload ?? null);
@@ -412,7 +526,9 @@ const BuildDetailRoute = () => {
         isMounted = false;
       };
     }
-    apiFetch<ApiBuildIconResponse>(`/builds/${buildId}/icons`)
+    apiFetch<ApiBuildIconResponse>(`/builds/${buildId}/icons`, {
+      headers: { "x-team-id": activeTeamId },
+    })
       .then((payload) => {
         if (!isMounted) return;
         const primary = pickPrimaryIcon(payload?.items);
@@ -432,7 +548,13 @@ const BuildDetailRoute = () => {
   return <BuildDetailPage build={build} iconUrl={iconUrl} isLoading={isLoading} error={error} />;
 };
 
-const LatestBuildsRoute = ({ ingestNonce }: { ingestNonce: number }) => {
+const LatestBuildsRoute = ({
+  ingestNonce,
+  activeTeamId,
+}: {
+  ingestNonce: number;
+  activeTeamId: string;
+}) => {
   const navigate = useNavigate();
   const [builds, setBuilds] = useState<ApiBuild[]>([]);
   const [buildIcons, setBuildIcons] = useState<Record<string, string>>({});
@@ -440,7 +562,13 @@ const LatestBuildsRoute = ({ ingestNonce }: { ingestNonce: number }) => {
 
   useEffect(() => {
     let isMounted = true;
-    apiFetch<ApiBuild[]>("/builds")
+    if (!activeTeamId) {
+      setBuilds([]);
+      return () => {
+        isMounted = false;
+      };
+    }
+    apiFetch<ApiBuild[]>("/builds", { headers: { "x-team-id": activeTeamId } })
       .then((payload) => {
         if (isMounted) {
           setBuilds(Array.isArray(payload) ? payload : []);
@@ -454,7 +582,7 @@ const LatestBuildsRoute = ({ ingestNonce }: { ingestNonce: number }) => {
     return () => {
       isMounted = false;
     };
-  }, [ingestNonce]);
+  }, [ingestNonce, activeTeamId]);
 
   useEffect(() => {
     let isMounted = true;
@@ -468,7 +596,9 @@ const LatestBuildsRoute = ({ ingestNonce }: { ingestNonce: number }) => {
       const entries = await Promise.all(
         builds.map(async (build) => {
           try {
-            const icons = await apiFetch<ApiBuildIconResponse>(`/builds/${build.id}/icons`);
+            const icons = await apiFetch<ApiBuildIconResponse>(`/builds/${build.id}/icons`, {
+              headers: { "x-team-id": activeTeamId },
+            });
             const primary = pickPrimaryIcon(icons?.items);
             const iconPath = primary?.dataUrl ?? primary?.url;
             const platform = primary?.platform;
@@ -498,7 +628,7 @@ const LatestBuildsRoute = ({ ingestNonce }: { ingestNonce: number }) => {
     return () => {
       isMounted = false;
     };
-  }, [builds]);
+  }, [builds, activeTeamId]);
 
   return (
     <BuildsPage
@@ -514,10 +644,12 @@ const AppBuildsRoute = ({
   apps,
   appIcons,
   ingestNonce,
+  activeTeamId,
 }: {
   apps: ApiApp[];
   appIcons: Record<string, string>;
   ingestNonce: number;
+  activeTeamId: string;
 }) => {
   const { appId } = useParams();
   const navigate = useNavigate();
@@ -534,7 +666,9 @@ const AppBuildsRoute = ({
         isMounted = false;
       };
     }
-    apiFetch<ApiBuild[]>(`/builds?appId=${appId}`)
+    apiFetch<ApiBuild[]>(`/builds?appId=${appId}`, {
+      headers: { "x-team-id": activeTeamId },
+    })
       .then((payload) => {
         if (isMounted) {
           setBuilds(Array.isArray(payload) ? payload : []);
@@ -548,7 +682,7 @@ const AppBuildsRoute = ({
     return () => {
       isMounted = false;
     };
-  }, [appId, ingestNonce]);
+  }, [appId, ingestNonce, activeTeamId]);
 
   useEffect(() => {
     let isMounted = true;
@@ -563,7 +697,9 @@ const AppBuildsRoute = ({
       const entries = await Promise.all(
         builds.map(async (build) => {
           try {
-            const icons = await apiFetch<ApiBuildIconResponse>(`/builds/${build.id}/icons`);
+            const icons = await apiFetch<ApiBuildIconResponse>(`/builds/${build.id}/icons`, {
+              headers: { "x-team-id": activeTeamId },
+            });
             const primary = pickPrimaryIcon(icons?.items);
             const iconPath = primary?.dataUrl ?? primary?.url;
             const platform = primary?.platform;

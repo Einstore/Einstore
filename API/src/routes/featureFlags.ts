@@ -27,6 +27,19 @@ const updateFlagSchema = z.object({
   metadata: z.any().nullable().optional(),
 });
 
+const discoverSchema = z.object({
+  flags: z
+    .array(
+      z.object({
+        key: z.string().min(1),
+        description: z.string().optional(),
+        defaultEnabled: z.boolean().optional(),
+        metadata: z.any().optional(),
+      })
+    )
+    .nonempty(),
+});
+
 const createOverrideSchema = z.object({
   scope: z.string().min(1),
   targetKey: z.string().min(1).nullable().optional(),
@@ -201,5 +214,23 @@ export async function featureFlagRoutes(app: FastifyInstance) {
     });
 
     return reply.send({ key, enabled });
+  });
+
+  app.post("/feature-flags/discover", { preHandler: requireAuth }, async (request, reply) => {
+    const parsed = discoverSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return reply.status(400).send({ error: "Invalid payload" });
+    }
+    const results = await Promise.allSettled(
+      parsed.data.flags.map((flag) =>
+        ensureFeatureFlag(prisma, flag.key, {
+          description: flag.description,
+          defaultEnabled: flag.defaultEnabled ?? false,
+          metadata: flag.metadata,
+        })
+      )
+    );
+    const created = results.filter((r) => r.status === "fulfilled").length;
+    return reply.status(201).send({ created });
   });
 }

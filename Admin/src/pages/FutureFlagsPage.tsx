@@ -1,6 +1,7 @@
 import { FeatureFlagsPage } from "@rafiki270/feature-flags/admin";
 
 import { apiFetch } from "../lib/api";
+import { adminFeatureFlagDefinitions } from "../data/featureFlagDefinitions";
 
 const FutureFlagsPage = () => {
   const filteredApiFetch = async (path: string, options?: RequestInit) => {
@@ -16,7 +17,7 @@ const FutureFlagsPage = () => {
 
   return (
     <div className="feature-flags-page">
-      <FeatureFlagsPage apiFetch={filteredApiFetch} />
+      <FeatureFlagsPage apiFetch={filteredApiFetch} definitions={adminFeatureFlagDefinitions as any} />
     </div>
   );
 };
