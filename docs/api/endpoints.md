@@ -120,7 +120,7 @@ Team-scoped endpoints:
 ## POST /builds/{id}/downloads
 - Purpose: Record a build download event
 - Auth scope: Bearer (rafiki270/auth) + Team membership
-- Request schema: `{ platform?: PlatformKind, targetId?: string, deviceId?: string, metadata?: object }`
+- Request schema: `{ platform?: PlatformKind, targetId?: string, deviceId?: string, metadata?: TrackingMetadata }`
 - Response schema: `BuildEvent`
 - Side effects: Creates a build event record (download)
 - Platform relevance: all
@@ -136,7 +136,7 @@ Team-scoped endpoints:
 ## POST /builds/{id}/installs
 - Purpose: Record a build install event
 - Auth scope: Bearer (rafiki270/auth) + Team membership
-- Request schema: `{ platform?: PlatformKind, targetId?: string, deviceId?: string, metadata?: object }`
+- Request schema: `{ platform?: PlatformKind, targetId?: string, deviceId?: string, metadata?: TrackingMetadata }`
 - Response schema: `BuildEvent`
 - Side effects: Creates a build event record (install)
 - Platform relevance: all
@@ -176,10 +176,29 @@ Team-scoped endpoints:
 ## POST /builds/{id}/ios/installs/track
 - Purpose: Record an install event from a signed client callback
 - Auth scope: Presigned token (query `token`)
-- Request schema: `{ platform?: PlatformKind, targetId?: string, deviceId?: string, metadata?: object }`
+- Request schema: `{ platform?: PlatformKind, targetId?: string, deviceId?: string, metadata?: TrackingMetadata }`
 - Response schema: `BuildEvent`
 - Side effects: Records an install event
 - Platform relevance: iOS
+
+### TrackingMetadata
+Optional tracking metadata shared by download/install endpoints.
+
+```
+{
+  "services": ["analytics", "errors", "distribution", "devices", "usage"],
+  "analytics": {
+    "event": { "name": "screen_view", "properties": { "screen": "home" } },
+    "userProperties": { "plan": "pro" },
+    "session": { "id": "sess_123", "startedAt": "2024-08-01T10:00:00Z", "durationMs": 120000 }
+  },
+  "errors": { "message": "Handled error", "stackTrace": "Error: ...", "properties": { "code": "E123" } },
+  "distribution": { "installSource": "email", "appVersion": "1.2.3", "buildNumber": "45" },
+  "device": { "model": "iPhone15,3", "manufacturer": "Apple", "osVersion": "17.4", "locale": "en-US" },
+  "usage": { "timestamp": "2024-08-01T10:00:00Z", "timeZone": "America/Los_Angeles" },
+  "custom": { "extra": "value" }
+}
+```
 
 ## POST /auth/register
 - Purpose: Register a new user

@@ -601,6 +601,150 @@
           "downloadsThisMonth",
           "uploadsInBillingCycle"
         ]
+      },
+      "BuildEventTrackingMetadata": {
+        "type": "object",
+        "description": "Optional tracking metadata for analytics, errors, distribution, device, and usage context.",
+        "properties": {
+          "services": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Enabled tracking sections (analytics, errors, distribution, devices, usage)."
+          },
+          "analytics": {
+            "type": "object",
+            "properties": {
+              "event": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "properties": {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "userProperties": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "session": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "startedAt": {
+                    "type": "string"
+                  },
+                  "durationMs": {
+                    "type": "integer"
+                  }
+                }
+              }
+            },
+            "additionalProperties": true
+          },
+          "errors": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string"
+              },
+              "stackTrace": {
+                "type": "string"
+              },
+              "properties": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            },
+            "additionalProperties": true
+          },
+          "distribution": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "device": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "usage": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "custom": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": true,
+        "example": {
+          "services": [
+            "analytics",
+            "distribution",
+            "devices",
+            "usage"
+          ],
+          "analytics": {
+            "event": {
+              "name": "app_launch",
+              "properties": {
+                "screen": "home"
+              }
+            },
+            "session": {
+              "id": "sess_123",
+              "startedAt": "2024-08-01T10:00:00Z",
+              "durationMs": 120000
+            }
+          },
+          "distribution": {
+            "installSource": "email",
+            "appVersion": "1.2.3",
+            "buildNumber": "45"
+          },
+          "device": {
+            "model": "iPhone15,3",
+            "osVersion": "17.4",
+            "locale": "en-US"
+          },
+          "usage": {
+            "timestamp": "2024-08-01T10:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          }
+        }
+      },
+      "BuildEventTrackRequest": {
+        "type": "object",
+        "properties": {
+          "platform": {
+            "type": "string",
+            "enum": [
+              "ios",
+              "watchos",
+              "tvos",
+              "visionos",
+              "android",
+              "wearos",
+              "auto"
+            ]
+          },
+          "targetId": {
+            "type": "string"
+          },
+          "deviceId": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/BuildEventTrackingMetadata"
+          }
+        },
+        "additionalProperties": false
       }
     },
     "parameters": {
@@ -856,14 +1000,32 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "userId": { "type": "string" },
-                          "username": { "type": "string" },
-                          "email": { "type": "string", "nullable": true },
-                          "fullName": { "type": "string", "nullable": true },
-                          "buildCount": { "type": "integer" },
-                          "totalBytes": { "type": "integer" },
-                          "downloadCount": { "type": "integer" },
-                          "downloadBytes": { "type": "integer" }
+                          "userId": {
+                            "type": "string"
+                          },
+                          "username": {
+                            "type": "string"
+                          },
+                          "email": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "fullName": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "buildCount": {
+                            "type": "integer"
+                          },
+                          "totalBytes": {
+                            "type": "integer"
+                          },
+                          "downloadCount": {
+                            "type": "integer"
+                          },
+                          "downloadBytes": {
+                            "type": "integer"
+                          }
                         },
                         "required": [
                           "userId",
@@ -878,7 +1040,9 @@
                       }
                     }
                   },
-                  "required": ["users"]
+                  "required": [
+                    "users"
+                  ]
                 }
               }
             }
@@ -1514,6 +1678,56 @@
           "201": {
             "description": "Created"
           }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuildEventTrackRequest"
+              },
+              "example": {
+                "platform": "ios",
+                "deviceId": "device-123",
+                "targetId": "ios-app",
+                "metadata": {
+                  "services": [
+                    "analytics",
+                    "distribution",
+                    "devices",
+                    "usage"
+                  ],
+                  "analytics": {
+                    "event": {
+                      "name": "app_launch",
+                      "properties": {
+                        "screen": "home"
+                      }
+                    },
+                    "session": {
+                      "id": "sess_123",
+                      "startedAt": "2024-08-01T10:00:00Z",
+                      "durationMs": 120000
+                    }
+                  },
+                  "distribution": {
+                    "installSource": "email",
+                    "appVersion": "1.2.3",
+                    "buildNumber": "45"
+                  },
+                  "device": {
+                    "model": "iPhone15,3",
+                    "osVersion": "17.4",
+                    "locale": "en-US"
+                  },
+                  "usage": {
+                    "timestamp": "2024-08-01T10:00:00Z",
+                    "timeZone": "America/Los_Angeles"
+                  }
+                }
+              }
+            }
+          }
         }
       },
       "get": {
@@ -1567,6 +1781,56 @@
         "responses": {
           "201": {
             "description": "Created"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuildEventTrackRequest"
+              },
+              "example": {
+                "platform": "ios",
+                "deviceId": "device-123",
+                "targetId": "ios-app",
+                "metadata": {
+                  "services": [
+                    "analytics",
+                    "distribution",
+                    "devices",
+                    "usage"
+                  ],
+                  "analytics": {
+                    "event": {
+                      "name": "app_launch",
+                      "properties": {
+                        "screen": "home"
+                      }
+                    },
+                    "session": {
+                      "id": "sess_123",
+                      "startedAt": "2024-08-01T10:00:00Z",
+                      "durationMs": 120000
+                    }
+                  },
+                  "distribution": {
+                    "installSource": "email",
+                    "appVersion": "1.2.3",
+                    "buildNumber": "45"
+                  },
+                  "device": {
+                    "model": "iPhone15,3",
+                    "osVersion": "17.4",
+                    "locale": "en-US"
+                  },
+                  "usage": {
+                    "timestamp": "2024-08-01T10:00:00Z",
+                    "timeZone": "America/Los_Angeles"
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -1706,7 +1970,57 @@
               "type": "string"
             }
           }
-        ]
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuildEventTrackRequest"
+              },
+              "example": {
+                "platform": "ios",
+                "deviceId": "device-123",
+                "targetId": "ios-app",
+                "metadata": {
+                  "services": [
+                    "analytics",
+                    "distribution",
+                    "devices",
+                    "usage"
+                  ],
+                  "analytics": {
+                    "event": {
+                      "name": "app_launch",
+                      "properties": {
+                        "screen": "home"
+                      }
+                    },
+                    "session": {
+                      "id": "sess_123",
+                      "startedAt": "2024-08-01T10:00:00Z",
+                      "durationMs": 120000
+                    }
+                  },
+                  "distribution": {
+                    "installSource": "email",
+                    "appVersion": "1.2.3",
+                    "buildNumber": "45"
+                  },
+                  "device": {
+                    "model": "iPhone15,3",
+                    "osVersion": "17.4",
+                    "locale": "en-US"
+                  },
+                  "usage": {
+                    "timestamp": "2024-08-01T10:00:00Z",
+                    "timeZone": "America/Los_Angeles"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/targets": {
