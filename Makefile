@@ -60,9 +60,11 @@ migrate:
 		BASE_URL="$${DATABASE_URL:-}"; \
 		if [ -z "$$BASE_URL" ] && [ -f API/.env ]; then \
 			BASE_LINE=$$(grep -E '^DATABASE_URL=' API/.env | tail -n 1); \
-			if [ -n "$$BASE_LINE" ]; then \
-				BASE_URL=$${BASE_LINE#DATABASE_URL=}; \
-			fi; \
+		if [ -n "$$BASE_LINE" ]; then \
+			BASE_URL=$${BASE_LINE#DATABASE_URL=}; \
+			BASE_URL=$${BASE_URL#\"}; \
+			BASE_URL=$${BASE_URL%\"}; \
+		fi; \
 		fi; \
 		if [ -z "$$BASE_URL" ]; then \
 			BASE_URL="postgresql://postgres@localhost:5432/einstore?schema=public"; \
@@ -86,7 +88,7 @@ migrate:
 			"if not parsed.scheme or not parsed.netloc:" \
 			"    raise SystemExit(f'Invalid DATABASE_URL: {base}')" \
 			"test_uri = parsed._replace(path='/' + target)" \
-			"admin_uri = parsed._replace(path='/postgres')" \
+			"admin_uri = parsed._replace(path='/postgres', query='')" \
 			"print(urlunparse(test_uri))" \
 			"print(urlunparse(admin_uri))" \
 			> "$$TMP_SCRIPT"; \
@@ -120,35 +122,39 @@ migrate:
 	fi
 
 test:
-	@npm --prefix Libraries/teams install
-	@npm --prefix Libraries/teams run build
-	@npm --prefix API run test:unit
-	@npm --prefix API run prisma:generate
-	@npm --prefix API run build
-	@PORT=8083 \
-	AUTH_JWT_SECRET=change-me \
-	AUTH_JWT_ISSUER=einstore \
-	AUTH_JWT_AUDIENCE=einstore-api \
-	AUTH_REFRESH_TTL_DAYS=30 \
-	AUTH_ACCESS_TTL_MINUTES=15 \
-	DATABASE_URL="postgresql://postgres@localhost:5432/einstore-test?schema=public" \
-	NODE_ENV=test \
-	npm --prefix API run prisma:deploy; \
-	PORT=8083 \
-	AUTH_JWT_SECRET=change-me \
-	AUTH_JWT_ISSUER=einstore \
-	AUTH_JWT_AUDIENCE=einstore-api \
-	AUTH_REFRESH_TTL_DAYS=30 \
-	AUTH_ACCESS_TTL_MINUTES=15 \
-	DATABASE_URL="postgresql://postgres@localhost:5432/einstore-test?schema=public" \
-	NODE_ENV=test \
-	node API/dist/index.js > /tmp/einstore-api-test.log 2>&1 & \
-	PID=$$!; \
-	sleep 1; \
-	newman run postman_collection.json -e API/tests/postman_environment.json; \
-	STATUS=$$?; \
-	kill $$PID; \
-	exit $$STATUS
+	@if [ "$(firstword $(MAKECMDGOALS))" = "migrate" ] && [ "$(MIGRATE_MODE)" = "test" ]; then \
+		echo "Skipping API test suite (triggered via 'make migrate test')."; \
+	else \
+		npm --prefix Libraries/teams install; \
+		npm --prefix Libraries/teams run build; \
+		npm --prefix API run test:unit; \
+		npm --prefix API run prisma:generate; \
+		npm --prefix API run build; \
+		PORT=8083 \
+		AUTH_JWT_SECRET=change-me \
+		AUTH_JWT_ISSUER=einstore \
+		AUTH_JWT_AUDIENCE=einstore-api \
+		AUTH_REFRESH_TTL_DAYS=30 \
+		AUTH_ACCESS_TTL_MINUTES=15 \
+		DATABASE_URL="postgresql://postgres@localhost:5432/einstore-test?schema=public" \
+		NODE_ENV=test \
+		npm --prefix API run prisma:deploy; \
+		PORT=8083 \
+		AUTH_JWT_SECRET=change-me \
+		AUTH_JWT_ISSUER=einstore \
+		AUTH_JWT_AUDIENCE=einstore-api \
+		AUTH_REFRESH_TTL_DAYS=30 \
+		AUTH_ACCESS_TTL_MINUTES=15 \
+		DATABASE_URL="postgresql://postgres@localhost:5432/einstore-test?schema=public" \
+		NODE_ENV=test \
+		node API/dist/index.js > /tmp/einstore-api-test.log 2>&1 & \
+		PID=$$!; \
+		sleep 1; \
+		newman run postman_collection.json -e API/tests/postman_environment.json; \
+		STATUS=$$?; \
+		kill $$PID; \
+		exit $$STATUS; \
+	fi
 
 test-unit:
 	@npm --prefix API run test:unit
