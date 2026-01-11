@@ -2130,6 +2130,58 @@
       ]
     },
     {
+      "name": "Search",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/search?q={{searchQuery}}&buildLimit=6&appLimit=6",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "search"
+          ],
+          "query": [
+            {
+              "key": "q",
+              "value": "{{searchQuery}}"
+            },
+            {
+              "key": "buildLimit",
+              "value": "6"
+            },
+            {
+              "key": "appLimit",
+              "value": "6"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Search ok', function () {",
+              "  pm.expect([200, 400]).to.include(pm.response.code);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
       "name": "Get Storage",
       "request": {
         "method": "GET",

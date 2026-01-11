@@ -1,9 +1,12 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
 
 import Breadcrumbs from "./Breadcrumbs";
 import Icon from "./Icon";
 import { getInitialTheme, setTheme, type ThemeMode } from "../lib/theme";
 import type { SessionUser } from "../lib/session";
+import { apiFetch } from "../lib/api";
+import type { SearchResponse } from "../lib/search";
 
 type TopbarProps = {
   title: string;
@@ -12,6 +15,7 @@ type TopbarProps = {
   onToggleSidebar?: () => void;
   onLogout?: () => void;
   user?: SessionUser | null;
+  activeTeamId?: string;
 };
 
 const Topbar = ({
@@ -21,13 +25,33 @@ const Topbar = ({
   onToggleSidebar,
   onLogout,
   user,
+  activeTeamId,
 }: TopbarProps) => {
+  const navigate = useNavigate();
   const [theme, setThemeState] = useState<ThemeMode>(() => getInitialTheme());
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<SearchResponse>({
+    apps: [],
+    builds: [],
+  });
   const userMenuRef = useRef<HTMLDivElement | null>(null);
+  const searchRef = useRef<HTMLDivElement | null>(null);
   const avatarUrl = user?.avatarUrl ?? null;
   const userLabel = user?.name || user?.email || user?.username || "User";
+  const trimmedQuery = searchValue.trim();
+
+  const buildResults = useMemo(() => {
+    const deduped = new Map(
+      (searchResults.builds ?? []).map((build) => [build.id, build])
+    );
+    return Array.from(deduped.values()).slice(0, 6);
+  }, [searchResults.builds]);
+
+  const appResults = useMemo(() => searchResults.apps ?? [], [searchResults.apps]);
 
   useEffect(() => {
     if (!isUserMenuOpen) return;
@@ -42,8 +66,50 @@ const Topbar = ({
   }, [isUserMenuOpen]);
 
   useEffect(() => {
+    if (!isSearchOpen) return;
+    const handleClick = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (searchRef.current && !searchRef.current.contains(target)) {
+        setIsSearchOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [isSearchOpen]);
+
+  useEffect(() => {
     setAvatarFailed(false);
   }, [avatarUrl]);
+
+  useEffect(() => {
+    if (!activeTeamId || trimmedQuery.length < 2) {
+      setSearchResults({ apps: [], builds: [] });
+      setIsSearchOpen(false);
+      setIsSearching(false);
+      return;
+    }
+    setIsSearchOpen(true);
+    setIsSearching(true);
+    const handle = window.setTimeout(() => {
+      const params = new URLSearchParams();
+      params.set("q", trimmedQuery);
+      params.set("appLimit", "6");
+      params.set("buildLimit", "6");
+      apiFetch<SearchResponse>(`/search?${params.toString()}`, {
+        headers: { "x-team-id": activeTeamId },
+      })
+        .then((payload) => {
+          setSearchResults(payload ?? { apps: [], builds: [] });
+        })
+        .catch(() => {
+          setSearchResults({ apps: [], builds: [] });
+        })
+        .finally(() => {
+          setIsSearching(false);
+        });
+    }, 200);
+    return () => window.clearTimeout(handle);
+  }, [activeTeamId, trimmedQuery]);
 
   const toggleTheme = () => {
     const next = theme === "dark" ? "light" : "dark";
@@ -64,14 +130,106 @@ const Topbar = ({
             >
               <Icon name="menu" className="h-4 w-4" />
             </button>
-            <div className="flex h-11 min-w-[180px] flex-1 items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-500 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
-              <Icon name="search" className="h-4 w-4 text-slate-400" />
-              <input
-                type="search"
-                placeholder="Search (Ctrl+/)"
-                aria-label="Search"
-                className="h-full w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400 dark:text-slate-100"
-              />
+            <div ref={searchRef} className="relative flex-1">
+              <div className="flex h-11 min-w-[180px] items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-500 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
+                <Icon name="search" className="h-4 w-4 text-slate-400" />
+                <input
+                  type="search"
+                  placeholder="Search apps or builds"
+                  aria-label="Search"
+                  value={searchValue}
+                  onChange={(event) => setSearchValue(event.target.value)}
+                  onFocus={() => {
+                    if (trimmedQuery.length >= 2) {
+                      setIsSearchOpen(true);
+                    }
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" && trimmedQuery.length >= 2) {
+                      navigate(`/search?q=${encodeURIComponent(trimmedQuery)}`);
+                      setIsSearchOpen(false);
+                    }
+                    if (event.key === "Escape") {
+                      setIsSearchOpen(false);
+                    }
+                  }}
+                  className="h-full w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400 dark:text-slate-100"
+                />
+              </div>
+              {isSearchOpen ? (
+                <div className="absolute left-0 right-0 z-30 mt-2 rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900">
+                  <button
+                    type="button"
+                    className="flex h-11 w-full items-center justify-between border-b border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                    onClick={() => {
+                      navigate(`/search?q=${encodeURIComponent(trimmedQuery)}`);
+                      setIsSearchOpen(false);
+                    }}
+                  >
+                    See all &gt;
+                  </button>
+                  <div className="max-h-80 overflow-y-auto p-2">
+                    {isSearching ? (
+                      <p className="px-2 py-3 text-xs text-slate-500 dark:text-slate-400">
+                        Searching...
+                      </p>
+                    ) : null}
+                    {!isSearching && !appResults.length && !buildResults.length ? (
+                      <p className="px-2 py-3 text-xs text-slate-500 dark:text-slate-400">
+                        No results yet.
+                      </p>
+                    ) : null}
+                    {appResults.length ? (
+                      <div className="space-y-1">
+                        <p className="px-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                          Apps
+                        </p>
+                        {appResults.map((app) => (
+                          <button
+                            key={app.id}
+                            type="button"
+                            className="flex w-full items-center justify-between rounded-md px-2 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                            onClick={() => {
+                              navigate(`/apps/${app.id}/builds`);
+                              setIsSearchOpen(false);
+                            }}
+                          >
+                            <span className="font-medium">{app.name}</span>
+                            <span className="text-xs text-slate-400 dark:text-slate-500">
+                              {app.identifier}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
+                    {buildResults.length ? (
+                      <div className="mt-3 space-y-1">
+                        <p className="px-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                          Builds
+                        </p>
+                        {buildResults.map((build) => (
+                          <button
+                            key={build.id}
+                            type="button"
+                            className="flex w-full items-center justify-between rounded-md px-2 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                            onClick={() => {
+                              navigate(`/apps/${build.appId}/builds/${build.id}`);
+                              setIsSearchOpen(false);
+                            }}
+                          >
+                            <span className="font-medium">
+                              {build.displayName}
+                            </span>
+                            <span className="text-xs text-slate-400 dark:text-slate-500">
+                              #{build.buildNumber} • v{build.version}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              ) : null}
             </div>
           </div>
           <div className="flex items-center gap-2">

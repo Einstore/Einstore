@@ -96,6 +96,7 @@ const AdminLayout = ({
         onToggleSidebar={() => setIsSidebarOpen((current) => !current)}
         onLogout={handleLogout}
         user={user}
+        activeTeamId={activeTeamId}
         actions={
           <>
             {actions.map((action) => (

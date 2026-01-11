@@ -27,6 +27,7 @@ import { prisma } from "../lib/prisma.js";
 import { loadConfig } from "../lib/config.js";
 import { requireAuth, requireTeam } from "../auth/guard.js";
 import { privateApiPlugins } from "../private/registry.js";
+import { searchRoutes } from "./search.js";
 
 export async function registerRoutes(app: FastifyInstance) {
   const config = loadConfig();
@@ -59,6 +60,7 @@ export async function registerRoutes(app: FastifyInstance) {
   await app.register(iosInstallRoutes);
   await app.register(apiKeyRoutes);
   await app.register(settingsRoutes);
+  await app.register(searchRoutes);
 
   for (const plugin of privateApiPlugins) {
     if (typeof plugin.register !== "function") continue;

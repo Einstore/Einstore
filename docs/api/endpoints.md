@@ -28,6 +28,7 @@ Team-scoped endpoints:
 - `/builds/:id/ios/manifest`
 - `/builds/:id/ios/download`
 - `/builds/:id/ios/installs/track`
+- `/search`
 
 ## GET /health
 - Purpose: Health check
@@ -42,6 +43,18 @@ Team-scoped endpoints:
 - Auth scope: None
 - Request schema: none
 - Response schema: `{ "name": string, "version": string }`
+- Side effects: none
+- Platform relevance: all
+
+## GET /search
+- Purpose: Search apps and builds by name, identifier, version, or build number
+- Auth scope: Team
+- Request schema: query params
+  - `q` (string, required): search term
+  - `appId` (string, optional): filter builds by app ID
+  - `appLimit` (number, optional, default 10): max apps returned
+  - `buildLimit` (number, optional, default 6): max builds returned
+- Response schema: `{ "apps": [{ "id": "app", "name": "App", "identifier": "com.app" }], "builds": [{ "id": "build", "buildNumber": "42", "displayName": "Release", "version": "1.0.0", "createdAt": "2026-01-11T00:00:00.000Z", "appId": "app", "appName": "App", "appIdentifier": "com.app" }] }`
 - Side effects: none
 - Platform relevance: all
 

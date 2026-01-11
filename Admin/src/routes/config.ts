@@ -42,6 +42,11 @@ export const pageConfig = {
     breadcrumbs: [{ label: "Builds" }, { label: "Detail" }],
     actions: [{ id: "upload-build", label: "Upload build", variant: "primary" }],
   },
+  search: {
+    title: "Search builds",
+    breadcrumbs: [{ label: "Search" }],
+    actions: [],
+  },
   flags: {
     title: "Future flags",
     breadcrumbs: [{ label: "Governance" }, { label: "Future flags" }],

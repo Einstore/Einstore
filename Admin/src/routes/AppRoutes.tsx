@@ -15,6 +15,7 @@ import BuildsPage from "../pages/BuildsPage";
 import FutureFlagsPage from "../pages/FutureFlagsPage";
 import LoginPage from "../pages/LoginPage";
 import OverviewPage from "../pages/OverviewPage";
+import SearchPage from "../pages/SearchPage";
 import SettingsPage from "../pages/SettingsPage";
 import BuildDetailPage from "../pages/BuildDetailPage";
 import AppBuildsPage from "../pages/AppBuildsPage";
@@ -316,6 +317,17 @@ const AppRoutes = () => {
       path: "/apps/:appId/builds/:buildId",
       element: <BuildDetailRoute activeTeamId={activeTeamId} />,
       navId: "builds",
+    },
+    {
+      id: "search",
+      path: "/search",
+      element: (
+        <SearchPage
+          apps={apps}
+          appIcons={appIcons}
+          activeTeamId={activeTeamId}
+        />
+      ),
     },
     {
       id: "flags",
