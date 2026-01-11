@@ -1,5 +1,8 @@
+import { useState } from "react";
+
 import AppsTable from "../components/AppsTable";
 import FilterPill from "../components/FilterPill";
+import IconSelectField from "../components/IconSelectField";
 import Panel from "../components/Panel";
 import SearchField from "../components/SearchField";
 import SectionHeader from "../components/SectionHeader";
@@ -12,6 +15,8 @@ type AppsPageProps = {
 };
 
 const AppsPage = ({ apps, onSelectApp }: AppsPageProps) => {
+  const [platform, setPlatform] = useState("all");
+
   return (
     <div className="space-y-6">
       <SectionHeader
@@ -28,15 +33,16 @@ const AppsPage = ({ apps, onSelectApp }: AppsPageProps) => {
             />
           </div>
           <div className="col-span-12 md:col-span-6 xl:col-span-4">
-            <SelectField
+            <IconSelectField
               id="platform-filter"
               label="Platform"
+              value={platform}
+              onChange={setPlatform}
               options={[
                 { value: "all", label: "All platforms" },
-                { value: "ios", label: "iOS" },
-                { value: "android", label: "Android" },
+                { value: "ios", label: "iOS", icon: "ios" },
+                { value: "android", label: "Android", icon: "android" },
               ]}
-              value="all"
             />
           </div>
           <div className="col-span-12 md:col-span-6 xl:col-span-4">

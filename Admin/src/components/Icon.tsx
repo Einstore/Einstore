@@ -8,6 +8,7 @@ import {
   faLock,
   faRocket,
 } from "@fortawesome/free-solid-svg-icons";
+import { faApple, faAndroid } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const icons = {
@@ -19,6 +20,8 @@ const icons = {
   settings: faGear,
   flags: faFlag,
   bell: faBell,
+  ios: faApple,
+  android: faAndroid,
 } as const;
 
 export type IconName = keyof typeof icons;
