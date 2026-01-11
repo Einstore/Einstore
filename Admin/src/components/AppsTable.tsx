@@ -86,12 +86,14 @@ const AppsTable = ({ apps, appIcons, onSelectApp, viewMode, onViewChange }: Apps
         </div>
       ) : (
         <div className="mt-4">
-          <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)] gap-4 border-b border-slate-200 pb-3 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:border-slate-700 dark:text-slate-400">
-            <span>App</span>
-            <span>Updated</span>
-            <span>Created</span>
+          <div className="-mx-5 border-b border-slate-200 pb-3 dark:border-slate-700">
+            <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)] gap-4 px-5 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              <span>App</span>
+              <span>Updated</span>
+              <span>Created</span>
+            </div>
           </div>
-          <div>
+          <div className="-mx-5">
             {apps.map((app) => (
               <AppRow
                 key={app.id}

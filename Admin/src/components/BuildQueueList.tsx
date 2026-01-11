@@ -15,9 +15,10 @@ type BuildQueueListProps = {
 const BuildQueueList = ({ jobs, icons, platforms, onSelect, onInstall, onDownload }: BuildQueueListProps) => {
   return (
     <div className="rounded-xl bg-white p-5 shadow-sm dark:bg-slate-800">
-      {jobs.map((job) => {
-        const name =
-          "displayName" in job && job.displayName ? job.displayName : job.name ?? "Build";
+      <div className="-mx-5">
+        {jobs.map((job) => {
+          const name =
+            "displayName" in job && job.displayName ? job.displayName : job.name ?? "Build";
         const buildNumber =
           "buildNumber" in job && job.buildNumber
             ? job.buildNumber
@@ -32,22 +33,23 @@ const BuildQueueList = ({ jobs, icons, platforms, onSelect, onInstall, onDownloa
         const storageKind = "storageKind" in job ? job.storageKind : undefined;
         const platform = platforms?.[job.id] ?? ("platform" in job ? (job as ApiBuild).platform : undefined);
 
-        return (
-          <BuildRow
-            key={job.id}
-            name={name}
-            buildNumber={buildNumber}
-            size={size}
-            createdAt={createdAt}
-            storageKind={storageKind}
-            iconUrl={icons?.[job.id]}
-            platform={platform}
-            onInstall={onInstall ? () => onInstall(job.id) : undefined}
-            onDownload={onDownload ? () => onDownload(job.id) : undefined}
-            onSelect={onSelect ? () => onSelect(job.id) : undefined}
-          />
-        );
-      })}
+          return (
+            <BuildRow
+              key={job.id}
+              name={name}
+              buildNumber={buildNumber}
+              size={size}
+              createdAt={createdAt}
+              storageKind={storageKind}
+              iconUrl={icons?.[job.id]}
+              platform={platform}
+              onInstall={onInstall ? () => onInstall(job.id) : undefined}
+              onDownload={onDownload ? () => onDownload(job.id) : undefined}
+              onSelect={onSelect ? () => onSelect(job.id) : undefined}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 };
