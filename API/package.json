@@ -18,7 +18,7 @@
     "@fastify/multipart": "^9.3.0",
     "@prisma/client": "^6.16.1",
     "@rafiki270/feature-flags": "file:../Libraries/feature-flags",
-    "@rafiki270/teams": "file:../Libraries/teams",
+    "@rafiki270/teams": "git+https://github.com/rafiki270/teams.git#935a199",
     "@unlikeother/auth": "file:../Libraries/rafiki-auth",
     "apk-parser3": "^0.1.7",
     "dotenv": "^16.4.5",
