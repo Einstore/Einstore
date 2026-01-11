@@ -19,10 +19,6 @@ const AppsPage = ({ apps, onSelectApp }: AppsPageProps) => {
 
   return (
     <div className="space-y-6">
-      <SectionHeader
-        title="Catalog filters"
-        description="Track approved builds, ownership, and current release status."
-      />
       <Panel className="space-y-6">
         <div className="grid grid-cols-12 gap-6">
           <div className="col-span-12 md:col-span-6 xl:col-span-4">

@@ -283,6 +283,28 @@ model User {
   userTeamSettings    UserTeamSetting[]
   createdBuilds       Build[]             @relation("BuildCreatedBy")
   buildEvents         BuildEvent[]
+  createdApiKeys      ApiKey[]            @relation("ApiKeyCreator")
+}
+
+model ApiKey {
+  id              String   @id @default(uuid())
+  teamId          String
+  name            String
+  tokenHash       String   @unique
+  tokenPrefix     String
+  createdByUserId String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  lastUsedAt      DateTime?
+  revokedAt       DateTime?
+  expiresAt       DateTime?
+
+  team            Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  createdByUser   User?    @relation("ApiKeyCreator", fields: [createdByUserId], references: [id], onDelete: SetNull)
+
+  @@index([teamId])
+  @@index([tokenPrefix])
+  @@index([createdByUserId])
 }
 
 model Credential {
@@ -388,6 +410,7 @@ model Team {
   userTeamSettings UserTeamSetting[]
   apps            App[]
   buildEvents     BuildEvent[]
+  apiKeys         ApiKey[]
 }
 
 model TeamMember {

@@ -9,10 +9,6 @@ type ReleasesSectionProps = {
 const ReleasesSection = ({ apps }: ReleasesSectionProps) => {
   return (
     <section className="space-y-6">
-      <SectionHeader
-        title="Active releases"
-        description="Apps currently live or awaiting approval."
-      />
       <AppsTable apps={apps} />
     </section>
   );

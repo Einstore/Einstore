@@ -41,7 +41,7 @@ const Sidebar = ({
           alt="Einstore"
           className="h-20 w-20 rounded-xl"
         />
-        <div>
+        <div className="-ml-[18px]">
           <p className="text-2xl font-semibold uppercase tracking-wide text-slate-900 dark:text-slate-100">
             Einstore
           </p>

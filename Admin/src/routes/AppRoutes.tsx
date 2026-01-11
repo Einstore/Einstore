@@ -50,7 +50,6 @@ const navItems: NavItemConfig[] = [
     id: "flags",
     label: "Future flags",
     icon: "flags",
-    featureFlag: "admin.future_flags",
     superOnly: true,
   },
   {
@@ -147,6 +146,7 @@ const AppRoutes = () => {
     selectTeam,
     createTeam,
     badges,
+    me,
   } = useSessionState(location.pathname);
   const isSaas = import.meta.env.VITE_SAAS === "true";
 
@@ -237,7 +237,6 @@ const AppRoutes = () => {
       path: "/flags",
       element: <FutureFlagsPage />,
       navId: "flags",
-      featureFlag: "admin.future_flags",
       superOnly: true,
     },
     {
@@ -341,6 +340,7 @@ const AppRoutes = () => {
               activeTeamId={activeTeamId}
               teams={teams}
               onUpload={handleIngest}
+              user={me}
             />
           </RequireAuth>
         }

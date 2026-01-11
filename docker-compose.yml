@@ -16,6 +16,7 @@ services:
       AUTH_JWT_AUDIENCE: einstore-api
       AUTH_REFRESH_TTL_DAYS: 30
       AUTH_ACCESS_TTL_MINUTES: 15
+      API_KEY_SECRET: change-me
     ports:
       - "8080:8080"
     depends_on:

@@ -10,6 +10,7 @@ const configSchema = z.object({
   INBOUND_EMAIL_DOMAIN: z.string().default("local.einstore"),
   CORS_ORIGINS: z.string().optional(),
   UPLOAD_MAX_BYTES: z.coerce.number().default(8 * 1024 * 1024 * 1024),
+  API_KEY_SECRET: z.string().min(1).optional(),
 });
 
 export type AppConfig = z.infer<typeof configSchema>;
@@ -19,6 +20,9 @@ export function loadConfig(): AppConfig {
   if (!parsed.success) {
     const issues = parsed.error.issues.map((issue) => issue.message).join("; ");
     throw new Error(`Invalid configuration: ${issues}`);
+  }
+  if (parsed.data.NODE_ENV === "production" && !parsed.data.API_KEY_SECRET) {
+    throw new Error("Invalid configuration: API_KEY_SECRET is required in production.");
   }
   return parsed.data;
 }

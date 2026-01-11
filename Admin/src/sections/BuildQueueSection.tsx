@@ -9,10 +9,6 @@ type BuildQueueSectionProps = {
 const BuildQueueSection = ({ jobs }: BuildQueueSectionProps) => {
   return (
     <section className="space-y-6">
-      <SectionHeader
-        title="Build queue"
-        description="Automated builds currently running or waiting."
-      />
       <BuildQueueList jobs={jobs} />
     </section>
   );

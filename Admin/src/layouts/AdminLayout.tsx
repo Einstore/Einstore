@@ -10,6 +10,7 @@ import Topbar from "../components/Topbar";
 import type { NavItem } from "../components/Sidebar";
 import { apiFetch } from "../lib/api";
 import type { TeamSummary } from "../lib/teams";
+import type { SessionUser } from "../lib/session";
 
 type AdminLayoutProps = {
   navItems: readonly NavItem[];
@@ -22,6 +23,7 @@ type AdminLayoutProps = {
   activeTeamId: string;
   teams: TeamSummary[];
   onUpload: (file: File) => Promise<void>;
+  user?: SessionUser | null;
 };
 
 const AdminLayout = ({
@@ -35,6 +37,7 @@ const AdminLayout = ({
   activeTeamId,
   teams,
   onUpload,
+  user,
 }: AdminLayoutProps) => {
   const [isAddAppOpen, setIsAddAppOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -89,6 +92,7 @@ const AdminLayout = ({
         breadcrumbs={breadcrumbs}
         onToggleSidebar={() => setIsSidebarOpen((current) => !current)}
         onLogout={handleLogout}
+        user={user}
         actions={
           <>
             {actions.map((action) => (

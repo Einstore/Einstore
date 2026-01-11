@@ -13,6 +13,7 @@ const corsOrigins = config.CORS_ORIGINS
   : [];
 app.register(cors, {
   origin: corsOrigins.length ? corsOrigins : true,
+  allowedHeaders: ["Authorization", "Content-Type", "x-team-id", "x-api-key"],
 });
 app.register(multipart, {
   limits: {

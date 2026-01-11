@@ -7,7 +7,7 @@ import path from "node:path";
 import { ingestAndroidApk } from "../lib/ingest/android.js";
 import { ingestIosIpa } from "../lib/ingest/ios.js";
 import { ensureZipReadable, isInvalidArchiveError } from "../lib/zip.js";
-import { requireTeam } from "../auth/guard.js";
+import { requireTeamOrApiKey } from "../auth/guard.js";
 import { broadcastBadgesUpdate } from "../lib/realtime.js";
 
 const ingestSchema = z.object({
@@ -20,7 +20,7 @@ type IngestRequest = z.infer<typeof ingestSchema>;
 const allowedUploadExtensions = new Set([".apk", ".ipa"]);
 
 export async function pipelineRoutes(app: FastifyInstance) {
-  app.post("/ingest", { preHandler: requireTeam }, async (request, reply) => {
+  app.post("/ingest", { preHandler: requireTeamOrApiKey }, async (request, reply) => {
     const parsed = ingestSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(400).send({ error: "Invalid payload" });
@@ -66,7 +66,7 @@ export async function pipelineRoutes(app: FastifyInstance) {
     });
   });
 
-  app.post("/ingest/upload", { preHandler: requireTeam }, async (request, reply) => {
+  app.post("/ingest/upload", { preHandler: requireTeamOrApiKey }, async (request, reply) => {
     if (!request.isMultipart()) {
       return reply.status(400).send({ error: "multipart_required" });
     }

@@ -92,6 +92,10 @@ services:
   - key: AUTH_ACCESS_TTL_MINUTES
     scope: RUN_TIME
     value: "15"
+  - key: API_KEY_SECRET
+    scope: RUN_TIME
+    type: SECRET
+    value: ${API_KEY_SECRET}
   - key: CORS_ORIGINS
     scope: RUN_TIME
     value: https://admin.einstore.pro,https://einstore.pro,http://localhost:8081,http://localhost:5173

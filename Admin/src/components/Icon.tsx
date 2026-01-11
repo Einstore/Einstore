@@ -10,6 +10,7 @@ import {
   faGlobe,
   faGrip,
   faHouse,
+  faKey,
   faLock,
   faMagnifyingGlass,
   faMoon,
@@ -40,6 +41,7 @@ const icons = {
   plus: faPlus,
   sun: faSun,
   menu: faBars,
+  key: faKey,
 } as const;
 
 export type IconName = keyof typeof icons;

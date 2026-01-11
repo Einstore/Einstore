@@ -1,5 +1,5 @@
 import type { AuthSessionInfo } from "@unlikeother/auth";
-import type { Team, TeamMember, User } from "@prisma/client";
+import type { ApiKey, Team, TeamMember, User } from "@prisma/client";
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -16,5 +16,6 @@ declare module "fastify" {
     team?: Team;
     teamMember?: TeamMember;
     user?: User;
+    apiKey?: ApiKey;
   }
 }

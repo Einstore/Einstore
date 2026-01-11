@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import Breadcrumbs from "./Breadcrumbs";
 import Icon from "./Icon";
 import { getInitialTheme, setTheme, type ThemeMode } from "../lib/theme";
+import type { SessionUser } from "../lib/session";
 
 type TopbarProps = {
   title: string;
@@ -10,12 +11,23 @@ type TopbarProps = {
   actions?: ReactNode;
   onToggleSidebar?: () => void;
   onLogout?: () => void;
+  user?: SessionUser | null;
 };
 
-const Topbar = ({ title, breadcrumbs, actions, onToggleSidebar, onLogout }: TopbarProps) => {
+const Topbar = ({
+  title,
+  breadcrumbs,
+  actions,
+  onToggleSidebar,
+  onLogout,
+  user,
+}: TopbarProps) => {
   const [theme, setThemeState] = useState<ThemeMode>(() => getInitialTheme());
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [avatarFailed, setAvatarFailed] = useState(false);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
+  const avatarUrl = user?.avatarUrl ?? null;
+  const userLabel = user?.name || user?.email || user?.username || "User";
 
   useEffect(() => {
     if (!isUserMenuOpen) return;
@@ -28,6 +40,10 @@ const Topbar = ({ title, breadcrumbs, actions, onToggleSidebar, onLogout }: Topb
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, [isUserMenuOpen]);
+
+  useEffect(() => {
+    setAvatarFailed(false);
+  }, [avatarUrl]);
 
   const toggleTheme = () => {
     const next = theme === "dark" ? "light" : "dark";
@@ -94,12 +110,21 @@ const Topbar = ({ title, breadcrumbs, actions, onToggleSidebar, onLogout }: Topb
             <div ref={userMenuRef} className="relative">
               <button
                 type="button"
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-200"
+                className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-200"
                 aria-label="User menu"
                 aria-expanded={isUserMenuOpen}
                 onClick={() => setIsUserMenuOpen((current) => !current)}
               >
-                <Icon name="user" className="h-5 w-5" />
+                {avatarUrl && !avatarFailed ? (
+                  <img
+                    src={avatarUrl}
+                    alt={userLabel}
+                    className="h-full w-full object-cover"
+                    onError={() => setAvatarFailed(true)}
+                  />
+                ) : (
+                  <Icon name="user" className="h-5 w-5" />
+                )}
               </button>
               {isUserMenuOpen ? (
                 <div className="absolute right-0 mt-2 w-56 rounded-lg border border-slate-200 bg-white p-2 shadow-sm dark:border-slate-700 dark:bg-slate-800">
