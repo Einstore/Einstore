@@ -356,6 +356,10 @@
           "updatedAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "billingCycleStartAt": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
@@ -535,6 +539,68 @@
             "type": "string"
           }
         }
+      },
+      "TeamStats": {
+        "type": "object",
+        "properties": {
+          "billingCycleStartAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "totalStorageBytes": {
+            "type": "integer"
+          },
+          "downloadsThisMonth": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "eventCount": {
+                "type": "integer"
+              },
+              "bytes": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "from",
+              "eventCount",
+              "bytes"
+            ]
+          },
+          "uploadsInBillingCycle": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "buildCount": {
+                "type": "integer"
+              },
+              "appCount": {
+                "type": "integer"
+              },
+              "bytes": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "from",
+              "buildCount",
+              "appCount",
+              "bytes"
+            ]
+          }
+        },
+        "required": [
+          "billingCycleStartAt",
+          "totalStorageBytes",
+          "downloadsThisMonth",
+          "uploadsInBillingCycle"
+        ]
       }
     },
     "parameters": {
@@ -2698,6 +2764,34 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/teams/stats": {
+      "get": {
+        "summary": "Team stats",
+        "description": "Storage totals, downloads this month, and uploads in the current billing cycle for the active team.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Team stats",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamStats"
+                }
+              }
+            }
           }
         }
       }

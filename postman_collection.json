@@ -2990,6 +2990,45 @@
           }
         }
       ]
+    },
+    {
+      "name": "Team Stats",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/teams/stats",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "teams",
+            "stats"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Team stats ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
     }
   ],
   "event": [
