@@ -9,7 +9,7 @@
     "start": "node dist/index.js",
     "test:unit": "node scripts/run-unit-tests.mjs",
     "postinstall": "npm run prisma:generate",
-    "private:prepare": "node ../scripts/prepare-private.mjs",
+    "private:prepare": "node ./scripts/prepare-private.mjs",
     "prisma:generate": "npm run private:prepare && prisma generate --schema prisma/generated/schema.prisma",
     "prisma:migrate": "npm run private:prepare && prisma migrate dev --schema prisma/generated/schema.prisma",
     "prisma:deploy": "npm run private:prepare && prisma migrate deploy --schema prisma/generated/schema.prisma",
