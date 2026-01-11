@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { startTransition, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 
 import ActionButton from "../components/ActionButton";
@@ -67,7 +67,9 @@ const AdminLayout = ({
   };
 
   const handleNavSelect = (id: string) => {
-    navigate(`/${id}`);
+    startTransition(() => {
+      navigate(`/${id}`);
+    });
     setIsSidebarOpen(false);
   };
 
