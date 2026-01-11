@@ -14,6 +14,7 @@ import {
   faMoon,
   faPlus,
   faRocket,
+  faSun,
 } from "@fortawesome/free-solid-svg-icons";
 import { faApple, faAndroid } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -36,6 +37,7 @@ const icons = {
   user: faCircleUser,
   chevronDown: faChevronDown,
   plus: faPlus,
+  sun: faSun,
 } as const;
 
 export type IconName = keyof typeof icons;

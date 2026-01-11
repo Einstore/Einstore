@@ -38,13 +38,14 @@ const Topbar = ({ title, breadcrumbs, actions }: TopbarProps) => {
               type="button"
               className="flex h-11 w-11 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100"
               aria-label="Theme"
+              aria-pressed={theme === "dark"}
               onClick={() => {
                 const next = theme === "dark" ? "light" : "dark";
                 setThemeState(next);
                 setTheme(next);
               }}
             >
-              <Icon name="moon" className="h-4 w-4" />
+              <Icon name={theme === "dark" ? "sun" : "moon"} className="h-4 w-4" />
             </button>
             <button
               type="button"
