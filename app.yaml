@@ -37,7 +37,7 @@ ingress:
 name: einstore
 region: lon
 services:
-- build_command: npm install && npm run prisma:generate && npm run build
+- build_command: npm --prefix ../Libraries/rafiki-auth install && npm --prefix ../Libraries/rafiki-auth run build && npm install && npm run prisma:generate && npm run build
   envs:
   - key: DATABASE_URL
     scope: RUN_TIME
