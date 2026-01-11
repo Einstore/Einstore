@@ -1,7 +1,8 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import Breadcrumbs from "./Breadcrumbs";
 import Icon from "./Icon";
+import { getInitialTheme, setTheme, type ThemeMode } from "../lib/theme";
 
 type TopbarProps = {
   title: string;
@@ -10,6 +11,8 @@ type TopbarProps = {
 };
 
 const Topbar = ({ title, breadcrumbs, actions }: TopbarProps) => {
+  const [theme, setThemeState] = useState<ThemeMode>(() => getInitialTheme());
+
   return (
     <header className="z-20 border-b border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-900">
       <div className="space-y-4 px-6 py-4">
@@ -35,6 +38,11 @@ const Topbar = ({ title, breadcrumbs, actions }: TopbarProps) => {
               type="button"
               className="flex h-11 w-11 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100"
               aria-label="Theme"
+              onClick={() => {
+                const next = theme === "dark" ? "light" : "dark";
+                setThemeState(next);
+                setTheme(next);
+              }}
             >
               <Icon name="moon" className="h-4 w-4" />
             </button>

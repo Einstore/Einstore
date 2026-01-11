@@ -8,6 +8,10 @@
   color-scheme: light;
 }
 
+:root.dark {
+  color-scheme: dark;
+}
+
 body {
   @apply bg-slate-50 text-slate-900 font-body;
 }
