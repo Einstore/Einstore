@@ -18,6 +18,7 @@ import { realtimeRoutes } from "./realtime.js";
 import { usageRoutes } from "./usage.js";
 import { buildEventRoutes } from "./build-events.js";
 import { iosInstallRoutes } from "./ios-install.js";
+import { apiKeyRoutes } from "./api-keys.js";
 import { registerTeamRoutes, registerUserTeamSettingsRoutes } from "@rafiki270/teams";
 import { prisma } from "../lib/prisma.js";
 import { loadConfig } from "../lib/config.js";
@@ -50,4 +51,5 @@ export async function registerRoutes(app) {
     await app.register(usageRoutes);
     await app.register(buildEventRoutes);
     await app.register(iosInstallRoutes);
+    await app.register(apiKeyRoutes);
 }

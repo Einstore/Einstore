@@ -1,4 +1,27 @@
 import yauzl from "yauzl";
+const INVALID_ARCHIVE_SIGNATURE = "end of central directory record signature not found";
+export const isInvalidArchiveError = (error) => {
+    const message = error instanceof Error ? error.message : String(error);
+    return message.toLowerCase().includes(INVALID_ARCHIVE_SIGNATURE);
+};
+const sleep = (durationMs) => new Promise((resolve) => setTimeout(resolve, durationMs));
+export async function ensureZipReadable(filePath, { retries = 2, delayMs = 150 } = {}) {
+    for (let attempt = 0; attempt <= retries; attempt += 1) {
+        try {
+            await listZipEntries(filePath);
+            return;
+        }
+        catch (error) {
+            if (!isInvalidArchiveError(error)) {
+                throw error;
+            }
+            if (attempt >= retries) {
+                throw error;
+            }
+            await sleep(delayMs);
+        }
+    }
+}
 export async function listZipEntries(filePath) {
     return new Promise((resolve, reject) => {
         yauzl.open(filePath, { lazyEntries: true }, (err, zipfile) => {

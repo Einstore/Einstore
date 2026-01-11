@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { requireTeam } from "../auth/guard.js";
@@ -14,6 +16,48 @@ const groupArtifactsByKind = (items) => {
         list.sort((left, right) => right.createdAt.getTime() - left.createdAt.getTime());
     }
     return grouped;
+};
+const storageRoot = path.resolve(process.cwd(), "storage", "ingest");
+const resolveBaseUrl = (request) => {
+    const protoHeader = request.headers["x-forwarded-proto"];
+    const hostHeader = request.headers["x-forwarded-host"] ?? request.headers["host"];
+    const proto = Array.isArray(protoHeader) ? protoHeader[0] : protoHeader;
+    const host = Array.isArray(hostHeader) ? hostHeader[0] : hostHeader;
+    if (!host) {
+        return "http://localhost:8080";
+    }
+    return `${proto || "http"}://${host}`;
+};
+const resolveIconPath = (iconPath) => {
+    const candidate = path.isAbsolute(iconPath) ? iconPath : path.join(storageRoot, iconPath);
+    const resolved = path.resolve(candidate);
+    const relative = path.relative(storageRoot, resolved);
+    if (relative.startsWith("..") || path.isAbsolute(relative)) {
+        return null;
+    }
+    return resolved;
+};
+const readIconDataUrl = async (filePath) => {
+    const buffer = await fs.promises.readFile(filePath);
+    return `data:image/png;base64,${buffer.toString("base64")}`;
+};
+const extractIconBitmap = (metadata) => {
+    if (!metadata || typeof metadata !== "object" || Array.isArray(metadata))
+        return null;
+    const iconBitmap = metadata.iconBitmap;
+    if (!iconBitmap || typeof iconBitmap !== "object" || Array.isArray(iconBitmap))
+        return null;
+    const record = iconBitmap;
+    const iconPath = typeof record.path === "string" ? record.path : "";
+    if (!iconPath)
+        return null;
+    return {
+        path: iconPath,
+        width: typeof record.width === "number" ? record.width : undefined,
+        height: typeof record.height === "number" ? record.height : undefined,
+        sizeBytes: typeof record.sizeBytes === "number" ? record.sizeBytes : undefined,
+        sourcePath: typeof record.sourcePath === "string" ? record.sourcePath : undefined,
+    };
 };
 const createBuildSchema = z.object({
     appIdentifier: z.string().min(1),
@@ -145,5 +189,74 @@ export async function buildRoutes(app) {
         }
         const artifactsByKind = groupArtifactsByKind(record.artifacts);
         return reply.send({ ...record, artifactsByKind });
+    });
+    app.get("/builds/:id/icons", { preHandler: requireTeam }, async (request, reply) => {
+        const teamId = request.team?.id;
+        if (!teamId) {
+            return reply.status(403).send({ error: "team_required", message: "Team context required" });
+        }
+        const id = request.params.id;
+        const record = await prisma.build.findFirst({
+            where: { id, version: { app: { teamId } } },
+            include: {
+                version: { include: { app: true } },
+                targets: true,
+            },
+        });
+        if (!record) {
+            return reply.status(404).send({ error: "Not found" });
+        }
+        const baseUrl = resolveBaseUrl(request);
+        const items = (await Promise.all(record.targets.map(async (target) => {
+            const iconBitmap = extractIconBitmap(target.metadata);
+            if (!iconBitmap)
+                return null;
+            const resolved = resolveIconPath(iconBitmap.path);
+            if (!resolved || !fs.existsSync(resolved))
+                return null;
+            return {
+                targetId: target.id,
+                bundleId: target.bundleId,
+                platform: target.platform,
+                role: target.role,
+                iconBitmap: {
+                    width: iconBitmap.width,
+                    height: iconBitmap.height,
+                    sizeBytes: iconBitmap.sizeBytes,
+                    sourcePath: iconBitmap.sourcePath,
+                },
+                url: `${baseUrl}/builds/${record.id}/icons/${target.id}`,
+                contentType: "image/png",
+                dataUrl: await readIconDataUrl(resolved),
+            };
+        }))).filter((item) => Boolean(item));
+        return reply.send({ buildId: record.id, items });
+    });
+    app.get("/builds/:id/icons/:targetId", { preHandler: requireTeam }, async (request, reply) => {
+        const teamId = request.team?.id;
+        if (!teamId) {
+            return reply.status(403).send({ error: "team_required", message: "Team context required" });
+        }
+        const params = request.params;
+        const target = await prisma.target.findFirst({
+            where: {
+                id: params.targetId,
+                buildId: params.id,
+                build: { version: { app: { teamId } } },
+            },
+        });
+        if (!target) {
+            return reply.status(404).send({ error: "Not found" });
+        }
+        const iconBitmap = extractIconBitmap(target.metadata);
+        if (!iconBitmap) {
+            return reply.status(404).send({ error: "icon_not_found" });
+        }
+        const resolved = resolveIconPath(iconBitmap.path);
+        if (!resolved || !fs.existsSync(resolved)) {
+            return reply.status(404).send({ error: "icon_not_found" });
+        }
+        reply.type("image/png");
+        return reply.send(fs.createReadStream(resolved));
     });
 }

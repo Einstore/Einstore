@@ -1,6 +1,7 @@
 import { asAuthError } from "@unlikeother/auth";
 import { authService } from "./service.js";
 import { prisma } from "../lib/prisma.js";
+import { hashApiKey } from "../lib/api-keys.js";
 export async function requireAuth(request, reply) {
     const header = request.headers["authorization"];
     if (!header || typeof header !== "string" || !header.startsWith("Bearer ")) {
@@ -72,4 +73,42 @@ export async function requireTeam(request, reply) {
     }
     request.team = membership.team;
     request.teamMember = membership;
+}
+export async function requireTeamAdmin(request, reply) {
+    await requireTeam(request, reply);
+    if (reply.sent) {
+        return;
+    }
+    const role = request.teamMember?.role;
+    if (role !== "owner" && role !== "admin") {
+        return reply.status(403).send({ error: "forbidden", message: "Admin access required" });
+    }
+}
+export async function requireTeamOrApiKey(request, reply) {
+    const apiKeyHeader = request.headers["x-api-key"];
+    if (typeof apiKeyHeader === "string" && apiKeyHeader.trim()) {
+        const tokenHash = hashApiKey(apiKeyHeader.trim());
+        const apiKey = await prisma.apiKey.findUnique({
+            where: { tokenHash },
+            include: { team: true },
+        });
+        if (!apiKey || apiKey.revokedAt) {
+            return reply
+                .status(401)
+                .send({ error: "api_key_invalid", message: "Invalid API key" });
+        }
+        if (apiKey.expiresAt && apiKey.expiresAt < new Date()) {
+            return reply
+                .status(401)
+                .send({ error: "api_key_expired", message: "API key expired" });
+        }
+        await prisma.apiKey.update({
+            where: { id: apiKey.id },
+            data: { lastUsedAt: new Date() },
+        });
+        request.team = apiKey.team;
+        request.apiKey = apiKey;
+        return;
+    }
+    await requireTeam(request, reply);
 }

@@ -5,7 +5,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { ingestAndroidApk } from "../lib/ingest/android.js";
 import { ingestIosIpa } from "../lib/ingest/ios.js";
-import { requireTeam } from "../auth/guard.js";
+import { ensureZipReadable, isInvalidArchiveError } from "../lib/zip.js";
+import { requireTeamOrApiKey } from "../auth/guard.js";
 import { broadcastBadgesUpdate } from "../lib/realtime.js";
 const ingestSchema = z.object({
     buildId: z.string().uuid().optional(),
@@ -14,7 +15,7 @@ const ingestSchema = z.object({
 });
 const allowedUploadExtensions = new Set([".apk", ".ipa"]);
 export async function pipelineRoutes(app) {
-    app.post("/ingest", { preHandler: requireTeam }, async (request, reply) => {
+    app.post("/ingest", { preHandler: requireTeamOrApiKey }, async (request, reply) => {
         const parsed = ingestSchema.safeParse(request.body);
         if (!parsed.success) {
             return reply.status(400).send({ error: "Invalid payload" });
@@ -26,11 +27,29 @@ export async function pipelineRoutes(app) {
         }
         const userId = request.auth?.user.id;
         if (payload.kind === "apk") {
+            try {
+                await ensureZipReadable(payload.filePath);
+            }
+            catch (error) {
+                if (isInvalidArchiveError(error)) {
+                    return reply.status(400).send({ error: "invalid_archive" });
+                }
+                throw error;
+            }
             const result = await ingestAndroidApk(payload.filePath, teamId, userId);
             await broadcastBadgesUpdate(teamId).catch(() => undefined);
             return reply.status(201).send({ status: "ingested", result });
         }
         if (payload.kind === "ipa") {
+            try {
+                await ensureZipReadable(payload.filePath);
+            }
+            catch (error) {
+                if (isInvalidArchiveError(error)) {
+                    return reply.status(400).send({ error: "invalid_archive" });
+                }
+                throw error;
+            }
             const result = await ingestIosIpa(payload.filePath, teamId, userId);
             await broadcastBadgesUpdate(teamId).catch(() => undefined);
             return reply.status(201).send({ status: "ingested", result });
@@ -40,7 +59,7 @@ export async function pipelineRoutes(app) {
             payload,
         });
     });
-    app.post("/ingest/upload", { preHandler: requireTeam }, async (request, reply) => {
+    app.post("/ingest/upload", { preHandler: requireTeamOrApiKey }, async (request, reply) => {
         if (!request.isMultipart()) {
             return reply.status(400).send({ error: "multipart_required" });
         }
@@ -73,6 +92,16 @@ export async function pipelineRoutes(app) {
         }
         const userId = request.auth?.user.id;
         try {
+            await ensureZipReadable(filePath);
+        }
+        catch (error) {
+            if (isInvalidArchiveError(error)) {
+                await fs.promises.rm(filePath, { force: true });
+                return reply.status(400).send({ error: "invalid_archive" });
+            }
+            throw error;
+        }
+        try {
             if (extension === ".apk") {
                 const result = await ingestAndroidApk(filePath, teamId, userId);
                 await broadcastBadgesUpdate(teamId).catch(() => undefined);
@@ -83,8 +112,7 @@ export async function pipelineRoutes(app) {
             return reply.status(201).send({ status: "ingested", result });
         }
         catch (error) {
-            const message = error instanceof Error ? error.message : String(error);
-            if (message.includes("end of central directory record signature not found")) {
+            if (isInvalidArchiveError(error)) {
                 return reply.status(400).send({ error: "invalid_archive" });
             }
             throw error;
