@@ -15,27 +15,35 @@ const BuildsPage = ({ builds, selectedAppName }: BuildsPageProps) => {
         title="Latest builds"
         description="Recent builds tied to your apps and release workflows."
       />
-      {selectedAppName ? (
-        <Panel className="flex items-center justify-between gap-4">
-          <div>
-            <p className="text-sm uppercase tracking-wide text-ink/50">
-              Selected app
-            </p>
-            <p className="mt-2 text-xl font-display text-ink">
-              {selectedAppName}
-            </p>
+      <div className="grid grid-cols-12 gap-6">
+        {selectedAppName ? (
+          <div className="col-span-12 md:col-span-6 xl:col-span-4">
+            <Panel className="flex h-full items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  Selected app
+                </p>
+                <p className="mt-2 text-xl font-semibold text-slate-900 dark:text-slate-100">
+                  {selectedAppName}
+                </p>
+              </div>
+              <StatusPill status="running" label="Latest builds" />
+            </Panel>
           </div>
-          <StatusPill status="running" label="Latest builds" />
-        </Panel>
-      ) : null}
-      <Panel className="flex items-center justify-between gap-4">
-        <div>
-          <p className="text-sm uppercase tracking-wide text-ink/50">
-            Total builds
-          </p>
-          <p className="mt-2 text-2xl font-display text-ink">{builds.length}</p>
+        ) : null}
+        <div className="col-span-12 md:col-span-6 xl:col-span-4">
+          <Panel className="flex h-full items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                Total builds
+              </p>
+              <p className="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">
+                {builds.length}
+              </p>
+            </div>
+          </Panel>
         </div>
-      </Panel>
+      </div>
       <BuildQueueList jobs={builds} />
     </div>
   );

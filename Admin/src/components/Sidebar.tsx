@@ -29,48 +29,37 @@ const Sidebar = ({
   dropzone,
 }: SidebarProps) => {
   return (
-    <aside className="flex h-full flex-col rounded-2xl bg-white p-5 shadow-card">
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-mint text-ink">
-          E
-        </div>
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-ink/50">
-            Einstore
-          </p>
-          <p className="font-display text-base text-ink">Admin</p>
-        </div>
+    <aside className="flex h-screen w-64 min-w-64 flex-col border-r border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
+      <div className="px-6 py-6">
+        <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+          Einstore
+        </p>
+        <p className="mt-1 text-base font-semibold text-slate-900 dark:text-slate-100">
+          Admin
+        </p>
       </div>
 
-      {teamSwitcher ? <div className="mt-10">{teamSwitcher}</div> : null}
+      {teamSwitcher ? <div className="px-4">{teamSwitcher}</div> : null}
 
-      <nav className="mt-8 flex flex-1 flex-col gap-2">
+      <nav className="mt-6 flex flex-1 flex-col gap-2 px-2">
         {items.map((item) => {
           const isActive = item.id === activeId;
           return (
             <button
               key={item.id}
               type="button"
-              className={`flex h-11 items-center justify-between rounded-xl px-4 text-left text-sm font-medium transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 ${
+              className={`flex h-11 items-center gap-3 rounded-lg px-4 text-left text-sm font-medium transition-colors ${
                 isActive
-                  ? "bg-mint text-ink"
-                  : "bg-transparent text-ink/60 hover:bg-ink/5"
+                  ? "bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400"
+                  : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700"
               }`}
               aria-current={isActive ? "page" : undefined}
               onClick={() => onSelect?.(item.id)}
             >
-              <span className="flex items-center gap-3">
-                <Icon name={item.icon} className="text-lg" />
-                {item.label}
-              </span>
+              <Icon name={item.icon} className="h-5 w-5" />
+              <span className="flex-1">{item.label}</span>
               {item.badge ? (
-                <span
-                  className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                    isActive
-                      ? "bg-white/60 text-ink"
-                      : "bg-ink/10 text-ink"
-                  }`}
-                >
+                <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-600 dark:bg-slate-700 dark:text-slate-300">
                   {item.badge}
                 </span>
               ) : null}
@@ -79,8 +68,12 @@ const Sidebar = ({
         })}
       </nav>
 
-      {dropzone ? <div className="pt-6">{dropzone}</div> : null}
-      {footer ? <div className="pt-6">{footer}</div> : null}
+      {dropzone ? <div className="px-4 pb-4">{dropzone}</div> : null}
+      {footer ? (
+        <div className="border-t border-slate-200 px-4 py-4 text-xs text-slate-400 dark:border-slate-700 dark:text-slate-500">
+          {footer}
+        </div>
+      ) : null}
     </aside>
   );
 };

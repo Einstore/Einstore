@@ -55,14 +55,16 @@ const FileDropzone = ({
   return (
     <div className="space-y-3">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-ink/60">
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
           {label}
         </p>
-        {helper ? <p className="text-xs text-ink/50">{helper}</p> : null}
+        {helper ? (
+          <p className="text-xs text-slate-400 dark:text-slate-500">{helper}</p>
+        ) : null}
       </div>
       <div
-        className={`flex flex-col items-center justify-center gap-3 rounded-2xl bg-white p-6 text-sm shadow-card transition-all duration-200 ease-out ${
-          isDragging ? "scale-[0.99]" : ""
+        className={`flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-slate-200 bg-white p-5 text-sm transition-colors dark:border-slate-700 dark:bg-slate-800 ${
+          isDragging ? "bg-slate-50 dark:bg-slate-700" : ""
         } ${disabled ? "pointer-events-none opacity-60" : ""}`}
         onDragEnter={(event) => {
           if (disabled) return;
@@ -81,17 +83,21 @@ const FileDropzone = ({
           handleFiles(event.dataTransfer.files);
         }}
       >
-        <p className="text-ink/70">Drop IPA or APK here</p>
+        <p className="text-slate-600 dark:text-slate-300">Drop IPA or APK here</p>
         <ActionButton
           label="Browse file"
           variant="outline"
           onClick={() => inputRef.current?.click()}
           disabled={disabled}
         />
-        <p className="text-xs text-ink/50">{formatFile(file)}</p>
-        {error ? <p className="text-xs text-coral">{error}</p> : null}
+        <p className="text-xs text-slate-400 dark:text-slate-500">
+          {formatFile(file)}
+        </p>
+        {error ? <p className="text-xs text-red-500">{error}</p> : null}
         {statusMessage ? (
-          <p className="text-xs text-ink/60">{statusMessage}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            {statusMessage}
+          </p>
         ) : null}
         <input
           ref={inputRef}

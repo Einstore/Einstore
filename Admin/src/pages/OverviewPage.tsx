@@ -47,9 +47,10 @@ const OverviewPage = ({
       {showMetrics ? <OverviewSection metrics={metrics} /> : null}
       {showPipeline ? <PipelineSection stages={pipelineStages} /> : null}
       <SplitLayout
-        className="lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]"
         left={<ReleasesSection apps={apps} />}
         right={<BuildQueueSection jobs={buildQueue} />}
+        leftClassName="col-span-12 xl:col-span-7"
+        rightClassName="col-span-12 xl:col-span-5"
       />
       {showActivityStorage && !showBothActivityStorage ? (
         showActivity ? (
@@ -60,9 +61,10 @@ const OverviewPage = ({
       ) : null}
       {showBothActivityStorage ? (
         <SplitLayout
-          className="lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
           left={<ActivitySection items={activity} />}
           right={<StorageSection buckets={storageBuckets} />}
+          leftClassName="col-span-12 xl:col-span-6"
+          rightClassName="col-span-12 xl:col-span-6"
         />
       ) : null}
     </>

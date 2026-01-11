@@ -8,23 +8,25 @@ type MetricCardProps = {
 };
 
 const trendStyles = {
-  up: "text-teal",
-  down: "text-coral",
-  flat: "text-ink/60",
+  up: "text-green-600",
+  down: "text-red-500",
+  flat: "text-slate-500",
 } as const;
 
 const MetricCard = ({ label, value, delta, trend }: MetricCardProps) => {
   return (
     <Panel className="flex h-full flex-col gap-6">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold uppercase tracking-wide text-ink/50">
+        <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
           {label}
         </span>
         <span className={`text-sm font-semibold ${trendStyles[trend]}`}>
           {delta}
         </span>
       </div>
-      <div className="text-3xl font-display text-ink">{value}</div>
+      <div className="text-3xl font-semibold text-slate-900 dark:text-slate-100">
+        {value}
+      </div>
     </Panel>
   );
 };

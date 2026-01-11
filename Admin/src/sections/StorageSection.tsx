@@ -13,9 +13,11 @@ const StorageSection = ({ buckets }: StorageSectionProps) => {
         title="Storage usage"
         description="Capacity distribution across critical buckets."
       />
-      <div className="grid gap-6">
+      <div className="grid grid-cols-12 gap-6">
         {buckets.map((bucket) => (
-          <StorageCard key={bucket.id} {...bucket} />
+          <div key={bucket.id} className="col-span-12">
+            <StorageCard {...bucket} />
+          </div>
         ))}
       </div>
     </section>

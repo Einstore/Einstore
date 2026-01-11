@@ -25,11 +25,15 @@ const ConfirmDialog = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 px-4">
-      <Panel className="w-full max-w-lg space-y-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+      <Panel className="w-full max-w-lg space-y-4 p-6">
         <div>
-          <h3 className="text-xl font-display text-ink">{title}</h3>
-          <p className="mt-2 text-sm text-ink/60">{description}</p>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+            {title}
+          </h3>
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+            {description}
+          </p>
         </div>
         <div className="flex flex-wrap justify-end gap-3">
           <ActionButton label={cancelLabel} variant="outline" onClick={onCancel} />

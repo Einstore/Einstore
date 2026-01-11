@@ -33,10 +33,10 @@ const FeatureFlagForm = ({
   return (
     <Panel className="space-y-6">
       <div>
-        <h2 className="text-xl font-display text-ink">
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
           {isEditing ? "Edit flag" : "Create flag"}
         </h2>
-        <p className="mt-2 text-sm text-ink/60">
+        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
           Use future flags to prepare staged rollouts before they are activated.
         </p>
       </div>
@@ -86,7 +86,7 @@ const FeatureFlagForm = ({
           ) : null}
         </div>
       </form>
-      {error ? <p className="text-xs text-coral">{error}</p> : null}
+      {error ? <p className="text-xs text-red-500">{error}</p> : null}
     </Panel>
   );
 };

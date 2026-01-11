@@ -15,10 +15,12 @@ const PipelineStageCard = ({
   return (
     <Panel className="flex items-center justify-between gap-4">
       <div>
-        <p className="text-sm font-semibold uppercase tracking-wide text-ink/50">
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
           {label}
         </p>
-        <p className="mt-2 text-lg font-display text-ink">{notes}</p>
+        <p className="mt-2 text-lg font-semibold text-slate-900 dark:text-slate-100">
+          {notes}
+        </p>
       </div>
       <StatusPill status={status} label={status} />
     </Panel>

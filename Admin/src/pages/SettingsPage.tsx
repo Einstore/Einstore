@@ -48,7 +48,9 @@ const SettingsPage = ({
         </Panel>
       ) : (
         <Panel>
-          <p className="text-sm text-ink/60">No team is available yet.</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            No team is available yet.
+          </p>
         </Panel>
       ),
     },
@@ -65,7 +67,9 @@ const SettingsPage = ({
         </div>
       ) : (
         <Panel>
-          <p className="text-sm text-ink/60">Invite teammates once you have a team.</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Invite teammates once you have a team.
+          </p>
         </Panel>
       ),
     },
@@ -77,7 +81,7 @@ const SettingsPage = ({
       label: "Billing",
       content: (
         <Panel>
-          <p className="text-sm text-ink/60">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             Billing settings are available only in the SaaS version.
           </p>
         </Panel>

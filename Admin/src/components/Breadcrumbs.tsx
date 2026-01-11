@@ -8,7 +8,7 @@ type BreadcrumbsProps = {
 
 const Breadcrumbs = ({ items }: BreadcrumbsProps) => {
   return (
-    <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.2em] text-ink/40">
+    <div className="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">
       {items.map((item, index) => (
         <span key={`${item.label}-${index}`} className="flex items-center gap-2">
           <span>{item.label}</span>

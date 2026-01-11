@@ -152,7 +152,7 @@ const FutureFlagsPage = () => {
         title="Future flags"
         description="Stage upcoming rollouts and prepare releases with toggles that are ready when you are."
       />
-      {loadError ? <p className="text-sm text-coral">{loadError}</p> : null}
+      {loadError ? <p className="text-sm text-red-500">{loadError}</p> : null}
       <FeatureFlagForm
         values={formValues}
         isEditing={Boolean(activeFlagKey)}

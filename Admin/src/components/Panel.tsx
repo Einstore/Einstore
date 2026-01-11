@@ -8,7 +8,7 @@ type PanelProps = {
 const Panel = ({ children, className = "" }: PanelProps) => {
   return (
     <div
-      className={`rounded-2xl bg-white p-4 shadow-card transition-all duration-200 ease-out hover:-translate-y-0.5 ${className}`}
+      className={`rounded-xl bg-white p-5 shadow-sm dark:bg-slate-800 ${className}`}
     >
       {children}
     </div>

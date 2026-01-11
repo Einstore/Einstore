@@ -9,10 +9,5 @@
 }
 
 body {
-  @apply bg-sand text-ink font-body;
-}
-
-::selection {
-  background: #c8f7a1;
-  color: #111827;
+  @apply bg-slate-50 text-slate-900 font-body;
 }

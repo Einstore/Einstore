@@ -13,9 +13,11 @@ const OverviewSection = ({ metrics }: OverviewSectionProps) => {
         title="Signal overview"
         description="Live metrics from the last 24 hours across environments and policy gates."
       />
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-12 gap-6">
         {metrics.map((metric) => (
-          <MetricCard key={metric.label} {...metric} />
+          <div key={metric.label} className="col-span-12 md:col-span-6 xl:col-span-4">
+            <MetricCard {...metric} />
+          </div>
         ))}
       </div>
     </section>

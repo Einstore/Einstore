@@ -32,12 +32,14 @@ const AddAppDialog = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 px-4">
-      <Panel className="w-full max-w-xl space-y-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+      <Panel className="w-full max-w-lg space-y-6 p-6">
         <div>
-          <h3 className="text-2xl font-display text-ink">Add app build</h3>
-          <p className="mt-2 text-sm text-ink/60">
-            Upload an IPA, APK, or AAB to start ingestion. App details will be read from the manifest.
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+            Add app build
+          </h3>
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+            Upload an IPA or APK to start ingestion. App details will be read from the manifest.
           </p>
         </div>
         <FileDropzone
@@ -48,7 +50,7 @@ const AddAppDialog = ({
           statusMessage={status || undefined}
         />
         {error ? (
-          <p className="rounded-2xl border border-coral/40 bg-coral/10 p-3 text-xs text-coral">
+          <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-600">
             {error}
           </p>
         ) : null}

@@ -85,7 +85,7 @@ const AdminLayout = ({
             />
           }
           footer={
-            <div className="rounded-2xl bg-sand p-4 text-sm text-ink/60">
+            <div className="rounded-lg bg-slate-100 p-4 text-sm text-slate-500 dark:bg-slate-700 dark:text-slate-300">
               Next checkpoint: SOC2 evidence export due in 2 days.
             </div>
           }
@@ -108,7 +108,9 @@ const AdminLayout = ({
           </>
         }
       />
-      <Outlet />
+      <div className="flex-1 overflow-y-auto p-6">
+        <Outlet />
+      </div>
       <AddAppDialog
         isOpen={isAddAppOpen}
         onClose={() => setIsAddAppOpen(false)}

@@ -13,9 +13,11 @@ const ActivitySection = ({ items }: ActivitySectionProps) => {
         title="Activity stream"
         description="Recent actions taken by the operations team."
       />
-      <div className="grid gap-6">
+      <div className="grid grid-cols-12 gap-6">
         {items.map((item) => (
-          <ActivityItemCard key={item.id} {...item} />
+          <div key={item.id} className="col-span-12">
+            <ActivityItemCard {...item} />
+          </div>
         ))}
       </div>
     </section>

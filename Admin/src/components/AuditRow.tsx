@@ -9,13 +9,13 @@ type AuditRowProps = {
 
 const AuditRow = ({ title, owner, time, status }: AuditRowProps) => {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-ink/5 py-4 text-sm last:border-b-0">
+    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 py-4 text-sm last:border-b-0 dark:border-slate-700">
       <div>
-        <p className="font-semibold text-ink">{title}</p>
-        <p className="text-ink/60">Owner: {owner}</p>
+        <p className="font-semibold text-slate-900 dark:text-slate-100">{title}</p>
+        <p className="text-slate-500 dark:text-slate-400">Owner: {owner}</p>
       </div>
       <div className="flex items-center gap-4">
-        <p className="text-ink/50">{time}</p>
+        <p className="text-slate-400 dark:text-slate-500">{time}</p>
         <StatusPill status={status} label={status} />
       </div>
     </div>

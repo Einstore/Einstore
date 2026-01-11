@@ -15,9 +15,11 @@ const PipelineSection = ({ stages }: PipelineSectionProps) => {
         description="Track the stages that feed approvals and distribution."
         actions={<ActionButton label="Review incidents" variant="primary" />}
       />
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-12 gap-6">
         {stages.map((stage) => (
-          <PipelineStageCard key={stage.id} {...stage} />
+          <div key={stage.id} className="col-span-12 md:col-span-6 xl:col-span-4">
+            <PipelineStageCard {...stage} />
+          </div>
         ))}
       </div>
     </section>

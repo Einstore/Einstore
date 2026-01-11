@@ -1,14 +1,14 @@
 const statusStyles = {
-  live: "bg-mint text-ink",
-  review: "bg-mist text-ink",
-  paused: "bg-sand text-ink/60",
-  queued: "bg-sand text-ink/70",
-  running: "bg-mint text-ink",
-  failed: "bg-coral/15 text-coral",
-  success: "bg-emerald-100 text-emerald-800",
-  healthy: "bg-emerald-100 text-emerald-800",
-  warning: "bg-mist text-ink",
-  critical: "bg-coral text-white",
+  live: "bg-green-100 text-green-700",
+  review: "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300",
+  paused: "bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400",
+  queued: "bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400",
+  running: "bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300",
+  failed: "bg-red-100 text-red-700",
+  success: "bg-green-100 text-green-700",
+  healthy: "bg-green-100 text-green-700",
+  warning: "bg-amber-100 text-amber-700",
+  critical: "bg-red-500 text-white",
 } as const;
 
 type StatusKey = keyof typeof statusStyles;

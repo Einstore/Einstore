@@ -19,7 +19,7 @@ const SelectField = ({ id, label, options, value, hint }: SelectFieldProps) => {
       <select
         id={id}
         defaultValue={value}
-        className="h-11 w-full rounded-xl bg-white px-4 text-sm text-ink shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20"
+        className="h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>

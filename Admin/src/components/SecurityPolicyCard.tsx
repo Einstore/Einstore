@@ -17,10 +17,10 @@ const SecurityPolicyCard = ({
   return (
     <Panel className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="font-semibold text-ink">{title}</p>
+        <p className="font-semibold text-slate-900 dark:text-slate-100">{title}</p>
         <StatusPill status={status} label={status} />
       </div>
-      <div className="text-xs text-ink/60">
+      <div className="text-xs text-slate-500 dark:text-slate-400">
         <p>Owner: {owner}</p>
         <p>Last reviewed: {lastReview}</p>
       </div>

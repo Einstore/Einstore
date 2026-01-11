@@ -11,31 +11,26 @@ type TopbarProps = {
 
 const Topbar = ({ title, breadcrumbs, actions }: TopbarProps) => {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-6">
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-ink shadow-card">
-          A
-        </div>
+    <header className="z-20 border-b border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-900">
+      <div className="flex h-16 items-center justify-between px-6">
         <div>
-          <p className="text-sm text-ink/50">Hi, Alex</p>
-          <p className="text-lg font-semibold text-ink">Welcome back</p>
+          {breadcrumbs?.length ? <Breadcrumbs items={breadcrumbs} /> : null}
+          <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+            {title}
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100"
+            aria-label="Notifications"
+          >
+            <Icon name="bell" className="h-4 w-4" />
+          </button>
+          {actions ? <div className="flex items-center gap-3">{actions}</div> : null}
         </div>
       </div>
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-ink shadow-card transition-all duration-200 ease-out hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20"
-          aria-label="Notifications"
-        >
-          <Icon name="bell" className="text-sm" />
-        </button>
-        {actions ? <div className="flex gap-3">{actions}</div> : null}
-      </div>
-      <div className="w-full">
-        {breadcrumbs?.length ? <Breadcrumbs items={breadcrumbs} /> : null}
-        <p className="mt-2 text-base font-semibold text-ink">{title}</p>
-      </div>
-    </div>
+    </header>
   );
 };
 

@@ -16,9 +16,11 @@ const SecurityPage = ({ policies, audits }: SecurityPageProps) => {
         title="Security posture"
         description="Track compliance controls and scheduled access reviews."
       />
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-12 gap-6">
         {policies.map((policy) => (
-          <SecurityPolicyCard key={policy.id} {...policy} />
+          <div key={policy.id} className="col-span-12 md:col-span-6 xl:col-span-4">
+            <SecurityPolicyCard {...policy} />
+          </div>
         ))}
       </div>
       <SectionHeader
