@@ -25,6 +25,7 @@ type AdminLayoutProps = {
   teams: TeamSummary[];
   onUpload: (file: File) => Promise<void>;
   user?: SessionUser | null;
+  appIcons?: Record<string, string>;
 };
 
 const AdminLayout = ({
@@ -39,6 +40,7 @@ const AdminLayout = ({
   teams,
   onUpload,
   user,
+  appIcons,
 }: AdminLayoutProps) => {
   const [isAddAppOpen, setIsAddAppOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -97,6 +99,7 @@ const AdminLayout = ({
         onLogout={handleLogout}
         user={user}
         activeTeamId={activeTeamId}
+        appIcons={appIcons}
         actions={
           <>
             {actions.map((action) => (

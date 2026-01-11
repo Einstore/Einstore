@@ -523,6 +523,7 @@ const AppRoutes = () => {
               teams={teams}
               onUpload={handleIngest}
               user={me}
+              appIcons={appIcons}
             />
           </RequireAuth>
         }

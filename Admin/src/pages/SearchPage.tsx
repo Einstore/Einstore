@@ -133,7 +133,7 @@ const SearchPage = ({ apps, appIcons, activeTeamId }: SearchPageProps) => {
               aria-label="Search builds"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              className="h-full w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400 dark:text-slate-100"
+              className="h-full w-full bg-transparent text-base text-slate-700 outline-none placeholder:text-slate-400 dark:text-slate-100"
             />
           </div>
           <div ref={dropdownRef} className="relative w-full max-w-[280px]">
@@ -237,13 +237,20 @@ const SearchPage = ({ apps, appIcons, activeTeamId }: SearchPageProps) => {
                 onClick={() => navigate(`/apps/${build.appId}/builds/${build.id}`)}
                 className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 dark:hover:bg-slate-700"
               >
-                <div>
-                  <p className="font-semibold text-slate-900 dark:text-slate-100">
-                    {build.displayName}
-                  </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    {build.appName} • {build.appIdentifier}
-                  </p>
+                <div className="flex items-center gap-3">
+                  <AppAvatar
+                    name={build.appName}
+                    iconUrl={appIcons[build.appId]}
+                    size="sm"
+                  />
+                  <div>
+                    <p className="font-semibold text-slate-900 dark:text-slate-100">
+                      {build.displayName}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      {build.appName} • {build.appIdentifier}
+                    </p>
+                  </div>
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-slate-600 dark:text-slate-300">

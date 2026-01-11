@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Breadcrumbs from "./Breadcrumbs";
+import AppAvatar from "./AppAvatar";
 import Icon from "./Icon";
 import { getInitialTheme, setTheme, type ThemeMode } from "../lib/theme";
 import type { SessionUser } from "../lib/session";
@@ -17,6 +18,7 @@ type TopbarProps = {
   onLogout?: () => void;
   user?: SessionUser | null;
   activeTeamId?: string;
+  appIcons?: Record<string, string>;
 };
 
 const Topbar = ({
@@ -27,6 +29,7 @@ const Topbar = ({
   onLogout,
   user,
   activeTeamId,
+  appIcons = {},
 }: TopbarProps) => {
   const navigate = useNavigate();
   const [theme, setThemeState] = useState<ThemeMode>(() => getInitialTheme());
@@ -164,7 +167,7 @@ const Topbar = ({
                       setIsSearchOpen(false);
                     }
                   }}
-                  className="h-full w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400 dark:text-slate-100"
+                  className="h-full w-full bg-transparent text-base text-slate-700 outline-none placeholder:text-slate-400 dark:text-slate-100"
                 />
               </div>
               {isSearchOpen ? (
@@ -205,7 +208,14 @@ const Topbar = ({
                               setIsSearchOpen(false);
                             }}
                           >
-                            <span className="font-medium">{app.name}</span>
+                            <span className="flex items-center gap-3">
+                              <AppAvatar
+                                name={app.name}
+                                iconUrl={appIcons[app.id]}
+                                size="sm"
+                              />
+                              <span className="font-medium">{app.name}</span>
+                            </span>
                             <span className="text-xs text-slate-400 dark:text-slate-500">
                               {app.identifier}
                             </span>
@@ -228,8 +238,13 @@ const Topbar = ({
                               setIsSearchOpen(false);
                             }}
                           >
-                            <span className="font-medium">
-                              {build.displayName}
+                            <span className="flex items-center gap-3">
+                              <AppAvatar
+                                name={build.appName}
+                                iconUrl={appIcons[build.appId]}
+                                size="sm"
+                              />
+                              <span className="font-medium">{build.displayName}</span>
                             </span>
                             <span className="text-xs text-slate-400 dark:text-slate-500">
                               #{build.buildNumber} • v{build.version}
