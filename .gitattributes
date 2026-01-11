@@ -1,2 +1,4 @@
 API/tests/app-debug.apk filter=lfs diff=lfs merge=lfs -text
 API/tests/app-debug.ipa filter=lfs diff=lfs merge=lfs -text
+Admin/public/*.png filter=lfs diff=lfs merge=lfs -text
+Admin/public/*.ico filter=lfs diff=lfs merge=lfs -text
