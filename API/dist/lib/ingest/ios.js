@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import plist from "plist";
 import { prisma } from "../prisma.js";
-import { listZipEntries, readZipEntries } from "../zip.js";
+import { listZipEntries, readZipEntries, scanZipEntries } from "../zip.js";
 const readPngDimensions = (buffer) => {
     if (buffer.length < 24)
         return null;
@@ -60,22 +60,18 @@ const extractBestIcon = async (filePath, targetRoot, entries, outputDir, info) =
     const targetEntries = entries.filter((entry) => !entry.endsWith("/") && entry.startsWith(targetRoot));
     const candidates = resolveIconCandidates(info);
     let best = null;
-    const pickFromBuffers = async (entryNames) => {
+    const pickFromEntries = async (entryNames) => {
         if (!entryNames.length)
             return;
-        const buffers = await readZipEntries(filePath, new Set(entryNames));
-        for (const entryName of entryNames) {
-            const buffer = buffers.get(entryName);
-            if (!buffer)
-                continue;
+        const wanted = new Set(entryNames);
+        await scanZipEntries(filePath, (entryName) => wanted.has(entryName), async (entryName, buffer) => {
             const dimensions = readPngDimensions(buffer);
             if (!dimensions)
-                continue;
+                return;
             const size = buffer.length;
             if (!best ||
                 dimensions.width * dimensions.height > best.width * best.height ||
-                (dimensions.width * dimensions.height === best.width * best.height &&
-                    size > best.size)) {
+                (dimensions.width * dimensions.height === best.width * best.height && size > best.size)) {
                 best = {
                     entryName,
                     width: dimensions.width,
@@ -84,7 +80,7 @@ const extractBestIcon = async (filePath, targetRoot, entries, outputDir, info) =
                     buffer,
                 };
             }
-        }
+        });
     };
     if (candidates.length) {
         const candidateEntries = [];
@@ -94,7 +90,7 @@ const extractBestIcon = async (filePath, targetRoot, entries, outputDir, info) =
                 candidateEntries.push(entry);
             }
         }
-        await pickFromBuffers(candidateEntries);
+        await pickFromEntries(candidateEntries);
     }
     if (!best) {
         const fallbackEntries = targetEntries.filter((entry) => {
@@ -102,11 +98,11 @@ const extractBestIcon = async (filePath, targetRoot, entries, outputDir, info) =
             return (lower.endsWith(".png") &&
                 (lower.includes("appicon") || lower.includes("icon") || lower.includes("launcher")));
         });
-        await pickFromBuffers(fallbackEntries);
+        await pickFromEntries(fallbackEntries);
     }
     if (!best) {
         const allPngEntries = targetEntries.filter((entry) => entry.toLowerCase().endsWith(".png"));
-        await pickFromBuffers(allPngEntries);
+        await pickFromEntries(allPngEntries);
     }
     if (!best)
         return null;
@@ -150,7 +146,7 @@ const resolveTargetRoots = (entries) => {
     }
     return Array.from(roots);
 };
-export async function ingestIosIpa(filePath) {
+export async function ingestIosIpa(filePath, teamId, createdByUserId) {
     if (!fs.existsSync(filePath)) {
         throw new Error("IPA not found");
     }
@@ -217,9 +213,9 @@ export async function ingestIosIpa(filePath) {
     const resolvedVersion = mainTarget.version || "1.0.0";
     const resolvedBuild = mainTarget.build || "1";
     const appRecord = await prisma.app.upsert({
-        where: { identifier: mainTarget.bundleId },
+        where: { teamId_identifier: { teamId, identifier: mainTarget.bundleId } },
         update: { name: resolvedAppName },
-        create: { identifier: mainTarget.bundleId, name: resolvedAppName },
+        create: { identifier: mainTarget.bundleId, name: resolvedAppName, teamId },
     });
     const versionRecord = await prisma.version.upsert({
         where: {
@@ -239,6 +235,7 @@ export async function ingestIosIpa(filePath) {
             storageKind: "local",
             storagePath: filePath,
             sizeBytes: stats.size,
+            createdByUserId,
         },
     });
     for (const target of targets) {

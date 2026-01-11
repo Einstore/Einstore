@@ -1190,6 +1190,118 @@
         }
       }
     },
+    "/builds/{id}/ios/install-link": {
+      "post": {
+        "summary": "Create iOS install link",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Install link"
+          }
+        }
+      }
+    },
+    "/builds/{id}/ios/manifest": {
+      "get": {
+        "summary": "Get iOS manifest plist",
+        "responses": {
+          "200": {
+            "description": "Manifest"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/builds/{id}/ios/download": {
+      "get": {
+        "summary": "Download iOS IPA",
+        "responses": {
+          "200": {
+            "description": "Download"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/builds/{id}/ios/installs/track": {
+      "post": {
+        "summary": "Track iOS install",
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
     "/targets": {
       "post": {
         "summary": "Create target",

@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
-import { requireAuth } from "../auth/guard.js";
+import { requireSuperUser } from "../auth/guard.js";
 import { ensureFeatureFlag, isFeatureFlagEnabled } from "@rafiki270/feature-flags";
 const listQuerySchema = z.object({
-    limit: z.coerce.number().int().positive().max(100).default(20),
+    limit: z.coerce.number().int().positive().max(200).default(20),
     offset: z.coerce.number().int().nonnegative().default(0),
 });
 const createFlagSchema = z.object({
@@ -33,7 +33,7 @@ const evaluateQuerySchema = z.object({
     targetKey: z.string().min(1).optional(),
 });
 export async function featureFlagRoutes(app) {
-    app.post("/feature-flags", { preHandler: requireAuth }, async (request, reply) => {
+    app.post("/feature-flags", { preHandler: requireSuperUser }, async (request, reply) => {
         const parsed = createFlagSchema.safeParse(request.body);
         if (!parsed.success) {
             return reply.status(400).send({ error: "Invalid payload" });
@@ -45,7 +45,7 @@ export async function featureFlagRoutes(app) {
         });
         return reply.status(201).send(created);
     });
-    app.get("/feature-flags", { preHandler: requireAuth }, async (request, reply) => {
+    app.get("/feature-flags", { preHandler: requireSuperUser }, async (request, reply) => {
         const parsed = listQuerySchema.safeParse(request.query);
         if (!parsed.success) {
             return reply.status(400).send({ error: "Invalid query" });
@@ -57,7 +57,7 @@ export async function featureFlagRoutes(app) {
         });
         return reply.send(items);
     });
-    app.get("/feature-flags/:key", { preHandler: requireAuth }, async (request, reply) => {
+    app.get("/feature-flags/:key", { preHandler: requireSuperUser }, async (request, reply) => {
         const key = request.params.key;
         const record = await prisma.featureFlag.findUnique({
             where: { key },
@@ -68,7 +68,7 @@ export async function featureFlagRoutes(app) {
         }
         return reply.send(record);
     });
-    app.patch("/feature-flags/:key", { preHandler: requireAuth }, async (request, reply) => {
+    app.patch("/feature-flags/:key", { preHandler: requireSuperUser }, async (request, reply) => {
         const key = request.params.key;
         const parsed = updateFlagSchema.safeParse(request.body);
         if (!parsed.success) {
@@ -84,7 +84,7 @@ export async function featureFlagRoutes(app) {
         });
         return reply.send(updated);
     });
-    app.delete("/feature-flags/:key", { preHandler: requireAuth }, async (request, reply) => {
+    app.delete("/feature-flags/:key", { preHandler: requireSuperUser }, async (request, reply) => {
         const key = request.params.key;
         try {
             const deleted = await prisma.featureFlag.delete({ where: { key } });
@@ -97,7 +97,7 @@ export async function featureFlagRoutes(app) {
             throw error;
         }
     });
-    app.post("/feature-flags/:key/overrides", { preHandler: requireAuth }, async (request, reply) => {
+    app.post("/feature-flags/:key/overrides", { preHandler: requireSuperUser }, async (request, reply) => {
         const key = request.params.key;
         const parsed = createOverrideSchema.safeParse(request.body);
         if (!parsed.success) {
@@ -125,7 +125,7 @@ export async function featureFlagRoutes(app) {
             });
         return reply.status(201).send(record);
     });
-    app.get("/feature-flags/:key/overrides", { preHandler: requireAuth }, async (request, reply) => {
+    app.get("/feature-flags/:key/overrides", { preHandler: requireSuperUser }, async (request, reply) => {
         const key = request.params.key;
         const parsed = overrideQuerySchema.safeParse(request.query);
         if (!parsed.success) {
@@ -146,7 +146,7 @@ export async function featureFlagRoutes(app) {
         });
         return reply.send(overrides);
     });
-    app.get("/feature-flags/:key/evaluate", { preHandler: requireAuth }, async (request, reply) => {
+    app.get("/feature-flags/:key/evaluate", { preHandler: requireSuperUser }, async (request, reply) => {
         const key = request.params.key;
         const parsed = evaluateQuerySchema.safeParse(request.query);
         if (!parsed.success) {

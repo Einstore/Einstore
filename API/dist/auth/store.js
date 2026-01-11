@@ -11,6 +11,7 @@ const mapUser = (user) => ({
 });
 export class PrismaAuthStore {
     async createUser(input) {
+        const shouldBeSuperUser = input.isSuperUser ?? ((await prisma.user.count()) === 0);
         const user = await prisma.user.create({
             data: {
                 username: input.username,
@@ -18,6 +19,7 @@ export class PrismaAuthStore {
                 fullName: input.fullName ?? null,
                 avatarUrl: input.avatarUrl ?? null,
                 status: input.status ?? "active",
+                isSuperUser: shouldBeSuperUser,
                 createdAt: input.now,
                 updatedAt: input.now,
             },
@@ -25,6 +27,7 @@ export class PrismaAuthStore {
         return mapUser(user);
     }
     async createUserWithCredential(input) {
+        const shouldBeSuperUser = input.isSuperUser ?? ((await prisma.user.count()) === 0);
         const user = await prisma.user.create({
             data: {
                 username: input.username,
@@ -32,6 +35,7 @@ export class PrismaAuthStore {
                 fullName: input.fullName ?? null,
                 avatarUrl: input.avatarUrl ?? null,
                 status: input.status ?? "active",
+                isSuperUser: shouldBeSuperUser,
                 createdAt: input.now,
                 updatedAt: input.now,
                 credential: {
@@ -66,6 +70,9 @@ export class PrismaAuthStore {
             where: { email },
         });
         return user ? mapUser(user) : null;
+    }
+    async getUserCount() {
+        return prisma.user.count();
     }
     async getCredentialByUserId(userId) {
         const credential = await prisma.credential.findUnique({

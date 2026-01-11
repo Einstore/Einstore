@@ -173,7 +173,11 @@ export async function authRoutes(app) {
         const token = header.replace("Bearer ", "").trim();
         try {
             const session = await authService.getSession(token);
-            return reply.send(session);
+            const user = await prisma.user.findUnique({
+                where: { id: session.userId },
+                select: { isSuperUser: true },
+            });
+            return reply.send({ ...session, isSuperUser: Boolean(user?.isSuperUser) });
         }
         catch (err) {
             const authErr = asAuthError(err, "token_invalid");

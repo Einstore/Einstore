@@ -219,9 +219,26 @@ describe("routes", () => {
     prismaMock.version.findUnique.mockResolvedValue({ id: ids.versionId });
     prismaMock.version.upsert.mockResolvedValue({ id: ids.versionId });
 
+    const buildDetail = {
+      id: ids.buildId,
+      storageKind: "local",
+      storagePath: "/tmp/app.bin",
+      buildNumber: "1",
+      displayName: "Test App",
+      version: {
+        version: "1.0.0",
+        app: {
+          id: ids.appId,
+          teamId: "team-1",
+          identifier: "com.example.app",
+          name: "Test App",
+        },
+      },
+    };
+
     prismaMock.build.create.mockResolvedValue({ id: ids.buildId });
     prismaMock.build.findMany.mockResolvedValue([{ id: ids.buildId }]);
-    prismaMock.build.findFirst.mockResolvedValue({ id: ids.buildId });
+    prismaMock.build.findFirst.mockResolvedValue(buildDetail);
     prismaMock.build.findUnique.mockResolvedValue({ id: ids.buildId });
     prismaMock.build.groupBy.mockResolvedValue([
       {
@@ -504,6 +521,36 @@ describe("routes", () => {
         data: expect.objectContaining({ createdByUserId: "user-1" }),
       }),
     );
+  });
+
+  it("ios install link endpoints", async () => {
+    const linkResponse = await app.inject({
+      method: "POST",
+      url: `/builds/${ids.buildId}/ios/install-link`,
+      headers: { authorization: "Bearer token", "x-team-id": "team-1" },
+    });
+    expect(linkResponse.statusCode).toBe(200);
+    const linkPayload = linkResponse.json();
+    expect(linkPayload.manifestUrl).toContain(`/builds/${ids.buildId}/ios/manifest`);
+    expect(linkPayload.installTrackUrl).toContain(`/builds/${ids.buildId}/ios/installs/track`);
+
+    const manifestUrl = new URL(linkPayload.manifestUrl);
+    const manifestResponse = await app.inject({
+      method: "GET",
+      url: `${manifestUrl.pathname}${manifestUrl.search}`,
+    });
+    expect(manifestResponse.statusCode).toBe(200);
+    expect(manifestResponse.headers["content-type"]).toContain("application/xml");
+    expect(manifestResponse.body).toContain("com.example.app");
+
+    const trackUrl = new URL(linkPayload.installTrackUrl);
+    const trackResponse = await app.inject({
+      method: "POST",
+      url: `${trackUrl.pathname}${trackUrl.search}`,
+      payload: { platform: "ios", deviceId: "device-1" },
+      headers: { "content-type": "application/json" },
+    });
+    expect(trackResponse.statusCode).toBe(201);
   });
 
   it("build download events endpoints", async () => {

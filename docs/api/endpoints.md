@@ -22,6 +22,10 @@ Team-scoped endpoints:
 - `/badges`
 - `/ws`
 - `/usage/storage/users`
+- `/builds/:id/ios/install-link`
+- `/builds/:id/ios/manifest`
+- `/builds/:id/ios/download`
+- `/builds/:id/ios/installs/track`
 
 ## GET /health
 - Purpose: Health check
@@ -94,6 +98,38 @@ Team-scoped endpoints:
 - Response schema: `BuildEvent[]`
 - Side effects: none
 - Platform relevance: all
+
+## POST /builds/{id}/ios/install-link
+- Purpose: Create a short-lived iOS install link (manifest + download)
+- Auth scope: Bearer (rafiki270/auth) + Team membership
+- Request schema: none
+- Response schema: `{ manifestUrl: string, itmsServicesUrl: string, downloadUrl: string, installTrackUrl: string, expiresAt: string }`
+- Side effects: none
+- Platform relevance: iOS
+
+## GET /builds/{id}/ios/manifest
+- Purpose: Fetch the signed iOS install manifest (plist)
+- Auth scope: Presigned token (query `token`)
+- Request schema: query `{ token: string }`
+- Response schema: plist XML
+- Side effects: none
+- Platform relevance: iOS
+
+## GET /builds/{id}/ios/download
+- Purpose: Download the IPA via signed link (streams local or redirects to presigned S3/Spaces URL)
+- Auth scope: Presigned token (query `token`)
+- Request schema: query `{ token: string }`
+- Response schema: binary stream or redirect
+- Side effects: Records a download event
+- Platform relevance: iOS
+
+## POST /builds/{id}/ios/installs/track
+- Purpose: Record an install event from a signed client callback
+- Auth scope: Presigned token (query `token`)
+- Request schema: `{ platform?: PlatformKind, targetId?: string, deviceId?: string, metadata?: object }`
+- Response schema: `BuildEvent`
+- Side effects: Records an install event
+- Platform relevance: iOS
 
 ## POST /auth/register
 - Purpose: Register a new user

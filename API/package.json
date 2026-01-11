@@ -14,6 +14,8 @@
     "prisma:ensure-schema": "echo \"CREATE SCHEMA IF NOT EXISTS einstore;\" | prisma db execute --stdin --schema prisma/schema.prisma"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.966.0",
+    "@aws-sdk/s3-request-presigner": "^3.966.0",
     "@devicefarmer/adbkit-apkreader": "^3.2.4",
     "@fastify/cors": "^8.5.0",
     "@fastify/multipart": "^8.3.0",

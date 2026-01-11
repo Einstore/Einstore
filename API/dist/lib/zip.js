@@ -77,3 +77,53 @@ export async function readZipEntries(filePath, wanted) {
         });
     });
 }
+export async function scanZipEntries(filePath, shouldRead, onEntry) {
+    return new Promise((resolve, reject) => {
+        yauzl.open(filePath, { lazyEntries: true }, (err, zipfile) => {
+            if (err || !zipfile) {
+                reject(err ?? new Error("Unable to open zip file"));
+                return;
+            }
+            const closeWithError = (error) => {
+                zipfile.close();
+                reject(error instanceof Error ? error : new Error(String(error)));
+            };
+            zipfile.readEntry();
+            zipfile.on("entry", (entry) => {
+                const name = entry.fileName;
+                if (name.endsWith("/") || !shouldRead(name)) {
+                    zipfile.readEntry();
+                    return;
+                }
+                zipfile.openReadStream(entry, (streamErr, stream) => {
+                    if (streamErr || !stream) {
+                        closeWithError(streamErr ?? new Error("Unable to read zip entry"));
+                        return;
+                    }
+                    const chunks = [];
+                    stream.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
+                    stream.on("end", async () => {
+                        try {
+                            await onEntry(name, Buffer.concat(chunks));
+                            zipfile.readEntry();
+                        }
+                        catch (error) {
+                            closeWithError(error);
+                        }
+                    });
+                    stream.on("error", (streamError) => {
+                        closeWithError(streamError);
+                    });
+                });
+            });
+            zipfile.on("end", () => {
+                zipfile.close();
+                resolve();
+            });
+            zipfile.on("error", (error) => {
+                zipfile.close();
+                reject(error);
+            });
+        });
+    });
+}

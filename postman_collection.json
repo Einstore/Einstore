@@ -1171,6 +1171,95 @@
       ]
     },
     {
+      "name": "Create iOS Install Link",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
+          }
+        ],
+        "url": "{{baseUrl}}/builds/{{buildId}}/ios/install-link"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Create iOS install link ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});",
+              "if (pm.response.code === 200) {",
+              "  const json = pm.response.json();",
+              "  pm.environment.set('manifestUrl', json.manifestUrl);",
+              "  pm.environment.set('installTrackUrl', json.installTrackUrl);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get iOS Manifest",
+      "request": {
+        "method": "GET",
+        "url": "{{manifestUrl}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Get iOS manifest ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Track iOS Install",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"platform\": \"ios\",\n  \"deviceId\": \"device-1\"\n}"
+        },
+        "url": "{{installTrackUrl}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Track iOS install ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(201);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
       "name": "Get Targets",
       "request": {
         "method": "GET",
