@@ -6,6 +6,7 @@ Modern private app distribution platform for iOS + Android.
 - `API/` Node.js + Fastify + Prisma + Postgres
 - `Admin/` React + Tailwind (CSR)
 - `Web/` React + Tailwind (CSR)
+- `frameworks/` Mobile tracking libraries (iOS, Android, Flutter)
 - `Libraries/` External submodules (auth only)
 - `dev/` Legacy reference (gitignored)
 
