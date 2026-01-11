@@ -1,6 +1,7 @@
 import BuildQueueList from "../components/BuildQueueList";
 import Panel from "../components/Panel";
 import SectionHeader from "../components/SectionHeader";
+import StatusPill from "../components/StatusPill";
 import type { ApiBuild } from "../lib/apps";
 
 type BuildsPageProps = {
