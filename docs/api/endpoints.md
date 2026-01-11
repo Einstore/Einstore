@@ -379,6 +379,17 @@ Team-scoped endpoints:
 - Side effects: none
 - Platform relevance: ios, android
 
+## GET /builds/{id}/metadata
+- Purpose: Fetch build metadata with artifacts grouped by kind plus targets/app/version context
+- Auth scope: Bearer (rafiki270/auth)
+- Request schema: path `{ id: string }`
+- Response schema: `Build & { version: Version & { app: App }, targets: Target[], artifacts: ComplianceArtifact[], signing?: SigningIdentity, artifactsByKind: Record<string, ComplianceArtifact[]> }`
+- Side effects: none
+- Platform relevance: ios, android
+- Notes:
+  - iOS Info.plist fields live in `targets[].metadata.info`; entitlements in `artifactsByKind.entitlements`.
+  - Android permissions live in `artifactsByKind.permissions`.
+
 ## POST /targets
 - Purpose: Create target
 - Auth scope: Bearer (rafiki270/auth)

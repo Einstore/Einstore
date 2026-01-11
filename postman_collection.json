@@ -1171,6 +1171,50 @@
       ]
     },
     {
+      "name": "Get Build Metadata",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/builds/{{buildId}}/metadata",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "builds",
+            "{{buildId}}",
+            "metadata"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Get build metadata ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
       "name": "Create iOS Install Link",
       "request": {
         "method": "POST",

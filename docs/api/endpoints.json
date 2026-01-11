@@ -1082,6 +1082,35 @@
         }
       }
     },
+    "/builds/{id}/metadata": {
+      "get": {
+        "summary": "Get build metadata",
+        "description": "Returns build metadata with artifacts grouped by kind plus targets/app/version context.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Build metadata"
+          }
+        }
+      }
+    },
     "/builds/{id}/downloads": {
       "post": {
         "summary": "Record build download",

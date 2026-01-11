@@ -5,6 +5,19 @@ import { requireTeam } from "../auth/guard.js";
 import { requireAppForTeam } from "../lib/team-access.js";
 import { broadcastBadgesUpdate } from "../lib/realtime.js";
 
+const groupArtifactsByKind = <T extends { kind: string; createdAt: Date }>(items: T[]) => {
+  const grouped: Record<string, T[]> = {};
+  for (const item of items) {
+    const existing = grouped[item.kind] ?? [];
+    existing.push(item);
+    grouped[item.kind] = existing;
+  }
+  for (const list of Object.values(grouped)) {
+    list.sort((left, right) => right.createdAt.getTime() - left.createdAt.getTime());
+  }
+  return grouped;
+};
+
 const createBuildSchema = z.object({
   appIdentifier: z.string().min(1),
   appName: z.string().min(1),
@@ -124,5 +137,27 @@ export async function buildRoutes(app: FastifyInstance) {
       return reply.status(404).send({ error: "Not found" });
     }
     return reply.send(record);
+  });
+
+  app.get("/builds/:id/metadata", { preHandler: requireTeam }, async (request, reply) => {
+    const teamId = request.team?.id;
+    if (!teamId) {
+      return reply.status(403).send({ error: "team_required", message: "Team context required" });
+    }
+    const id = (request.params as { id: string }).id;
+    const record = await prisma.build.findFirst({
+      where: { id, version: { app: { teamId } } },
+      include: {
+        version: { include: { app: true } },
+        targets: true,
+        artifacts: true,
+        signing: true,
+      },
+    });
+    if (!record) {
+      return reply.status(404).send({ error: "Not found" });
+    }
+    const artifactsByKind = groupArtifactsByKind(record.artifacts);
+    return reply.send({ ...record, artifactsByKind });
   });
 }
