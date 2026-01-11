@@ -37,7 +37,7 @@ ingress:
 name: einstore
 region: lon
 services:
-- build_command: npm --prefix ../Libraries/rafiki-auth install && npm --prefix ../Libraries/rafiki-auth
+- build_command: if [ -n "$BILLING_DEPLOY_KEY" ]; then mkdir -p ~/.ssh && echo "$BILLING_DEPLOY_KEY" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa && ssh-keyscan github.com >> ~/.ssh/known_hosts && mkdir -p ../Private && git clone git@github.com:Einstore/Billing.git ../Private/billing; fi && npm --prefix ../Libraries/rafiki-auth install && npm --prefix ../Libraries/rafiki-auth
     run build && rm -rf node_modules/@unlikeother/auth/dist && mkdir -p node_modules/@unlikeother/auth/dist
     && cp -R ../Libraries/rafiki-auth/dist/* node_modules/@unlikeother/auth/dist/
     && npm --prefix ../Libraries/teams install && npm --prefix ../Libraries/teams
@@ -96,6 +96,10 @@ services:
     scope: RUN_TIME
     type: SECRET
     value: ${API_KEY_SECRET}
+  - key: BILLING_DEPLOY_KEY
+    scope: BUILD_TIME
+    type: SECRET
+    value: ${BILLING_DEPLOY_KEY}
   - key: CORS_ORIGINS
     scope: RUN_TIME
     value: https://admin.einstore.pro,https://einstore.pro,http://localhost:8081,http://localhost:5173
@@ -123,11 +127,15 @@ static_sites:
   name: web
   output_dir: .
   source_dir: /Web
-- build_command: npm install && npm run build
+- build_command: if [ -n "$BILLING_DEPLOY_KEY" ]; then mkdir -p ~/.ssh && echo "$BILLING_DEPLOY_KEY" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa && ssh-keyscan github.com >> ~/.ssh/known_hosts && mkdir -p ../Private && git clone git@github.com:Einstore/Billing.git ../Private/billing; fi && npm install && npm run build
   envs:
   - key: VITE_API_BASE_URL
     scope: BUILD_TIME
     value: https://api.einstore.pro
+  - key: BILLING_DEPLOY_KEY
+    scope: BUILD_TIME
+    type: SECRET
+    value: ${BILLING_DEPLOY_KEY}
   github:
     branch: main
     deploy_on_push: false

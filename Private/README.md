@@ -41,6 +41,11 @@ Notes:
 - API: `npm run dev`, `npm run prisma:generate`, `npm run prisma:deploy`, `npm run build` all call `scripts/prepare-private.mjs` to stitch private modules.
 - Admin: `npm run dev` and `npm run build` call `scripts/prepare-private.mjs` to generate private routes/menu config.
 
+## DigitalOcean deploy (private modules)
+- Add a deploy key to this repo (read-only).
+- Set `BILLING_DEPLOY_KEY` as a build-time secret in DO.
+- Pre-build (already wired in `app.yaml`): write the key to `~/.ssh`, add `github.com` to `known_hosts`, `git clone git@github.com:Einstore/Billing.git ../Private/billing`, then run the normal build so `prepare-private.mjs` picks it up.
+
 ## Adding a module
 1) Create `/Private/<module>/private.manifest.json` as above.
 2) Add `api/` plugin (ESM) and optional `ui/` route component.
