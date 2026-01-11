@@ -118,6 +118,10 @@ static_sites:
   output_dir: .
   source_dir: /Web
 - build_command: npm install && npm run build
+  envs:
+  - key: VITE_API_BASE_URL
+    scope: BUILD_TIME
+    value: https://api.einstore.pro
   github:
     branch: main
     deploy_on_push: true
