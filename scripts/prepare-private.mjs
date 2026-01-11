@@ -3,6 +3,7 @@ import path from "path";
 
 const projectRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const privateRoot = path.join(projectRoot, "Private");
+const apiPrivateDir = path.join(projectRoot, "API", "Private");
 
 const apiRegistryPath = path.join(projectRoot, "API", "src", "private", "registry.ts");
 const apiTypesPath = path.join(projectRoot, "API", "src", "private", "private-modules.generated.d.ts");
@@ -208,6 +209,23 @@ const copyDir = async (source, destination) => {
   await fs.cp(source, destination, { recursive: true, force: true });
 };
 
+const syncApiPrivateDir = async (modules) => {
+  await fs.rm(apiPrivateDir, { recursive: true, force: true });
+  if (!modules.length) return [];
+
+  const synced = [];
+  for (const mod of modules) {
+    const targetDir = path.join(apiPrivateDir, mod.id);
+    await copyDir(mod.dir, targetDir);
+    const entryRel = mod.apiEntry ? path.relative(mod.dir, mod.apiEntry) : null;
+    synced.push({
+      ...mod,
+      apiEntry: entryRel ? path.join(targetDir, entryRel) : null,
+    });
+  }
+  return synced;
+};
+
 const generatePrismaArtifacts = async (modules) => {
   const baseSchemaPath = path.join(projectRoot, "API", "prisma", "schema.prisma");
   const baseMigrationsDir = path.join(projectRoot, "API", "prisma", "migrations");
@@ -247,8 +265,9 @@ const generatePrismaArtifacts = async (modules) => {
 
 const main = async () => {
   const manifests = await readManifests();
-  await generateApiRegistry(manifests);
-  await generateApiTypes(manifests);
+  const syncedModules = await syncApiPrivateDir(manifests);
+  await generateApiRegistry(syncedModules);
+  await generateApiTypes(syncedModules);
   await generateAdminRoutes(manifests);
   await generatePrismaArtifacts(manifests);
 };

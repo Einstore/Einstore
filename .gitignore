@@ -3,6 +3,7 @@
 /storage/
 /API/storage/
 API/.env
+API/Private/
 node_modules/
 functions/**/.deployed
 functions/**/__deployer__.zip
