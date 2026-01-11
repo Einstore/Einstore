@@ -13,6 +13,7 @@ postgresql://postgres@localhost:5432/einstore?schema=public
 - Alert system usage: see `docs/alerts.md`.
 - Build failures: reproduce and fix locally first; only deploy after the local build passes.
 - Always debug DigitalOcean/App Platform issues with `doctl` first.
+- Deployment debugging: use `doctl` (e.g., `doctl apps logs/get/list`) before changing configs or code.
 
 ## Before You Start
 
