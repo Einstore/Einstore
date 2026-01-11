@@ -37,7 +37,10 @@ ingress:
 name: einstore
 region: lon
 services:
-- build_command: if [ -n "$BILLING_DEPLOY_KEY" ]; then mkdir -p ~/.ssh && echo "$BILLING_DEPLOY_KEY" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa && ssh-keyscan github.com >> ~/.ssh/known_hosts && mkdir -p ../Private && git clone git@github.com:Einstore/Billing.git ../Private/billing; fi && npm --prefix ../Libraries/rafiki-auth install && npm --prefix ../Libraries/rafiki-auth
+- build_command: if [ -n "$BILLING_DEPLOY_KEY" ]; then mkdir -p ~/.ssh && echo "$BILLING_DEPLOY_KEY"
+    > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa && ssh-keyscan github.com >> ~/.ssh/known_hosts
+    && mkdir -p ../Private && git clone git@github.com:Einstore/Billing.git ../Private/billing;
+    fi && npm --prefix ../Libraries/rafiki-auth install && npm --prefix ../Libraries/rafiki-auth
     run build && rm -rf node_modules/@unlikeother/auth/dist && mkdir -p node_modules/@unlikeother/auth/dist
     && cp -R ../Libraries/rafiki-auth/dist/* node_modules/@unlikeother/auth/dist/
     && npm --prefix ../Libraries/teams install && npm --prefix ../Libraries/teams
@@ -48,7 +51,7 @@ services:
   - key: DATABASE_URL
     scope: RUN_TIME
     type: SECRET
-    value: ${db.DATABASE_URL}&schema=einstore
+    value: EV[1:c7/Ha6DXFwzrkJqnv5rQHESF+s9wnIPl:VO+5oq+tIWYpSdbzU4fC5gniBUx9TW2c/94GohkR5kh6RZo+gX5CPT1cqyXkRM3IsBA=]
   - key: SPACES_ENDPOINT
     scope: RUN_TIME
     value: https://lon1.digitaloceanspaces.com
@@ -68,11 +71,11 @@ services:
     value: EV[1:fd8+yzvlF7vd/05qq7ueHFaR8LnDLrkA:uiX2d/K07pldbBnahamt9GTCG1JVajRQWN3TLyyXv1DYeXpuNvWCauJ3yuF/FJNCfkdJEyqRup6L4pM=]
   - key: GOOGLE_CLIENT_ID
     scope: RUN_TIME
-    value: 193510011126-0d3c6jk1j6dohiqlh8q7c8i0vl7jm349.apps.googleusercontent.com
+    value: 49313448856-rrlpvcg18e8m628rkqn3s10ilke6lpn3.apps.googleusercontent.com
   - key: GOOGLE_CLIENT_SECRET
     scope: RUN_TIME
     type: SECRET
-    value: EV[1:C1D3zmPY+iDYiNPQJJiYaIeS0oXor+Ee:UcAOXGSBDw4PTceFJbdPVZ6kgPmgmkmUS/BUeA8W9bhbn4iM0KU1Fm1h0Hn3+RDcQYGi]
+    value: EV[1:f9rHoA7RMEUo3M1JSB8+uRA1SYAa9K6y:4nI0GudTOL0HOKsHOLlSopRQGorx/uAopbgFgvgveOzft48WHUyEmGpDquIgA0NoBuas]
   - key: GOOGLE_REDIRECT_URI
     scope: RUN_TIME
     value: https://api.einstore.pro/auth/oauth/google/callback
@@ -95,11 +98,11 @@ services:
   - key: API_KEY_SECRET
     scope: RUN_TIME
     type: SECRET
-    value: ${API_KEY_SECRET}
+    value: EV[1:pEztCa5UhQNMV5ErTqLjVtUwciUDiBrB:/YNfXpW5qGOcSbvEMIj79vIDWGW3w4Go4+i5GPF8iUtb]
   - key: BILLING_DEPLOY_KEY
     scope: BUILD_TIME
     type: SECRET
-    value: ${BILLING_DEPLOY_KEY}
+    value: EV[1:fecdPnNxziuuXXbcaoeYAcEJDmmsgNlo:HPrZimVW0X9njalAeyeFBXqxiR620+vT3TPznPyGN5zqKWJ1jdo8P0yXm13n4kPnF1lEIvEoFIv0cEeVdzEbBBxTvstrAWPHzPA0cVk0nVV8uw7GXitukMgsVntUoy3VZsGd5P9DPr0dEy07OkwPgVWh4lM7DnI9t5SOF5aqWfV/Oueh+re8CdhqQmfsMQbyszmVqY4WmmpEwLFIdxrrdEfwkSTPGf79hxSGXXZU4MoJYtWUa2Y87dUBLqrZ61g+0m4A3AWvmX+fynThJNvYyrBnYRE84f+FHZxZkAidXLZ1Ct+dtJzkxyK0gv6674uBwgvrGhGCqXlaGcszoSl85XFVafkrj4j4nmthGIK7qHNReyZpHGaPmDguvElNgsUTAISQDo5yxXki8VWMN+t8bSGbHnt8A0jB83OWAgopU1ZM2v8ErCazjiDJitc6T6fT6zzm+Bp03+I5eP4mvkFxJB/Mvh1bjV3jKhj3hF2lrz25Q4wFm+IEY63QCgxfzyKhd9eLEAOFCLLjfzw2vppt1HQNum5nMmjQ0lja01nMh8og2YxDdECw5pNSlw==]
   - key: CORS_ORIGINS
     scope: RUN_TIME
     value: https://admin.einstore.pro,https://einstore.pro,http://localhost:8081,http://localhost:5173
@@ -108,7 +111,6 @@ services:
     value: "false"
   github:
     branch: main
-    deploy_on_push: false
     repo: Einstore/Einstore
   health_check:
     http_path: /health
@@ -121,13 +123,15 @@ services:
 static_sites:
 - github:
     branch: main
-    deploy_on_push: false
     repo: Einstore/Einstore
   index_document: index.html
   name: web
   output_dir: .
   source_dir: /Web
-- build_command: if [ -n "$BILLING_DEPLOY_KEY" ]; then mkdir -p ~/.ssh && echo "$BILLING_DEPLOY_KEY" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa && ssh-keyscan github.com >> ~/.ssh/known_hosts && mkdir -p ../Private && git clone git@github.com:Einstore/Billing.git ../Private/billing; fi && npm install && npm run build
+- build_command: if [ -n "$BILLING_DEPLOY_KEY" ]; then mkdir -p ~/.ssh && echo "$BILLING_DEPLOY_KEY"
+    > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa && ssh-keyscan github.com >> ~/.ssh/known_hosts
+    && mkdir -p ../Private && git clone git@github.com:Einstore/Billing.git ../Private/billing;
+    fi && npm install && npm run build
   envs:
   - key: VITE_API_BASE_URL
     scope: BUILD_TIME
@@ -135,10 +139,9 @@ static_sites:
   - key: BILLING_DEPLOY_KEY
     scope: BUILD_TIME
     type: SECRET
-    value: ${BILLING_DEPLOY_KEY}
+    value: EV[1:fILF5dkPCsheR/h2IgD2JmCSJhpaXAlM:rO7EEKtEF1GPAmkZPFSyhaTZLG+lK2OfFLCe+kfMysBO+/IiONmzCSsfuB9uR34VP3HbaKSGfiiykxNua10R5qjwjY5DSJx6e8OzwCI2T5bomzLsnML+svBkoA/N4WDaWh1tXB6oOtcFGGxq/xJ78vuV0kEAmmhNTJG73bQmsByI7KEjIgfsDwFtfUsyDtCpoH4vMqYX+CZter3Mql5sRuDLZKW+MfZvFu0VKpose3JeVu0bOCcirW6LkaFuIC6995z1tcaxklxopMyQ6WHOVfy03Jf+El5vvAx8umooWbUebhRKGPKp8aH+JCSA0K7d64EQaB+1SepAn4k6a55648YVYhz8Wb31Y/awZGVFlshvuypBj+5lGYJD5RZNgl5+kqGl1YZpn9DQ6xwu1v7jn9tEd1mJkFlxcX04gxvZOMQR8/PyJxUspX49YsAkrLWY4Off9pI28BtuoDpXZrsgaVivq11t7aEAxolRZoZExpEgw83YRqqrUBoaNWylCoT31gOzdphPYmlNpKvhvnxXFD2Oi2ISnpcIfYgwjp9BfbQ+lSwtSnUgvqcwJA==]
   github:
     branch: main
-    deploy_on_push: false
     repo: Einstore/Einstore
   name: admin
   output_dir: dist
