@@ -17,6 +17,7 @@ const mapUser = (user: {
   fullName: string | null;
   avatarUrl: string | null;
   status: "active" | "disabled";
+  isSuperUser: boolean;
   createdAt: Date;
   updatedAt: Date;
 }): AuthUserRecord => ({
@@ -26,6 +27,7 @@ const mapUser = (user: {
   fullName: user.fullName ?? null,
   avatarUrl: user.avatarUrl ?? null,
   status: user.status,
+  isSuperUser: user.isSuperUser,
   createdAt: user.createdAt,
   updatedAt: user.updatedAt,
 });
@@ -37,8 +39,11 @@ export class PrismaAuthStore implements AuthStore {
     fullName?: string | null;
     avatarUrl?: string | null;
     status?: "active" | "disabled";
+    isSuperUser?: boolean;
     now: Date;
   }): Promise<AuthUserRecord> {
+    const shouldBeSuperUser =
+      input.isSuperUser ?? ((await prisma.user.count()) === 0);
     const user = await prisma.user.create({
       data: {
         username: input.username,
@@ -46,6 +51,7 @@ export class PrismaAuthStore implements AuthStore {
         fullName: input.fullName ?? null,
         avatarUrl: input.avatarUrl ?? null,
         status: input.status ?? "active",
+        isSuperUser: shouldBeSuperUser,
         createdAt: input.now,
         updatedAt: input.now,
       },
@@ -59,10 +65,13 @@ export class PrismaAuthStore implements AuthStore {
     fullName?: string | null;
     avatarUrl?: string | null;
     status?: "active" | "disabled";
+    isSuperUser?: boolean;
     passwordHash: string;
     passwordAlgo: string;
     now: Date;
   }): Promise<AuthUserRecord> {
+    const shouldBeSuperUser =
+      input.isSuperUser ?? ((await prisma.user.count()) === 0);
     const user = await prisma.user.create({
       data: {
         username: input.username,
@@ -70,6 +79,7 @@ export class PrismaAuthStore implements AuthStore {
         fullName: input.fullName ?? null,
         avatarUrl: input.avatarUrl ?? null,
         status: input.status ?? "active",
+        isSuperUser: shouldBeSuperUser,
         createdAt: input.now,
         updatedAt: input.now,
         credential: {
@@ -107,6 +117,10 @@ export class PrismaAuthStore implements AuthStore {
       where: { email },
     });
     return user ? mapUser(user) : null;
+  }
+
+  async getUserCount(): Promise<number> {
+    return prisma.user.count();
   }
 
   async getCredentialByUserId(userId: string): Promise<AuthCredentialRecord | null> {

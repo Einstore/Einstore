@@ -23,7 +23,7 @@ All endpoints return JSON. Authenticated endpoints require `Authorization: Beare
 - Auth scope: Public (handled by rafiki270/auth)
 - Request schema: `{ username: string, password: string, email?: string }`
 - Response schema: `{ userId: string, session: { accessToken: string, refreshToken: string, expiresIn: number } }`
-- Side effects: Creates user, credential, session; ensures a personal team on first login
+- Side effects: Creates user, credential, session; ensures a personal team on first login; first user is marked super user
 - Platform relevance: all
 
 ## POST /auth/login
@@ -95,7 +95,7 @@ All endpoints return JSON. Authenticated endpoints require `Authorization: Beare
 - Auth scope: Public (handled by rafiki270/auth)
 - Request schema: `{ authCode: string }`
 - Response schema: `{ session: { accessToken: string, refreshToken: string, expiresIn: number } }`
-- Side effects: Creates session; ensures a personal team on first login
+- Side effects: Creates session; ensures a personal team on first login; first user is marked super user
 - Platform relevance: all
 
 ## GET /teams

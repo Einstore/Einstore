@@ -493,7 +493,7 @@
     "/auth/register": {
       "post": {
         "summary": "Register user",
-        "description": "Creates a personal team if the user has no team membership yet.",
+        "description": "Creates a personal team if the user has no team membership yet. The first registered user is marked as a super user.",
         "requestBody": {
           "required": true,
           "content": {
@@ -749,7 +749,7 @@
     "/auth/oauth/exchange": {
       "post": {
         "summary": "Exchange OAuth auth code",
-        "description": "Creates a session and ensures a personal team exists for first-time logins.",
+        "description": "Creates a session and ensures a personal team exists for first-time logins. The first user is marked as a super user.",
         "requestBody": {
           "required": true,
           "content": {
