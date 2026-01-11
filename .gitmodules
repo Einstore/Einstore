@@ -7,3 +7,6 @@
 [submodule "Libraries/teams"]
 	path = Libraries/teams
 	url = https://github.com/rafiki270/teams.git
+[submodule "Libraries/api-keys"]
+	path = Libraries/api-keys
+	url = git@github.com:rafiki270/api-keys.git

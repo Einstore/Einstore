@@ -26,7 +26,7 @@ postgresql://postgres@localhost:5432/einstore?schema=public
 - `Web/`: React + Tailwind (CSR).
 - `Libraries/`: external submodules. Do not edit submodule contents unless explicitly requested.
 - `dev/`: legacy reference (gitignored).
- - Reusable code for feature flags, teams, and auth must live inside their respective `Libraries/` packages. Do not implement reusable package logic inside `API/`, `Admin/`, or `Web/`.
+- Reusable code for feature flags, api keys, teams, and auth must live inside their respective `Libraries/` packages. Do not implement reusable package logic inside `API/`, `Admin/`, or `Web/`.
 
 ## UI Conventions
 
