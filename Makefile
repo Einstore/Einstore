@@ -36,6 +36,8 @@ launch:
 	wait $$API_PID $$ADMIN_PID
 
 test:
+	@npm --prefix Libraries/teams install
+	@npm --prefix Libraries/teams run build
 	@npm --prefix API run test:unit
 	@npm --prefix API run prisma:generate
 	@npm --prefix API run build
