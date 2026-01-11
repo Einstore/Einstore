@@ -125,6 +125,28 @@ export const useSessionState = (refreshKey?: string) => {
     }).catch(() => undefined);
   }, []);
 
+  const createTeam = useCallback(async (name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      throw new Error("Team name is required.");
+    }
+    const payload = await apiFetch<{ team?: TeamSummary } | TeamSummary>("/teams", {
+      method: "POST",
+      body: JSON.stringify({ name: trimmed }),
+    });
+    const team = "team" in payload ? payload.team : payload;
+    if (!team) {
+      return;
+    }
+    setTeams((current) => {
+      if (current.some((item) => item.id === team.id)) {
+        return current;
+      }
+      return [team, ...current];
+    });
+    setActiveTeamId(team.id);
+  }, []);
+
   return {
     hasToken,
     me,
@@ -135,5 +157,6 @@ export const useSessionState = (refreshKey?: string) => {
     isAdmin,
     teamMembers,
     selectTeam,
+    createTeam,
   };
 };

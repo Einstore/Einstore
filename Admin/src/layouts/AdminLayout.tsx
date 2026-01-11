@@ -18,6 +18,7 @@ type AdminLayoutProps = {
   breadcrumbs: { label: string }[];
   actions: { id: string; label: string; variant?: "primary" | "outline" }[];
   onTeamChange: (teamId: string) => void;
+  onCreateTeam?: (name: string) => Promise<void>;
   activeTeamId: string;
   teams: TeamSummary[];
   onUpload: (file: File) => Promise<void>;
@@ -30,6 +31,7 @@ const AdminLayout = ({
   breadcrumbs,
   actions,
   onTeamChange,
+  onCreateTeam,
   activeTeamId,
   teams,
   onUpload,
@@ -73,6 +75,7 @@ const AdminLayout = ({
               teams={teams}
               activeTeamId={activeTeamId}
               onChange={onTeamChange}
+              onCreateTeam={onCreateTeam}
             />
           }
           dropzone={

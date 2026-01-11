@@ -2,6 +2,7 @@ import {
   faBarsProgress,
   faBoxesStacked,
   faBell,
+  faChevronDown,
   faCircleUser,
   faFlag,
   faGear,
@@ -11,6 +12,7 @@ import {
   faLock,
   faMagnifyingGlass,
   faMoon,
+  faPlus,
   faRocket,
 } from "@fortawesome/free-solid-svg-icons";
 import { faApple, faAndroid } from "@fortawesome/free-brands-svg-icons";
@@ -32,6 +34,8 @@ const icons = {
   moon: faMoon,
   grid: faGrip,
   user: faCircleUser,
+  chevronDown: faChevronDown,
+  plus: faPlus,
 } as const;
 
 export type IconName = keyof typeof icons;

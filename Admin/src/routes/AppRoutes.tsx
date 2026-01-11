@@ -141,6 +141,7 @@ const AppRoutes = () => {
     teamMembers,
     isAdmin,
     selectTeam,
+    createTeam,
   } = useSessionState(location.pathname);
   const isSaas = import.meta.env.VITE_SAAS === "true";
 
@@ -310,6 +311,7 @@ const AppRoutes = () => {
               title={page.title}
               actions={page.actions}
               onTeamChange={selectTeam}
+              onCreateTeam={createTeam}
               activeTeamId={activeTeamId}
               teams={teams}
               onUpload={handleIngest}
