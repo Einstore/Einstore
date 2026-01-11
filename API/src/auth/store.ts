@@ -14,6 +14,8 @@ const mapUser = (user: {
   id: string;
   username: string;
   email: string | null;
+  fullName: string | null;
+  avatarUrl: string | null;
   status: "active" | "disabled";
   createdAt: Date;
   updatedAt: Date;
@@ -21,8 +23,8 @@ const mapUser = (user: {
   id: user.id,
   username: user.username,
   email: user.email ?? null,
-  fullName: null,
-  avatarUrl: null,
+  fullName: user.fullName ?? null,
+  avatarUrl: user.avatarUrl ?? null,
   status: user.status,
   createdAt: user.createdAt,
   updatedAt: user.updatedAt,
@@ -41,6 +43,8 @@ export class PrismaAuthStore implements AuthStore {
       data: {
         username: input.username,
         email: input.email ?? null,
+        fullName: input.fullName ?? null,
+        avatarUrl: input.avatarUrl ?? null,
         status: input.status ?? "active",
         createdAt: input.now,
         updatedAt: input.now,
@@ -63,6 +67,8 @@ export class PrismaAuthStore implements AuthStore {
       data: {
         username: input.username,
         email: input.email ?? null,
+        fullName: input.fullName ?? null,
+        avatarUrl: input.avatarUrl ?? null,
         status: input.status ?? "active",
         createdAt: input.now,
         updatedAt: input.now,

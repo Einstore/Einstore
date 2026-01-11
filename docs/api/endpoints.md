@@ -98,6 +98,102 @@ All endpoints return JSON. Authenticated endpoints require `Authorization: Beare
 - Side effects: Creates session
 - Platform relevance: all
 
+## GET /teams
+- Purpose: List teams for the authenticated user
+- Auth scope: Bearer (rafiki270/auth)
+- Request schema: none
+- Response schema: `{ teams: Team[] }` (includes `memberRole`)
+- Side effects: none
+- Platform relevance: all
+
+## POST /teams
+- Purpose: Create a new team and set it as active
+- Auth scope: Bearer (rafiki270/auth)
+- Request schema: `{ name: string, slug?: string, defaultCurrency?: string, billingCurrency?: string, defaultExportPreset?: string, overviewStatsPeriod?: string, vatRegistered?: boolean, vatNumberRequired?: boolean, categoryRequired?: boolean, vatMissingThresholdMinor?: number, country?: string, timezone?: string }`
+- Response schema: `{ team: Team }`
+- Side effects: Creates Team + TeamMember (owner), updates last active team
+- Platform relevance: all
+
+## GET /teams/{teamId}
+- Purpose: Fetch current team details
+- Auth scope: Bearer (rafiki270/auth) + Team membership
+- Request schema: path `{ teamId: string }`
+- Response schema: `{ team: Team }`
+- Side effects: none
+- Platform relevance: all
+
+## PATCH /teams/{teamId}
+- Purpose: Update team settings
+- Auth scope: Bearer (rafiki270/auth) + Team role (owner/admin)
+- Request schema: `{ name?: string, slug?: string, defaultCurrency?: string, defaultExportPreset?: string, overviewStatsPeriod?: string, vatRegistered?: boolean, vatNumberRequired?: boolean, categoryRequired?: boolean, vatMissingThresholdMinor?: number, country?: string, timezone?: string }`
+- Response schema: `{ team: Team }`
+- Side effects: Updates Team
+- Platform relevance: all
+
+## GET /teams/{teamId}/users
+- Purpose: List team members
+- Auth scope: Bearer (rafiki270/auth) + Team role (owner/admin)
+- Request schema: path `{ teamId: string }`
+- Response schema: `{ users: TeamUser[] }`
+- Side effects: none
+- Platform relevance: all
+
+## POST /teams/{teamId}/users
+- Purpose: Add a user to the team
+- Auth scope: Bearer (rafiki270/auth) + Team role (owner/admin)
+- Request schema: `{ email: string }`
+- Response schema: `{ user: TeamUser }`
+- Side effects: Creates TeamMember
+- Platform relevance: all
+
+## PATCH /teams/{teamId}/users/{userId}
+- Purpose: Update a team member role
+- Auth scope: Bearer (rafiki270/auth) + Team role (owner/admin)
+- Request schema: `{ role: "owner" | "admin" | "member" }`
+- Response schema: `{ user: TeamUser }`
+- Side effects: Updates TeamMember
+- Platform relevance: all
+
+## DELETE /teams/{teamId}/users/{userId}
+- Purpose: Remove a team member (may promote another owner if needed)
+- Auth scope: Bearer (rafiki270/auth) + Team role (owner/admin)
+- Request schema: none
+- Response schema: `{ removedUserId: string, promotedUserId: string | null }`
+- Side effects: Deletes TeamMember, may promote another admin
+- Platform relevance: all
+
+## POST /teams/{teamId}/select
+- Purpose: Set active team for current user
+- Auth scope: Bearer (rafiki270/auth) + Team membership
+- Request schema: none
+- Response schema: `{ activeTeamId: string }`
+- Side effects: Updates user lastActiveTeamId
+- Platform relevance: all
+
+## GET /teams/{teamId}/inbox
+- Purpose: Resolve team inbox address
+- Auth scope: Bearer (rafiki270/auth) + Team membership
+- Request schema: none
+- Response schema: `{ address: string }`
+- Side effects: none
+- Platform relevance: all
+
+## GET /user-team-settings/{key}
+- Purpose: Fetch a user/team-scoped setting
+- Auth scope: Bearer (rafiki270/auth) + Team membership
+- Request schema: path `{ key: string }`
+- Response schema: `{ key: string, value: any | null }`
+- Side effects: none
+- Platform relevance: all
+
+## PUT /user-team-settings/{key}
+- Purpose: Upsert a user/team-scoped setting
+- Auth scope: Bearer (rafiki270/auth) + Team membership
+- Request schema: `{ value: any | null }`
+- Response schema: `{ key: string, value: any | null }`
+- Side effects: Creates or updates UserTeamSetting
+- Platform relevance: all
+
 ## POST /apps
 - Purpose: Create app
 - Auth scope: Bearer (rafiki270/auth)

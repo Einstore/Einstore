@@ -20,12 +20,14 @@
     "apk-parser3": "^0.1.7",
     "dotenv": "^16.4.5",
     "fastify": "^4.29.0",
+    "geoip-lite": "^1.4.10",
     "plist": "^3.1.0",
     "yauzl": "^2.10.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^22.10.1",
+    "@types/geoip-lite": "^1.4.4",
     "@types/plist": "^3.0.5",
     "@types/yauzl": "^2.10.3",
     "prisma": "^6.16.1",

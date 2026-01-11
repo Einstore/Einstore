@@ -52,6 +52,29 @@ const prismaMock = {
     findFirst: vi.fn(),
     update: vi.fn(),
   },
+  user: {
+    findUnique: vi.fn(),
+    update: vi.fn(),
+  },
+  team: {
+    create: vi.fn(),
+    findUnique: vi.fn(),
+    update: vi.fn(),
+  },
+  teamMember: {
+    findFirst: vi.fn(),
+    findMany: vi.fn(),
+    findUnique: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    count: vi.fn(),
+  },
+  userTeamSetting: {
+    findUnique: vi.fn(),
+    upsert: vi.fn(),
+  },
+  $transaction: vi.fn(),
 };
 
 vi.mock("../../lib/prisma.js", () => ({
@@ -59,7 +82,9 @@ vi.mock("../../lib/prisma.js", () => ({
 }));
 
 vi.mock("../../auth/guard.js", () => ({
-  requireAuth: async () => undefined,
+  requireAuth: async (request: { auth?: { user?: { id: string } } }) => {
+    request.auth = { user: { id: "user-1" } };
+  },
 }));
 
 const authServiceMock = {
@@ -193,6 +218,83 @@ describe("routes", () => {
 
     ensureFeatureFlagMock.mockResolvedValue({ id: "flag-1", key: "beta.feature" });
     isFeatureFlagEnabledMock.mockResolvedValue(true);
+
+    const team = {
+      id: "team-1",
+      name: "Core Team",
+      slug: "core-team",
+      inboxBase: "core",
+      storageLimitBytes: BigInt(1073741824),
+    };
+
+    prismaMock.user.findUnique.mockResolvedValue({
+      id: "user-1",
+      email: "tester@example.com",
+      fullName: "Test User",
+      avatarUrl: null,
+      username: "tester",
+      lastActiveTeamId: team.id,
+    });
+    prismaMock.user.update.mockResolvedValue({ id: "user-1", lastActiveTeamId: team.id });
+
+    prismaMock.team.create.mockResolvedValue(team);
+    prismaMock.team.findUnique.mockResolvedValue(team);
+    prismaMock.team.update.mockResolvedValue(team);
+
+    prismaMock.teamMember.findFirst.mockResolvedValue({ team });
+    prismaMock.teamMember.findUnique.mockResolvedValue({
+      teamId: team.id,
+      userId: "user-1",
+      role: "owner",
+      createdAt: new Date(),
+      team,
+      user: {
+        id: "user-1",
+        email: "tester@example.com",
+        fullName: "Test User",
+        avatarUrl: null,
+        username: "tester",
+      },
+    });
+    prismaMock.teamMember.findMany.mockResolvedValue([
+      {
+        teamId: team.id,
+        userId: "user-1",
+        role: "owner",
+        createdAt: new Date(),
+        team,
+        user: {
+          id: "user-1",
+          email: "tester@example.com",
+          fullName: "Test User",
+          avatarUrl: null,
+          username: "tester",
+        },
+      },
+    ]);
+    prismaMock.teamMember.create.mockResolvedValue({ id: "member-1" });
+    prismaMock.teamMember.update.mockResolvedValue({
+      teamId: team.id,
+      userId: "user-1",
+      role: "admin",
+      createdAt: new Date(),
+      user: {
+        id: "user-1",
+        email: "tester@example.com",
+        fullName: "Test User",
+        avatarUrl: null,
+        username: "tester",
+      },
+    });
+    prismaMock.teamMember.delete.mockResolvedValue({ id: "member-1" });
+    prismaMock.teamMember.count.mockResolvedValue(1);
+
+    prismaMock.userTeamSetting.findUnique.mockResolvedValue({ value: { theme: "dark" } });
+    prismaMock.userTeamSetting.upsert.mockResolvedValue({ value: { theme: "dark" } });
+
+    prismaMock.$transaction.mockImplementation(async (fn: (tx: typeof prismaMock) => Promise<unknown>) =>
+      fn(prismaMock),
+    );
   });
 
   it("GET /health", async () => {
@@ -253,6 +355,36 @@ describe("routes", () => {
     expect(oauthCallbackResponse.statusCode).toBe(302);
     const oauthExchangeResponse = await postJson("/auth/oauth/exchange", { authCode: "oauth-code" });
     expect(oauthExchangeResponse.statusCode).toBe(200);
+  });
+
+  it("teams endpoints", async () => {
+    const listResponse = await app.inject({ method: "GET", url: "/teams" });
+    expect(listResponse.statusCode).toBe(200);
+
+    const createResponse = await postJson("/teams", { name: "Core Team" });
+    expect(createResponse.statusCode).toBe(201);
+
+    const getResponse = await app.inject({ method: "GET", url: "/teams/team-1" });
+    expect(getResponse.statusCode).toBe(200);
+
+    const selectResponse = await app.inject({ method: "POST", url: "/teams/team-1/select" });
+    expect(selectResponse.statusCode).toBe(200);
+
+    const usersResponse = await app.inject({ method: "GET", url: "/teams/team-1/users" });
+    expect(usersResponse.statusCode).toBe(200);
+  });
+
+  it("user team settings endpoints", async () => {
+    const getResponse = await app.inject({ method: "GET", url: "/user-team-settings/theme" });
+    expect(getResponse.statusCode).toBe(200);
+
+    const putResponse = await app.inject({
+      method: "PUT",
+      url: "/user-team-settings/theme",
+      payload: { value: { theme: "dark" } },
+      headers: { "content-type": "application/json" },
+    });
+    expect(putResponse.statusCode).toBe(200);
   });
 
   it("apps endpoints", async () => {
