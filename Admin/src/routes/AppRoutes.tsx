@@ -656,6 +656,7 @@ const AppBuildsRoute = ({
   const navigate = useNavigate();
   const [builds, setBuilds] = useState<ApiBuild[]>([]);
   const [buildIcons, setBuildIcons] = useState<Record<string, string>>({});
+  const [buildPlatforms, setBuildPlatforms] = useState<Record<string, string>>({});
   const selectedApp = apps.find((app) => app.id === appId) ?? null;
   const appIcon = appId ? appIcons[appId] : undefined;
 
@@ -689,6 +690,7 @@ const AppBuildsRoute = ({
     let isMounted = true;
     if (!builds.length) {
       setBuildIcons({});
+      setBuildPlatforms({});
       return () => {
         isMounted = false;
       };
