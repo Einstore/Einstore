@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@devicefarmer/adbkit-apkreader": "^3.2.4",
-    "@fastify/multipart": "^9.3.0",
+    "@fastify/multipart": "^8.3.0",
     "@prisma/client": "^6.16.1",
     "@rafiki270/feature-flags": "git+https://github.com/rafiki270/FeatureFlags.git#be7bc46aeee923a36b08f2f75196f7b98dc7a123",
     "@rafiki270/teams": "git+https://github.com/rafiki270/teams.git#935a199",
