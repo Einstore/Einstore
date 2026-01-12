@@ -8,6 +8,24 @@ import Pagination from "../components/Pagination";
 import type { ApiApp } from "../lib/apps";
 import type { PaginationMeta } from "../lib/pagination";
 
+const VIEW_MODE_COOKIE = "apps_view_mode";
+
+const readViewModeCookie = (): "list" | "grid" => {
+  if (typeof document === "undefined") return "list";
+  const match = document.cookie
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${VIEW_MODE_COOKIE}=`));
+  const value = match?.split("=")[1];
+  return value === "grid" ? "grid" : "list";
+};
+
+const writeViewModeCookie = (mode: "list" | "grid") => {
+  if (typeof document === "undefined") return;
+  const maxAge = 60 * 60 * 24 * 180; // ~6 months
+  document.cookie = `${VIEW_MODE_COOKIE}=${mode}; path=/; max-age=${maxAge}`;
+};
+
 type AppsPageProps = {
   apps: ApiApp[];
   appIcons?: Record<string, string>;
@@ -31,7 +49,12 @@ const AppsPage = ({
   onPerPageChange,
   onUpload,
 }: AppsPageProps) => {
-  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+  const [viewMode, setViewMode] = useState<"list" | "grid">(() => readViewModeCookie());
+
+  const handleViewChange = (mode: "list" | "grid") => {
+    setViewMode(mode);
+    writeViewModeCookie(mode);
+  };
 
   return (
     <div className="space-y-6">
@@ -70,7 +93,7 @@ const AppsPage = ({
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setViewMode("grid")}
+              onClick={() => handleViewChange("grid")}
               className={`flex h-11 w-11 items-center justify-center rounded-lg border transition-colors ${
                 viewMode === "grid"
                   ? "border-indigo-500 bg-indigo-50 text-indigo-600 dark:border-indigo-400/60 dark:bg-indigo-500/20 dark:text-indigo-300"
@@ -90,7 +113,7 @@ const AppsPage = ({
             </button>
             <button
               type="button"
-              onClick={() => setViewMode("list")}
+              onClick={() => handleViewChange("list")}
               className={`flex h-11 w-11 items-center justify-center rounded-lg border transition-colors ${
                 viewMode === "list"
                   ? "border-indigo-500 bg-indigo-50 text-indigo-600 dark:border-indigo-400/60 dark:bg-indigo-500/20 dark:text-indigo-300"
@@ -111,7 +134,7 @@ const AppsPage = ({
             appIcons={appIcons}
             onSelectApp={onSelectApp}
             viewMode={viewMode}
-            onViewChange={setViewMode}
+            onViewChange={handleViewChange}
           />
           <Pagination
             page={pagination.page}
