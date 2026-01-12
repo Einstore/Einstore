@@ -26,10 +26,7 @@ type BuildDetailPageProps = {
   onDownload?: (buildId: string) => void;
   tags?: ApiTag[];
   availableTags?: ApiTag[];
-  isSavingTags?: boolean;
-  tagError?: string | null;
-  onSaveTags?: (tags: string[]) => void;
-  lastSavedTagsAt?: string | null;
+  onChangeTags?: (tags: string[]) => void;
 };
 
 const formatKind = (kind: string) => kind.replace(/_/g, " ");
@@ -107,10 +104,7 @@ const BuildDetailPage = ({
   onDownload,
   tags = [],
   availableTags = [],
-  isSavingTags,
-  tagError,
-  onSaveTags,
-  lastSavedTagsAt,
+  onChangeTags,
 }: BuildDetailPageProps) => {
   const primaryTarget = pickPrimaryTarget(build?.targets);
   const appName = build?.version?.app?.name ?? build?.displayName ?? "—";
@@ -139,11 +133,6 @@ const BuildDetailPage = ({
   useEffect(() => {
     setTagDraft(tags.map((tag) => tag.name));
   }, [tags]);
-
-  const handleSaveTags = () => {
-    if (!onSaveTags) return;
-    onSaveTags(tagDraft);
-  };
 
   return (
     <div className="space-y-6">
@@ -268,18 +257,15 @@ const BuildDetailPage = ({
             <Panel className="col-span-12 space-y-4">
               <SectionHeader
                 title="Tags"
-                subtitle="Tags help you find builds quickly. Add multiple tags and save to update this build."
+                subtitle="Tags help you find builds quickly. Add multiple tags; changes save automatically."
               />
-              {tagError ? (
-                <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:border-rose-800 dark:bg-rose-900/30 dark:text-rose-200">
-                  {tagError}
-                </div>
-              ) : null}
               <TagInput
                 value={tagDraft}
-                onChange={setTagDraft}
+                onChange={(next) => {
+                  setTagDraft(next);
+                  onChangeTags?.(next);
+                }}
                 suggestions={availableTags.map((tag) => tag.name)}
-                disabled={isSavingTags}
                 placeholder="Add a tag (e.g. release, beta, hotfix)"
               />
               {tags.length ? (
@@ -299,19 +285,6 @@ const BuildDetailPage = ({
                   No tags yet. Add some to make search easier.
                 </p>
               )}
-              <div className="flex flex-wrap items-center gap-3">
-                <button
-                  type="button"
-                  className="h-11 rounded-lg bg-indigo-600 px-4 text-sm font-semibold text-white transition-colors hover:bg-indigo-500 disabled:opacity-60"
-                  onClick={handleSaveTags}
-                  disabled={isSavingTags || !onSaveTags}
-                >
-                  {isSavingTags ? "Saving…" : "Save tags"}
-                </button>
-                <span className="text-xs text-slate-500 dark:text-slate-400">
-                  {lastSavedTagsAt ? `Saved ${lastSavedTagsAt}` : "Not saved yet"}
-                </span>
-              </div>
             </Panel>
           </div>
 

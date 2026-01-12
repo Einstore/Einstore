@@ -609,9 +609,7 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
   const [error, setError] = useState<string | null>(null);
   const [tags, setTags] = useState<ApiTag[]>([]);
   const [availableTags, setAvailableTags] = useState<ApiTag[]>([]);
-  const [isSavingTags, setIsSavingTags] = useState(false);
   const [tagError, setTagError] = useState<string | null>(null);
-  const [lastSavedTagsAt, setLastSavedTagsAt] = useState<string | null>(null);
   const installBuild = useCallback(
     async (id: string) => {
       try {
@@ -761,13 +759,8 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
       onDownload={downloadBuild}
       tags={tags}
       availableTags={availableTags}
-      isSavingTags={isSavingTags}
-      tagError={tagError}
-      lastSavedTagsAt={lastSavedTagsAt}
-      onSaveTags={async (nextTags) => {
+      onChangeTags={async (nextTags) => {
         if (!buildId) return;
-        setIsSavingTags(true);
-        setTagError(null);
         try {
           const normalized = nextTags.map((tag) => tag.trim().toLowerCase());
           const payload = await apiFetch<{ tags: ApiTag[] }>(`/builds/${buildId}/tags`, {
@@ -776,7 +769,6 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
             body: JSON.stringify({ tags: normalized }),
           });
           setTags(payload?.tags ?? []);
-          setLastSavedTagsAt(new Date().toLocaleTimeString());
           const appId = build?.version?.app?.id;
           const params = new URLSearchParams({ perPage: "100" });
           if (appId) {
@@ -789,8 +781,6 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
             .catch(() => undefined);
         } catch {
           setTagError("Unable to save tags. Please try again.");
-        } finally {
-          setIsSavingTags(false);
         }
       }}
     />
