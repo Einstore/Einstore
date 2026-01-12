@@ -139,7 +139,7 @@ export const useSessionState = (refreshKey?: string) => {
     if (!accessToken) {
       return;
     }
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8100";
     const wsBase = baseUrl.startsWith("https://")
       ? baseUrl.replace("https://", "wss://")
       : baseUrl.replace("http://", "ws://");

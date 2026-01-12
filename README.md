@@ -18,6 +18,7 @@ Modern private app distribution platform for iOS + Android.
 - `make launch` starts the API and Admin dev servers plus Caddy for local domains.
 - For App Platform build/run simulation, see `docs/app-platform-local-sim.md`.
 - With DNS entries for `admin.local.einstore.pro`, `api.local.einstore.pro`, and `local.einstore.pro`, you can access the dev stack from other devices at `https://admin.local.einstore.pro` and `https://api.local.einstore.pro` (Caddy terminates HTTPS with local certificates; override `DEV_*` vars in the Makefile if you need different ports).
+- Default ports now live in the 8100 range: API 8100, Admin 8101, Postgres 8102 (Docker host), and the test runner on 8103.
 
 ## Uploading a binary to Einstore
 1. Create or copy an API key in Admin (`API Keys`). The API key identifies the team.

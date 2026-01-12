@@ -36,4 +36,4 @@ fi
 pack build "$IMAGE_NAME" --builder "$BUILDER" --path "$ROOT_DIR" "${PACK_ENV[@]}"
 
 docker compose -f "$COMPOSE_FILE" up -d do-db
-docker run --rm --env-file "$ENV_FILE" --network einstore-app-platform -p 8080:8080 "$IMAGE_NAME"
+docker run --rm --env-file "$ENV_FILE" --network einstore-app-platform -p 8100:8100 "$IMAGE_NAME"

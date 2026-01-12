@@ -25,7 +25,7 @@ const resolveBaseUrl = (request) => {
     const proto = Array.isArray(protoHeader) ? protoHeader[0] : protoHeader;
     const host = Array.isArray(hostHeader) ? hostHeader[0] : hostHeader;
     if (!host) {
-        return "http://localhost:8080";
+        return "http://localhost:8100";
     }
     return `${proto || "http"}://${host}`;
 };

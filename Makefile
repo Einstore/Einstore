@@ -5,13 +5,13 @@ APP_ID ?= afde427c-09c9-475a-851c-c7a618040891
 APP_ID_STAGING ?= <set-staging-app-id>
 MIGRATION_NAME ?= baseline
 MIGRATION_TEST_DB ?= einstore-test
-DEV_API_PORT ?= 8080
-DEV_ADMIN_PORT ?= 5173
+DEV_API_PORT ?= 8100
+DEV_ADMIN_PORT ?= 8101
 DEV_API_DOMAIN ?= api.local.einstore.pro
 DEV_ADMIN_DOMAIN ?= admin.local.einstore.pro
 DEV_WEB_DOMAIN ?= local.einstore.pro
 DEV_CADDYFILE ?= ./Caddyfile.dev
-DEV_CORS_ORIGINS ?= https://$(DEV_ADMIN_DOMAIN),https://$(DEV_WEB_DOMAIN),http://$(DEV_ADMIN_DOMAIN),http://$(DEV_WEB_DOMAIN),http://localhost:8081,http://localhost:5173
+DEV_CORS_ORIGINS ?= https://$(DEV_ADMIN_DOMAIN),https://$(DEV_WEB_DOMAIN),http://$(DEV_ADMIN_DOMAIN),http://$(DEV_WEB_DOMAIN),http://localhost:8101
 DEV_VITE_API_BASE_URL ?= https://$(DEV_API_DOMAIN)
 DEV_INBOUND_EMAIL_DOMAIN ?= $(DEV_WEB_DOMAIN)
 DEV_ADMIN_CLIENT_PORT ?= 443
@@ -117,7 +117,7 @@ migrate:
 		fi; \
 		fi; \
 		if [ -z "$$BASE_URL" ]; then \
-			BASE_URL="postgresql://postgres@localhost:5432/einstore?schema=public"; \
+			BASE_URL="postgresql://postgres@localhost:8102/einstore?schema=public"; \
 		fi; \
 		TARGET_DB="$(MIGRATION_TEST_DB)"; \
 		if ! command -v python3 >/dev/null 2>&1; then \
@@ -180,22 +180,22 @@ test:
 		npm --prefix API run test:unit; \
 		npm --prefix API run prisma:generate; \
 		npm --prefix API run build; \
-		PORT=8083 \
+		PORT=8103 \
 		AUTH_JWT_SECRET=change-me \
 		AUTH_JWT_ISSUER=einstore \
 		AUTH_JWT_AUDIENCE=einstore-api \
 		AUTH_REFRESH_TTL_DAYS=30 \
 		AUTH_ACCESS_TTL_MINUTES=15 \
-		DATABASE_URL="postgresql://postgres@localhost:5432/einstore-test?schema=public" \
+		DATABASE_URL="postgresql://postgres@localhost:8102/einstore-test?schema=public" \
 		NODE_ENV=test \
 		npm --prefix API run prisma:deploy; \
-		PORT=8083 \
+		PORT=8103 \
 		AUTH_JWT_SECRET=change-me \
 		AUTH_JWT_ISSUER=einstore \
 		AUTH_JWT_AUDIENCE=einstore-api \
 		AUTH_REFRESH_TTL_DAYS=30 \
 		AUTH_ACCESS_TTL_MINUTES=15 \
-		DATABASE_URL="postgresql://postgres@localhost:5432/einstore-test?schema=public" \
+		DATABASE_URL="postgresql://postgres@localhost:8102/einstore-test?schema=public" \
 		NODE_ENV=test \
 		node API/dist/index.js > /tmp/einstore-api-test.log 2>&1 & \
 		PID=$$!; \
@@ -213,9 +213,9 @@ docker:
 	@docker compose down --remove-orphans
 	@docker compose up --build -d
 	@IP=$$(ipconfig getifaddr en0 || ipconfig getifaddr en1 || echo localhost); \
-	echo "API:   http://$$IP:8080"; \
-	echo "Admin: http://$$IP:8081"; \
-	open http://$$IP:8081
+	echo "API:   http://$$IP:8100"; \
+	echo "Admin: http://$$IP:8101"; \
+	open http://$$IP:8101
 
 staging:
 	@:

@@ -73,6 +73,6 @@ RUN rm -rf node_modules/@rafiki270/teams/dist \
 RUN npm run prisma:generate
 RUN npm run build
 
-EXPOSE 8080
+EXPOSE 8100
 
 CMD ["node", "dist/index.js"]

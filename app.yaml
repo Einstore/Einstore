@@ -135,7 +135,10 @@ services:
     value: EV[1:fecdPnNxziuuXXbcaoeYAcEJDmmsgNlo:HPrZimVW0X9njalAeyeFBXqxiR620+vT3TPznPyGN5zqKWJ1jdo8P0yXm13n4kPnF1lEIvEoFIv0cEeVdzEbBBxTvstrAWPHzPA0cVk0nVV8uw7GXitukMgsVntUoy3VZsGd5P9DPr0dEy07OkwPgVWh4lM7DnI9t5SOF5aqWfV/Oueh+re8CdhqQmfsMQbyszmVqY4WmmpEwLFIdxrrdEfwkSTPGf79hxSGXXZU4MoJYtWUa2Y87dUBLqrZ61g+0m4A3AWvmX+fynThJNvYyrBnYRE84f+FHZxZkAidXLZ1Ct+dtJzkxyK0gv6674uBwgvrGhGCqXlaGcszoSl85XFVafkrj4j4nmthGIK7qHNReyZpHGaPmDguvElNgsUTAISQDo5yxXki8VWMN+t8bSGbHnt8A0jB83OWAgopU1ZM2v8ErCazjiDJitc6T6fT6zzm+Bp03+I5eP4mvkFxJB/Mvh1bjV3jKhj3hF2lrz25Q4wFm+IEY63QCgxfzyKhd9eLEAOFCLLjfzw2vppt1HQNum5nMmjQ0lja01nMh8og2YxDdECw5pNSlw==]
   - key: CORS_ORIGINS
     scope: RUN_TIME
-    value: https://admin.einstore.pro,https://einstore.pro,http://localhost:8081,http://localhost:5173
+    value: https://admin.einstore.pro,https://einstore.pro,http://localhost:8101
+  - key: PORT
+    scope: RUN_TIME
+    value: "8100"
   - key: NPM_CONFIG_INSTALL_LINKS
     scope: BUILD_TIME
     value: "false"
@@ -144,7 +147,7 @@ services:
     repo: Einstore/Einstore
   health_check:
     http_path: /health
-  http_port: 8080
+  http_port: 8100
   instance_count: 1
   instance_size_slug: apps-s-1vcpu-0.5gb
   name: api

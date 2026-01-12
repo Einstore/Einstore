@@ -1,0 +1,18 @@
+{
+	admin off
+}
+
+{$API_HOST:-api.local.einstore.pro} {
+	tls internal
+	reverse_proxy api:8100
+}
+
+{$ADMIN_HOST:-admin.local.einstore.pro} {
+	tls internal
+	reverse_proxy admin:8101
+}
+
+{$WEB_HOST:-local.einstore.pro} {
+	tls internal
+	respond "Web service is not configured in the Docker stack." 503
+}

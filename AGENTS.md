@@ -3,7 +3,7 @@
 ## Local DB (debug)
 
 ```
-postgresql://postgres@localhost:5432/einstore?schema=public
+postgresql://postgres@localhost:8102/einstore?schema=public
 ```
 
 ## Documentation hygiene

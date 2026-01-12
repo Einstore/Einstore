@@ -641,13 +641,13 @@ const AppRoutes = () => {
     {
       id: "build-detail",
       path: "/builds/:buildId",
-      element: <BuildDetailRoute activeTeamId={activeTeamId} />,
+      element: <BuildDetailRoute activeTeamId={activeTeamId} currentUserId={me?.userId} />,
       navId: "builds",
     },
     {
       id: "build-detail",
       path: "/apps/:appId/builds/:buildId",
-      element: <BuildDetailRoute activeTeamId={activeTeamId} />,
+      element: <BuildDetailRoute activeTeamId={activeTeamId} currentUserId={me?.userId} />,
       navId: "builds",
     },
     {
@@ -840,7 +840,13 @@ const AppsRoute = ({
   );
 };
 
-const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
+const BuildDetailRoute = ({
+  activeTeamId,
+  currentUserId,
+}: {
+  activeTeamId: string;
+  currentUserId?: string | null;
+}) => {
   const { buildId } = useParams();
   const [build, setBuild] = useState<ApiBuildMetadata | null>(null);
   const [iconUrl, setIconUrl] = useState<string | null>(null);
@@ -1147,7 +1153,7 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
       isCommentsLoading={isLoadingComments}
       isCommentSubmitting={isPostingComment}
       commentsError={commentsError}
-      currentUserId={me?.userId}
+      currentUserId={currentUserId}
     />
   );
 };

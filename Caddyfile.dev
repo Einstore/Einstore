@@ -4,11 +4,11 @@
 }
 
 {$API_HOST:-api.local.einstore.pro} {
-	reverse_proxy 127.0.0.1:{$API_PORT:-8080}
+	reverse_proxy 127.0.0.1:{$API_PORT:-8100}
 }
 
 {$ADMIN_HOST:-admin.local.einstore.pro} {
-	reverse_proxy 127.0.0.1:{$ADMIN_PORT:-5173}
+	reverse_proxy 127.0.0.1:{$ADMIN_PORT:-8101}
 }
 
 {$WEB_HOST:-local.einstore.pro} {

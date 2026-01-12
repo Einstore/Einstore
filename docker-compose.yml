@@ -8,7 +8,7 @@ services:
     image: einstore-api:1.0.0
     environment:
       NODE_ENV: development
-      PORT: 8080
+      PORT: 8100
       DATABASE_URL: postgresql://einstore:einstore@db:5432/einstore?schema=public
       AAPT_PATH: /usr/local/bin/aapt2
       AUTH_JWT_SECRET: change-me
@@ -18,7 +18,7 @@ services:
       AUTH_ACCESS_TTL_MINUTES: 15
       API_KEY_SECRET: change-me
     ports:
-      - "8080:8080"
+      - "8100:8100"
     depends_on:
       - db
 
@@ -30,9 +30,24 @@ services:
     environment:
       NODE_ENV: development
     ports:
-      - "8081:8081"
+      - "8101:8101"
     depends_on:
       - api
+
+  caddy:
+    image: caddy:2
+    container_name: einstore-caddy
+    depends_on:
+      - api
+      - admin
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile
+      - caddy-data:/data
+      - caddy-config:/config
 
   db:
     image: postgres:17-alpine
@@ -41,9 +56,11 @@ services:
       POSTGRES_PASSWORD: einstore
       POSTGRES_DB: einstore
     ports:
-      - "5432:5432"
+      - "8102:5432"
     volumes:
       - pgsql-data:/var/lib/postgresql/data
 
 volumes:
   pgsql-data:
+  caddy-data:
+  caddy-config:
