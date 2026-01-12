@@ -53,7 +53,17 @@ export async function teamLogoRoutes(app: FastifyInstance) {
     if (!teamId) {
       return reply.status(403).send({ error: "team_required", message: "Team context required" });
     }
-    const file = await request.file({ limits: { fileSize: MAX_BYTES, files: 1 } });
+    let file;
+    try {
+      file = await request.file({ limits: { fileSize: MAX_BYTES, files: 1 } });
+    } catch (error) {
+      if ((error as { code?: string }).code === "FST_ERR_CTP_INVALID_CONTENT_LENGTH") {
+        return reply
+          .status(400)
+          .send({ error: "content_length_mismatch", message: "Content-Length did not match body size." });
+      }
+      throw error;
+    }
     if (!file) {
       return reply.status(400).send({ error: "file_required", message: "Logo file is required." });
     }
