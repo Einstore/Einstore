@@ -53,26 +53,28 @@ const BuildRow = ({
         <p className="text-slate-400 dark:text-slate-500">{createdAt}</p>
         <div className="flex items-center gap-2">
           {showInstall ? (
-            <span
-              className="rounded-lg bg-indigo-600 px-3 py-1 text-xs font-semibold text-white"
+            <button
+              type="button"
+              className="inline-flex h-10 items-center rounded-lg bg-indigo-600 px-4 text-xs font-semibold text-white hover:bg-indigo-500"
               onClick={(event) => {
                 event.stopPropagation();
                 onInstall?.();
               }}
             >
               Install
-            </span>
+            </button>
           ) : null}
           {showDownloadButton ? (
-            <span
-              className="rounded-lg border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700 dark:border-slate-600 dark:text-slate-200"
+            <button
+              type="button"
+              className="inline-flex h-10 items-center rounded-lg border border-slate-300 px-4 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
               onClick={(event) => {
                 event.stopPropagation();
                 onDownload?.();
               }}
             >
               Download
-            </span>
+            </button>
           ) : null}
         </div>
       </div>
