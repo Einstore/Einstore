@@ -85,6 +85,14 @@ export async function teamLogoRoutes(app: FastifyInstance) {
     return reply.send({ url });
   });
 
+  app.get("/teams/logo", { preHandler: requireTeam }, async (request, reply) => {
+    const teamId = request.team?.id;
+    if (!teamId) {
+      return reply.status(403).send({ error: "team_required", message: "Team context required" });
+    }
+    return reply.redirect(`/teams/${teamId}/logo`);
+  });
+
   app.get("/teams/:id/logo", async (request, reply) => {
     const { id } = request.params as { id: string };
     if (!id) {
