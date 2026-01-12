@@ -16,3 +16,4 @@ Admin/src/private/routes.generated.tsx
 Private/*
 !Private/README.md
 API/.env
+/frameworks/flutter/.dart_tool
