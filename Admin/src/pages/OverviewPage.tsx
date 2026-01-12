@@ -3,11 +3,8 @@ import ReleasesSection from "../sections/ReleasesSection";
 import StorageSection from "../sections/StorageSection";
 import BuildQueueSection from "../sections/BuildQueueSection";
 import SplitLayout from "../components/SplitLayout";
-import type {
-  AppSummary,
-  BuildJob,
-  Metric,
-} from "../data/mock";
+import Panel from "../components/Panel";
+import type { AppSummary, BuildJob, Metric } from "../data/mock";
 import type { StorageUsageUser } from "../types/usage";
 
 type OverviewPageProps = {
@@ -31,8 +28,36 @@ const OverviewPage = ({
   showMetrics = false,
   showStorage = false,
 }: OverviewPageProps) => {
+  const appsCount = apps?.length ?? 0;
+  const buildsCount = buildQueue?.length ?? 0;
+
   return (
     <div className="space-y-10">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <Panel className="flex flex-col gap-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+            Apps
+          </p>
+          <p className="text-2xl font-semibold text-slate-900 dark:text-slate-100">{appsCount}</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Total apps in this workspace</p>
+        </Panel>
+        <Panel className="flex flex-col gap-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+            Builds
+          </p>
+          <p className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+            {buildsCount}
+          </p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Recent builds listed below</p>
+        </Panel>
+        <Panel className="flex flex-col gap-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+            Placeholder
+          </p>
+          <p className="text-2xl font-semibold text-slate-900 dark:text-slate-100">—</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Add a KPI here</p>
+        </Panel>
+      </div>
       {showMetrics ? <OverviewSection metrics={metrics} /> : null}
       <SplitLayout
         left={<ReleasesSection apps={apps} />}
