@@ -137,31 +137,32 @@ const OverviewPage = ({
               Preview builds
             </p>
             <div className="flex flex-col gap-1 text-xs text-slate-500 dark:text-slate-400 md:flex-row md:items-center md:gap-3">
-              <div className="flex flex-col gap-1">
-                <span className="font-semibold text-slate-600 dark:text-slate-200">App</span>
-                <div className="relative w-full min-w-[220px] md:w-64">
-                  <input
-                    type="search"
-                    value={appSearch || selectedAppLabel}
-                    onChange={(event) => {
-                      setAppSearch(event.target.value);
-                      setIsAppDropdownOpen(true);
-                    }}
-                    onFocus={() => setIsAppDropdownOpen(true)}
-                    onBlur={() => {
-                      // Delay closing to allow click selection
-                      setTimeout(() => setIsAppDropdownOpen(false), 100);
-                    }}
-                    className="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 pr-8 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-                    placeholder="Search apps"
-                    aria-label="Filter preview builds by app"
-                  />
-                  <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">
-                    ▼
-                  </div>
-                  {isAppDropdownOpen && (
-                    <div className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-800">
-                      {filteredAppOptions.map((option) => (
+              <div className="relative w-full min-w-[220px] md:w-64">
+                <input
+                  type="search"
+                  value={appSearch || selectedAppLabel}
+                  onChange={(event) => {
+                    setAppSearch(event.target.value);
+                    setIsAppDropdownOpen(true);
+                  }}
+                  onFocus={() => setIsAppDropdownOpen(true)}
+                  onBlur={() => {
+                    // Delay closing to allow click selection
+                    setTimeout(() => setIsAppDropdownOpen(false), 100);
+                  }}
+                  className="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 pr-8 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                  placeholder="Filter apps"
+                  aria-label="Filter preview builds by app"
+                />
+                <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">
+                  ▼
+                </div>
+                {isAppDropdownOpen && (
+                  <div className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-800">
+                    {filteredAppOptions.map((option) => {
+                      const appIcon = option.id !== "all" ? appIconsByApp?.[option.id] : null;
+                      const fallbackInitial = option.name.charAt(0).toUpperCase();
+                      return (
                         <button
                           key={option.id}
                           type="button"
@@ -177,20 +178,31 @@ const OverviewPage = ({
                             setIsAppDropdownOpen(false);
                           }}
                         >
-                          <span>{option.name}</span>
-                          {option.id === previewAppId ? (
-                            <span className="text-xs">Selected</span>
-                          ) : null}
+                          <div className="flex items-center gap-3">
+                            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-xs font-semibold text-slate-700 ring-1 ring-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:ring-slate-600">
+                              {appIcon ? (
+                                <img
+                                  src={appIcon}
+                                  alt=""
+                                  className="h-full w-full rounded-lg object-cover"
+                                />
+                              ) : (
+                                fallbackInitial
+                              )}
+                            </span>
+                            <span>{option.name}</span>
+                          </div>
+                          {option.id === previewAppId ? <span className="text-xs">Selected</span> : null}
                         </button>
-                      ))}
-                      {!filteredAppOptions.length ? (
-                        <div className="px-3 py-2 text-xs text-slate-500 dark:text-slate-400">
-                          No apps found
-                        </div>
-                      ) : null}
-                    </div>
-                  )}
-                </div>
+                      );
+                    })}
+                    {!filteredAppOptions.length ? (
+                      <div className="px-3 py-2 text-xs text-slate-500 dark:text-slate-400">
+                        No apps found
+                      </div>
+                    ) : null}
+                  </div>
+                )}
               </div>
             </div>
           </div>

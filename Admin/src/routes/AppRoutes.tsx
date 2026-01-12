@@ -23,7 +23,6 @@ import AcceptInvitePage from "../pages/AcceptInvitePage";
 import {
   buildQueue,
   metrics,
-  apps as overviewApps,
   pipelineAlerts,
   pipelineStages,
   securityAudits,
@@ -481,7 +480,7 @@ const AppRoutes = () => {
       element: (
         <OverviewPage
           metrics={metrics}
-          apps={overviewApps}
+          apps={apps}
           buildQueue={buildQueue}
           previewBuilds={previewBuilds}
           appIconsByApp={appIcons}
