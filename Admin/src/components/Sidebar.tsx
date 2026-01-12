@@ -78,7 +78,7 @@ const Sidebar = ({
         })}
       </nav>
 
-      {dropzone ? <div className="px-4 pb-4">{dropzone}</div> : null}
+      {dropzone ? <div className="sticky bottom-0 px-4 pb-4">{dropzone}</div> : null}
       {footer ? (
         <div className="border-t border-slate-200 px-4 py-4 text-xs text-slate-400 dark:border-slate-700 dark:text-slate-500">
           {footer}
