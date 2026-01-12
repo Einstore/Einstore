@@ -903,12 +903,56 @@ const LatestBuildsRoute = ({
     };
   }, [builds, activeTeamId]);
 
+  const installBuild = useCallback(
+    async (buildId: string) => {
+      try {
+        const payload = await apiFetch<{ itmsServicesUrl?: string; downloadUrl?: string }>(
+          `/builds/${buildId}/ios/install-link`,
+          {
+            method: "POST",
+            headers: { "x-team-id": activeTeamId },
+          }
+        );
+        if (payload?.itmsServicesUrl) {
+          window.location.href = payload.itmsServicesUrl;
+        } else if (payload?.downloadUrl) {
+          window.open(payload.downloadUrl, "_blank", "noopener,noreferrer");
+        }
+      } catch {
+        // ignore install errors for now
+      }
+    },
+    [activeTeamId]
+  );
+
+  const downloadBuild = useCallback(
+    async (buildId: string) => {
+      try {
+        const payload = await apiFetch<{ downloadUrl?: string }>(
+          `/builds/${buildId}/ios/install-link`,
+          {
+            method: "POST",
+            headers: { "x-team-id": activeTeamId },
+          }
+        );
+        if (payload?.downloadUrl) {
+          window.open(payload.downloadUrl, "_blank", "noopener,noreferrer");
+        }
+      } catch {
+        // ignore download errors for now
+      }
+    },
+    [activeTeamId]
+  );
+
   return (
     <BuildsPage
       builds={builds}
       buildIcons={buildIcons}
       buildPlatforms={buildPlatforms}
       onSelectBuild={(id) => navigate(`/builds/${id}`)}
+      onInstallBuild={installBuild}
+      onDownloadBuild={downloadBuild}
       pagination={pagination}
       onPageChange={setPage}
       onPerPageChange={(nextPerPage) => {
@@ -949,13 +993,13 @@ const AppBuildsRoute = ({
   const installBuild = useCallback(
     async (buildId: string) => {
       try {
-        const payload = await apiFetch<{
-          itmsServicesUrl?: string;
-          downloadUrl?: string;
-        }>(`/builds/${buildId}/ios/install-link`, {
-          method: "POST",
-          headers: { "x-team-id": activeTeamId },
-        });
+        const payload = await apiFetch<{ itmsServicesUrl?: string; downloadUrl?: string }>(
+          `/builds/${buildId}/ios/install-link`,
+          {
+            method: "POST",
+            headers: { "x-team-id": activeTeamId },
+          }
+        );
         if (payload?.itmsServicesUrl) {
           window.location.href = payload.itmsServicesUrl;
           return;
