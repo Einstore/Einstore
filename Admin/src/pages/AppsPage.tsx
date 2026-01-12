@@ -67,9 +67,41 @@ const AppsPage = ({
               })}
             </div>
           </div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Apps
-          </p>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setViewMode("grid")}
+              className={`flex h-11 w-11 items-center justify-center rounded-lg border transition-colors ${
+                viewMode === "grid"
+                  ? "border-indigo-500 bg-indigo-50 text-indigo-600 dark:border-indigo-400/60 dark:bg-indigo-500/20 dark:text-indigo-300"
+                  : "border-slate-200 bg-white text-slate-500 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+              }`}
+              aria-label="Grid view"
+              aria-pressed={viewMode === "grid"}
+            >
+              <svg
+                className="h-4 w-4"
+                viewBox="0 0 448 448"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M128 136c0-22.1-17.9-40-40-40L40 96C17.9 96 0 113.9 0 136l0 48c0 22.1 17.9 40 40 40l48 0c22.1 0 40-17.9 40-40l0-48zm0 192c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40l0 48c0 22.1 17.9 40 40 40l48 0c22.1 0 40-17.9 40-40l0-48zm32-192l0 48c0 22.1 17.9 40 40 40l48 0c22.1 0 40-17.9 40-40l0-48c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40zM288 328c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40l0 48c0 22.1 17.9 40 40 40l48 0c22.1 0 40-17.9 40-40l0-48zm32-192l0 48c0 22.1 17.9 40 40 40l48 0c22.1 0 40-17.9 40-40l0-48c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40zM448 328c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40l0 48c0 22.1 17.9 40 40 40l48 0c22.1 0 40-17.9 40-40l0-48z" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("list")}
+              className={`flex h-11 w-11 items-center justify-center rounded-lg border transition-colors ${
+                viewMode === "list"
+                  ? "border-indigo-500 bg-indigo-50 text-indigo-600 dark:border-indigo-400/60 dark:bg-indigo-500/20 dark:text-indigo-300"
+                  : "border-slate-200 bg-white text-slate-500 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+              }`}
+              aria-label="List view"
+              aria-pressed={viewMode === "list"}
+            >
+              <Icon name="list" className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </Panel>
       {apps.length ? (
