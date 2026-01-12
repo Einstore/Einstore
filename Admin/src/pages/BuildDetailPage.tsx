@@ -20,6 +20,7 @@ import Pagination from "../components/Pagination";
 import type { PaginationMeta } from "../lib/pagination";
 import CommentsPanel from "../components/CommentsPanel";
 import type { ApiComment } from "../lib/comments";
+import { canInstallForPlatforms } from "../lib/platform";
 
 const metadataDescriptionMap = { ...infoPlistKeyDescriptionMap, ...androidManifestKeyDescriptionMap };
 
@@ -142,6 +143,7 @@ const BuildDetailPage = ({
   const created = formatDateTime(build?.createdAt);
   const signingIssuer = build?.signing?.issuer ?? "—";
   const signingSubject = build?.signing?.subject ?? "—";
+  const canInstall = canInstallForPlatforms(build?.targets?.map((target) => target.platform) ?? []);
   const artifactsByKind = build?.artifactsByKind ?? {};
   const artifactGroups = Object.entries(artifactsByKind).map(([kind, items]) => {
     const unique = (items ?? []).filter(Boolean).reduce<ApiArtifact[]>((acc, current) => {
@@ -225,14 +227,16 @@ const BuildDetailPage = ({
                 <StatusPill status="running" label={`Build ${buildNumber}`} />
               </div>
               <div className="flex flex-wrap justify-center gap-3 pt-2">
-                <button
-                  type="button"
-                  className="h-10 rounded-lg bg-indigo-600 px-4 text-xs font-semibold text-white hover:bg-indigo-500"
-                  onClick={() => build?.id && onInstall?.(build.id)}
-                  disabled={!build}
-                >
-                  Install
-                </button>
+                {canInstall ? (
+                  <button
+                    type="button"
+                    className="h-10 rounded-lg bg-indigo-600 px-4 text-xs font-semibold text-white hover:bg-indigo-500"
+                    onClick={() => build?.id && onInstall?.(build.id)}
+                    disabled={!build}
+                  >
+                    Install
+                  </button>
+                ) : null}
                 <button
                   type="button"
                   className="h-10 rounded-lg border border-slate-300 px-4 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
