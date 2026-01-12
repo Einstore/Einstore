@@ -4,12 +4,14 @@ import { pipeline } from "node:stream/promises";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { GetObjectCommand, HeadObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { ingestAndroidApk } from "../lib/ingest/android.js";
 import { ingestIosIpa } from "../lib/ingest/ios.js";
 import { ensureZipReadable, isInvalidArchiveError } from "../lib/zip.js";
 import { requireTeamOrApiKey } from "../auth/guard.js";
 import { broadcastBadgesUpdate } from "../lib/realtime.js";
 import { prisma } from "../lib/prisma.js";
+import { resolveS3Client, presignPutObject } from "../lib/storage-presign.js";
 
 const ingestSchema = z.object({
   buildId: z.string().uuid().optional(),
@@ -21,6 +23,17 @@ type IngestRequest = z.infer<typeof ingestSchema>;
 const allowedUploadExtensions = new Set([".apk", ".ipa"]);
 const STORAGE_LIMIT_SETTING_KEY = "storage.defaultLimitGb";
 const ONE_GB_BYTES = 1024n * 1024n * 1024n;
+const PRESIGNED_TTL_SECONDS = 900;
+const presignUploadSchema = z.object({
+  filename: z.string().min(1),
+  sizeBytes: z.coerce.number().int().positive(),
+  contentType: z.string().optional(),
+});
+const completeUploadSchema = z.object({
+  key: z.string().min(1),
+  filename: z.string().min(1).optional(),
+  sizeBytes: z.coerce.number().int().positive().optional(),
+});
 
 const parseContentLength = (value: unknown) => {
   const raw = Array.isArray(value) ? value[0] : value;
@@ -121,7 +134,171 @@ const ensureStorageCapacity = async (teamId: string, requiredBytes: bigint) => {
   );
 };
 
+const resolveSpacesConfig = () => {
+  const client = resolveS3Client();
+  const bucket = process.env.SPACES_BUCKET;
+  if (!client || !bucket) return null;
+  return { client, bucket };
+};
+
+const headSpacesObject = async (bucket: string, key: string) => {
+  const spaces = resolveSpacesConfig();
+  if (!spaces) return null;
+  const response = await spaces.client.send(new HeadObjectCommand({ Bucket: bucket, Key: key }));
+  return {
+    size: typeof response.ContentLength === "number" ? BigInt(response.ContentLength) : null,
+    contentType: response.ContentType ?? null,
+  };
+};
+
+const downloadSpacesObject = async (bucket: string, key: string, extension: string) => {
+  const spaces = resolveSpacesConfig();
+  if (!spaces) {
+    throw new Error("Spaces not configured");
+  }
+  const uploadDir = path.resolve(process.cwd(), "storage", "uploads");
+  await fs.promises.mkdir(uploadDir, { recursive: true });
+  const filePath = path.join(uploadDir, `${crypto.randomUUID()}${extension}`);
+  const object = await spaces.client.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
+  if (!object.Body) {
+    throw new Error("Empty object");
+  }
+  await pipeline(object.Body as NodeJS.ReadableStream, fs.createWriteStream(filePath));
+  const stats = await fs.promises.stat(filePath);
+  return { filePath, sizeBytes: BigInt(stats.size) };
+};
+
+const deleteSpacesObject = async (bucket: string, key: string) => {
+  const spaces = resolveSpacesConfig();
+  if (!spaces) return;
+  await spaces.client.send(new DeleteObjectCommand({ Bucket: bucket, Key: key })).catch(() => undefined);
+};
+
 export async function pipelineRoutes(app: FastifyInstance) {
+  app.post("/ingest/upload-url", { preHandler: requireTeamOrApiKey }, async (request, reply) => {
+    const parsed = presignUploadSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return reply.status(400).send({ error: "Invalid payload" });
+    }
+    const teamId = request.team?.id;
+    if (!teamId) {
+      return reply.status(403).send({ error: "team_required", message: "Team context required" });
+    }
+    const spaces = resolveSpacesConfig();
+    if (!spaces) {
+      return reply.status(500).send({ error: "storage_not_configured" });
+    }
+    const extension = path.extname(parsed.data.filename).toLowerCase();
+    if (!allowedUploadExtensions.has(extension)) {
+      return reply.status(400).send({ error: "unsupported_file_type" });
+    }
+    const sizeBytes = BigInt(parsed.data.sizeBytes);
+    try {
+      await ensureStorageCapacity(teamId, sizeBytes);
+    } catch (error) {
+      if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
+        return reply
+          .status((error as { statusCode?: number }).statusCode ?? 413)
+          .send({ error: "storage_limit_exceeded", message: (error as { message?: string }).message });
+      }
+      throw error;
+    }
+    const key = `ingest/${teamId}/${crypto.randomUUID()}${extension}`;
+    const contentType = parsed.data.contentType || "application/octet-stream";
+    const uploadUrl = await presignPutObject({
+      bucket: spaces.bucket,
+      key,
+      expiresIn: PRESIGNED_TTL_SECONDS,
+      contentType,
+      contentLength: parsed.data.sizeBytes,
+    });
+    return reply.send({
+      uploadUrl,
+      key,
+      expiresIn: PRESIGNED_TTL_SECONDS,
+      headers: { "Content-Type": contentType },
+    });
+  });
+
+  app.post("/ingest/complete-upload", { preHandler: requireTeamOrApiKey }, async (request, reply) => {
+    const parsed = completeUploadSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return reply.status(400).send({ error: "Invalid payload" });
+    }
+    const teamId = request.team?.id;
+    if (!teamId) {
+      return reply.status(403).send({ error: "team_required", message: "Team context required" });
+    }
+    const spaces = resolveSpacesConfig();
+    if (!spaces) {
+      return reply.status(500).send({ error: "storage_not_configured" });
+    }
+    const extension = path.extname(parsed.data.filename ?? parsed.data.key).toLowerCase();
+    if (!allowedUploadExtensions.has(extension)) {
+      return reply.status(400).send({ error: "unsupported_file_type" });
+    }
+    const head = await headSpacesObject(spaces.bucket, parsed.data.key);
+    const expectedSize = head?.size ?? (parsed.data.sizeBytes ? BigInt(parsed.data.sizeBytes) : null);
+    if (!expectedSize || expectedSize <= 0) {
+      return reply.status(411).send({ error: "content_length_required" });
+    }
+    try {
+      await ensureStorageCapacity(teamId, expectedSize);
+    } catch (error) {
+      if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
+        return reply
+          .status((error as { statusCode?: number }).statusCode ?? 413)
+          .send({ error: "storage_limit_exceeded", message: (error as { message?: string }).message });
+      }
+      throw error;
+    }
+
+    let filePath: string | null = null;
+    try {
+      const download = await downloadSpacesObject(spaces.bucket, parsed.data.key, extension);
+      filePath = download.filePath;
+      try {
+        await ensureStorageCapacity(teamId, download.sizeBytes);
+      } catch (error) {
+        await fs.promises.rm(filePath, { force: true }).catch(() => undefined);
+        if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
+          return reply
+            .status((error as { statusCode?: number }).statusCode ?? 413)
+            .send({ error: "storage_limit_exceeded", message: (error as { message?: string }).message });
+        }
+        throw error;
+      }
+      const userId = request.auth?.user.id;
+      try {
+        await ensureZipReadable(filePath);
+      } catch (error) {
+        if (isInvalidArchiveError(error)) {
+          await fs.promises.rm(filePath, { force: true });
+          return reply.status(400).send({ error: "invalid_archive" });
+        }
+        throw error;
+      }
+      if (extension === ".apk") {
+        const result = await ingestAndroidApk(filePath, teamId, userId);
+        await deleteSpacesObject(spaces.bucket, parsed.data.key);
+        await broadcastBadgesUpdate(teamId).catch(() => undefined);
+        return reply.status(201).send({ status: "ingested", result });
+      }
+      const result = await ingestIosIpa(filePath, teamId, userId);
+      await deleteSpacesObject(spaces.bucket, parsed.data.key);
+      await broadcastBadgesUpdate(teamId).catch(() => undefined);
+      return reply.status(201).send({ status: "ingested", result });
+    } catch (error) {
+      if (filePath) {
+        await fs.promises.rm(filePath, { force: true }).catch(() => undefined);
+      }
+      if (isInvalidArchiveError(error)) {
+        return reply.status(400).send({ error: "invalid_archive" });
+      }
+      throw error;
+    }
+  });
+
   app.post("/ingest", { preHandler: requireTeamOrApiKey }, async (request, reply) => {
     const parsed = ingestSchema.safeParse(request.body);
     if (!parsed.success) {

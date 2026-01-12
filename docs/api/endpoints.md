@@ -707,13 +707,31 @@ Optional tracking metadata shared by download/install endpoints.
 - Notes:
   - Errors: `400 invalid_archive` when the IPA/APK is not a valid zip archive.
 
+## POST /ingest/upload-url
+- Purpose: Get a pre-signed Spaces URL for large IPA/APK uploads
+- Auth scope: Bearer (rafiki270/auth) or `x-api-key` (CI uploads)
+- Request schema: `{ filename: string, sizeBytes: number, contentType?: string }`
+- Response schema: `{ uploadUrl: string, key: string, expiresIn: number, headers: Record<string,string> }`
+- Side effects: Reserves storage quota and returns a pre-signed PUT URL; caller must upload the file and then finalize via `/ingest/complete-upload`.
+- Platform relevance: ios, android
+
+## POST /ingest/complete-upload
+- Purpose: Finalize a pre-signed upload and ingest the IPA/APK
+- Auth scope: Bearer (rafiki270/auth) or `x-api-key` (CI uploads)
+- Request schema: `{ key: string, filename?: string, sizeBytes?: number }`
+- Response schema: `{ status: string, result: object }`
+- Side effects: Downloads the uploaded file from Spaces, validates it, ingests metadata, and cleans up the temporary object.
+- Platform relevance: ios, android
+- Notes:
+  - Errors: `400 invalid_archive` when the IPA/APK is not a valid zip archive.
+
 ## POST /store/upload
 - Purpose: Upload a binary directly to Einstore storage (any file type)
 - Auth scope: Team or API key (`x-api-key` header or `token` query param)
 - Request schema: multipart form with `file`; `token` query param supported as an alternative to header auth
 - Response schema: `{ "status": "stored", "filePath": "storage/uploads/<generated>", "filename": "original.ext", "sizeBytes": 123, "teamId": "team" }`
 - Side effects: Stores the file locally (subject to storage quota and purge rules)
-- Notes: Request must include `Content-Length` for quota checks; oldest builds are purged automatically to free space (never deletes the last build of an app).
+- Notes: `Content-Length` is preferred for quota checks; oldest builds are purged automatically to free space (never deletes the last build of an app).
 
 ## POST /feature-flags
 - Purpose: Create/ensure feature flag
