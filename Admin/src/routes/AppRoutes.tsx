@@ -441,41 +441,64 @@ const AppRoutes = () => {
         throw toError("INGEST-TOO-LARGE", "File exceeds 8GB limit");
       }
 
-      const presign = await apiFetch<{ uploadUrl: string; key: string; headers?: Record<string, string> }>(
-        "/ingest/upload-url",
-        {
-          method: "POST",
-          body: JSON.stringify({ filename: file.name, sizeBytes: file.size, contentType }),
+      let primaryError: Error | null = null;
+
+      try {
+        const presign = await apiFetch<{ uploadUrl: string; key: string; headers?: Record<string, string> }>(
+          "/ingest/upload-url",
+          {
+            method: "POST",
+            body: JSON.stringify({ filename: file.name, sizeBytes: file.size, contentType }),
+          }
+        ).catch((err) => {
+          throw toError("INGEST-PRESIGN", err instanceof Error ? err.message : "Could not create upload link");
+        });
+
+        const headers = new Headers(presign.headers);
+        if (!headers.has("Content-Type")) {
+          headers.set("Content-Type", contentType);
         }
-      ).catch((err) => {
-        throw toError("INGEST-PRESIGN", err instanceof Error ? err.message : "Could not create upload link");
-      });
 
-      const headers = new Headers(presign.headers);
-      if (!headers.has("Content-Type")) {
-        headers.set("Content-Type", contentType);
+        const uploadResponse = await fetch(presign.uploadUrl, {
+          method: "PUT",
+          headers,
+          body: file,
+        }).catch((err) => {
+          throw toError("INGEST-PUT-NET", err instanceof Error ? err.message : "Upload network error");
+        });
+
+        if (!uploadResponse.ok) {
+          const code = uploadResponse.status === 403 ? "INGEST-CORS" : "INGEST-PUT";
+          const msg = uploadResponse.status === 403 ? "Upload blocked by storage CORS/ACL" : "Upload failed";
+          throw toError(code, `${msg} (status ${uploadResponse.status})`);
+        }
+
+        await apiFetch("/ingest/complete-upload", {
+          method: "POST",
+          body: JSON.stringify({ key: presign.key, filename: file.name, sizeBytes: file.size }),
+        }).catch((err) => {
+          throw toError("INGEST-COMPLETE", err instanceof Error ? err.message : "Finalize failed");
+        });
+      } catch (err) {
+        primaryError = err instanceof Error ? err : toError("INGEST-UNKNOWN", "Upload failed");
+        // Fallback to legacy multipart upload
+        const fallbackForm = new FormData();
+        fallbackForm.append("file", file);
+        try {
+          await apiUpload("/ingest/upload", fallbackForm);
+        } catch (fallbackErr) {
+          const fallbackCode =
+            fallbackErr instanceof Error && (fallbackErr as any).code
+              ? (fallbackErr as any).code
+              : "INGEST-FALLBACK";
+          const message =
+            fallbackErr instanceof Error ? fallbackErr.message : "Fallback upload failed";
+          throw toError(
+            fallbackCode,
+            `${message}; primary=${primaryError.message}`
+          );
+        }
       }
-
-      const uploadResponse = await fetch(presign.uploadUrl, {
-        method: "PUT",
-        headers,
-        body: file,
-      }).catch((err) => {
-        throw toError("INGEST-PUT-NET", err instanceof Error ? err.message : "Upload network error");
-      });
-
-      if (!uploadResponse.ok) {
-        const code = uploadResponse.status === 403 ? "INGEST-CORS" : "INGEST-PUT";
-        const msg = uploadResponse.status === 403 ? "Upload blocked by storage CORS/ACL" : "Upload failed";
-        throw toError(code, `${msg} (status ${uploadResponse.status})`);
-      }
-
-      await apiFetch("/ingest/complete-upload", {
-        method: "POST",
-        body: JSON.stringify({ key: presign.key, filename: file.name, sizeBytes: file.size }),
-      }).catch((err) => {
-        throw toError("INGEST-COMPLETE", err instanceof Error ? err.message : "Finalize failed");
-      });
 
       await loadApps();
       setIngestNonce((current) => current + 1);
