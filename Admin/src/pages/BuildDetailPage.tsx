@@ -282,6 +282,23 @@ const BuildDetailPage = ({
                 disabled={isSavingTags}
                 placeholder="Add a tag (e.g. release, beta, hotfix)"
               />
+              {tags.length ? (
+                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                  <span className="font-semibold uppercase tracking-wide">Saved</span>
+                  {tags.map((tag) => (
+                    <span
+                      key={tag.id}
+                      className="rounded-full bg-slate-100 px-3 py-1 text-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                    >
+                      {tag.name}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  No tags yet. Add some to make search easier.
+                </p>
+              )}
               <div className="flex flex-wrap items-center gap-3">
                 <button
                   type="button"

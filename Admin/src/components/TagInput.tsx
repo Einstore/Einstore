@@ -9,7 +9,7 @@ type TagInputProps = {
   disabled?: boolean;
 };
 
-const cleanTag = (value: string) => value.trim().replace(/\s+/g, " ");
+const cleanTag = (value: string) => value.trim().replace(/\s+/g, " ").toLowerCase();
 
 const TagInput = ({ value, onChange, suggestions = [], placeholder, disabled }: TagInputProps) => {
   const [input, setInput] = useState("");

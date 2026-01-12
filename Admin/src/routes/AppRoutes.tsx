@@ -769,10 +769,11 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
         setIsSavingTags(true);
         setTagError(null);
         try {
+          const normalized = nextTags.map((tag) => tag.trim().toLowerCase());
           const payload = await apiFetch<{ tags: ApiTag[] }>(`/builds/${buildId}/tags`, {
             method: "PUT",
             headers: { "Content-Type": "application/json", "x-team-id": activeTeamId },
-            body: JSON.stringify({ tags: nextTags }),
+            body: JSON.stringify({ tags: normalized }),
           });
           setTags(payload?.tags ?? []);
           setLastSavedTagsAt(new Date().toLocaleTimeString());
