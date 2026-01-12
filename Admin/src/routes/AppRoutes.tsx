@@ -81,6 +81,19 @@ const AppRoutes = () => {
   const envAnalyticsKey = import.meta.env.VITE_ANALYTICS_KEY ?? "";
   const [previewBuilds, setPreviewBuilds] = useState<SearchBuildResult[]>([]);
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
+  const {
+    hasToken,
+    isSuperUser,
+    teams,
+    activeTeamId,
+    teamMembers,
+    isAdmin,
+    selectTeam,
+    createTeam,
+    badges,
+    me,
+  } = useSessionState(location.pathname);
+  const isSaas = import.meta.env.VITE_SAAS === "true";
   const uploadDebugInfo = useMemo(() => {
     const accessToken = localStorage.getItem("accessToken");
     const refreshToken = localStorage.getItem("refreshToken");
@@ -96,19 +109,6 @@ const AppRoutes = () => {
       2
     );
   }, [activeTeamId]);
-  const {
-    hasToken,
-    isSuperUser,
-    teams,
-    activeTeamId,
-    teamMembers,
-    isAdmin,
-    selectTeam,
-    createTeam,
-    badges,
-    me,
-  } = useSessionState(location.pathname);
-  const isSaas = import.meta.env.VITE_SAAS === "true";
 
   const loadApps = useCallback(async () => {
     if (!activeTeamId) {
