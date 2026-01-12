@@ -9,6 +9,7 @@ import type { ApiApp } from "../lib/apps";
 import type { PaginationMeta } from "../lib/pagination";
 
 const VIEW_MODE_COOKIE = "apps_view_mode";
+const PLATFORM_COOKIE = "apps_platform";
 
 const readViewModeCookie = (): "list" | "grid" => {
   if (typeof document === "undefined") return "list";
@@ -24,6 +25,23 @@ const writeViewModeCookie = (mode: "list" | "grid") => {
   if (typeof document === "undefined") return;
   const maxAge = 60 * 60 * 24 * 180; // ~6 months
   document.cookie = `${VIEW_MODE_COOKIE}=${mode}; path=/; max-age=${maxAge}`;
+};
+
+const readPlatformCookie = (): string => {
+  if (typeof document === "undefined") return "all";
+  const match = document.cookie
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${PLATFORM_COOKIE}=`));
+  const value = match?.split("=")[1];
+  return value === "ios" || value === "android" ? value : "all";
+};
+
+const writePlatformCookie = (value: string) => {
+  if (typeof document === "undefined") return;
+  const normalized = value === "ios" || value === "android" ? value : "all";
+  const maxAge = 60 * 60 * 24 * 180;
+  document.cookie = `${PLATFORM_COOKIE}=${normalized}; path=/; max-age=${maxAge}`;
 };
 
 type AppsPageProps = {
@@ -50,6 +68,14 @@ const AppsPage = ({
   onUpload,
 }: AppsPageProps) => {
   const [viewMode, setViewMode] = useState<"list" | "grid">(() => readViewModeCookie());
+  const [platformValue, setPlatformValue] = useState<string>(() => readPlatformCookie());
+
+  const handlePlatformChange = (value: string) => {
+    const next = value === "ios" || value === "android" ? value : "all";
+    setPlatformValue(next);
+    writePlatformCookie(next);
+    onPlatformChange(next);
+  };
 
   const handleViewChange = (mode: "list" | "grid") => {
     setViewMode(mode);
@@ -70,12 +96,12 @@ const AppsPage = ({
                 { id: "ios", label: "iOS", icon: "ios" },
                 { id: "android", label: "Android", icon: "android" },
               ].map((option) => {
-                const isActive = platform === option.id;
+                const isActive = platformValue === option.id;
                 return (
                   <button
                     key={option.id}
                     type="button"
-                    onClick={() => onPlatformChange(option.id)}
+                    onClick={() => handlePlatformChange(option.id)}
                     className={`flex h-11 items-center gap-2 rounded-lg border px-4 text-sm font-medium transition-colors ${
                       isActive
                         ? "border-indigo-500 bg-indigo-50 text-indigo-600 dark:border-indigo-400/60 dark:bg-indigo-500/20 dark:text-indigo-300"
@@ -135,6 +161,7 @@ const AppsPage = ({
             onSelectApp={onSelectApp}
             viewMode={viewMode}
             onViewChange={handleViewChange}
+            platform={platformValue}
           />
           <Pagination
             page={pagination.page}
