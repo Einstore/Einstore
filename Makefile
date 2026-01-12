@@ -10,7 +10,6 @@ DEV_ADMIN_PORT ?= 8101
 DEV_API_DOMAIN ?= api.local.einstore.pro
 DEV_ADMIN_DOMAIN ?= admin.local.einstore.pro
 DEV_WEB_DOMAIN ?= local.einstore.pro
-DEV_CADDYFILE ?= ./Caddyfile.dev
 DEV_CORS_ORIGINS ?= https://$(DEV_ADMIN_DOMAIN),https://$(DEV_WEB_DOMAIN),http://$(DEV_ADMIN_DOMAIN),http://$(DEV_WEB_DOMAIN),http://localhost:8101
 DEV_VITE_API_BASE_URL ?= https://$(DEV_API_DOMAIN)
 DEV_INBOUND_EMAIL_DOMAIN ?= $(DEV_WEB_DOMAIN)
