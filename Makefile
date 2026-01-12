@@ -56,23 +56,8 @@ launch:
 			docker stop $$CONTAINERS; \
 		fi; \
 	fi; \
-	if ! command -v caddy >/dev/null 2>&1; then \
-		echo "Caddy is required for dev domain routing. Install it from https://caddyserver.com/docs/install." >&2; \
-		exit 1; \
-	fi; \
-	if pgrep -x caddy >/dev/null 2>&1; then \
-		echo "Another caddy instance is already running; stop it before running 'make launch' to avoid port conflicts." >&2; \
-		exit 1; \
-	fi; \
-	API_HOST=$(DEV_API_DOMAIN) \
-	API_PORT=$(DEV_API_PORT) \
-	ADMIN_HOST=$(DEV_ADMIN_DOMAIN) \
-	ADMIN_PORT=$(DEV_ADMIN_PORT) \
-	WEB_HOST=$(DEV_WEB_DOMAIN) \
-	caddy validate --config $(DEV_CADDYFILE) --adapter caddyfile >/dev/null; \
-	API_PID=""; ADMIN_PID=""; CADDY_PID=""; \
+	API_PID=""; ADMIN_PID=""; \
 	cleanup() { \
-		[ -n "$$CADDY_PID" ] && kill "$$CADDY_PID" 2>/dev/null || true; \
 		[ -n "$$ADMIN_PID" ] && kill "$$ADMIN_PID" 2>/dev/null || true; \
 		[ -n "$$API_PID" ] && kill "$$API_PID" 2>/dev/null || true; \
 	}; \
@@ -92,14 +77,7 @@ launch:
 		VITE_API_BASE_URL=$(DEV_VITE_API_BASE_URL) \
 		npm run dev & \
 	ADMIN_PID=$$!; \
-	API_HOST=$(DEV_API_DOMAIN) \
-	API_PORT=$(DEV_API_PORT) \
-	ADMIN_HOST=$(DEV_ADMIN_DOMAIN) \
-	ADMIN_PORT=$(DEV_ADMIN_PORT) \
-	WEB_HOST=$(DEV_WEB_DOMAIN) \
-	caddy run --config $(DEV_CADDYFILE) --adapter caddyfile & \
-	CADDY_PID=$$!; \
-	wait $$API_PID $$ADMIN_PID $$CADDY_PID; \
+	wait $$API_PID $$ADMIN_PID; \
 	trap - INT TERM EXIT
 
 migrate:
