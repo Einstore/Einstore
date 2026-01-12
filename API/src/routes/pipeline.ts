@@ -210,7 +210,6 @@ export async function pipelineRoutes(app: FastifyInstance) {
       key,
       expiresIn: PRESIGNED_TTL_SECONDS,
       contentType,
-      contentLength: parsed.data.sizeBytes,
     });
     return reply.send({
       uploadUrl,

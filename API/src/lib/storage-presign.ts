@@ -37,7 +37,6 @@ type PresignPutInput = {
   key: string;
   expiresIn?: number;
   contentType?: string;
-  contentLength?: number;
 };
 
 export const presignPutObject = async ({
@@ -45,7 +44,6 @@ export const presignPutObject = async ({
   key,
   expiresIn = 900,
   contentType,
-  contentLength,
 }: PresignPutInput) => {
   const client = resolveS3Client();
   if (!client) {
@@ -55,7 +53,6 @@ export const presignPutObject = async ({
     Bucket: bucket,
     Key: key,
     ContentType: contentType,
-    ContentLength: contentLength,
   });
   return getSignedUrl(client, command, { expiresIn });
 };
