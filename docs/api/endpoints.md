@@ -196,7 +196,7 @@ Team-scoped endpoints:
 - Auth scope: Bearer (rafiki270/auth) + Team membership
 - Request schema: `{ platform?: PlatformKind, targetId?: string, deviceId?: string, metadata?: TrackingMetadata }`
 - Response schema: `{ items: TrackingEvent[] }`
-- Side effects: Creates one row per requested service
+- Side effects: Creates one row per requested service (analytics, errors, distribution, devices, usage, crashes)
 - Platform relevance: all
 
 ## Planned Crash API (coming soon)
@@ -390,6 +390,30 @@ Optional tracking metadata shared by download/install endpoints.
 - Request schema: `{ email: string }`
 - Response schema: `{ user: TeamUser }`
 - Side effects: Creates TeamMember
+- Platform relevance: all
+
+## POST /teams/{teamId}/invites
+- Purpose: Create an invitation link for a team
+- Auth scope: Bearer (rafiki270/auth) + Team role (owner/admin)
+- Request schema: `{ maxUses?: number (0 = unlimited), allowedDomain?: string }`
+- Response schema: `{ invite: { token: string, path: string, maxUses: number, remainingUses: number|null, allowedDomain?: string|null } }`
+- Side effects: Creates TeamInvite
+- Platform relevance: all
+
+## GET /invites/{token}
+- Purpose: Inspect an invitation before accepting
+- Auth scope: Public
+- Request schema: path `{ token: string }` (token or full URL)
+- Response schema: `{ invite: { token: string, teamId: string, teamName: string, teamSlug: string, allowedDomain?: string|null, maxUses: number, remainingUses: number|null } }`
+- Side effects: none
+- Platform relevance: all
+
+## POST /invites/{token}/accept
+- Purpose: Accept an invitation and join the team
+- Auth scope: Bearer (rafiki270/auth)
+- Request schema: path `{ token: string }`
+- Response schema: `{ teamId: string, teamName: string, joined: boolean, alreadyMember: boolean, remainingUses?: number|null }`
+- Side effects: Adds TeamMember (role=member), increments usage (unless already member), sets last active team
 - Platform relevance: all
 
 ## PATCH /teams/{teamId}/users/{userId}

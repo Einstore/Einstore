@@ -1824,7 +1824,8 @@
                 "errors",
                 "distribution",
                 "devices",
-                "usage"
+                "usage",
+                "crashes"
               ],
               "type": "string"
             }
@@ -3134,6 +3135,57 @@
         "summary": "Search apps and builds (includes tags)"
       }
     },
+    "/settings/storage-limit": {
+      "get": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Default storage limit"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get default storage limit (GB)"
+      },
+      "put": {
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "defaultLimitGb": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "defaultLimitGb"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Updated storage limit"
+          },
+          "400": {
+            "description": "Invalid limit"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Update default storage limit (GB)"
+      }
+    },
     "/storage": {
       "get": {
         "parameters": [
@@ -3915,57 +3967,6 @@
           }
         ],
         "summary": "Get version"
-      }
-    },
-    "/settings/storage-limit": {
-      "get": {
-        "summary": "Get default storage limit (GB)",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Default storage limit"
-          }
-        }
-      },
-      "put": {
-        "summary": "Update default storage limit (GB)",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "defaultLimitGb": {
-                    "type": "number"
-                  }
-                },
-                "required": [
-                  "defaultLimitGb"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Updated storage limit"
-          },
-          "400": {
-            "description": "Invalid limit"
-          }
-        }
       }
     },
     "/ws": {

@@ -58,6 +58,7 @@ enum TrackingService {
   distribution
   devices
   usage
+  crashes
 }
 
 enum UserStatus {
@@ -296,6 +297,7 @@ model User {
   authCodes           AuthCode[]
   passwordResetTokens PasswordResetToken[]
   teamMemberships     TeamMember[]
+  createdInvites      TeamInvite[]        @relation("TeamInviteCreator")
   createdTeams        Team[]               @relation("TeamOwner")
   lastActiveTeam      Team?                @relation("LastActiveTeam", fields: [lastActiveTeamId], references: [id])
   userTeamSettings    UserTeamSetting[]
@@ -433,6 +435,7 @@ model Team {
   apiKeys         ApiKey[]
   tags            Tag[]
   trackingEvents  TrackingEvent[]
+  invites         TeamInvite[]
 }
 
 model TeamMember {
@@ -520,6 +523,10 @@ model TrackingEvent {
   distribution           Json?
   device                 Json?
   usage                  Json?
+  crash                  Json?
+  environment            String?
+  binaryHash             String?
+  signingCertHash        String?
   custom                 Json?
   occurredAt             DateTime         @default(now())
   createdAt              DateTime         @default(now())
@@ -532,6 +539,22 @@ model TrackingEvent {
   @@index([teamId])
   @@index([service])
   @@index([occurredAt])
+}
+
+model TeamInvite {
+  id              String   @id @default(uuid())
+  teamId          String
+  token           String   @unique
+  createdByUserId String
+  maxUses         Int      @default(0)
+  usedCount       Int      @default(0)
+  allowedDomain   String?
+  createdAt       DateTime @default(now())
+
+  team            Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  createdByUser   User     @relation("TeamInviteCreator", fields: [createdByUserId], references: [id], onDelete: Cascade)
+
+  @@index([teamId])
 }
 
 model Tag {

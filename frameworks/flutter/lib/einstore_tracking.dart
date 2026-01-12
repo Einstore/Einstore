@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class EinstoreTrackingException implements Exception {
   EinstoreTrackingException(this.message);
@@ -10,7 +11,7 @@ class EinstoreTrackingException implements Exception {
   String toString() => "EinstoreTrackingException: $message";
 }
 
-enum EinstoreService { analytics, errors, distribution, devices, usage }
+enum EinstoreService { analytics, errors, distribution, devices, usage, crashes }
 
 abstract class LaunchStore {
   Future<bool> hasLaunched(String key);
@@ -47,6 +48,7 @@ class EinstoreTrackingConfig {
     Map<String, Object?>? userProperties,
     this.launchKey,
     LaunchStore? launchStore,
+    bool? crashEnabled,
   })  : headers = headers ?? <String, String>{},
         baseUrl = baseUrl ?? Uri.parse("https://api.einstore.dev"),
         buildId = buildId,
@@ -56,7 +58,8 @@ class EinstoreTrackingConfig {
         distributionInfo = distributionInfo ?? <String, Object?>{},
         deviceInfo = deviceInfo ?? <String, Object?>{},
         userProperties = userProperties ?? <String, Object?>{},
-        launchStore = launchStore ?? MemoryLaunchStore();
+        launchStore = launchStore ?? MemoryLaunchStore(),
+        crashEnabled = crashEnabled ?? false;
 
   final Uri? baseUrl;
   final String? buildId;
@@ -74,6 +77,7 @@ class EinstoreTrackingConfig {
   final Map<String, Object?> userProperties;
   final String? launchKey;
   final LaunchStore launchStore;
+  final bool crashEnabled;
 }
 
 class EinstoreTracker {
@@ -81,13 +85,22 @@ class EinstoreTracker {
       : _client = httpClient ?? HttpClient(),
         _sessionId = _newSessionId(),
         _sessionStart = DateTime.now().toUtc(),
-        _userProperties = Map<String, Object?>.from(config.userProperties);
+        _userProperties = Map<String, Object?>.from(config.userProperties),
+        _packageInfoFuture = PackageInfo.fromPlatform(),
+        _crashFile = "${Directory.systemTemp.path}/einstore_crashes.json" {
+    if (config.crashEnabled && _hasService(EinstoreService.crashes)) {
+      uploadPendingCrashes();
+    }
+  }
 
   final EinstoreTrackingConfig config;
   final HttpClient _client;
   String _sessionId;
   DateTime _sessionStart;
   final Map<String, Object?> _userProperties;
+  final Future<PackageInfo> _packageInfoFuture;
+  PackageInfo? _packageInfo;
+  final String _crashFile;
 
   void startNewSession() {
     _sessionId = _newSessionId();
@@ -151,8 +164,29 @@ class EinstoreTracker {
     _client.close(force: true);
   }
 
+  Future<void> recordCrash(Map<String, Object?> crash) async {
+    if (!config.crashEnabled || !_hasService(EinstoreService.crashes)) return;
+    final existing = await _loadPendingCrashes();
+    existing.add(crash);
+    await _savePendingCrashes(existing);
+  }
+
+  Future<void> uploadPendingCrashes() async {
+    if (!config.crashEnabled || !_hasService(EinstoreService.crashes)) return;
+    final crashes = await _loadPendingCrashes();
+    if (crashes.isEmpty) return;
+    for (final crash in crashes) {
+      try {
+        await _track(_eventUrl(), crash: crash);
+      } catch (_) {
+        return;
+      }
+    }
+    await _savePendingCrashes([]);
+  }
+
   Future<void> _track(Uri? url,
-      {Map<String, Object?>? event, Map<String, Object?>? errorInfo}) async {
+      {Map<String, Object?>? event, Map<String, Object?>? errorInfo, Map<String, Object?>? crash}) async {
     final resolved = url ?? _resolvedEventUrl();
     if (resolved == null) {
       throw EinstoreTrackingException("Tracking URL is required");
@@ -160,7 +194,7 @@ class EinstoreTracker {
     final request = await _client.postUrl(resolved);
     request.headers.contentType = ContentType.json;
     config.headers.forEach(request.headers.set);
-    final payload = _buildPayload(event: event, errorInfo: errorInfo);
+    final payload = await _buildPayload(event: event, errorInfo: errorInfo, crash: crash);
     request.add(utf8.encode(jsonEncode(payload)));
     final response = await request.close();
     await response.drain();
@@ -171,16 +205,17 @@ class EinstoreTracker {
     }
   }
 
-  Map<String, Object?> _buildPayload(
-      {Map<String, Object?>? event, Map<String, Object?>? errorInfo}) {
+  Future<Map<String, Object?>> _buildPayload(
+      {Map<String, Object?>? event, Map<String, Object?>? errorInfo, Map<String, Object?>? crash}) async {
     final payload = <String, Object?>{
       "platform": config.platform,
     };
     if (config.deviceId != null && config.deviceId!.isNotEmpty) {
       payload["deviceId"] = config.deviceId;
     }
-    if (config.targetId != null && config.targetId!.isNotEmpty) {
-      payload["targetId"] = config.targetId;
+    final targetId = await _resolveTargetId();
+    if (targetId != null && targetId.isNotEmpty) {
+      payload["targetId"] = targetId;
     }
 
     final metadata = <String, Object?>{
@@ -205,15 +240,26 @@ class EinstoreTracker {
       metadata["errors"] = errorInfo;
     }
 
+    if (_hasService(EinstoreService.crashes) && crash != null) {
+      final crashPayload = Map<String, Object?>.from(crash);
+      final packageInfo = await _resolvePackageInfo();
+      crashPayload.putIfAbsent("platform", () => config.platform);
+      if (packageInfo != null) {
+        crashPayload.putIfAbsent("appVersion", () => packageInfo.version);
+        crashPayload.putIfAbsent("buildNumber", () => packageInfo.buildNumber);
+      }
+      metadata["crash"] = crashPayload;
+    }
+
     if (_hasService(EinstoreService.distribution)) {
-      final distribution = _distributionPayload();
+      final distribution = await _distributionPayload();
       if (distribution.isNotEmpty) {
         metadata["distribution"] = distribution;
       }
     }
 
     if (_hasService(EinstoreService.devices)) {
-      final device = _devicePayload();
+      final device = await _devicePayload();
       if (device.isNotEmpty) {
         metadata["device"] = device;
       }
@@ -265,17 +311,68 @@ class EinstoreTracker {
     };
   }
 
-  Map<String, Object?> _distributionPayload() {
+  Future<Map<String, Object?>> _distributionPayload() async {
     final payload = Map<String, Object?>.from(config.distributionInfo);
+    final packageInfo = await _resolvePackageInfo();
+    if (packageInfo != null) {
+      payload.putIfAbsent("appVersion", () => packageInfo.version);
+      payload.putIfAbsent("buildNumber", () => packageInfo.buildNumber);
+    }
     return payload;
   }
 
-  Map<String, Object?> _devicePayload() {
+  Future<Map<String, Object?>> _devicePayload() async {
     final payload = Map<String, Object?>.from(config.deviceInfo);
     payload.putIfAbsent("osVersion", () => Platform.operatingSystemVersion);
     payload.putIfAbsent("locale", () => Platform.localeName);
     payload.putIfAbsent("platform", () => config.platform);
+    final packageInfo = await _resolvePackageInfo();
+    if (packageInfo != null) {
+      payload.putIfAbsent("appVersion", () => packageInfo.version);
+      payload.putIfAbsent("buildNumber", () => packageInfo.buildNumber);
+    }
     return payload;
+  }
+
+  Future<PackageInfo?> _resolvePackageInfo() async {
+    if (_packageInfo != null) {
+      return _packageInfo;
+    }
+    try {
+      _packageInfo = await _packageInfoFuture;
+      return _packageInfo;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<String?> _resolveTargetId() async {
+    if (config.targetId != null && config.targetId!.isNotEmpty) {
+      return config.targetId;
+    }
+    final info = await _resolvePackageInfo();
+    return info?.packageName;
+  }
+
+  Future<List<Map<String, Object?>>> _loadPendingCrashes() async {
+    final file = File(_crashFile);
+    if (!await file.exists()) return [];
+    try {
+      final text = await file.readAsString();
+      if (text.isEmpty) return [];
+      final data = jsonDecode(text);
+      if (data is List) {
+        return data.cast<Map<String, Object?>>();
+      }
+    } catch (_) {
+      return [];
+    }
+    return [];
+  }
+
+  Future<void> _savePendingCrashes(List<Map<String, Object?>> crashes) async {
+    final file = File(_crashFile);
+    await file.writeAsString(jsonEncode(crashes));
   }
 
   void _ensureServiceEnabled(EinstoreService service) {
@@ -313,14 +410,15 @@ class EinstoreTracker {
     if (provided != null) {
       return provided;
     }
-    if (config.baseUrl == null || config.buildId == null) {
+    if (config.baseUrl == null) {
       return null;
     }
-    final path = defaultPath.replaceAll("{id}", config.buildId!);
     final base = config.baseUrl!;
-    final joined = base.toString().endsWith("/")
-        ? "${base.toString()}$path"
-        : "${base.toString()}/$path";
+    final path = config.buildId != null
+        ? defaultPath.replaceAll("{id}", config.buildId!)
+        : "tracking/events";
+    final joined =
+        base.toString().endsWith("/") ? "${base.toString()}$path" : "${base.toString()}/$path";
     return Uri.parse(joined);
   }
 }

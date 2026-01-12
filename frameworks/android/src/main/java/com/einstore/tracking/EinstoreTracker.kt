@@ -18,7 +18,8 @@ enum class EinstoreService(val key: String) {
   ERRORS("errors"),
   DISTRIBUTION("distribution"),
   DEVICES("devices"),
-  USAGE("usage");
+  USAGE("usage"),
+  CRASHES("crashes");
 
   companion object {
     fun defaults(): Set<EinstoreService> = setOf(DISTRIBUTION, DEVICES)
@@ -39,7 +40,8 @@ data class EinstoreTrackingConfig(
   val services: Set<EinstoreService> = EinstoreService.defaults(),
   val distributionInfo: Map<String, Any?> = emptyMap(),
   val deviceInfo: Map<String, Any?> = emptyMap(),
-  val launchKey: String? = null
+  val launchKey: String? = null,
+  val crashEnabled: Boolean = false
 )
 
 class EinstoreTracker(
@@ -52,9 +54,16 @@ class EinstoreTracker(
 
   private val appContext = context.applicationContext
   private val preferences = appContext.getSharedPreferences("einstore_tracking", Context.MODE_PRIVATE)
+  private val crashKey = "einstore_crashes"
   private var sessionId = UUID.randomUUID().toString()
   private var sessionStartMs = System.currentTimeMillis()
   private val userProperties = mutableMapOf<String, Any?>()
+
+  init {
+    if (config.crashEnabled && config.services.contains(EinstoreService.CRASHES)) {
+      uploadPendingCrashes()
+    }
+  }
 
   fun startNewSession() {
     sessionId = UUID.randomUUID().toString()
@@ -135,6 +144,39 @@ class EinstoreTracker(
     )
   }
 
+  fun recordCrash(crash: Map<String, Any?>) {
+    if (!config.crashEnabled || !config.services.contains(EinstoreService.CRASHES)) return
+    val existing = pendingCrashes().toMutableList()
+    existing.add(crash)
+    preferences.edit().putString(crashKey, JSONArray(existing).toString()).apply()
+  }
+
+  fun uploadPendingCrashes(callback: ((Result<Unit>) -> Unit)? = null) {
+    if (!config.crashEnabled || !config.services.contains(EinstoreService.CRASHES)) {
+      callback?.invoke(Result.success(Unit))
+      return
+    }
+    val crashes = pendingCrashes()
+    if (crashes.isEmpty()) {
+      callback?.invoke(Result.success(Unit))
+      return
+    }
+    val results = mutableListOf<Result<Unit>>()
+    crashes.forEach { crash ->
+      trackAsync(resolvedEventUrl(), crash = crash, requiredService = EinstoreService.CRASHES) {
+        results.add(it)
+        if (results.size == crashes.size) {
+          if (results.any { res -> res.isFailure }) {
+            callback?.invoke(results.first { it.isFailure })
+          } else {
+            preferences.edit().remove(crashKey).apply()
+            callback?.invoke(Result.success(Unit))
+          }
+        }
+      }
+    }
+  }
+
   private fun resolvedDownloadUrl(): String? {
     return resolveUrl(config.downloadUrl, "builds/{id}/downloads")
   }
@@ -152,11 +194,15 @@ class EinstoreTracker(
       return provided
     }
     val base = config.baseUrl
-    val buildId = config.buildId
-    if (base.isNullOrBlank() || buildId.isNullOrBlank()) {
+    if (base.isNullOrBlank()) {
       return null
     }
-    val path = defaultPath.replace("{id}", buildId)
+    val buildId = config.buildId
+    val path = if (!buildId.isNullOrBlank()) {
+      defaultPath.replace("{id}", buildId)
+    } else {
+      "tracking/events"
+    }
     return if (base.endsWith("/")) base + path else "$base/$path"
   }
 
@@ -164,6 +210,7 @@ class EinstoreTracker(
     url: String?,
     event: AnalyticsEvent? = null,
     errorInfo: ErrorInfo? = null,
+    crash: Map<String, Any?>? = null,
     requiredService: EinstoreService? = null,
     callback: ((Result<Unit>) -> Unit)?
   ) {
@@ -176,13 +223,13 @@ class EinstoreTracker(
       return
     }
     executor.execute {
-      callback?.invoke(post(url, event, errorInfo))
+      callback?.invoke(post(url, event, errorInfo, crash))
     }
   }
 
-  private fun post(url: String, event: AnalyticsEvent?, errorInfo: ErrorInfo?): Result<Unit> {
+  private fun post(url: String, event: AnalyticsEvent?, errorInfo: ErrorInfo?, crash: Map<String, Any?>?): Result<Unit> {
     return try {
-      val payload = buildPayload(event, errorInfo)
+      val payload = buildPayload(event, errorInfo, crash)
       val connection = URL(url).openConnection() as HttpURLConnection
       connection.requestMethod = "POST"
       connection.doOutput = true
@@ -206,11 +253,11 @@ class EinstoreTracker(
     }
   }
 
-  private fun buildPayload(event: AnalyticsEvent?, errorInfo: ErrorInfo?): String {
+  private fun buildPayload(event: AnalyticsEvent?, errorInfo: ErrorInfo?, crash: Map<String, Any?>?): String {
     val root = JSONObject()
     root.put("platform", config.platform)
     resolveDeviceId()?.let { root.put("deviceId", it) }
-    config.targetId?.let { root.put("targetId", it) }
+    resolveTargetId()?.let { root.put("targetId", it) }
 
     val metadata = JSONObject()
     metadata.put("services", JSONArray(config.services.map { it.key }))
@@ -263,6 +310,19 @@ class EinstoreTracker(
 
     if (config.services.contains(EinstoreService.USAGE)) {
       metadata.put("usage", usagePayload())
+    }
+
+    if (config.services.contains(EinstoreService.CRASHES) && crash != null) {
+      val crashPayload = mapToJson(crash.toMutableMap().apply {
+        putIfAbsent("platform", config.platform)
+        if (!containsKey("appVersion")) {
+          put("appVersion", resolvePackageInfo()?.versionName)
+        }
+        if (!containsKey("buildNumber")) {
+          put("buildNumber", resolveVersionCode(resolvePackageInfo()))
+        }
+      })
+      metadata.put("crash", crashPayload)
     }
 
     if (config.metadata.isNotEmpty()) {
@@ -349,6 +409,26 @@ class EinstoreTracker(
     return created
   }
 
+  private fun pendingCrashes(): List<Map<String, Any?>> {
+    val json = preferences.getString(crashKey, null) ?: return emptyList()
+    return try {
+      val array = JSONArray(json)
+      (0 until array.length()).mapNotNull { idx ->
+        val obj = array.optJSONObject(idx) ?: return@mapNotNull null
+        obj.toMap()
+      }
+    } catch (_: Exception) {
+      emptyList()
+    }
+  }
+
+  private fun resolveTargetId(): String? {
+    if (!config.targetId.isNullOrBlank()) {
+      return config.targetId
+    }
+    return appContext.packageName
+  }
+
   private fun resolveLaunchKey(): String {
     if (!config.launchKey.isNullOrBlank()) {
       return config.launchKey
@@ -376,6 +456,16 @@ class EinstoreTracker(
       @Suppress("DEPRECATION")
       packageInfo.versionCode.toString()
     }
+  }
+
+  private fun JSONObject.toMap(): Map<String, Any?> {
+    val map = mutableMapOf<String, Any?>()
+    val keys = keys()
+    while (keys.hasNext()) {
+      val key = keys.next()
+      map[key] = this.opt(key)
+    }
+    return map
   }
 
   private fun mapToJson(map: Map<String, Any?>): JSONObject {

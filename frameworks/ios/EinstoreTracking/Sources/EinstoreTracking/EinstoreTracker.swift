@@ -17,6 +17,7 @@ public enum EinstoreService: String, CaseIterable {
   case distribution
   case devices
   case usage
+  case crashes
 }
 
 public protocol EinstoreLaunchStorage {
@@ -77,6 +78,7 @@ public struct EinstoreTrackingConfig {
   public let services: [EinstoreService]
   public let distributionInfo: [String: Any]
   public let deviceInfo: [String: Any]
+  public let crashEnabled: Bool
 
   public init(
     baseUrl: URL? = URL(string: "https://api.einstore.dev"),
@@ -92,7 +94,8 @@ public struct EinstoreTrackingConfig {
     launchKey: String? = nil,
     services: [EinstoreService] = [.distribution, .devices],
     distributionInfo: [String: Any] = [:],
-    deviceInfo: [String: Any] = [:]
+    deviceInfo: [String: Any] = [:],
+    crashEnabled: Bool = false
   ) {
     self.baseUrl = baseUrl
     self.buildId = buildId
@@ -108,6 +111,7 @@ public struct EinstoreTrackingConfig {
     self.services = services
     self.distributionInfo = distributionInfo
     self.deviceInfo = deviceInfo
+    self.crashEnabled = crashEnabled
   }
 }
 
@@ -127,6 +131,7 @@ public final class EinstoreTracker {
   private let session: URLSession
   private let deviceIdProvider: EinstoreDeviceIdProvider
   private let launchStorage: EinstoreLaunchStorage
+  private let crashStorageKey = "einstore.crashes"
   private var sessionId: String
   private var sessionStart: Date
   private var userProperties: [String: Any]
@@ -144,6 +149,9 @@ public final class EinstoreTracker {
     self.sessionId = UUID().uuidString
     self.sessionStart = Date()
     self.userProperties = [:]
+    if config.crashEnabled && isServiceEnabled(.crashes) {
+      uploadPendingCrashes()
+    }
   }
 
   public func startNewSession() {
@@ -169,6 +177,44 @@ public final class EinstoreTracker {
       requiredService: .analytics,
       completion: completion
     )
+  }
+
+  public func recordCrash(_ crash: [String: Any]) {
+    guard config.crashEnabled, isServiceEnabled(.crashes) else { return }
+    var existing = pendingCrashes()
+    existing.append(crash)
+    UserDefaults.standard.set(existing, forKey: crashStorageKey)
+  }
+
+  public func uploadPendingCrashes(completion: ((Result<Void, Error>) -> Void)? = nil) {
+    guard config.crashEnabled, isServiceEnabled(.crashes) else {
+      completion?(.success(()))
+      return
+    }
+    let crashes = pendingCrashes()
+    guard !crashes.isEmpty else {
+      completion?(.success(()))
+      return
+    }
+    let group = DispatchGroup()
+    var firstError: Error?
+    for crash in crashes {
+      group.enter()
+      trackCrash(crash: crash) { result in
+        if case .failure(let error) = result, firstError == nil {
+          firstError = error
+        }
+        group.leave()
+      }
+    }
+    group.notify(queue: .main) {
+      if firstError == nil {
+        UserDefaults.standard.removeObject(forKey: self.crashStorageKey)
+        completion?(.success(()))
+      } else if let error = firstError {
+        completion?(.failure(error))
+      }
+    }
   }
 
   public func trackLaunchOnce(completion: ((Result<Void, Error>) -> Void)? = nil) {
@@ -241,10 +287,13 @@ public final class EinstoreTracker {
     if let provided {
       return provided
     }
-    guard let base = config.baseUrl, let buildId = config.buildId else {
+    guard let base = config.baseUrl else {
       return nil
     }
-    return base.appendingPathComponent(defaultPath.replacingOccurrences(of: "{id}", with: buildId))
+    if let buildId = config.buildId {
+      return base.appendingPathComponent(defaultPath.replacingOccurrences(of: "{id}", with: buildId))
+    }
+    return base.appendingPathComponent("tracking/events")
   }
 
   private var resolvedDownloadUrl: URL? {
@@ -266,10 +315,34 @@ public final class EinstoreTracker {
     return deviceIdProvider.deviceId()
   }
 
+  private func resolveTargetId() -> String? {
+    if let targetId = config.targetId, !targetId.isEmpty {
+      return targetId
+    }
+    return Bundle.main.bundleIdentifier
+  }
+
+  private func pendingCrashes() -> [[String: Any]] {
+    (UserDefaults.standard.array(forKey: crashStorageKey) as? [[String: Any]]) ?? []
+  }
+
+  private func trackCrash(
+    crash: [String: Any],
+    completion: ((Result<Void, Error>) -> Void)?
+  ) {
+    track(
+      url: resolvedEventUrl ?? resolvedLaunchUrl,
+      crash: crash,
+      requiredService: .crashes,
+      completion: completion
+    )
+  }
+
   private func track(
     url: URL?,
     event: AnalyticsEvent? = nil,
     errorInfo: ErrorInfo? = nil,
+    crash: [String: Any]? = nil,
     requiredService: EinstoreService? = nil,
     completion: ((Result<Void, Error>) -> Void)?
   ) {
@@ -282,19 +355,19 @@ public final class EinstoreTracker {
       return
     }
     do {
-      let payload = try buildPayload(event: event, errorInfo: errorInfo)
+      let payload = try buildPayload(event: event, errorInfo: errorInfo, crash: crash)
       send(url: url, payload: payload, completion: completion)
     } catch {
       completion?(.failure(error))
     }
   }
 
-  private func buildPayload(event: AnalyticsEvent?, errorInfo: ErrorInfo?) throws -> [String: Any] {
+  private func buildPayload(event: AnalyticsEvent?, errorInfo: ErrorInfo?, crash: [String: Any]?) throws -> [String: Any] {
     var payload: [String: Any] = ["platform": config.platform]
     if let deviceId = resolveDeviceId() {
       payload["deviceId"] = deviceId
     }
-    if let targetId = config.targetId {
+    if let targetId = resolveTargetId() {
       payload["targetId"] = targetId
     }
 
@@ -345,6 +418,20 @@ public final class EinstoreTracker {
 
     if isServiceEnabled(.usage) {
       metadata["usage"] = usagePayload()
+    }
+
+    if isServiceEnabled(.crashes), let crash = crash {
+      var crashPayload = crash
+      if crashPayload["appVersion"] == nil, let version = appVersion() {
+        crashPayload["appVersion"] = version
+      }
+      if crashPayload["buildNumber"] == nil, let build = buildNumber() {
+        crashPayload["buildNumber"] = build
+      }
+      if crashPayload["platform"] == nil {
+        crashPayload["platform"] = config.platform
+      }
+      metadata["crash"] = crashPayload
     }
 
     if let custom = config.metadata, !custom.isEmpty {

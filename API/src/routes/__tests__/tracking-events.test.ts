@@ -6,6 +6,9 @@ vi.mock("../../lib/prisma.js", () => {
     build: {
       findFirst: vi.fn(),
     },
+    target: {
+      findFirst: vi.fn(),
+    },
     trackingEvent: {
       create: vi.fn(),
       findMany: vi.fn(),
@@ -34,6 +37,7 @@ describe("trackingEventRoutes", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     prismaMock.build.findFirst.mockResolvedValue({ id: "build-1" });
+    prismaMock.target.findFirst.mockResolvedValue({ buildId: "build-1" });
     prismaMock.$transaction.mockImplementation(async (operations: any[]) => Promise.all(operations));
   });
 
@@ -55,13 +59,21 @@ describe("trackingEventRoutes", () => {
         platform: "ios",
         deviceId: "device-123",
         metadata: {
-          services: ["analytics", "errors", "usage"],
+          services: ["analytics", "errors", "usage", "crashes"],
           analytics: {
             event: { name: "app_launch", properties: { screen: "home" } },
             userProperties: { plan: "pro" },
             session: { id: "sess-1", startedAt: "2024-01-01T00:00:00.000Z", durationMs: 120000 },
           },
           errors: { message: "oops", stackTrace: "stack", properties: { code: "E123" } },
+          crash: {
+            exceptionType: "SIGABRT",
+            stackTrace: "crash stack",
+            occurredAt: "2024-01-02T00:00:00.000Z",
+            appVersion: "1.0.0",
+            buildNumber: "2",
+            binaryHash: "abc",
+          },
           usage: { timestamp: "2024-01-01T00:00:00.000Z", timeZone: "UTC", locale: "en-US" },
           custom: { env: "staging" },
         },
@@ -70,8 +82,46 @@ describe("trackingEventRoutes", () => {
 
     expect(response.statusCode).toBe(201);
     const body = response.json() as { items: any[] };
-    expect(body.items).toHaveLength(3);
-    expect(created.map((row) => row.service)).toEqual(["analytics", "errors", "usage"]);
+    expect(body.items).toHaveLength(4);
+    expect(created.map((row) => row.service)).toEqual(["analytics", "errors", "usage", "crashes"]);
+    const crash = created.find((c) => c.service === "crashes");
+    expect(crash?.binaryHash).toBe("abc");
+  });
+
+  it("resolves build by target when build id is not provided", async () => {
+    const created: any[] = [];
+    prismaMock.trackingEvent.create.mockImplementation(async ({ data }: any) => {
+      const record = { id: `evt-${created.length + 1}`, ...data };
+      created.push(record);
+      return record;
+    });
+
+    const app = Fastify();
+    await app.register(trackingEventRoutes);
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/tracking/events",
+      payload: {
+        platform: "ios",
+        targetId: "com.example.app",
+        metadata: {
+          services: ["distribution"],
+          distribution: { buildNumber: "123", appVersion: "1.0.0" },
+        },
+      },
+    });
+
+    expect(response.statusCode).toBe(201);
+    expect(prismaMock.target.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          bundleId: "com.example.app",
+        }),
+      }),
+    );
+    expect(created).toHaveLength(1);
+    expect(created[0].buildId).toBe("build-1");
   });
 
   it("lists tracking events with pagination", async () => {

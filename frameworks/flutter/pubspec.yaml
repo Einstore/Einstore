@@ -3,5 +3,7 @@ description: Track Einstore download and launch events from Flutter apps.
 version: 0.1.0
 environment:
   sdk: ">=2.18.0 <4.0.0"
+dependencies:
+  package_info_plus: ^5.0.1
 dev_dependencies:
   test: ^1.25.2
