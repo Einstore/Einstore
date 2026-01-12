@@ -31,6 +31,7 @@ Team-scoped endpoints:
 - `/search`
 - `/builds/:id/tags`
 - `/tags`
+- `/store/upload`
 
 ## GET /health
 - Purpose: Health check
@@ -85,6 +86,12 @@ Team-scoped endpoints:
   - `perPage` (number, optional, default 25, max 100): page size
   - `limit` and `offset` (legacy, optional)
 - Response schema: `{ "items": [{ "id": "tag", "name": "release", "usageCount": 3 }], "page": 1, "perPage": 25, "total": 1, "totalPages": 1 }`
+
+## POST /store/upload
+- Purpose: Upload a binary directly to Einstore storage (any file type)
+- Auth scope: Team or API key (supports `token` query param as API key)
+- Request schema: multipart/form-data with a single `file` field; `token` can be passed as a query string instead of `x-api-key`.
+- Response schema: `{ "status": "stored", "filePath": "storage/uploads/<generated>", "filename": "original.ext", "sizeBytes": 123, "teamId": "team" }`
 - Side effects: none
 - Platform relevance: all
 
@@ -178,6 +185,14 @@ Team-scoped endpoints:
 
 ## POST /builds/{id}/events
 - Purpose: Record tracking events (analytics, errors, distribution, devices, usage)
+- Auth scope: Bearer (rafiki270/auth) + Team membership
+- Request schema: `{ platform?: PlatformKind, targetId?: string, deviceId?: string, metadata?: TrackingMetadata }`
+- Response schema: `{ items: TrackingEvent[] }`
+- Side effects: Creates one row per requested service
+- Platform relevance: all
+
+## POST /tracking/events
+- Purpose: Record tracking events without needing a build ID (build resolved by target/bundle id + version/build number)
 - Auth scope: Bearer (rafiki270/auth) + Team membership
 - Request schema: `{ platform?: PlatformKind, targetId?: string, deviceId?: string, metadata?: TrackingMetadata }`
 - Response schema: `{ items: TrackingEvent[] }`

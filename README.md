@@ -18,3 +18,13 @@ Modern private app distribution platform for iOS + Android.
 - `make launch` starts the API and Admin dev servers plus Caddy for local domains.
 - For App Platform build/run simulation, see `docs/app-platform-local-sim.md`.
 - With DNS entries for `admin.local.einstore.pro`, `api.local.einstore.pro`, and `local.einstore.pro`, you can access the dev stack from other devices at `https://admin.local.einstore.pro` and `https://api.local.einstore.pro` (Caddy terminates HTTPS with local certificates; override `DEV_*` vars in the Makefile if you need different ports).
+
+## Uploading a binary to Einstore
+1. Create or copy an API key in Admin (`API Keys`). The API key identifies the team.
+2. Upload any file with a multipart request to `/store/upload`, passing the API key as a `token` query param (no auth header required):
+   ```bash
+   curl -X POST \
+     -F "file=@/path/to/binary.apk" \
+     "https://api.local.einstore.pro/store/upload?token=YOUR_API_KEY_TOKEN"
+   ```
+3. The response includes `filePath` and `sizeBytes` confirming the file is stored. Use that path when triggering ingest or other workflows.

@@ -95,13 +95,20 @@ export async function requireTeamAdmin(request: FastifyRequest, reply: FastifyRe
 
 export async function requireTeamOrApiKey(request: FastifyRequest, reply: FastifyReply) {
   const apiKeyHeader = request.headers["x-api-key"];
-  if (typeof apiKeyHeader === "string" && apiKeyHeader.trim()) {
+  const queryToken =
+    typeof request.query === "object" && request.query !== null && "token" in request.query
+      ? (request.query as Record<string, unknown>).token
+      : undefined;
+  const apiKeyToken =
+    (typeof apiKeyHeader === "string" && apiKeyHeader.trim()) ||
+    (typeof queryToken === "string" && queryToken.trim());
+  if (apiKeyToken) {
     const secret = resolveApiKeySecret({
       env: process.env,
       fallbackEnvKeys: ["AUTH_JWT_SECRET"],
       defaultSecret: "dev-api-key-secret",
     });
-    const { apiKey, error } = await verifyApiKey(prisma, apiKeyHeader.trim(), {
+    const { apiKey, error } = await verifyApiKey(prisma, apiKeyToken.trim(), {
       secret,
     });
     if (!apiKey || error === "api_key_invalid") {

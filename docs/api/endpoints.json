@@ -1,485 +1,65 @@
 {
-  "openapi": "3.0.3",
-  "info": {
-    "title": "Einstore API",
-    "version": "1.0.0",
-    "description": "Refactor API (MVP)"
-  },
-  "servers": [
-    {
-      "url": "http://localhost:8080"
-    }
-  ],
   "components": {
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
-      },
-      "apiKeyAuth": {
-        "type": "apiKey",
+    "parameters": {
+      "TeamIdHeader": {
+        "description": "Active team context. Required for team-scoped endpoints.",
         "in": "header",
-        "name": "x-api-key"
+        "name": "x-team-id",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
       }
     },
     "schemas": {
-      "AuthSession": {
-        "type": "object",
+      "ApiKeyCreateResponse": {
         "properties": {
-          "accessToken": {
-            "type": "string"
+          "apiKey": {
+            "$ref": "#/components/schemas/ApiKeySummary"
           },
-          "refreshToken": {
-            "type": "string"
-          },
-          "expiresIn": {
-            "type": "number"
-          }
-        }
-      },
-      "AuthRegisterResult": {
-        "type": "object",
-        "properties": {
-          "userId": {
-            "type": "string"
-          },
-          "session": {
-            "$ref": "#/components/schemas/AuthSession"
-          }
-        }
-      },
-      "AuthLoginResult": {
-        "type": "object",
-        "properties": {
-          "userId": {
-            "type": "string"
-          },
-          "session": {
-            "$ref": "#/components/schemas/AuthSession"
-          }
-        }
-      },
-      "AuthSessionInfo": {
-        "type": "object",
-        "properties": {
-          "userId": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string",
-            "nullable": true
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "avatarUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "type": "string"
-          },
-          "isSuperUser": {
-            "type": "boolean"
-          }
-        }
-      },
-      "App": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "identifier": {
-            "type": "string"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "Version": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "appId": {
-            "type": "string"
-          },
-          "version": {
+          "token": {
             "type": "string"
           }
-        }
-      },
-      "Build": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "versionId": {
-            "type": "string"
-          },
-          "buildNumber": {
-            "type": "string"
-          },
-          "displayName": {
-            "type": "string"
-          },
-          "storageKind": {
-            "type": "string"
-          },
-          "storagePath": {
-            "type": "string"
-          },
-          "sizeBytes": {
-            "type": "number"
-          }
-        }
-      },
-      "Target": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "buildId": {
-            "type": "string"
-          },
-          "platform": {
-            "type": "string"
-          },
-          "role": {
-            "type": "string"
-          },
-          "bundleId": {
-            "type": "string"
-          }
-        }
-      },
-      "Variant": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "buildId": {
-            "type": "string"
-          },
-          "kind": {
-            "type": "string"
-          },
-          "key": {
-            "type": "string"
-          },
-          "value": {
-            "type": "string"
-          }
-        }
-      },
-      "Module": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "buildId": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "onDemand": {
-            "type": "boolean"
-          }
-        }
-      },
-      "Capability": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "targetId": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          }
-        }
-      },
-      "ComplianceArtifact": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "buildId": {
-            "type": "string"
-          },
-          "kind": {
-            "type": "string"
-          },
-          "storageKind": {
-            "type": "string"
-          },
-          "storagePath": {
-            "type": "string"
-          }
-        }
-      },
-      "FeatureFlag": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "key": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "defaultEnabled": {
-            "type": "boolean"
-          },
-          "metadata": {
-            "type": "object",
-            "nullable": true
-          }
-        }
-      },
-      "FeatureFlagOverride": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "flagId": {
-            "type": "string"
-          },
-          "scope": {
-            "type": "string"
-          },
-          "targetKey": {
-            "type": "string",
-            "nullable": true
-          },
-          "enabled": {
-            "type": "boolean"
-          },
-          "rolloutPercentage": {
-            "type": "integer",
-            "nullable": true
-          },
-          "metadata": {
-            "type": "object",
-            "nullable": true
-          }
-        }
-      },
-      "Team": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "slug": {
-            "type": "string"
-          },
-          "inboxBase": {
-            "type": "string"
-          },
-          "planName": {
-            "type": "string"
-          },
-          "planLimit": {
-            "type": "integer"
-          },
-          "billingCurrency": {
-            "type": "string",
-            "nullable": true
-          },
-          "defaultCurrency": {
-            "type": "string",
-            "nullable": true
-          },
-          "country": {
-            "type": "string",
-            "nullable": true
-          },
-          "timezone": {
-            "type": "string",
-            "nullable": true
-          },
-          "vatRegistered": {
-            "type": "boolean"
-          },
-          "vatNumberRequired": {
-            "type": "boolean"
-          },
-          "categoryRequired": {
-            "type": "boolean"
-          },
-          "defaultExportPreset": {
-            "type": "string"
-          },
-          "storageLimitBytes": {
-            "type": "number",
-            "nullable": true
-          },
-          "overviewStatsPeriod": {
-            "type": "string"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "billingCycleStartAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "TeamWithRole": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "slug": {
-            "type": "string"
-          },
-          "inboxBase": {
-            "type": "string"
-          },
-          "planName": {
-            "type": "string"
-          },
-          "planLimit": {
-            "type": "integer"
-          },
-          "billingCurrency": {
-            "type": "string",
-            "nullable": true
-          },
-          "defaultCurrency": {
-            "type": "string",
-            "nullable": true
-          },
-          "country": {
-            "type": "string",
-            "nullable": true
-          },
-          "timezone": {
-            "type": "string",
-            "nullable": true
-          },
-          "vatRegistered": {
-            "type": "boolean"
-          },
-          "vatNumberRequired": {
-            "type": "boolean"
-          },
-          "categoryRequired": {
-            "type": "boolean"
-          },
-          "defaultExportPreset": {
-            "type": "string"
-          },
-          "storageLimitBytes": {
-            "type": "number",
-            "nullable": true
-          },
-          "overviewStatsPeriod": {
-            "type": "string"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "memberRole": {
-            "type": "string"
-          }
-        }
-      },
-      "TeamUser": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string",
-            "nullable": true
-          },
-          "fullName": {
-            "type": "string",
-            "nullable": true
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "avatarUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "username": {
-            "type": "string",
-            "nullable": true
-          },
-          "role": {
-            "type": "string"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "UserTeamSetting": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string"
-          },
-          "value": {}
-        }
+        },
+        "type": "object"
       },
       "ApiKeySummary": {
-        "type": "object",
         "properties": {
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "createdBy": {
+            "nullable": true,
+            "properties": {
+              "email": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "nullable": true,
+                "type": "string"
+              },
+              "username": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
           "id": {
+            "type": "string"
+          },
+          "lastUsedAt": {
+            "format": "date-time",
+            "nullable": true,
             "type": "string"
           },
           "name": {
@@ -488,242 +68,137 @@
           "prefix": {
             "type": "string"
           },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "lastUsedAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
           "revokedAt": {
-            "type": "string",
             "format": "date-time",
-            "nullable": true
-          },
-          "expiresAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "createdBy": {
-            "type": "object",
             "nullable": true,
-            "properties": {
-              "id": {
-                "type": "string"
-              },
-              "name": {
-                "type": "string",
-                "nullable": true
-              },
-              "email": {
-                "type": "string",
-                "nullable": true
-              },
-              "username": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      },
-      "ApiKeyCreateResponse": {
-        "type": "object",
-        "properties": {
-          "apiKey": {
-            "$ref": "#/components/schemas/ApiKeySummary"
-          },
-          "token": {
             "type": "string"
           }
-        }
+        },
+        "type": "object"
       },
-      "TeamStats": {
-        "type": "object",
+      "App": {
         "properties": {
-          "billingCycleStartAt": {
-            "type": "string",
-            "format": "date-time"
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
           },
-          "totalStorageBytes": {
-            "type": "integer"
+          "id": {
+            "type": "string"
           },
-          "downloadsThisMonth": {
-            "type": "object",
-            "properties": {
-              "from": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "eventCount": {
-                "type": "integer"
-              },
-              "bytes": {
-                "type": "integer"
-              }
-            },
-            "required": [
-              "from",
-              "eventCount",
-              "bytes"
-            ]
+          "identifier": {
+            "type": "string"
           },
-          "uploadsInBillingCycle": {
-            "type": "object",
-            "properties": {
-              "from": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "buildCount": {
-                "type": "integer"
-              },
-              "appCount": {
-                "type": "integer"
-              },
-              "bytes": {
-                "type": "integer"
-              }
-            },
-            "required": [
-              "from",
-              "buildCount",
-              "appCount",
-              "bytes"
-            ]
+          "name": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
           }
         },
-        "required": [
-          "billingCycleStartAt",
-          "totalStorageBytes",
-          "downloadsThisMonth",
-          "uploadsInBillingCycle"
-        ]
+        "type": "object"
       },
-      "BuildEventTrackingMetadata": {
-        "type": "object",
-        "description": "Optional tracking metadata for analytics, errors, distribution, device, and usage context.",
+      "AuthLoginResult": {
         "properties": {
-          "services": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Enabled tracking sections (analytics, errors, distribution, devices, usage)."
+          "session": {
+            "$ref": "#/components/schemas/AuthSession"
           },
-          "analytics": {
-            "type": "object",
-            "properties": {
-              "event": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "properties": {
-                    "type": "object",
-                    "additionalProperties": true
-                  }
-                }
-              },
-              "userProperties": {
-                "type": "object",
-                "additionalProperties": true
-              },
-              "session": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string"
-                  },
-                  "startedAt": {
-                    "type": "string"
-                  },
-                  "durationMs": {
-                    "type": "integer"
-                  }
-                }
-              }
-            },
-            "additionalProperties": true
-          },
-          "errors": {
-            "type": "object",
-            "properties": {
-              "message": {
-                "type": "string"
-              },
-              "stackTrace": {
-                "type": "string"
-              },
-              "properties": {
-                "type": "object",
-                "additionalProperties": true
-              }
-            },
-            "additionalProperties": true
-          },
-          "distribution": {
-            "type": "object",
-            "additionalProperties": true
-          },
-          "device": {
-            "type": "object",
-            "additionalProperties": true
-          },
-          "usage": {
-            "type": "object",
-            "additionalProperties": true
-          },
-          "custom": {
-            "type": "object",
-            "additionalProperties": true
+          "userId": {
+            "type": "string"
           }
         },
-        "additionalProperties": true,
-        "example": {
-          "services": [
-            "analytics",
-            "distribution",
-            "devices",
-            "usage"
-          ],
-          "analytics": {
-            "event": {
-              "name": "app_launch",
-              "properties": {
-                "screen": "home"
-              }
-            },
-            "session": {
-              "id": "sess_123",
-              "startedAt": "2024-08-01T10:00:00Z",
-              "durationMs": 120000
-            }
+        "type": "object"
+      },
+      "AuthRegisterResult": {
+        "properties": {
+          "session": {
+            "$ref": "#/components/schemas/AuthSession"
           },
-          "distribution": {
-            "installSource": "email",
-            "appVersion": "1.2.3",
-            "buildNumber": "45"
-          },
-          "device": {
-            "model": "iPhone15,3",
-            "osVersion": "17.4",
-            "locale": "en-US"
-          },
-          "usage": {
-            "timestamp": "2024-08-01T10:00:00Z",
-            "timeZone": "America/Los_Angeles"
+          "userId": {
+            "type": "string"
           }
-        }
+        },
+        "type": "object"
+      },
+      "AuthSession": {
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "expiresIn": {
+            "type": "number"
+          },
+          "refreshToken": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "AuthSessionInfo": {
+        "properties": {
+          "avatarUrl": {
+            "nullable": true,
+            "type": "string"
+          },
+          "email": {
+            "nullable": true,
+            "type": "string"
+          },
+          "isSuperUser": {
+            "type": "boolean"
+          },
+          "name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Build": {
+        "properties": {
+          "buildNumber": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "sizeBytes": {
+            "type": "number"
+          },
+          "storageKind": {
+            "type": "string"
+          },
+          "storagePath": {
+            "type": "string"
+          },
+          "versionId": {
+            "type": "string"
+          }
+        },
+        "type": "object"
       },
       "BuildEventTrackRequest": {
-        "type": "object",
+        "additionalProperties": false,
         "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/BuildEventTrackingMetadata"
+          },
           "platform": {
-            "type": "string",
             "enum": [
               "ios",
               "watchos",
@@ -732,192 +207,1286 @@
               "android",
               "wearos",
               "auto"
-            ]
+            ],
+            "type": "string"
           },
           "targetId": {
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "BuildEventTrackingMetadata": {
+        "additionalProperties": true,
+        "description": "Optional tracking metadata for analytics, errors, distribution, device, and usage context.",
+        "example": {
+          "analytics": {
+            "event": {
+              "name": "app_launch",
+              "properties": {
+                "screen": "home"
+              }
+            },
+            "session": {
+              "durationMs": 120000,
+              "id": "sess_123",
+              "startedAt": "2024-08-01T10:00:00Z"
+            }
           },
-          "deviceId": {
+          "device": {
+            "locale": "en-US",
+            "model": "iPhone15,3",
+            "osVersion": "17.4"
+          },
+          "distribution": {
+            "appVersion": "1.2.3",
+            "buildNumber": "45",
+            "installSource": "email"
+          },
+          "services": [
+            "analytics",
+            "distribution",
+            "devices",
+            "usage"
+          ],
+          "usage": {
+            "timeZone": "America/Los_Angeles",
+            "timestamp": "2024-08-01T10:00:00Z"
+          }
+        },
+        "properties": {
+          "analytics": {
+            "additionalProperties": true,
+            "properties": {
+              "event": {
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "properties": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              },
+              "session": {
+                "properties": {
+                  "durationMs": {
+                    "type": "integer"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "startedAt": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "userProperties": {
+                "additionalProperties": true,
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "custom": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "device": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "distribution": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "errors": {
+            "additionalProperties": true,
+            "properties": {
+              "message": {
+                "type": "string"
+              },
+              "properties": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "stackTrace": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "services": {
+            "description": "Enabled tracking sections (analytics, errors, distribution, devices, usage).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "usage": {
+            "additionalProperties": true,
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "Capability": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "targetId": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComplianceArtifact": {
+        "properties": {
+          "buildId": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "storageKind": {
+            "type": "string"
+          },
+          "storagePath": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "FeatureFlag": {
+        "properties": {
+          "defaultEnabled": {
+            "type": "boolean"
+          },
+          "description": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "key": {
             "type": "string"
           },
           "metadata": {
-            "$ref": "#/components/schemas/BuildEventTrackingMetadata"
+            "nullable": true,
+            "type": "object"
           }
         },
-        "additionalProperties": false
+        "type": "object"
+      },
+      "FeatureFlagOverride": {
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "flagId": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "metadata": {
+            "nullable": true,
+            "type": "object"
+          },
+          "rolloutPercentage": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "scope": {
+            "type": "string"
+          },
+          "targetKey": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Module": {
+        "properties": {
+          "buildId": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "onDemand": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "Target": {
+        "properties": {
+          "buildId": {
+            "type": "string"
+          },
+          "bundleId": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Team": {
+        "properties": {
+          "billingCurrency": {
+            "nullable": true,
+            "type": "string"
+          },
+          "billingCycleStartAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "categoryRequired": {
+            "type": "boolean"
+          },
+          "country": {
+            "nullable": true,
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "defaultCurrency": {
+            "nullable": true,
+            "type": "string"
+          },
+          "defaultExportPreset": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "inboxBase": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "overviewStatsPeriod": {
+            "type": "string"
+          },
+          "planLimit": {
+            "type": "integer"
+          },
+          "planName": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "storageLimitBytes": {
+            "nullable": true,
+            "type": "number"
+          },
+          "timezone": {
+            "nullable": true,
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "vatNumberRequired": {
+            "type": "boolean"
+          },
+          "vatRegistered": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "TeamStats": {
+        "properties": {
+          "billingCycleStartAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "downloadsThisMonth": {
+            "properties": {
+              "bytes": {
+                "type": "integer"
+              },
+              "eventCount": {
+                "type": "integer"
+              },
+              "from": {
+                "format": "date-time",
+                "type": "string"
+              }
+            },
+            "required": [
+              "from",
+              "eventCount",
+              "bytes"
+            ],
+            "type": "object"
+          },
+          "totalStorageBytes": {
+            "type": "integer"
+          },
+          "uploadsInBillingCycle": {
+            "properties": {
+              "appCount": {
+                "type": "integer"
+              },
+              "buildCount": {
+                "type": "integer"
+              },
+              "bytes": {
+                "type": "integer"
+              },
+              "from": {
+                "format": "date-time",
+                "type": "string"
+              }
+            },
+            "required": [
+              "from",
+              "buildCount",
+              "appCount",
+              "bytes"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "billingCycleStartAt",
+          "totalStorageBytes",
+          "downloadsThisMonth",
+          "uploadsInBillingCycle"
+        ],
+        "type": "object"
+      },
+      "TeamUser": {
+        "properties": {
+          "avatarUrl": {
+            "nullable": true,
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "email": {
+            "nullable": true,
+            "type": "string"
+          },
+          "fullName": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "username": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TeamWithRole": {
+        "properties": {
+          "billingCurrency": {
+            "nullable": true,
+            "type": "string"
+          },
+          "categoryRequired": {
+            "type": "boolean"
+          },
+          "country": {
+            "nullable": true,
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "defaultCurrency": {
+            "nullable": true,
+            "type": "string"
+          },
+          "defaultExportPreset": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "inboxBase": {
+            "type": "string"
+          },
+          "memberRole": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "overviewStatsPeriod": {
+            "type": "string"
+          },
+          "planLimit": {
+            "type": "integer"
+          },
+          "planName": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "storageLimitBytes": {
+            "nullable": true,
+            "type": "number"
+          },
+          "timezone": {
+            "nullable": true,
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "vatNumberRequired": {
+            "type": "boolean"
+          },
+          "vatRegistered": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
       },
       "TrackingEvent": {
-        "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "buildId": { "type": "string" },
-          "teamId": { "type": "string" },
-          "userId": { "type": "string", "nullable": true },
+          "appVersion": {
+            "nullable": true,
+            "type": "string"
+          },
+          "buildId": {
+            "type": "string"
+          },
+          "buildNumber": {
+            "nullable": true,
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "custom": {
+            "nullable": true,
+            "type": "object"
+          },
+          "device": {
+            "nullable": true,
+            "type": "object"
+          },
+          "deviceAppVersion": {
+            "nullable": true,
+            "type": "string"
+          },
+          "deviceBuildNumber": {
+            "nullable": true,
+            "type": "string"
+          },
+          "deviceId": {
+            "nullable": true,
+            "type": "string"
+          },
+          "deviceManufacturer": {
+            "nullable": true,
+            "type": "string"
+          },
+          "deviceModel": {
+            "nullable": true,
+            "type": "string"
+          },
+          "deviceOsVersion": {
+            "nullable": true,
+            "type": "string"
+          },
+          "distribution": {
+            "nullable": true,
+            "type": "object"
+          },
+          "eventName": {
+            "nullable": true,
+            "type": "string"
+          },
+          "eventProperties": {
+            "nullable": true,
+            "type": "object"
+          },
+          "id": {
+            "type": "string"
+          },
+          "installSource": {
+            "nullable": true,
+            "type": "string"
+          },
+          "locale": {
+            "nullable": true,
+            "type": "string"
+          },
+          "message": {
+            "nullable": true,
+            "type": "string"
+          },
+          "occurredAt": {
+            "type": "string"
+          },
           "platform": {
-            "type": "string",
-            "enum": ["ios", "watchos", "tvos", "visionos", "android", "wearos", "auto"],
-            "nullable": true
+            "enum": [
+              "ios",
+              "watchos",
+              "tvos",
+              "visionos",
+              "android",
+              "wearos",
+              "auto"
+            ],
+            "nullable": true,
+            "type": "string"
           },
-          "targetId": { "type": "string", "nullable": true },
-          "deviceId": { "type": "string", "nullable": true },
           "service": {
-            "type": "string",
-            "enum": ["analytics", "errors", "distribution", "devices", "usage"]
+            "enum": [
+              "analytics",
+              "errors",
+              "distribution",
+              "devices",
+              "usage"
+            ],
+            "type": "string"
           },
-          "eventName": { "type": "string", "nullable": true },
-          "message": { "type": "string", "nullable": true },
-          "stackTrace": { "type": "string", "nullable": true },
-          "sessionId": { "type": "string", "nullable": true },
-          "sessionStartedAt": { "type": "string", "nullable": true },
-          "sessionDurationMs": { "type": "integer", "nullable": true },
-          "timeZone": { "type": "string", "nullable": true },
-          "timeZoneOffsetMinutes": { "type": "integer", "nullable": true },
-          "locale": { "type": "string", "nullable": true },
-          "deviceModel": { "type": "string", "nullable": true },
-          "deviceManufacturer": { "type": "string", "nullable": true },
-          "deviceOsVersion": { "type": "string", "nullable": true },
-          "deviceAppVersion": { "type": "string", "nullable": true },
-          "deviceBuildNumber": { "type": "string", "nullable": true },
-          "installSource": { "type": "string", "nullable": true },
-          "appVersion": { "type": "string", "nullable": true },
-          "buildNumber": { "type": "string", "nullable": true },
-          "eventProperties": { "type": "object", "nullable": true },
-          "userProperties": { "type": "object", "nullable": true },
-          "distribution": { "type": "object", "nullable": true },
-          "device": { "type": "object", "nullable": true },
-          "usage": { "type": "object", "nullable": true },
-          "custom": { "type": "object", "nullable": true },
-          "occurredAt": { "type": "string" },
-          "createdAt": { "type": "string" }
-        }
+          "sessionDurationMs": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "sessionId": {
+            "nullable": true,
+            "type": "string"
+          },
+          "sessionStartedAt": {
+            "nullable": true,
+            "type": "string"
+          },
+          "stackTrace": {
+            "nullable": true,
+            "type": "string"
+          },
+          "targetId": {
+            "nullable": true,
+            "type": "string"
+          },
+          "teamId": {
+            "type": "string"
+          },
+          "timeZone": {
+            "nullable": true,
+            "type": "string"
+          },
+          "timeZoneOffsetMinutes": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "usage": {
+            "nullable": true,
+            "type": "object"
+          },
+          "userId": {
+            "nullable": true,
+            "type": "string"
+          },
+          "userProperties": {
+            "nullable": true,
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "UserTeamSetting": {
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {}
+        },
+        "type": "object"
+      },
+      "Variant": {
+        "properties": {
+          "buildId": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Version": {
+        "properties": {
+          "appId": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "type": "object"
       }
     },
-    "parameters": {
-      "TeamIdHeader": {
-        "name": "x-team-id",
+    "securitySchemes": {
+      "apiKeyAuth": {
         "in": "header",
-        "required": true,
-        "schema": {
-          "type": "string"
-        },
-        "description": "Active team context. Required for team-scoped endpoints."
+        "name": "x-api-key",
+        "type": "apiKey"
+      },
+      "bearerAuth": {
+        "bearerFormat": "JWT",
+        "scheme": "bearer",
+        "type": "http"
       }
     }
   },
+  "info": {
+    "description": "Refactor API (MVP)",
+    "title": "Einstore API",
+    "version": "1.0.0"
+  },
+  "openapi": "3.0.3",
   "paths": {
-    "/health": {
+    "/api-keys": {
       "get": {
-        "summary": "Health check",
+        "description": "Team admin/owner only.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "OK"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "apiKeys": {
+                      "items": {
+                        "$ref": "#/components/schemas/ApiKeySummary"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "List"
           }
-        }
-      }
-    },
-    "/info": {
-      "get": {
-        "summary": "Service info",
-        "responses": {
-          "200": {
-            "description": "Info"
-          }
-        }
-      }
-    },
-    "/search": {
-      "get": {
-        "summary": "Search apps and builds (includes tags)",
+        },
         "security": [
           {
             "bearerAuth": []
           }
         ],
+        "summary": "List API keys"
+      },
+      "post": {
+        "description": "Team admin/owner only. Token returned once.",
         "parameters": [
           {
             "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "expiresAt": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "type": "object"
+              }
+            }
           },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyCreateResponse"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "security": [
           {
-            "name": "q",
-            "in": "query",
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create API key"
+      }
+    },
+    "/api-keys/{id}": {
+      "delete": {
+        "description": "Team admin/owner only.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
             "required": true,
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "appId",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Revoked"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Revoke API key"
+      }
+    },
+    "/apps": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
           },
           {
-            "name": "appPage",
             "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 1
-            }
-          },
-          {
-            "name": "appPerPage",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 10
-            }
-          },
-          {
-            "name": "buildPage",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 1
-            }
-          },
-          {
-            "name": "buildPerPage",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 6
-            }
-          },
-          {
-            "name": "appLimit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 10
-            }
-          },
-          {
-            "name": "buildLimit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 6
-            }
-          },
-          {
-            "name": "appOffset",
-            "in": "query",
+            "name": "page",
             "required": false,
             "schema": {
               "type": "integer"
             }
           },
           {
-            "name": "buildOffset",
             "in": "query",
+            "name": "perPage",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "platform",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List apps"
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/App"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create app"
+      }
+    },
+    "/apps/{id}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "App"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get app"
+      }
+    },
+    "/artifacts": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List compliance artifacts"
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create compliance artifact"
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "description": "Ensures a personal team exists for first-time logins.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "identifier": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "identifier",
+                  "password"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthLoginResult"
+                }
+              }
+            },
+            "description": "Session"
+          }
+        },
+        "summary": "Login"
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "refreshToken": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "refreshToken"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Revoked"
+          }
+        },
+        "summary": "Logout"
+      }
+    },
+    "/auth/oauth/exchange": {
+      "post": {
+        "description": "Creates a session and ensures a personal team exists for first-time logins. The first user is marked as a super user.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "authCode": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "authCode"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Session"
+          }
+        },
+        "summary": "Exchange OAuth auth code"
+      }
+    },
+    "/auth/oauth/{provider}/callback": {
+      "get": {
+        "responses": {
+          "302": {
+            "description": "Redirect"
+          }
+        },
+        "summary": "OAuth callback"
+      }
+    },
+    "/auth/oauth/{provider}/start": {
+      "get": {
+        "requestBody": {
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "authorizeUrl": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OAuth start"
+          }
+        },
+        "summary": "Start OAuth login"
+      }
+    },
+    "/auth/password-reset": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Sent"
+          }
+        },
+        "summary": "Request password reset"
+      }
+    },
+    "/auth/password-reset/confirm": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "newPassword": {
+                    "type": "string"
+                  },
+                  "token": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token",
+                  "newPassword"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Reset"
+          }
+        },
+        "summary": "Confirm password reset"
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "refreshToken": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "refreshToken"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Session"
+          }
+        },
+        "summary": "Refresh token"
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "description": "Creates a personal team if the user has no team membership yet. The first registered user is marked as a super user.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "username": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "username",
+                  "password"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthRegisterResult"
+                }
+              }
+            },
+            "description": "Registered"
+          }
+        },
+        "summary": "Register user"
+      }
+    },
+    "/auth/session": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthSessionInfo"
+                }
+              }
+            },
+            "description": "Session"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get session"
+      }
+    },
+    "/badges": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "perPage",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
             "required": false,
             "schema": {
               "type": "integer"
@@ -926,26 +1495,698 @@
         ],
         "responses": {
           "200": {
-            "description": "Search results"
-          },
-          "400": {
-            "description": "Invalid query"
+            "description": "Badges"
           }
-        }
-      }
-    },
-    "/builds/{id}/tags": {
-      "get": {
-        "summary": "List build tags",
+        },
         "security": [
           {
             "bearerAuth": []
           }
         ],
+        "summary": "Badge counts"
+      }
+    },
+    "/builds": {
+      "get": {
         "parameters": [
           {
-            "name": "id",
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List builds"
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create build"
+      }
+    },
+    "/builds/{id}": {
+      "get": {
+        "parameters": [
+          {
             "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Build"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get build"
+      }
+    },
+    "/builds/{id}/downloads": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List build downloads"
+      },
+      "post": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "deviceId": "device-123",
+                "metadata": {
+                  "analytics": {
+                    "event": {
+                      "name": "app_launch",
+                      "properties": {
+                        "screen": "home"
+                      }
+                    },
+                    "session": {
+                      "durationMs": 120000,
+                      "id": "sess_123",
+                      "startedAt": "2024-08-01T10:00:00Z"
+                    }
+                  },
+                  "device": {
+                    "locale": "en-US",
+                    "model": "iPhone15,3",
+                    "osVersion": "17.4"
+                  },
+                  "distribution": {
+                    "appVersion": "1.2.3",
+                    "buildNumber": "45",
+                    "installSource": "email"
+                  },
+                  "services": [
+                    "analytics",
+                    "distribution",
+                    "devices",
+                    "usage"
+                  ],
+                  "usage": {
+                    "timeZone": "America/Los_Angeles",
+                    "timestamp": "2024-08-01T10:00:00Z"
+                  }
+                },
+                "platform": "ios",
+                "targetId": "ios-app"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/BuildEventTrackRequest"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Record build download"
+      }
+    },
+    "/builds/{id}/events": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "default": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "perPage",
+            "schema": {
+              "default": 25,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "service",
+            "schema": {
+              "enum": [
+                "analytics",
+                "errors",
+                "distribution",
+                "devices",
+                "usage"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "items": {
+                      "items": {
+                        "$ref": "#/components/schemas/TrackingEvent"
+                      },
+                      "type": "array"
+                    },
+                    "page": {
+                      "type": "integer"
+                    },
+                    "perPage": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "totalPages": {
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "List"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List tracking events"
+      },
+      "post": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuildEventTrackRequest"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "items": {
+                      "items": {
+                        "$ref": "#/components/schemas/TrackingEvent"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Record tracking events"
+      }
+    },
+    "/builds/{id}/icons": {
+      "get": {
+        "description": "Lists extracted icon images for build targets and includes inline data URLs.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Build icons"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List build icons"
+      }
+    },
+    "/builds/{id}/icons/{targetId}": {
+      "get": {
+        "description": "Returns the extracted icon image for a target.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "targetId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Icon image"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get build icon"
+      }
+    },
+    "/builds/{id}/installs": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List build installs"
+      },
+      "post": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "deviceId": "device-123",
+                "metadata": {
+                  "analytics": {
+                    "event": {
+                      "name": "app_launch",
+                      "properties": {
+                        "screen": "home"
+                      }
+                    },
+                    "session": {
+                      "durationMs": 120000,
+                      "id": "sess_123",
+                      "startedAt": "2024-08-01T10:00:00Z"
+                    }
+                  },
+                  "device": {
+                    "locale": "en-US",
+                    "model": "iPhone15,3",
+                    "osVersion": "17.4"
+                  },
+                  "distribution": {
+                    "appVersion": "1.2.3",
+                    "buildNumber": "45",
+                    "installSource": "email"
+                  },
+                  "services": [
+                    "analytics",
+                    "distribution",
+                    "devices",
+                    "usage"
+                  ],
+                  "usage": {
+                    "timeZone": "America/Los_Angeles",
+                    "timestamp": "2024-08-01T10:00:00Z"
+                  }
+                },
+                "platform": "ios",
+                "targetId": "ios-app"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/BuildEventTrackRequest"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Record build install"
+      }
+    },
+    "/builds/{id}/ios/download": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Download"
+          }
+        },
+        "summary": "Download iOS IPA"
+      }
+    },
+    "/builds/{id}/ios/install-link": {
+      "post": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Install link"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create iOS install link"
+      }
+    },
+    "/builds/{id}/ios/installs/track": {
+      "post": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "deviceId": "device-123",
+                "metadata": {
+                  "analytics": {
+                    "event": {
+                      "name": "app_launch",
+                      "properties": {
+                        "screen": "home"
+                      }
+                    },
+                    "session": {
+                      "durationMs": 120000,
+                      "id": "sess_123",
+                      "startedAt": "2024-08-01T10:00:00Z"
+                    }
+                  },
+                  "device": {
+                    "locale": "en-US",
+                    "model": "iPhone15,3",
+                    "osVersion": "17.4"
+                  },
+                  "distribution": {
+                    "appVersion": "1.2.3",
+                    "buildNumber": "45",
+                    "installSource": "email"
+                  },
+                  "services": [
+                    "analytics",
+                    "distribution",
+                    "devices",
+                    "usage"
+                  ],
+                  "usage": {
+                    "timeZone": "America/Los_Angeles",
+                    "timestamp": "2024-08-01T10:00:00Z"
+                  }
+                },
+                "platform": "ios",
+                "targetId": "ios-app"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/BuildEventTrackRequest"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Track iOS install"
+      }
+    },
+    "/builds/{id}/ios/manifest": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Manifest"
+          }
+        },
+        "summary": "Get iOS manifest plist"
+      }
+    },
+    "/builds/{id}/metadata": {
+      "get": {
+        "description": "Returns build metadata with artifacts grouped by kind plus targets/app/version context.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Build metadata"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get build metadata"
+      }
+    },
+    "/builds/{id}/tags": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
             "required": true,
             "schema": {
               "type": "string"
@@ -962,19 +2203,19 @@
           "404": {
             "description": "Not found"
           }
-        }
-      },
-      "put": {
-        "summary": "Replace build tags",
+        },
         "security": [
           {
             "bearerAuth": []
           }
         ],
+        "summary": "List build tags"
+      },
+      "put": {
         "parameters": [
           {
-            "name": "id",
             "in": "path",
+            "name": "id",
             "required": true,
             "schema": {
               "type": "string"
@@ -985,25 +2226,25 @@
           }
         ],
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
                 "properties": {
                   "tags": {
-                    "type": "array",
                     "items": {
                       "type": "string"
-                    }
+                    },
+                    "type": "array"
                   }
                 },
                 "required": [
                   "tags"
-                ]
+                ],
+                "type": "object"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -1012,58 +2253,860 @@
           "404": {
             "description": "Not found"
           }
-        }
-      }
-    },
-    "/tags": {
-      "get": {
-        "summary": "List team tags",
+        },
         "security": [
           {
             "bearerAuth": []
           }
         ],
+        "summary": "Replace build tags"
+      }
+    },
+    "/capabilities": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List capabilities"
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create capability"
+      }
+    },
+    "/feature-flags": {
+      "get": {
+        "description": "Super user only.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FeatureFlag"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "List"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List feature flags"
+      },
+      "post": {
+        "description": "Super user only.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "defaultEnabled": {
+                    "type": "boolean"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "key": {
+                    "type": "string"
+                  },
+                  "metadata": {
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "key"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeatureFlag"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create or ensure feature flag"
+      }
+    },
+    "/feature-flags/{key}": {
+      "delete": {
+        "description": "Super user only.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeatureFlag"
+                }
+              }
+            },
+            "description": "Deleted"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete feature flag"
+      },
+      "get": {
+        "description": "Super user only.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeatureFlag"
+                }
+              }
+            },
+            "description": "Feature flag"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get feature flag by key"
+      },
+      "patch": {
+        "description": "Super user only.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "defaultEnabled": {
+                    "type": "boolean"
+                  },
+                  "description": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "metadata": {
+                    "nullable": true,
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeatureFlag"
+                }
+              }
+            },
+            "description": "Updated"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Update feature flag"
+      }
+    },
+    "/feature-flags/{key}/evaluate": {
+      "get": {
+        "description": "Super user only.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "key": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Evaluation result"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Evaluate feature flag"
+      }
+    },
+    "/feature-flags/{key}/overrides": {
+      "get": {
+        "description": "Super user only.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FeatureFlagOverride"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "List"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List feature flag overrides"
+      },
+      "post": {
+        "description": "Super user only.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "metadata": {
+                    "type": "object"
+                  },
+                  "rolloutPercentage": {
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "scope": {
+                    "type": "string"
+                  },
+                  "targetKey": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "scope",
+                  "enabled"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeatureFlagOverride"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create or update feature flag override"
+      }
+    },
+    "/health": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Health check"
+      }
+    },
+    "/info": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Info"
+          }
+        },
+        "summary": "Service info"
+      }
+    },
+    "/ingest": {
+      "post": {
+        "description": "iOS: extracts entitlements/provisioning profile and stores an entitlements artifact with distribution = adhoc | appstore | enterprise | none | broken. Returns 400 invalid_archive when the IPA/APK is not a valid zip archive.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "filePath": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "enum": [
+                      "ipa",
+                      "apk",
+                      "aab"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "filePath",
+                  "kind"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "result": {
+                      "properties": {
+                        "appId": {
+                          "type": "string"
+                        },
+                        "appName": {
+                          "type": "string"
+                        },
+                        "buildId": {
+                          "type": "string"
+                        },
+                        "buildNumber": {
+                          "type": "string"
+                        },
+                        "iconBitmap": {
+                          "properties": {
+                            "height": {
+                              "type": "number"
+                            },
+                            "path": {
+                              "type": "string"
+                            },
+                            "sizeBytes": {
+                              "type": "number"
+                            },
+                            "width": {
+                              "type": "number"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "icons": {
+                          "items": {
+                            "properties": {
+                              "density": {
+                                "type": "string"
+                              },
+                              "path": {
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "identifier": {
+                          "type": "string"
+                        },
+                        "manifest": {
+                          "properties": {
+                            "icon": {
+                              "type": "string"
+                            },
+                            "minSdk": {
+                              "type": "string"
+                            },
+                            "packageName": {
+                              "type": "string"
+                            },
+                            "permissions": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            },
+                            "targetSdk": {
+                              "type": "string"
+                            },
+                            "versionCode": {
+                              "type": "string"
+                            },
+                            "versionName": {
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "minSdk": {
+                          "type": "string"
+                        },
+                        "packageName": {
+                          "type": "string"
+                        },
+                        "permissions": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "targetId": {
+                          "type": "string"
+                        },
+                        "targetSdk": {
+                          "type": "string"
+                        },
+                        "targets": {
+                          "items": {
+                            "properties": {
+                              "build": {
+                                "type": "string"
+                              },
+                              "bundleId": {
+                                "type": "string"
+                              },
+                              "iconBitmap": {
+                                "properties": {
+                                  "height": {
+                                    "type": "number"
+                                  },
+                                  "path": {
+                                    "type": "string"
+                                  },
+                                  "sizeBytes": {
+                                    "type": "number"
+                                  },
+                                  "width": {
+                                    "type": "number"
+                                  }
+                                },
+                                "type": "object"
+                              },
+                              "info": {
+                                "type": "object"
+                              },
+                              "minOsVersion": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "orientations": {
+                                "items": {
+                                  "type": "string"
+                                },
+                                "type": "array"
+                              },
+                              "platform": {
+                                "type": "string"
+                              },
+                              "role": {
+                                "type": "string"
+                              },
+                              "supportedDevices": {
+                                "items": {
+                                  "type": "string"
+                                },
+                                "type": "array"
+                              },
+                              "version": {
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "version": {
+                          "type": "string"
+                        },
+                        "versionCode": {
+                          "type": "string"
+                        },
+                        "versionId": {
+                          "type": "string"
+                        },
+                        "versionName": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Ingested"
+          },
+          "501": {
+            "description": "Not implemented"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "summary": "Queue ingestion"
+      }
+    },
+    "/ingest/upload": {
+      "post": {
+        "description": "Returns 400 invalid_archive when the IPA/APK is not a valid zip archive.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "format": "binary",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Ingested"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "summary": "Upload and ingest build"
+      }
+    },
+    "/modules": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List modules"
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create module"
+      }
+    },
+    "/resolve-install": {
+      "post": {
+        "description": "For iOS installs, the plist must include a prevalidated HTTPS download URL. The plist itself is not protected, so the IPA URL must be tokenized (local) or pre-signed (S3) and time-limited. Both plist and IPA download URLs require valid HTTPS certificates. For Android AABs, use bundletool with a device spec (ABI, density, language, sdkVersion) to generate device-specific APK sets and enforce the 4 GB compressed APK-set limit.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resolver response"
+          }
+        },
+        "summary": "Resolve install"
+      }
+    },
+    "/search": {
+      "get": {
         "parameters": [
           {
             "$ref": "#/components/parameters/TeamIdHeader"
           },
           {
-            "name": "appId",
             "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "appId",
             "required": false,
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "page",
             "in": "query",
+            "name": "appPage",
             "required": false,
             "schema": {
-              "type": "integer",
-              "default": 1
+              "default": 1,
+              "type": "integer"
             }
           },
           {
-            "name": "perPage",
             "in": "query",
+            "name": "appPerPage",
             "required": false,
             "schema": {
-              "type": "integer",
-              "default": 25
+              "default": 10,
+              "type": "integer"
             }
           },
           {
-            "name": "limit",
             "in": "query",
+            "name": "buildPage",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "buildPerPage",
+            "required": false,
+            "schema": {
+              "default": 6,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "appLimit",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "buildLimit",
+            "required": false,
+            "schema": {
+              "default": 6,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "appOffset",
             "required": false,
             "schema": {
               "type": "integer"
             }
           },
           {
-            "name": "offset",
             "in": "query",
+            "name": "buildOffset",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results"
+          },
+          "400": {
+            "description": "Invalid query"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Search apps and builds (includes tags)"
+      }
+    },
+    "/storage": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Storage config"
+          }
+        },
+        "summary": "Get storage config"
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Storage config"
+          }
+        },
+        "summary": "Set storage config"
+      }
+    },
+    "/tags": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          },
+          {
+            "in": "query",
+            "name": "appId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "perPage",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
             "required": false,
             "schema": {
               "type": "integer"
@@ -1077,1792 +3120,18 @@
           "400": {
             "description": "Invalid query"
           }
-        }
-      }
-    },
-    "/badges": {
-      "get": {
-        "summary": "Badge counts",
+        },
         "security": [
           {
             "bearerAuth": []
           }
         ],
-        "responses": {
-          "200": {
-            "description": "Badges"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "perPage",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ]
+        "summary": "List team tags"
       }
     },
-    "/ws": {
-      "get": {
-        "summary": "Realtime websocket",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "101": {
-            "description": "Switching Protocols"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          },
-          {
-            "name": "accessToken",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Access token for websocket auth (browser fallback when Authorization header cannot be set)."
-          },
-          {
-            "name": "teamId",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Team context for websocket auth (browser fallback when x-team-id header cannot be set)."
-          }
-        ]
-      }
-    },
-    "/usage/storage/users": {
-      "get": {
-        "summary": "Storage usage by user",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Usage",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "users": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "userId": {
-                            "type": "string"
-                          },
-                          "username": {
-                            "type": "string"
-                          },
-                          "email": {
-                            "type": "string",
-                            "nullable": true
-                          },
-                          "fullName": {
-                            "type": "string",
-                            "nullable": true
-                          },
-                          "buildCount": {
-                            "type": "integer"
-                          },
-                          "totalBytes": {
-                            "type": "integer"
-                          },
-                          "downloadCount": {
-                            "type": "integer"
-                          },
-                          "downloadBytes": {
-                            "type": "integer"
-                          }
-                        },
-                        "required": [
-                          "userId",
-                          "username",
-                          "email",
-                          "fullName",
-                          "buildCount",
-                          "totalBytes",
-                          "downloadCount",
-                          "downloadBytes"
-                        ]
-                      }
-                    }
-                  },
-                  "required": [
-                    "users"
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      }
-    },
-    "/auth/register": {
+    "/store/upload": {
       "post": {
-        "summary": "Register user",
-        "description": "Creates a personal team if the user has no team membership yet. The first registered user is marked as a super user.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "username": {
-                    "type": "string"
-                  },
-                  "password": {
-                    "type": "string"
-                  },
-                  "email": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "username",
-                  "password"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Registered",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthRegisterResult"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/auth/login": {
-      "post": {
-        "summary": "Login",
-        "description": "Ensures a personal team exists for first-time logins.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "identifier": {
-                    "type": "string"
-                  },
-                  "password": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "identifier",
-                  "password"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Session",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthLoginResult"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/auth/refresh": {
-      "post": {
-        "summary": "Refresh token",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "refreshToken": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "refreshToken"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Session"
-          }
-        }
-      }
-    },
-    "/auth/logout": {
-      "post": {
-        "summary": "Logout",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "refreshToken": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "refreshToken"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Revoked"
-          }
-        }
-      }
-    },
-    "/auth/session": {
-      "get": {
-        "summary": "Get session",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Session",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthSessionInfo"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/auth/password-reset": {
-      "post": {
-        "summary": "Request password reset",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "email": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "email"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Sent"
-          }
-        }
-      }
-    },
-    "/auth/password-reset/confirm": {
-      "post": {
-        "summary": "Confirm password reset",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "token": {
-                    "type": "string"
-                  },
-                  "newPassword": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "token",
-                  "newPassword"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Reset"
-          }
-        }
-      }
-    },
-    "/auth/oauth/{provider}/start": {
-      "get": {
-        "summary": "Start OAuth login",
-        "requestBody": {
-          "required": false
-        },
-        "responses": {
-          "200": {
-            "description": "OAuth start",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "authorizeUrl": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/auth/oauth/{provider}/callback": {
-      "get": {
-        "summary": "OAuth callback",
-        "responses": {
-          "302": {
-            "description": "Redirect"
-          }
-        }
-      }
-    },
-    "/auth/oauth/exchange": {
-      "post": {
-        "summary": "Exchange OAuth auth code",
-        "description": "Creates a session and ensures a personal team exists for first-time logins. The first user is marked as a super user.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "authCode": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "authCode"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Session"
-          }
-        }
-      }
-    },
-    "/apps": {
-      "post": {
-        "summary": "Create app",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/App"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      },
-      "get": {
-        "summary": "List apps",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "perPage",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "platform",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ]
-      }
-    },
-    "/apps/{id}": {
-      "get": {
-        "summary": "Get app",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "App"
-          }
-        }
-      }
-    },
-    "/versions": {
-      "post": {
-        "summary": "Create version",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Version"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      },
-      "get": {
-        "summary": "List versions",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      }
-    },
-    "/versions/{id}": {
-      "get": {
-        "summary": "Get version",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Version"
-          }
-        }
-      }
-    },
-    "/builds": {
-      "post": {
-        "summary": "Create build",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      },
-      "get": {
-        "summary": "List builds",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      }
-    },
-    "/builds/{id}": {
-      "get": {
-        "summary": "Get build",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Build"
-          }
-        }
-      }
-    },
-    "/builds/{id}/metadata": {
-      "get": {
-        "summary": "Get build metadata",
-        "description": "Returns build metadata with artifacts grouped by kind plus targets/app/version context.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Build metadata"
-          }
-        }
-      }
-    },
-    "/builds/{id}/icons": {
-      "get": {
-        "summary": "List build icons",
-        "description": "Lists extracted icon images for build targets and includes inline data URLs.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Build icons"
-          }
-        }
-      }
-    },
-    "/builds/{id}/icons/{targetId}": {
-      "get": {
-        "summary": "Get build icon",
-        "description": "Returns the extracted icon image for a target.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "targetId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Icon image"
-          }
-        }
-      }
-    },
-    "/builds/{id}/downloads": {
-      "post": {
-        "summary": "Record build download",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created"
-          }
-        },
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BuildEventTrackRequest"
-              },
-              "example": {
-                "platform": "ios",
-                "deviceId": "device-123",
-                "targetId": "ios-app",
-                "metadata": {
-                  "services": [
-                    "analytics",
-                    "distribution",
-                    "devices",
-                    "usage"
-                  ],
-                  "analytics": {
-                    "event": {
-                      "name": "app_launch",
-                      "properties": {
-                        "screen": "home"
-                      }
-                    },
-                    "session": {
-                      "id": "sess_123",
-                      "startedAt": "2024-08-01T10:00:00Z",
-                      "durationMs": 120000
-                    }
-                  },
-                  "distribution": {
-                    "installSource": "email",
-                    "appVersion": "1.2.3",
-                    "buildNumber": "45"
-                  },
-                  "device": {
-                    "model": "iPhone15,3",
-                    "osVersion": "17.4",
-                    "locale": "en-US"
-                  },
-                  "usage": {
-                    "timestamp": "2024-08-01T10:00:00Z",
-                    "timeZone": "America/Los_Angeles"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "summary": "List build downloads",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List"
-          }
-        }
-      }
-    },
-    "/builds/{id}/installs": {
-      "post": {
-        "summary": "Record build install",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created"
-          }
-        },
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BuildEventTrackRequest"
-              },
-              "example": {
-                "platform": "ios",
-                "deviceId": "device-123",
-                "targetId": "ios-app",
-                "metadata": {
-                  "services": [
-                    "analytics",
-                    "distribution",
-                    "devices",
-                    "usage"
-                  ],
-                  "analytics": {
-                    "event": {
-                      "name": "app_launch",
-                      "properties": {
-                        "screen": "home"
-                      }
-                    },
-                    "session": {
-                      "id": "sess_123",
-                      "startedAt": "2024-08-01T10:00:00Z",
-                      "durationMs": 120000
-                    }
-                  },
-                  "distribution": {
-                    "installSource": "email",
-                    "appVersion": "1.2.3",
-                    "buildNumber": "45"
-                  },
-                  "device": {
-                    "model": "iPhone15,3",
-                    "osVersion": "17.4",
-                    "locale": "en-US"
-                  },
-                  "usage": {
-                    "timestamp": "2024-08-01T10:00:00Z",
-                    "timeZone": "America/Los_Angeles"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "summary": "List build installs",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List"
-          }
-        }
-      }
-    },
-    "/builds/{id}/events": {
-      "post": {
-        "summary": "Record tracking events",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ],
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BuildEventTrackRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "items": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/TrackingEvent"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "summary": "List tracking events",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "default": 1
-            }
-          },
-          {
-            "name": "perPage",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "default": 25
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "service",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "analytics",
-                "errors",
-                "distribution",
-                "devices",
-                "usage"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "items": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/TrackingEvent"
-                      }
-                    },
-                    "page": { "type": "integer" },
-                    "perPage": { "type": "integer" },
-                    "total": { "type": "integer" },
-                    "totalPages": { "type": "integer" }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/builds/{id}/ios/install-link": {
-      "post": {
-        "summary": "Create iOS install link",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Install link"
-          }
-        }
-      }
-    },
-    "/builds/{id}/ios/manifest": {
-      "get": {
-        "summary": "Get iOS manifest plist",
-        "responses": {
-          "200": {
-            "description": "Manifest"
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "token",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ]
-      }
-    },
-    "/builds/{id}/ios/download": {
-      "get": {
-        "summary": "Download iOS IPA",
-        "responses": {
-          "200": {
-            "description": "Download"
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "token",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ]
-      }
-    },
-    "/builds/{id}/ios/installs/track": {
-      "post": {
-        "summary": "Track iOS install",
-        "responses": {
-          "201": {
-            "description": "Created"
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "token",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BuildEventTrackRequest"
-              },
-              "example": {
-                "platform": "ios",
-                "deviceId": "device-123",
-                "targetId": "ios-app",
-                "metadata": {
-                  "services": [
-                    "analytics",
-                    "distribution",
-                    "devices",
-                    "usage"
-                  ],
-                  "analytics": {
-                    "event": {
-                      "name": "app_launch",
-                      "properties": {
-                        "screen": "home"
-                      }
-                    },
-                    "session": {
-                      "id": "sess_123",
-                      "startedAt": "2024-08-01T10:00:00Z",
-                      "durationMs": 120000
-                    }
-                  },
-                  "distribution": {
-                    "installSource": "email",
-                    "appVersion": "1.2.3",
-                    "buildNumber": "45"
-                  },
-                  "device": {
-                    "model": "iPhone15,3",
-                    "osVersion": "17.4",
-                    "locale": "en-US"
-                  },
-                  "usage": {
-                    "timestamp": "2024-08-01T10:00:00Z",
-                    "timeZone": "America/Los_Angeles"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/targets": {
-      "post": {
-        "summary": "Create target",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      },
-      "get": {
-        "summary": "List targets",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      }
-    },
-    "/variants": {
-      "post": {
-        "summary": "Create variant",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      },
-      "get": {
-        "summary": "List variants",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      }
-    },
-    "/modules": {
-      "post": {
-        "summary": "Create module",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      },
-      "get": {
-        "summary": "List modules",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      }
-    },
-    "/capabilities": {
-      "post": {
-        "summary": "Create capability",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      },
-      "get": {
-        "summary": "List capabilities",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      }
-    },
-    "/artifacts": {
-      "post": {
-        "summary": "Create compliance artifact",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      },
-      "get": {
-        "summary": "List compliance artifacts",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      }
-    },
-    "/feature-flags": {
-      "post": {
-        "summary": "Create or ensure feature flag",
-        "description": "Super user only.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "key": {
-                    "type": "string"
-                  },
-                  "description": {
-                    "type": "string"
-                  },
-                  "defaultEnabled": {
-                    "type": "boolean"
-                  },
-                  "metadata": {
-                    "type": "object"
-                  }
-                },
-                "required": [
-                  "key"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FeatureFlag"
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "summary": "List feature flags",
-        "description": "Super user only.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FeatureFlag"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/feature-flags/{key}": {
-      "get": {
-        "summary": "Get feature flag by key",
-        "description": "Super user only.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Feature flag",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FeatureFlag"
-                }
-              }
-            }
-          }
-        }
-      },
-      "patch": {
-        "summary": "Update feature flag",
-        "description": "Super user only.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "description": {
-                    "type": "string",
-                    "nullable": true
-                  },
-                  "defaultEnabled": {
-                    "type": "boolean"
-                  },
-                  "metadata": {
-                    "type": "object",
-                    "nullable": true
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Updated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FeatureFlag"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete feature flag",
-        "description": "Super user only.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Deleted",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FeatureFlag"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/feature-flags/{key}/overrides": {
-      "post": {
-        "summary": "Create or update feature flag override",
-        "description": "Super user only.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "scope": {
-                    "type": "string"
-                  },
-                  "targetKey": {
-                    "type": "string",
-                    "nullable": true
-                  },
-                  "enabled": {
-                    "type": "boolean"
-                  },
-                  "rolloutPercentage": {
-                    "type": "integer",
-                    "nullable": true
-                  },
-                  "metadata": {
-                    "type": "object"
-                  }
-                },
-                "required": [
-                  "scope",
-                  "enabled"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FeatureFlagOverride"
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "summary": "List feature flag overrides",
-        "description": "Super user only.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FeatureFlagOverride"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/feature-flags/{key}/evaluate": {
-      "get": {
-        "summary": "Evaluate feature flag",
-        "description": "Super user only.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Evaluation result",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "key": {
-                      "type": "string"
-                    },
-                    "enabled": {
-                      "type": "boolean"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/ingest": {
-      "post": {
-        "summary": "Queue ingestion",
-        "description": "iOS: extracts entitlements/provisioning profile and stores an entitlements artifact with distribution = adhoc | appstore | enterprise | none | broken. Returns 400 invalid_archive when the IPA/APK is not a valid zip archive.",
+        "summary": "Upload binary to storage",
         "security": [
           {
             "bearerAuth": []
@@ -2871,241 +3140,18 @@
             "apiKeyAuth": []
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "filePath": {
-                    "type": "string"
-                  },
-                  "kind": {
-                    "type": "string",
-                    "enum": [
-                      "ipa",
-                      "apk",
-                      "aab"
-                    ]
-                  }
-                },
-                "required": [
-                  "filePath",
-                  "kind"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Ingested",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string"
-                    },
-                    "result": {
-                      "type": "object",
-                      "properties": {
-                        "appId": {
-                          "type": "string"
-                        },
-                        "versionId": {
-                          "type": "string"
-                        },
-                        "buildId": {
-                          "type": "string"
-                        },
-                        "targetId": {
-                          "type": "string"
-                        },
-                        "packageName": {
-                          "type": "string"
-                        },
-                        "versionName": {
-                          "type": "string"
-                        },
-                        "versionCode": {
-                          "type": "string"
-                        },
-                        "appName": {
-                          "type": "string"
-                        },
-                        "minSdk": {
-                          "type": "string"
-                        },
-                        "targetSdk": {
-                          "type": "string"
-                        },
-                        "permissions": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        },
-                        "icons": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "density": {
-                                "type": "string"
-                              },
-                              "path": {
-                                "type": "string"
-                              }
-                            }
-                          }
-                        },
-                        "manifest": {
-                          "type": "object",
-                          "properties": {
-                            "packageName": {
-                              "type": "string"
-                            },
-                            "versionName": {
-                              "type": "string"
-                            },
-                            "versionCode": {
-                              "type": "string"
-                            },
-                            "minSdk": {
-                              "type": "string"
-                            },
-                            "targetSdk": {
-                              "type": "string"
-                            },
-                            "permissions": {
-                              "type": "array",
-                              "items": {
-                                "type": "string"
-                              }
-                            },
-                            "icon": {
-                              "type": "string"
-                            }
-                          }
-                        },
-                        "iconBitmap": {
-                          "type": "object",
-                          "properties": {
-                            "path": {
-                              "type": "string"
-                            },
-                            "width": {
-                              "type": "number"
-                            },
-                            "height": {
-                              "type": "number"
-                            },
-                            "sizeBytes": {
-                              "type": "number"
-                            }
-                          }
-                        },
-                        "targets": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "name": {
-                                "type": "string"
-                              },
-                              "bundleId": {
-                                "type": "string"
-                              },
-                              "role": {
-                                "type": "string"
-                              },
-                              "platform": {
-                                "type": "string"
-                              },
-                              "version": {
-                                "type": "string"
-                              },
-                              "build": {
-                                "type": "string"
-                              },
-                              "supportedDevices": {
-                                "type": "array",
-                                "items": {
-                                  "type": "string"
-                                }
-                              },
-                              "orientations": {
-                                "type": "array",
-                                "items": {
-                                  "type": "string"
-                                }
-                              },
-                              "minOsVersion": {
-                                "type": "string"
-                              },
-                              "iconBitmap": {
-                                "type": "object",
-                                "properties": {
-                                  "path": {
-                                    "type": "string"
-                                  },
-                                  "width": {
-                                    "type": "number"
-                                  },
-                                  "height": {
-                                    "type": "number"
-                                  },
-                                  "sizeBytes": {
-                                    "type": "number"
-                                  }
-                                }
-                              },
-                              "info": {
-                                "type": "object"
-                              }
-                            }
-                          }
-                        },
-                        "identifier": {
-                          "type": "string"
-                        },
-                        "buildNumber": {
-                          "type": "string"
-                        },
-                        "version": {
-                          "type": "string"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "501": {
-            "description": "Not implemented"
-          }
-        },
         "parameters": [
           {
             "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      }
-    },
-    "/ingest/upload": {
-      "post": {
-        "summary": "Upload and ingest build",
-        "description": "Returns 400 invalid_archive when the IPA/APK is not a valid zip archive.",
-        "security": [
-          {
-            "bearerAuth": []
           },
           {
-            "apiKeyAuth": []
+            "name": "token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "API key token (query alternative to x-api-key header)"
           }
         ],
         "requestBody": {
@@ -3129,223 +3175,127 @@
         },
         "responses": {
           "201": {
-            "description": "Ingested"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      }
-    },
-    "/resolve-install": {
-      "post": {
-        "summary": "Resolve install",
-        "description": "For iOS installs, the plist must include a prevalidated HTTPS download URL. The plist itself is not protected, so the IPA URL must be tokenized (local) or pre-signed (S3) and time-limited. Both plist and IPA download URLs require valid HTTPS certificates. For Android AABs, use bundletool with a device spec (ABI, density, language, sdkVersion) to generate device-specific APK sets and enforce the 4 GB compressed APK-set limit.",
-        "responses": {
-          "200": {
-            "description": "Resolver response"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      }
-    },
-    "/storage": {
-      "get": {
-        "summary": "Get storage config",
-        "responses": {
-          "200": {
-            "description": "Storage config"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      },
-      "post": {
-        "summary": "Set storage config",
-        "responses": {
-          "200": {
-            "description": "Storage config"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      }
-    },
-    "/api-keys": {
-      "get": {
-        "summary": "List API keys",
-        "description": "Team admin/owner only.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "apiKeys": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/ApiKeySummary"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      },
-      "post": {
-        "summary": "Create API key",
-        "description": "Team admin/owner only. Token returned once.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "expiresAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  }
-                },
-                "required": [
-                  "name"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiKeyCreateResponse"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ]
-      }
-    },
-    "/api-keys/{id}": {
-      "delete": {
-        "summary": "Revoke API key",
-        "description": "Team admin/owner only.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Revoked"
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "description": "Stored file"
           },
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
+          "400": {
+            "description": "Invalid payload"
+          },
+          "413": {
+            "description": "File too large"
           }
-        ]
+        }
       }
     },
-    "/teams": {
+    "/targets": {
       "get": {
-        "summary": "List teams",
-        "security": [
+        "parameters": [
           {
-            "bearerAuth": []
+            "$ref": "#/components/parameters/TeamIdHeader"
           }
         ],
         "responses": {
           "200": {
             "description": "List"
           }
-        }
-      },
-      "post": {
-        "summary": "Create team",
+        },
         "security": [
           {
             "bearerAuth": []
           }
         ],
+        "summary": "List targets"
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create target"
+      }
+    },
+    "/teams": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "List"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List teams"
+      },
+      "post": {
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "201": {
             "description": "Created"
           }
-        }
-      }
-    },
-    "/teams/{teamId}": {
-      "get": {
-        "summary": "Get team",
+        },
         "security": [
           {
             "bearerAuth": []
           }
         ],
+        "summary": "Create team"
+      }
+    },
+    "/teams/stats": {
+      "get": {
+        "description": "Storage totals, downloads this month, and uploads in the current billing cycle for the active team.",
         "parameters": [
           {
-            "name": "teamId",
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamStats"
+                }
+              }
+            },
+            "description": "Team stats"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Team stats"
+      }
+    },
+    "/teams/{teamId}": {
+      "get": {
+        "parameters": [
+          {
             "in": "path",
+            "name": "teamId",
             "required": true,
             "schema": {
               "type": "string"
@@ -3356,19 +3306,19 @@
           "200": {
             "description": "OK"
           }
-        }
-      },
-      "patch": {
-        "summary": "Update team",
+        },
         "security": [
           {
             "bearerAuth": []
           }
         ],
+        "summary": "Get team"
+      },
+      "patch": {
         "parameters": [
           {
-            "name": "teamId",
             "in": "path",
+            "name": "teamId",
             "required": true,
             "schema": {
               "type": "string"
@@ -3376,34 +3326,84 @@
           }
         ],
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
             "description": "Updated"
           }
-        }
-      }
-    },
-    "/teams/{teamId}/users": {
-      "get": {
-        "summary": "List team users",
+        },
         "security": [
           {
             "bearerAuth": []
           }
         ],
+        "summary": "Update team"
+      }
+    },
+    "/teams/{teamId}/inbox": {
+      "get": {
         "parameters": [
           {
-            "name": "teamId",
             "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get team inbox address"
+      }
+    },
+    "/teams/{teamId}/select": {
+      "post": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Select active team"
+      }
+    },
+    "/teams/{teamId}/users": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
             "required": true,
             "schema": {
               "type": "string"
@@ -3414,19 +3414,19 @@
           "200": {
             "description": "List"
           }
-        }
-      },
-      "post": {
-        "summary": "Add team user",
+        },
         "security": [
           {
             "bearerAuth": []
           }
         ],
+        "summary": "List team users"
+      },
+      "post": {
         "parameters": [
           {
-            "name": "teamId",
             "in": "path",
+            "name": "teamId",
             "required": true,
             "schema": {
               "type": "string"
@@ -3434,83 +3434,42 @@
           }
         ],
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "201": {
             "description": "Created"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Add team user"
       }
     },
     "/teams/{teamId}/users/{userId}": {
-      "patch": {
-        "summary": "Update team user role",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "teamId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Updated"
-          }
-        }
-      },
       "delete": {
-        "summary": "Remove team user",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
         "parameters": [
           {
-            "name": "teamId",
             "in": "path",
+            "name": "teamId",
             "required": true,
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "userId",
             "in": "path",
+            "name": "userId",
             "required": true,
             "schema": {
               "type": "string"
@@ -3521,94 +3480,27 @@
           "200": {
             "description": "Removed"
           }
-        }
-      }
-    },
-    "/teams/{teamId}/select": {
-      "post": {
-        "summary": "Select active team",
+        },
         "security": [
           {
             "bearerAuth": []
           }
         ],
-        "parameters": [
-          {
-            "name": "teamId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/teams/{teamId}/inbox": {
-      "get": {
-        "summary": "Get team inbox address",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "teamId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/user-team-settings/{key}": {
-      "get": {
-        "summary": "Get user team setting",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "key",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
+        "summary": "Remove team user"
       },
-      "put": {
-        "summary": "Upsert user team setting",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
+      "patch": {
         "parameters": [
           {
-            "name": "key",
             "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "userId",
             "required": true,
             "schema": {
               "type": "string"
@@ -3616,31 +3508,71 @@
           }
         ],
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Updated"
           }
-        }
-      }
-    },
-    "/teams/stats": {
-      "get": {
-        "summary": "Team stats",
-        "description": "Storage totals, downloads this month, and uploads in the current billing cycle for the active team.",
+        },
         "security": [
           {
             "bearerAuth": []
           }
         ],
+        "summary": "Update team user role"
+      }
+    },
+    "/tracking/events": {
+      "post": {
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuildEventTrackRequest"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "items": {
+                      "items": {
+                        "$ref": "#/components/schemas/TrackingEvent"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Record tracking events (build auto-resolved)"
+      }
+    },
+    "/usage/storage/users": {
+      "get": {
         "parameters": [
           {
             "$ref": "#/components/parameters/TeamIdHeader"
@@ -3648,17 +3580,287 @@
         ],
         "responses": {
           "200": {
-            "description": "Team stats",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TeamStats"
+                  "properties": {
+                    "users": {
+                      "items": {
+                        "properties": {
+                          "buildCount": {
+                            "type": "integer"
+                          },
+                          "downloadBytes": {
+                            "type": "integer"
+                          },
+                          "downloadCount": {
+                            "type": "integer"
+                          },
+                          "email": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "fullName": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "totalBytes": {
+                            "type": "integer"
+                          },
+                          "userId": {
+                            "type": "string"
+                          },
+                          "username": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "userId",
+                          "username",
+                          "email",
+                          "fullName",
+                          "buildCount",
+                          "totalBytes",
+                          "downloadCount",
+                          "downloadBytes"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "users"
+                  ],
+                  "type": "object"
                 }
               }
+            },
+            "description": "Usage"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Storage usage by user"
+      }
+    },
+    "/user-team-settings/{key}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get user team setting"
+      },
+      "put": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Upsert user team setting"
+      }
+    },
+    "/variants": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List variants"
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create variant"
+      }
+    },
+    "/versions": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List versions"
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Version"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create version"
+      }
+    },
+    "/versions/{id}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Version"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get version"
+      }
+    },
+    "/ws": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          },
+          {
+            "description": "Access token for websocket auth (browser fallback when Authorization header cannot be set).",
+            "in": "query",
+            "name": "accessToken",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Team context for websocket auth (browser fallback when x-team-id header cannot be set).",
+            "in": "query",
+            "name": "teamId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "Switching Protocols"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Realtime websocket"
       }
     }
-  }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080"
+    }
+  ]
 }

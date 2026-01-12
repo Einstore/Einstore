@@ -128,4 +128,45 @@ export async function pipelineRoutes(app: FastifyInstance) {
       throw error;
     }
   });
+
+  app.post("/store/upload", { preHandler: requireTeamOrApiKey }, async (request, reply) => {
+    if (!request.isMultipart()) {
+      return reply.status(400).send({ error: "multipart_required" });
+    }
+    const part = await request.file();
+    if (!part) {
+      return reply.status(400).send({ error: "missing_file" });
+    }
+    const teamId = request.team?.id;
+    if (!teamId) {
+      return reply.status(403).send({ error: "team_required", message: "Team context required" });
+    }
+
+    const extension = path.extname(part.filename ?? "").toLowerCase();
+    const uploadDir = path.resolve(process.cwd(), "storage", "uploads");
+    await fs.promises.mkdir(uploadDir, { recursive: true });
+    const uploadName = `${crypto.randomUUID()}${extension}`;
+    const filePath = path.join(uploadDir, uploadName);
+
+    try {
+      await pipeline(part.file, fs.createWriteStream(filePath));
+    } catch (error) {
+      await fs.promises.rm(filePath, { force: true });
+      throw error;
+    }
+
+    if (part.file.truncated) {
+      await fs.promises.rm(filePath, { force: true });
+      return reply.status(413).send({ error: "file_too_large" });
+    }
+
+    const stats = await fs.promises.stat(filePath);
+    return reply.status(201).send({
+      status: "stored",
+      filePath,
+      filename: part.filename ?? uploadName,
+      sizeBytes: stats.size,
+      teamId,
+    });
+  });
 }

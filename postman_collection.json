@@ -2549,6 +2549,57 @@
       }
     },
     {
+      "name": "Store Upload (token query)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "multipart/form-data"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": "{{uploadFilePath}}"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/store/upload?token={{apiKeyToken}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "store",
+            "upload"
+          ],
+          "query": [
+            {
+              "key": "token",
+              "value": "{{apiKeyToken}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Store upload accepted', function () {",
+              "  pm.expect(pm.response.code).to.equal(201);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
       "name": "iOS Ingest",
       "request": {
         "method": "POST",
@@ -3213,54 +3264,6 @@
       ]
     },
     {
-      "name": "Record Tracking Events",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{accessToken}}"
-          },
-          {
-            "key": "x-team-id",
-            "value": "{{teamId}}"
-          },
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/builds/{{buildId}}/events",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "builds",
-            "{{buildId}}",
-            "events"
-          ]
-        },
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"platform\": \"ios\",\n  \"deviceId\": \"device-123\",\n  \"metadata\": {\n    \"services\": [\"analytics\", \"errors\", \"usage\"],\n    \"analytics\": {\n      \"event\": { \"name\": \"app_launch\", \"properties\": { \"screen\": \"home\" } },\n      \"session\": { \"id\": \"sess-1\", \"startedAt\": \"2024-01-01T00:00:00Z\", \"durationMs\": 120000 }\n    },\n    \"errors\": { \"message\": \"Handled error\", \"stackTrace\": \"Error: ...\" },\n    \"usage\": { \"timestamp\": \"2024-01-01T00:00:00Z\", \"timeZone\": \"UTC\", \"locale\": \"en-US\" }\n  }\n}"
-        }
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Tracking events recorded', function () {",
-              "  pm.expect(pm.response.code).to.equal(201);",
-              "});"
-            ]
-          }
-        }
-      ]
-    },
-    {
       "name": "List Tracking Events",
       "request": {
         "method": "GET",
@@ -3268,10 +3271,6 @@
           {
             "key": "Authorization",
             "value": "Bearer {{accessToken}}"
-          },
-          {
-            "key": "x-team-id",
-            "value": "{{teamId}}"
           }
         ],
         "url": {
@@ -3347,6 +3346,93 @@
             "exec": [
               "pm.test('Team stats ok', function () {",
               "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Record Tracking Events (auto)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/tracking/events",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tracking",
+            "events"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"platform\": \"ios\",\n  \"targetId\": \"com.example.app\",\n  \"deviceId\": \"device-123\",\n  \"metadata\": {\n    \"services\": [\"analytics\", \"errors\", \"usage\"],\n    \"analytics\": {\n      \"event\": { \"name\": \"app_launch\", \"properties\": { \"screen\": \"home\" } },\n      \"session\": { \"id\": \"sess-1\", \"startedAt\": \"2024-01-01T00:00:00Z\", \"durationMs\": 120000 }\n    },\n    \"errors\": { \"message\": \"Handled error\", \"stackTrace\": \"Error: ...\" },\n    \"usage\": { \"timestamp\": \"2024-01-01T00:00:00Z\", \"timeZone\": \"UTC\", \"locale\": \"en-US\" }\n  }\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Tracking events recorded', function () {",
+              "  pm.expect(pm.response.code).to.equal(201);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Record Tracking Events (by build id)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/builds/{{buildId}}/events",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "builds",
+            "{{buildId}}",
+            "events"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"platform\": \"ios\",\n  \"targetId\": \"com.example.app\",\n  \"deviceId\": \"device-123\",\n  \"metadata\": {\n    \"services\": [\"analytics\", \"errors\", \"usage\"],\n    \"analytics\": {\n      \"event\": { \"name\": \"app_launch\", \"properties\": { \"screen\": \"home\" } },\n      \"session\": { \"id\": \"sess-1\", \"startedAt\": \"2024-01-01T00:00:00Z\", \"durationMs\": 120000 }\n    },\n    \"errors\": { \"message\": \"Handled error\", \"stackTrace\": \"Error: ...\" },\n    \"usage\": { \"timestamp\": \"2024-01-01T00:00:00Z\", \"timeZone\": \"UTC\", \"locale\": \"en-US\" }\n  }\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Tracking events recorded', function () {",
+              "  pm.expect(pm.response.code).to.equal(201);",
               "});"
             ]
           }
