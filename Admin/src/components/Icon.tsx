@@ -19,6 +19,7 @@ import {
   faPlus,
   faRocket,
   faSun,
+  faDollarSign,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { faApple, faAndroid } from "@fortawesome/free-brands-svg-icons";
@@ -48,6 +49,7 @@ const icons = {
   key: faKey,
   close: faXmark,
   link: faLink,
+  dollar: faDollarSign,
 } as const;
 
 export type IconName = keyof typeof icons;

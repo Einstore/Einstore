@@ -485,7 +485,10 @@ const AppRoutes = () => {
   const routes: RouteConfig[] = [...coreRoutes, ...privateRoutes];
 
   const visibleNavItems = useMemo(() => {
-    const sortedPrivate = [...privateNavItems].sort((a, b) => a.label.localeCompare(b.label));
+    const normalizedPrivate = privateNavItems.map((item) =>
+      item.id === "billing" ? { ...item, icon: "dollar" as const } : item
+    );
+    const sortedPrivate = [...normalizedPrivate].sort((a, b) => a.label.localeCompare(b.label));
     const settingsIndex = navItems.findIndex((item) => item.id === "settings");
     const beforeSettings = settingsIndex >= 0 ? navItems.slice(0, settingsIndex) : navItems;
     const afterSettings = settingsIndex >= 0 ? navItems.slice(settingsIndex) : [];
