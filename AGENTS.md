@@ -47,6 +47,7 @@ postgresql://postgres@localhost:5432/einstore?schema=public
 - Worktree safety: never discard/revert uncommitted changes, especially ones not created in the current task context.
 - No destructive commands unless explicitly requested (e.g., `git reset`, `git clean`, `git restore`, `rm`).
 - Commit and push after each turn, but only include files you personally touched that turn—never stage or commit unrelated or pre-existing changes. This is very important: do not stage, commit, or remove any unrelated or pre-existing changes.
+- If you add or modify database migrations, run `make migrate test` before committing.
 
 ## Pagination standard
 
