@@ -29,7 +29,7 @@ const renderMetadataRows = (metadata: unknown) => {
   if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) return null;
   const entries = Object.entries(metadata as Record<string, unknown>);
   if (!entries.length) return null;
-  const formatValue = (value: unknown) => {
+  const formatValue = (value: unknown): string => {
     if (value == null) return "—";
     if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
       return String(value);
@@ -41,26 +41,46 @@ const renderMetadataRows = (metadata: unknown) => {
       .map(([k, v]) => `${k}: ${formatValue(v)}`)
       .join("; ");
   };
+
+  const toSegments = (value: unknown): string[] => {
+    const text = formatValue(value);
+    if (text.includes(";")) {
+      return text.split(";").map((item) => item.trim()).filter(Boolean);
+    }
+    if (text.includes(",")) {
+      return text.split(",").map((item) => item.trim()).filter(Boolean);
+    }
+    return [text];
+  };
+
   return (
     <div className="mt-2 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
       {entries.map(([key, value], index) => {
         const isEven = index % 2 === 0;
         const description = metadataDescriptionMap[key];
+        const segments = toSegments(value);
         return (
           <div
             key={key}
-            className={`grid gap-2 px-3 py-2 text-sm ${
+            className={`grid grid-cols-[1fr_2fr] gap-3 px-3 py-3 text-sm ${
               isEven ? "bg-slate-50 dark:bg-slate-800" : "bg-white dark:bg-slate-900"
             }`}
           >
-            <div className="flex items-start justify-between gap-2">
-              <span className="font-semibold text-slate-900 dark:text-slate-100">{key}</span>
+            <div className="space-y-1">
+              <p className="font-semibold text-slate-900 dark:text-slate-100">{key}</p>
               {description ? (
-                <span className="text-xs text-slate-500 dark:text-slate-400">{description}</span>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{description}</p>
               ) : null}
             </div>
-            <div className="break-words text-xs text-slate-700 dark:text-slate-300">
-              {formatValue(value)}
+            <div className="space-y-1 break-words text-xs text-slate-700 dark:text-slate-300">
+              {segments.map((segment, segmentIndex) => (
+                <div
+                  key={`${key}-${segmentIndex}`}
+                  className="rounded-md bg-slate-100 px-2 py-1 dark:bg-slate-700/60"
+                >
+                  {segment || "—"}
+                </div>
+              ))}
             </div>
           </div>
         );
