@@ -63,7 +63,16 @@ export async function searchRoutes(app) {
                 { version: { version: { contains: q, mode: "insensitive" } } },
                 { version: { app: { name: { contains: q, mode: "insensitive" } } } },
                 { version: { app: { identifier: { contains: q, mode: "insensitive" } } } },
-                { buildTags: { some: { tag: { normalizedName: normalizedQuery } } } },
+                {
+                    tags: {
+                        some: {
+                            OR: [
+                                { tag: { normalizedName: normalizedQuery } },
+                                { tag: { name: { contains: q, mode: "insensitive" } } },
+                            ],
+                        },
+                    },
+                },
             ],
         };
         const [appTotal, apps] = await prisma.$transaction([
@@ -75,22 +84,20 @@ export async function searchRoutes(app) {
                 take: appPagination.perPage,
             }),
         ]);
-        const [buildTotal, builds] = await prisma.$transaction([
-            prisma.build.count({ where: buildWhere }),
-            prisma.build.findMany({
-                where: buildWhere,
-                orderBy: { createdAt: "desc" },
-                skip: buildPagination.offset,
-                take: buildPagination.perPage,
-                include: {
-                    version: {
-                        include: {
-                            app: true,
-                        },
+        const buildTotal = await prisma.build.count({ where: buildWhere });
+        const builds = await prisma.build.findMany({
+            where: buildWhere,
+            orderBy: { createdAt: "desc" },
+            skip: buildPagination.offset,
+            take: buildPagination.perPage,
+            include: {
+                version: {
+                    include: {
+                        app: true,
                     },
                 },
-            }),
-        ]);
+            },
+        });
         const uniqueBuilds = new Map(builds.map((build) => [
             build.id,
             {
