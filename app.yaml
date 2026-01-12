@@ -42,11 +42,12 @@ jobs:
     > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa && ssh-keyscan github.com >> ~/.ssh/known_hosts
     && mkdir -p ../Private && git clone git@github.com:Einstore/Billing.git ../Private/billing;
     fi && npm install
+  environment_slug: node-js
   envs:
   - key: DATABASE_URL
     scope: RUN_TIME
     type: SECRET
-    value: EV[1:1trs2VkhpvGhCzNDc6Wws/iag2w1Jqnv:TJ2Ghn0Yj0Obzb6K25q35SzQ9aT8mWS7qh/mWUIz7pzmP6BuFU0rxYzvMMxNHvAgQc/UhiTDr//RHng7JcA9hcwKuT9zUIrJvXYj0CvBpsxpvFoGDWIkQTaCVVewxrMJftc23OLbAM/EQicSmk5mutSWBQ2VLvtthMMt+2fXZFHzBlq8xHIFaaMx+rUMxY2zz+VaSCRrVDBlzNwvkXbVwtFwOrg=]
+    value: EV[1:1zlanTjGTJXXvvYFVfoJlgNdel3FZmZK:ntVrUV69Zo98EOni/0v3t3l5l6PCRazOMylnxflYARSl+AVi51Ak4/u1CV9o7PStMUhs99/aWKXBmUVlfApjdGafxPUeuTtKljKrv1x/Ic9NrayUyarFQd1evtsLvbLCmAceUrRNaG1gBlxqrVprt3CCAtm+7n3asj7hI2cRy+C3yCnE5zEBj2mLSeGJP2I/]
   - key: BILLING_DEPLOY_KEY
     scope: BUILD_TIME
     type: SECRET
@@ -54,7 +55,6 @@ jobs:
   - key: NPM_CONFIG_INSTALL_LINKS
     scope: BUILD_TIME
     value: "false"
-  environment_slug: node-js
   github:
     branch: main
     repo: Einstore/Einstore
@@ -81,7 +81,7 @@ services:
   - key: DATABASE_URL
     scope: RUN_TIME
     type: SECRET
-    value: EV[1:1trs2VkhpvGhCzNDc6Wws/iag2w1Jqnv:TJ2Ghn0Yj0Obzb6K25q35SzQ9aT8mWS7qh/mWUIz7pzmP6BuFU0rxYzvMMxNHvAgQc/UhiTDr//RHng7JcA9hcwKuT9zUIrJvXYj0CvBpsxpvFoGDWIkQTaCVVewxrMJftc23OLbAM/EQicSmk5mutSWBQ2VLvtthMMt+2fXZFHzBlq8xHIFaaMx+rUMxY2zz+VaSCRrVDBlzNwvkXbVwtFwOrg=]
+    value: EV[1:VGOPbNMjwz8CuWdR22bvCqEs+gRau2PP:p5nG4Gui/gDPzhYUnZ0B1PgA2GAjjI4uFviDHYNYjvildSGEePHlEHRzkP1Dt5if0xvS1eZOFOqOO1q9CIMiIUxa9pkkD697OJDZwudF7Z4C7pHYn0TO5pYbs1mQ5yLAt+IdK4RN/V1QiNtCC+U/t15GPfDn/A/eASISjhtmGmG/LFR2Q3KlXZSB6YZHRYkD]
   - key: SPACES_ENDPOINT
     scope: RUN_TIME
     value: https://lon1.digitaloceanspaces.com
