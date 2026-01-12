@@ -69,10 +69,11 @@ describe("GET /search", () => {
     });
     expect(response.statusCode).toBe(200);
     const [countArgs] = prismaMock.build.count.mock.calls[0];
-    expect(countArgs.where?.OR).toEqual(
+    const orClauses = countArgs.where?.OR ?? [];
+    expect(orClauses).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          buildTags: {
+          tags: {
             some: expect.objectContaining({
               OR: expect.arrayContaining([
                 { tag: { normalizedName: "beta" } },

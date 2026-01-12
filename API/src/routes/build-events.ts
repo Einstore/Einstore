@@ -5,10 +5,13 @@ import { prisma } from "../lib/prisma.js";
 import { requireTeam } from "../auth/guard.js";
 import { requireBuildForTeam } from "../lib/team-access.js";
 import { BuildEventKind, PlatformKind } from "@prisma/client";
+import { buildPaginationMeta, resolvePagination } from "../lib/pagination.js";
 
 const listQuerySchema = z.object({
-  limit: z.coerce.number().int().positive().max(200).default(50),
-  offset: z.coerce.number().int().nonnegative().default(0),
+  page: z.coerce.number().int().positive().optional(),
+  perPage: z.coerce.number().int().min(1).max(200).optional(),
+  limit: z.coerce.number().int().positive().max(200).optional(),
+  offset: z.coerce.number().int().nonnegative().optional(),
 });
 
 const createEventSchema = z.object({
@@ -80,13 +83,35 @@ export async function buildEventRoutes(app: FastifyInstance) {
     if (!build) {
       return reply.status(404).send({ error: "Not found" });
     }
-    const items = await prisma.buildEvent.findMany({
-      where: { buildId, teamId, kind },
-      skip: parsed.data.offset,
-      take: parsed.data.limit,
-      orderBy: { createdAt: "desc" },
+    const pagination = resolvePagination({
+      page: parsed.data.page,
+      perPage: parsed.data.perPage,
+      limit: parsed.data.limit,
+      offset: parsed.data.offset,
+      defaultPerPage: 25,
+      maxPerPage: 200,
     });
-    return reply.send(items);
+    const where = { buildId, teamId, kind };
+    const [total, items] = await prisma.$transaction([
+      prisma.buildEvent.count({ where }),
+      prisma.buildEvent.findMany({
+        where,
+        skip: pagination.offset,
+        take: pagination.perPage,
+        orderBy: { createdAt: "desc" },
+        include: {
+          user: {
+            select: { id: true, username: true, email: true, fullName: true },
+          },
+        },
+      }),
+    ]);
+    const meta = buildPaginationMeta({
+      page: pagination.page,
+      perPage: pagination.perPage,
+      total,
+    });
+    return reply.send({ items, ...meta });
   };
 
   app.post("/builds/:id/downloads", { preHandler: requireTeam }, createHandler("download"));

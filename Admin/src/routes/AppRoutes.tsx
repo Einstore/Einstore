@@ -39,6 +39,7 @@ import {
   type ApiBuildIconResponse,
   type ApiBuildMetadata,
   type ApiTag,
+  type ApiBuildEvent,
 } from "../lib/apps";
 import { enableAnalytics, trackPageView } from "../lib/analytics";
 import { useSessionState } from "../lib/session";
@@ -704,6 +705,13 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
   const [error, setError] = useState<string | null>(null);
   const [tags, setTags] = useState<ApiTag[]>([]);
   const [availableTags, setAvailableTags] = useState<ApiTag[]>([]);
+  const [downloads, setDownloads] = useState<ApiBuildEvent[]>([]);
+  const [downloadMeta, setDownloadMeta] = useState<PaginationMeta>({
+    page: 1,
+    perPage: 10,
+    total: 0,
+    totalPages: 1,
+  });
   const installBuild = useCallback(
     async (id: string) => {
       try {
@@ -748,6 +756,8 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
     setBuild(null);
     setTags([]);
     setAvailableTags([]);
+    setDownloads([]);
+    setDownloadMeta({ page: 1, perPage: 10, total: 0, totalPages: 1 });
     setError(null);
     if (!buildId) {
       setIsLoading(false);
@@ -790,6 +800,47 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
       isMounted = false;
     };
   }, [buildId, activeTeamId]);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (!buildId) {
+      setDownloads([]);
+      setDownloadMeta({ page: 1, perPage: 10, total: 0, totalPages: 1 });
+      return () => {
+        isMounted = false;
+      };
+    }
+    const load = async () => {
+      const params = new URLSearchParams({
+        page: String(downloadMeta.page),
+        perPage: String(downloadMeta.perPage),
+      });
+      try {
+        const payload = await apiFetch<PaginatedResponse<ApiBuildEvent>>(
+          `/builds/${buildId}/downloads?${params.toString()}`,
+          {
+            headers: { "x-team-id": activeTeamId },
+          }
+        );
+        if (!isMounted) return;
+        setDownloads(payload?.items ?? []);
+        setDownloadMeta({
+          page: payload?.page ?? downloadMeta.page,
+          perPage: payload?.perPage ?? downloadMeta.perPage,
+          total: payload?.total ?? 0,
+          totalPages: payload?.totalPages ?? 1,
+        });
+      } catch {
+        if (!isMounted) return;
+        setDownloads([]);
+        setDownloadMeta({ page: 1, perPage: 10, total: 0, totalPages: 1 });
+      }
+    };
+    load();
+    return () => {
+      isMounted = false;
+    };
+  }, [buildId, activeTeamId, downloadMeta.page, downloadMeta.perPage]);
 
   useEffect(() => {
     let isMounted = true;
@@ -876,6 +927,11 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
         } catch {
           // Leave tags unchanged on error
         }
+      }}
+      downloads={downloads}
+      downloadMeta={downloadMeta}
+      onDownloadPageChange={(page) => {
+        setDownloadMeta((current) => ({ ...current, page }));
       }}
     />
   );

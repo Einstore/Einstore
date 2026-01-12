@@ -123,3 +123,19 @@ export const pickPrimaryTarget = (targets?: ApiTarget[] | null) => {
   if (!targets?.length) return null;
   return targets.find((target) => target.role === "app") ?? targets[0];
 };
+
+export type ApiBuildEvent = {
+  id: string;
+  buildId: string;
+  teamId: string;
+  kind: string;
+  createdAt: string;
+  ip?: string | null;
+  userAgent?: string | null;
+  user?: {
+    id: string;
+    username?: string | null;
+    email?: string | null;
+    fullName?: string | null;
+  } | null;
+};

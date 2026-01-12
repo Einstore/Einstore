@@ -10,10 +10,13 @@ import {
   type ApiArtifact,
   type ApiBuildMetadata,
   type ApiTag,
+  type ApiBuildEvent,
 } from "../lib/apps";
 import { infoPlistKeyDescriptionMap } from "../data/infoPlistKeys";
 import { androidManifestKeyDescriptionMap } from "../data/androidManifestKeys";
 import TagInput from "../components/TagInput";
+import Pagination from "../components/Pagination";
+import type { PaginationMeta } from "../lib/pagination";
 
 const metadataDescriptionMap = { ...infoPlistKeyDescriptionMap, ...androidManifestKeyDescriptionMap };
 
@@ -27,6 +30,9 @@ type BuildDetailPageProps = {
   tags?: ApiTag[];
   availableTags?: ApiTag[];
   onChangeTags?: (tags: string[]) => void;
+  downloads?: ApiBuildEvent[];
+  downloadMeta?: PaginationMeta;
+  onDownloadPageChange?: (page: number) => void;
 };
 
 const formatKind = (kind: string) => kind.replace(/_/g, " ");
@@ -105,6 +111,9 @@ const BuildDetailPage = ({
   tags = [],
   availableTags = [],
   onChangeTags,
+  downloads = [],
+  downloadMeta,
+  onDownloadPageChange,
 }: BuildDetailPageProps) => {
   const primaryTarget = pickPrimaryTarget(build?.targets);
   const appName = build?.version?.app?.name ?? build?.displayName ?? "—";
@@ -331,6 +340,52 @@ const BuildDetailPage = ({
           </div>
 
           <div className="grid grid-cols-12 gap-6">
+            <Panel className="col-span-12 md:col-span-6 space-y-4">
+              <SectionHeader title="Download history" subtitle="Newest first" />
+              {!downloads.length ? (
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  No downloads recorded for this build yet.
+                </p>
+              ) : (
+                <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
+                  {downloads.map((event, index) => {
+                    const isEven = index % 2 === 0;
+                    const user =
+                      event.user?.fullName ||
+                      event.user?.username ||
+                      event.user?.email ||
+                      "Unknown user";
+                    return (
+                      <div
+                        key={event.id}
+                        className={`flex items-center justify-between px-4 py-3 text-sm ${
+                          isEven ? "bg-slate-50 dark:bg-slate-800" : "bg-white dark:bg-slate-900"
+                        }`}
+                      >
+                        <div className="space-y-1">
+                          <p className="font-semibold text-slate-900 dark:text-slate-100">{user}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                            {event.userAgent || "Download"}
+                          </p>
+                        </div>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          {formatDateTime(event.createdAt)}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              {downloadMeta && downloadMeta.total > downloadMeta.perPage ? (
+                <Pagination
+                  page={downloadMeta.page}
+                  perPage={downloadMeta.perPage}
+                  totalPages={downloadMeta.totalPages}
+                  onPageChange={onDownloadPageChange}
+                />
+              ) : null}
+            </Panel>
+
             <Panel className="col-span-12 md:col-span-6 space-y-4">
               <SectionHeader title="Targets" />
               {!build.targets?.length ? (
