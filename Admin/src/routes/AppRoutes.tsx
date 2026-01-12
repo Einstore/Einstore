@@ -464,7 +464,7 @@ const AppRoutes = () => {
           headers,
           body: file,
         }).catch((err) => {
-          throw toError("INGEST-PUT-NET", err instanceof Error ? err.message : "Upload network error");
+          throw toError("INGEST-PUT-NET", err instanceof Error ? err.message : "Upload network error (PUT)");
         });
 
         if (!uploadResponse.ok) {

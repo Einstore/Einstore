@@ -53,6 +53,8 @@ export const presignPutObject = async ({
     Bucket: bucket,
     Key: key,
     ContentType: contentType,
+    // Avoid signing checksum-related headers to reduce CORS/preflight issues
+    ChecksumAlgorithm: undefined as any,
   });
   return getSignedUrl(client, command, { expiresIn });
 };
