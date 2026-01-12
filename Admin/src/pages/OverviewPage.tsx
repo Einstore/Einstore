@@ -137,7 +137,6 @@ const OverviewPage = ({
               Preview builds
             </p>
             <div className="flex flex-col gap-1 text-xs text-slate-500 dark:text-slate-400 md:flex-row md:items-center md:gap-3">
-              <p>Builds tagged with “preview”</p>
               <div className="flex flex-col gap-1">
                 <span className="font-semibold text-slate-600 dark:text-slate-200">App</span>
                 <div className="relative w-full min-w-[220px] md:w-64">
