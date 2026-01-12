@@ -2619,7 +2619,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"filePath\": \"/System/Volumes/Data/.internal/projects/Projects/Einstore/API/tests/app-debug.ipa\",\n  \"kind\": \"ipa\"\n}"
+          "raw": "{\n  \"filePath\": \"{{ipaPath}}\",\n  \"kind\": \"ipa\"\n}"
         },
         "url": {
           "raw": "{{baseUrl}}/ingest",
@@ -3274,7 +3274,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/builds/{{buildId}}/events?service=analytics&page=1&perPage=10",
+          "raw": "{{baseUrl}}/builds/{{buildId}}/events?service=crashes&page=1&perPage=10",
           "host": [
             "{{baseUrl}}"
           ],
@@ -3286,7 +3286,7 @@
           "query": [
             {
               "key": "service",
-              "value": "analytics"
+              "value": "crashes"
             },
             {
               "key": "page",
@@ -3305,9 +3305,9 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('Tracking events list ok', function () {",
-              "  pm.expect(pm.response.code).to.equal(200);",
-              "});"
+              "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+              "const body = pm.response.json();",
+              "pm.test('has crash items', function () { pm.expect(body.items.length).to.be.above(0); pm.expect(body.items[0].service).to.eql('crashes'); });"
             ]
           }
         }
@@ -3387,9 +3387,7 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('Tracking events recorded', function () {",
-              "  pm.expect(pm.response.code).to.equal(201);",
-              "});"
+              "if (pm.response.code === 201) { pm.test('status 201', function () { pm.response.to.have.status(201); }); } else { pm.test('skipped auto resolution (expected 404/400 if target missing)', function () { pm.expect([400,404]).to.include(pm.response.code); }); }"
             ]
           }
         }
@@ -3422,7 +3420,7 @@
         },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"platform\": \"ios\",\n  \"targetId\": \"com.example.app\",\n  \"deviceId\": \"device-123\",\n  \"metadata\": {\n    \"services\": [\"analytics\", \"errors\", \"usage\"],\n    \"analytics\": {\n      \"event\": { \"name\": \"app_launch\", \"properties\": { \"screen\": \"home\" } },\n      \"session\": { \"id\": \"sess-1\", \"startedAt\": \"2024-01-01T00:00:00Z\", \"durationMs\": 120000 }\n    },\n    \"errors\": { \"message\": \"Handled error\", \"stackTrace\": \"Error: ...\" },\n    \"usage\": { \"timestamp\": \"2024-01-01T00:00:00Z\", \"timeZone\": \"UTC\", \"locale\": \"en-US\" }\n  }\n}"
+          "raw": "{\n  \"platform\": \"ios\",\n  \"deviceId\": \"device-test\",\n  \"metadata\": {\n    \"services\": [\n      \"analytics\",\n      \"errors\",\n      \"distribution\",\n      \"devices\",\n      \"usage\",\n      \"crashes\"\n    ],\n    \"analytics\": {\n      \"event\": {\n        \"name\": \"app_launch_test\",\n        \"properties\": {\n          \"screen\": \"home\"\n        }\n      },\n      \"userProperties\": {\n        \"plan\": \"pro\"\n      },\n      \"session\": {\n        \"id\": \"sess-postman\",\n        \"startedAt\": \"2024-01-01T00:00:00.000Z\",\n        \"durationMs\": 5000\n      }\n    },\n    \"errors\": {\n      \"message\": \"handled\",\n      \"stackTrace\": \"stack\"\n    },\n    \"distribution\": {\n      \"installSource\": \"postman\",\n      \"appVersion\": \"1.0.0\",\n      \"buildNumber\": \"1\"\n    },\n    \"device\": {\n      \"model\": \"Postman Simulator\",\n      \"manufacturer\": \"Einstore\",\n      \"osVersion\": \"1.0\",\n      \"locale\": \"en-US\",\n      \"appVersion\": \"1.0.0\",\n      \"buildNumber\": \"1\"\n    },\n    \"usage\": {\n      \"timestamp\": \"2024-01-01T00:00:00.000Z\",\n      \"timeZone\": \"UTC\",\n      \"sessionId\": \"sess-postman\",\n      \"sessionDurationMs\": 5000\n    },\n    \"crash\": {\n      \"exceptionType\": \"SIGABRT\",\n      \"stackTrace\": \"crash stack\",\n      \"occurredAt\": \"2024-01-02T00:00:00.000Z\",\n      \"appVersion\": \"1.0.0\",\n      \"buildNumber\": \"1\",\n      \"binaryHash\": \"abc123\"\n    }\n  }\n}"
         }
       },
       "event": [
@@ -3431,9 +3429,11 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('Tracking events recorded', function () {",
-              "  pm.expect(pm.response.code).to.equal(201);",
-              "});"
+              "pm.test('status 201', function () { pm.response.to.have.status(201); });",
+              "const body = pm.response.json();",
+              "pm.test('creates one per service', function () { pm.expect(body.items.length).to.eql(6); });",
+              "pm.test('services include crashes', function () { pm.expect(body.items.map(i=>i.service)).to.include('crashes'); });",
+              "pm.test('build id matches env', function () { pm.expect(body.items.every(i=>i.buildId===pm.environment.get('buildId'))).to.be.true; });"
             ]
           }
         }

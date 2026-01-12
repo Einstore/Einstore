@@ -29,3 +29,9 @@ Modern private app distribution platform for iOS + Android.
    ```
 3. The response includes `filePath` and `sizeBytes` confirming the file is stored. Use that path when triggering ingest or other workflows.
 4. Teams have a storage quota (default 1 GB). If an upload would exceed the quota, the API purges the oldest builds first (never deletes the last build of an app). If no space can be freed, the upload is rejected with a clear error.
+
+## Integration tests (Newman)
+- Requirements: API running locally, valid `accessToken`, `teamId`, `apiKeyToken`, and sample APK/IPA paths.
+- Update `tests/newman/local.postman_environment.json` with your tokens and file paths.
+- Run: `cd API && npm run test:integration`
+- The command executes the Postman collection folders: `Upload Ingest (APK)`, `iOS Ingest`, and `Store Upload (token query)` against `postman_collection.json`.
