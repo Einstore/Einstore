@@ -29,6 +29,8 @@ Team-scoped endpoints:
 - `/builds/:id/ios/download`
 - `/builds/:id/ios/installs/track`
 - `/search`
+- `/builds/:id/tags`
+- `/tags`
 
 ## GET /health
 - Purpose: Health check
@@ -47,7 +49,7 @@ Team-scoped endpoints:
 - Platform relevance: all
 
 ## GET /search
-- Purpose: Search apps and builds by name, identifier, version, or build number
+- Purpose: Search apps and builds by name, identifier, version, build number, or tag
 - Auth scope: Team
 - Request schema: query params
   - `q` (string, required): search term
@@ -58,6 +60,31 @@ Team-scoped endpoints:
   - `buildPerPage` (number, optional, default 6): builds per page
   - `appLimit`, `buildLimit`, `appOffset`, `buildOffset` (legacy, optional)
 - Response schema: `{ "apps": { "items": [{ "id": "app", "name": "App", "identifier": "com.app" }], "page": 1, "perPage": 10, "total": 1, "totalPages": 1 }, "builds": { "items": [{ "id": "build", "buildNumber": "42", "displayName": "Release", "version": "1.0.0", "createdAt": "2026-01-11T00:00:00.000Z", "appId": "app", "appName": "App", "appIdentifier": "com.app" }], "page": 1, "perPage": 6, "total": 1, "totalPages": 1 } }`
+
+## GET /builds/:id/tags
+- Purpose: List tags attached to a build
+- Auth scope: Team
+- Request schema: path params
+  - `id` (string, required): Build ID
+- Response schema: `{ "tags": [{ "id": "tag", "name": "release" }] }`
+
+## PUT /builds/:id/tags
+- Purpose: Replace tags on a build (creates missing tags for the team)
+- Auth scope: Team
+- Request schema:
+  - Path: `id` (string, required): Build ID
+  - Body: `{ "tags": ["release", "beta"] }` (tags are deduplicated by normalized value)
+- Response schema: `{ "tags": [{ "id": "tag", "name": "release" }] }`
+
+## GET /tags
+- Purpose: List tags available to the team, optionally filtered to an app
+- Auth scope: Team
+- Request schema: query params
+  - `appId` (string, optional): restrict to tags used by builds for a specific app
+  - `page` (number, optional, default 1): page number
+  - `perPage` (number, optional, default 25, max 100): page size
+  - `limit` and `offset` (legacy, optional)
+- Response schema: `{ "items": [{ "id": "tag", "name": "release", "usageCount": 3 }], "page": 1, "perPage": 25, "total": 1, "totalPages": 1 }`
 - Side effects: none
 - Platform relevance: all
 

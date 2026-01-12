@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { requireTeam } from "../auth/guard.js";
 import { buildPaginationMeta, resolvePagination } from "../lib/pagination.js";
+import { normalizeTagName } from "../lib/tags.js";
 
 const searchQuerySchema = z.object({
   q: z.string().trim().min(1),
@@ -29,6 +30,7 @@ export async function searchRoutes(app: FastifyInstance) {
     }
 
     const { q, appId } = parsed.data;
+    const normalizedQuery = normalizeTagName(q);
     const appPagination = resolvePagination({
       page: parsed.data.appPage,
       perPage: parsed.data.appPerPage ?? parsed.data.appLimit,
@@ -66,6 +68,7 @@ export async function searchRoutes(app: FastifyInstance) {
         { version: { version: { contains: q, mode: "insensitive" } } },
         { version: { app: { name: { contains: q, mode: "insensitive" } } } },
         { version: { app: { identifier: { contains: q, mode: "insensitive" } } } },
+        { buildTags: { some: { tag: { normalizedName: normalizedQuery } } } },
       ],
     } as const;
 

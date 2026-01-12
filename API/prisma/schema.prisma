@@ -137,6 +137,7 @@ model Build {
   signing       SigningIdentity?
   createdByUser User?    @relation("BuildCreatedBy", fields: [createdByUserId], references: [id])
   events        BuildEvent[]
+  tags          BuildTag[]
 
   @@index([versionId])
   @@index([createdByUserId])
@@ -420,6 +421,7 @@ model Team {
   apps            App[]
   buildEvents     BuildEvent[]
   apiKeys         ApiKey[]
+  tags            Tag[]
 }
 
 model TeamMember {
@@ -474,4 +476,31 @@ model BuildEvent {
   @@index([teamId])
   @@index([userId])
   @@index([kind])
+}
+
+model Tag {
+  id             String     @id @default(uuid())
+  teamId         String
+  name           String
+  normalizedName String
+  createdAt      DateTime   @default(now())
+
+  team           Team       @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  buildTags      BuildTag[]
+
+  @@unique([teamId, normalizedName])
+  @@index([teamId, normalizedName])
+}
+
+model BuildTag {
+  buildId   String
+  tagId     String
+  createdAt DateTime @default(now())
+
+  build Build @relation(fields: [buildId], references: [id], onDelete: Cascade)
+  tag   Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([buildId, tagId])
+  @@index([tagId])
+  @@index([buildId])
 }

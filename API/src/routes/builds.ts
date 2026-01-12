@@ -158,7 +158,7 @@ export async function buildRoutes(app: FastifyInstance) {
       limit: parsed.data.limit,
       offset: parsed.data.offset,
     });
-    const where: { versionId?: string; version?: { app?: { teamId: string; id?: string } } } = {
+    const where: { versionId?: string; version?: { appId?: string; app?: { teamId: string } } } = {
       version: { app: { teamId } },
     };
     if (parsed.data.versionId) {
@@ -173,7 +173,7 @@ export async function buildRoutes(app: FastifyInstance) {
         });
         return reply.send({ items: [], ...meta });
       }
-      where.version = { app: { teamId, id: parsed.data.appId } };
+      where.version = { appId: parsed.data.appId, app: { teamId } };
     }
 
     const [total, items] = await prisma.$transaction([

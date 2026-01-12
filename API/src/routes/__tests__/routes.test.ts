@@ -8,6 +8,7 @@ const prismaMock = {
     findFirst: vi.fn(),
     findUnique: vi.fn(),
     upsert: vi.fn(),
+    count: vi.fn(),
   },
   version: {
     create: vi.fn(),
@@ -22,6 +23,7 @@ const prismaMock = {
     findFirst: vi.fn(),
     findUnique: vi.fn(),
     groupBy: vi.fn(),
+    count: vi.fn(),
   },
   target: {
     create: vi.fn(),
@@ -61,6 +63,16 @@ const prismaMock = {
     findMany: vi.fn(),
     findFirst: vi.fn(),
     update: vi.fn(),
+  },
+  tag: {
+    createMany: vi.fn(),
+    findMany: vi.fn(),
+    count: vi.fn(),
+  },
+  buildTag: {
+    findMany: vi.fn(),
+    createMany: vi.fn(),
+    deleteMany: vi.fn(),
   },
   apiKey: {
     create: vi.fn(),
@@ -252,6 +264,7 @@ describe("routes", () => {
     prismaMock.app.findFirst.mockResolvedValue({ id: ids.appId });
     prismaMock.app.findUnique.mockResolvedValue({ id: ids.appId });
     prismaMock.app.upsert.mockResolvedValue({ id: ids.appId });
+    prismaMock.app.count.mockResolvedValue(1);
 
     prismaMock.version.create.mockResolvedValue({ id: ids.versionId });
     prismaMock.version.findMany.mockResolvedValue([{ id: ids.versionId }]);
@@ -265,6 +278,7 @@ describe("routes", () => {
       storagePath: "/tmp/app.bin",
       buildNumber: "1",
       displayName: "Test App",
+      createdAt: new Date(),
       version: {
         version: "1.0.0",
         app: {
@@ -277,7 +291,27 @@ describe("routes", () => {
     };
 
     prismaMock.build.create.mockResolvedValue({ id: ids.buildId });
-    prismaMock.build.findMany.mockResolvedValue([{ id: ids.buildId }]);
+    prismaMock.build.findMany.mockResolvedValue([
+      {
+        id: ids.buildId,
+        buildNumber: "1",
+        displayName: "Test App",
+        createdAt: new Date(),
+        sizeBytes: 1024,
+        version: {
+          id: ids.versionId,
+          version: "1.0.0",
+          appId: ids.appId,
+          app: {
+            id: ids.appId,
+            teamId: "team-1",
+            identifier: "com.example.app",
+            name: "Test App",
+          },
+        },
+        targets: [{ platform: "ios", role: "app" }],
+      },
+    ]);
     prismaMock.build.findFirst.mockResolvedValue(buildDetail);
     prismaMock.build.findUnique.mockResolvedValue({ id: ids.buildId });
     prismaMock.build.groupBy.mockResolvedValue([
@@ -287,6 +321,7 @@ describe("routes", () => {
         _sum: { sizeBytes: 2048 },
       },
     ]);
+    prismaMock.build.count.mockResolvedValue(1);
 
     prismaMock.target.create.mockResolvedValue({ id: ids.targetId });
     prismaMock.target.findMany.mockResolvedValue([{ id: ids.targetId }]);
@@ -307,6 +342,9 @@ describe("routes", () => {
     prismaMock.complianceArtifact.findMany.mockResolvedValue([{ id: "artifact-1" }]);
     prismaMock.buildEvent.create.mockResolvedValue({ id: "event-1" });
     prismaMock.buildEvent.findMany.mockResolvedValue([{ id: "event-1" }]);
+    prismaMock.buildEvent.groupBy.mockResolvedValue([
+      { userId: "user-1", buildId: ids.buildId, _count: { _all: 1 } },
+    ]);
 
     ingestAndroidMock.mockResolvedValue({ buildId: "build-android" });
     ingestIosMock.mockResolvedValue({ buildId: "build-ios" });
@@ -405,9 +443,15 @@ describe("routes", () => {
     prismaMock.userTeamSetting.findUnique.mockResolvedValue({ value: { theme: "dark" } });
     prismaMock.userTeamSetting.upsert.mockResolvedValue({ value: { theme: "dark" } });
 
-    prismaMock.$transaction.mockImplementation(async (fn: (tx: typeof prismaMock) => Promise<unknown>) =>
-      fn(prismaMock),
-    );
+    prismaMock.$transaction.mockImplementation(async (operations: unknown) => {
+      if (typeof operations === "function") {
+        return (operations as (tx: typeof prismaMock) => Promise<unknown>)(prismaMock);
+      }
+      if (Array.isArray(operations)) {
+        return Promise.all(operations as Promise<unknown>[]);
+      }
+      return operations;
+    });
   });
 
   it("GET /health", async () => {

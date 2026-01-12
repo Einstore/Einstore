@@ -782,7 +782,7 @@
     },
     "/search": {
       "get": {
-        "summary": "Search apps and builds",
+        "summary": "Search apps and builds (includes tags)",
         "security": [
           {
             "bearerAuth": []
@@ -882,6 +882,152 @@
         "responses": {
           "200": {
             "description": "Search results"
+          },
+          "400": {
+            "description": "Invalid query"
+          }
+        }
+      }
+    },
+    "/builds/{id}/tags": {
+      "get": {
+        "summary": "List build tags",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Build tags"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace build tags",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "tags"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated build tags"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/tags": {
+      "get": {
+        "summary": "List team tags",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          },
+          {
+            "name": "appId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 25
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tags list"
           },
           "400": {
             "description": "Invalid query"

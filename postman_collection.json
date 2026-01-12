@@ -1338,6 +1338,98 @@
       ]
     },
     {
+      "name": "Get Build Tags",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/builds/{{buildId}}/tags",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "builds",
+            "{{buildId}}",
+            "tags"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Get build tags ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Set Build Tags",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tags\": [\"release\"]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/builds/{{buildId}}/tags",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "builds",
+            "{{buildId}}",
+            "tags"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Set build tags ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
       "name": "Get Build Icons",
       "request": {
         "method": "GET",
@@ -2194,6 +2286,63 @@
             "type": "text/javascript",
             "exec": [
               "pm.test('Search ok', function () {",
+              "  pm.expect([200, 400]).to.include(pm.response.code);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "List Tags",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/tags?page=1&perPage=25",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tags"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "perPage",
+              "value": "25"
+            },
+            {
+              "key": "appId",
+              "value": "{{appId}}",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('List tags ok', function () {",
               "  pm.expect([200, 400]).to.include(pm.response.code);",
               "});"
             ]
