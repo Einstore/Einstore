@@ -169,6 +169,7 @@ const SettingsPage = ({
                     try {
                       await apiFetch<{ url: string }>("/teams/logo", {
                         method: "POST",
+                        headers: { "x-team-id": activeTeamId },
                         body: formData,
                       });
                       setLogoMessage("Logo updated. If it doesn't show, refresh.");
