@@ -46,7 +46,7 @@ postgresql://postgres@localhost:5432/einstore?schema=public
 - Code files must not exceed 500 lines unless explicitly requested by the developer.
 - Worktree safety: never discard/revert uncommitted changes, especially ones not created in the current task context.
 - No destructive commands unless explicitly requested (e.g., `git reset`, `git clean`, `git restore`, `rm`).
-- Commit and push after each turn.
+- Commit and push after each turn, but only include files you personally touched that turn—never stage or commit unrelated or pre-existing changes.
 
 ## Pagination standard
 
