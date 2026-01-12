@@ -17,6 +17,7 @@ const AddAppDialog = ({
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
@@ -24,6 +25,7 @@ const AddAppDialog = ({
       setStatus("");
       setError("");
       setBusy(false);
+      setIsClosing(false);
     }
   }, [isOpen]);
 
@@ -31,9 +33,22 @@ const AddAppDialog = ({
     return null;
   }
 
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(onClose, 150);
+  };
+
+  const overlayOpacity = isClosing ? "opacity-0" : "opacity-100";
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <Panel className="w-full max-w-lg space-y-6 p-6">
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 transition-opacity duration-150 ${overlayOpacity}`}
+      onClick={handleClose}
+    >
+      <Panel
+        className="w-full max-w-lg space-y-6 p-6"
+        onClick={(event) => event.stopPropagation()}
+      >
         <div>
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
             Upload build
@@ -55,7 +70,7 @@ const AddAppDialog = ({
           </p>
         ) : null}
         <div className="flex flex-wrap justify-end gap-3">
-          <ActionButton label="Cancel" variant="outline" onClick={onClose} />
+          <ActionButton label="Cancel" variant="outline" onClick={handleClose} />
           <ActionButton
             label="Upload build"
             variant="primary"
