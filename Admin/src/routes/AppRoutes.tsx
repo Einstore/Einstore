@@ -268,7 +268,7 @@ const AppRoutes = () => {
     let isMounted = true;
     const params = new URLSearchParams({
       q: "preview",
-      appPerPage: "0",
+      appLimit: "0",
       buildPerPage: "4",
     });
     apiFetch<SearchResponse>(`/search?${params.toString()}`, {
