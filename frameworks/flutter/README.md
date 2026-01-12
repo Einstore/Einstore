@@ -15,9 +15,8 @@ import 'package:einstore_tracking/einstore_tracking.dart';
 
 final tracker = EinstoreTracker(
   EinstoreTrackingConfig(
-    downloadUrl: Uri.parse("https://api.einstore.dev/builds/BUILD_ID/downloads"),
-    launchUrl: Uri.parse("https://api.einstore.dev/builds/BUILD_ID/installs"),
-    eventUrl: Uri.parse("https://api.einstore.dev/builds/BUILD_ID/events"),
+    baseUrl: Uri.parse("https://api.einstore.dev"),
+    buildId: "BUILD_ID",
     headers: {
       "Authorization": "Bearer USER_TOKEN",
       "X-Team-Id": "TEAM_ID",
@@ -45,5 +44,6 @@ Pass the sections you want to track via `services`:
 ## Notes
 - Crashes are not tracked yet.
 - This package uses `dart:io`, so it targets Flutter mobile/desktop apps.
-- `eventUrl` can override where analytics/errors events are posted (defaults to `launchUrl`).
+- If you omit `baseUrl`, you can still pass full URLs via `downloadUrl` / `launchUrl` / `eventUrl`.
+- `eventUrl` can override where analytics/errors events are posted (defaults to `baseUrl/builds/{id}/events` or `launchUrl`).
 - Provide a persistent `LaunchStore` (for example via `shared_preferences`) if you want launch tracking to survive app restarts.

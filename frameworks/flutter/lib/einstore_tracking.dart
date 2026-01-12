@@ -31,6 +31,8 @@ class MemoryLaunchStore implements LaunchStore {
 
 class EinstoreTrackingConfig {
   EinstoreTrackingConfig({
+    this.baseUrl,
+    this.buildId,
     this.downloadUrl,
     this.launchUrl,
     this.eventUrl,
@@ -46,14 +48,18 @@ class EinstoreTrackingConfig {
     this.launchKey,
     LaunchStore? launchStore,
   })  : headers = headers ?? <String, String>{},
+        baseUrl = baseUrl ?? Uri.parse("https://api.einstore.dev"),
+        buildId = buildId,
         platform = platform ?? _defaultPlatform(),
         metadata = metadata ?? <String, Object?>{},
-        services = services ?? EinstoreService.values,
+        services = services ?? const [EinstoreService.distribution, EinstoreService.devices],
         distributionInfo = distributionInfo ?? <String, Object?>{},
         deviceInfo = deviceInfo ?? <String, Object?>{},
         userProperties = userProperties ?? <String, Object?>{},
         launchStore = launchStore ?? MemoryLaunchStore();
 
+  final Uri? baseUrl;
+  final String? buildId;
   final Uri? downloadUrl;
   final Uri? launchUrl;
   final Uri? eventUrl;
@@ -94,13 +100,13 @@ class EinstoreTracker {
 
   Future<void> trackDownload() async {
     _ensureServiceEnabled(EinstoreService.distribution);
-    await _track(config.downloadUrl);
+    await _track(_resolvedDownloadUrl());
   }
 
   Future<void> trackLaunch() async {
     _ensureServiceEnabled(EinstoreService.analytics);
     startNewSession();
-    await _track(config.launchUrl, event: _analyticsEvent("app_launch"));
+    await _track(_resolvedLaunchUrl(), event: _analyticsEvent("app_launch"));
   }
 
   Future<void> trackLaunchOnce() async {
@@ -147,10 +153,11 @@ class EinstoreTracker {
 
   Future<void> _track(Uri? url,
       {Map<String, Object?>? event, Map<String, Object?>? errorInfo}) async {
-    if (url == null) {
+    final resolved = url ?? _resolvedEventUrl();
+    if (resolved == null) {
       throw EinstoreTrackingException("Tracking URL is required");
     }
-    final request = await _client.postUrl(url);
+    final request = await _client.postUrl(resolved);
     request.headers.contentType = ContentType.json;
     config.headers.forEach(request.headers.set);
     final payload = _buildPayload(event: event, errorInfo: errorInfo);
@@ -282,11 +289,39 @@ class EinstoreTracker {
   }
 
   Uri _eventUrl() {
-    final url = config.eventUrl ?? config.launchUrl;
+    final url = config.eventUrl ?? _resolvedEventUrl();
     if (url == null) {
       throw EinstoreTrackingException("eventUrl or launchUrl is required");
     }
     return url;
+  }
+
+  Uri? _resolvedDownloadUrl() {
+    return _resolveUrl(config.downloadUrl, "builds/{id}/downloads");
+  }
+
+  Uri? _resolvedLaunchUrl() {
+    return _resolveUrl(config.launchUrl, "builds/{id}/installs");
+  }
+
+  Uri? _resolvedEventUrl() {
+    return _resolveUrl(config.eventUrl, "builds/{id}/events") ??
+        _resolveUrl(config.launchUrl, "builds/{id}/installs");
+  }
+
+  Uri? _resolveUrl(Uri? provided, String defaultPath) {
+    if (provided != null) {
+      return provided;
+    }
+    if (config.baseUrl == null || config.buildId == null) {
+      return null;
+    }
+    final path = defaultPath.replaceAll("{id}", config.buildId!);
+    final base = config.baseUrl!;
+    final joined = base.toString().endsWith("/")
+        ? "${base.toString()}$path"
+        : "${base.toString()}/$path";
+    return Uri.parse(joined);
   }
 }
 

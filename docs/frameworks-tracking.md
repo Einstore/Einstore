@@ -22,11 +22,13 @@ These are set to the lowest currently supported defaults in the libraries.
 ## Common Configuration
 All platforms share the same conceptual inputs.
 
-- `downloadUrl`: POST endpoint for download events (ex: `/builds/:id/downloads`).
-- `launchUrl`: POST endpoint for launch events (ex: `/builds/:id/installs` or iOS install track URL).
-- `eventUrl`: optional override for analytics/errors events; point this to `/builds/:id/events` to capture analytics/errors/device/usage.
+- `baseUrl` (optional): API base (defaults to `https://api.einstore.dev` in the SDKs).
+- `buildId` (optional): When set with `baseUrl`, the SDK builds default endpoints: `/builds/{id}/downloads`, `/builds/{id}/installs`, `/builds/{id}/events`.
+- `downloadUrl`: override for download events.
+- `launchUrl`: override for launch events (ex: tokenized iOS install track URL).
+- `eventUrl`: override for analytics/errors/device/usage events; otherwise uses `/builds/{id}/events`.
 - `headers`: auth headers (ex: `Authorization` and `X-Team-Id`).
-- `services`: list of sections to include in the payload.
+- `services`: list of sections to include in the payload (default: `distribution`, `devices`).
 - `distributionInfo`: custom fields for distribution rollout/source tracking.
 - `deviceInfo`: custom device fields (model/manufacturer) when the platform cannot provide them.
 - `metadata`: custom metadata merged into the payload.

@@ -63,6 +63,8 @@ public final class UserDefaultsDeviceIdProvider: EinstoreDeviceIdProvider {
 }
 
 public struct EinstoreTrackingConfig {
+  public let baseUrl: URL?
+  public let buildId: String?
   public let downloadUrl: URL?
   public let launchUrl: URL?
   public let eventUrl: URL?
@@ -77,6 +79,8 @@ public struct EinstoreTrackingConfig {
   public let deviceInfo: [String: Any]
 
   public init(
+    baseUrl: URL? = URL(string: "https://api.einstore.dev"),
+    buildId: String? = nil,
     downloadUrl: URL? = nil,
     launchUrl: URL? = nil,
     eventUrl: URL? = nil,
@@ -86,10 +90,12 @@ public struct EinstoreTrackingConfig {
     deviceId: String? = nil,
     metadata: [String: Any]? = nil,
     launchKey: String? = nil,
-    services: [EinstoreService] = EinstoreService.allCases,
+    services: [EinstoreService] = [.distribution, .devices],
     distributionInfo: [String: Any] = [:],
     deviceInfo: [String: Any] = [:]
   ) {
+    self.baseUrl = baseUrl
+    self.buildId = buildId
     self.downloadUrl = downloadUrl
     self.launchUrl = launchUrl
     self.eventUrl = eventUrl
@@ -152,13 +158,13 @@ public final class EinstoreTracker {
   }
 
   public func trackDownload(completion: ((Result<Void, Error>) -> Void)? = nil) {
-    track(url: config.downloadUrl, requiredService: .distribution, completion: completion)
+    track(url: resolvedDownloadUrl, requiredService: .distribution, completion: completion)
   }
 
   public func trackLaunch(completion: ((Result<Void, Error>) -> Void)? = nil) {
     startNewSession()
     track(
-      url: config.launchUrl,
+      url: resolvedLaunchUrl,
       event: AnalyticsEvent(name: "app_launch", properties: [:]),
       requiredService: .analytics,
       completion: completion
@@ -188,7 +194,7 @@ public final class EinstoreTracker {
     var payload = properties
     payload["screen"] = screenName
     track(
-      url: config.eventUrl ?? config.launchUrl,
+      url: resolvedEventUrl ?? resolvedLaunchUrl,
       event: AnalyticsEvent(name: "screen_view", properties: payload),
       requiredService: .analytics,
       completion: completion
@@ -201,7 +207,7 @@ public final class EinstoreTracker {
     completion: ((Result<Void, Error>) -> Void)? = nil
   ) {
     track(
-      url: config.eventUrl ?? config.launchUrl,
+      url: resolvedEventUrl ?? resolvedLaunchUrl,
       event: AnalyticsEvent(name: name, properties: properties),
       requiredService: .analytics,
       completion: completion
@@ -215,7 +221,7 @@ public final class EinstoreTracker {
     completion: ((Result<Void, Error>) -> Void)? = nil
   ) {
     track(
-      url: config.eventUrl ?? config.launchUrl,
+      url: resolvedEventUrl ?? resolvedLaunchUrl,
       errorInfo: ErrorInfo(message: message, stackTrace: stackTrace, properties: properties),
       requiredService: .errors,
       completion: completion
@@ -229,6 +235,28 @@ public final class EinstoreTracker {
     let bundleId = Bundle.main.bundleIdentifier ?? "unknown"
     let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "0"
     return "einstore.launch.\(bundleId).\(buildNumber)"
+  }
+
+  private func resolveUrl(_ provided: URL?, defaultPath: String) -> URL? {
+    if let provided {
+      return provided
+    }
+    guard let base = config.baseUrl, let buildId = config.buildId else {
+      return nil
+    }
+    return base.appendingPathComponent(defaultPath.replacingOccurrences(of: "{id}", with: buildId))
+  }
+
+  private var resolvedDownloadUrl: URL? {
+    resolveUrl(config.downloadUrl, defaultPath: "builds/{id}/downloads")
+  }
+
+  private var resolvedLaunchUrl: URL? {
+    resolveUrl(config.launchUrl, defaultPath: "builds/{id}/installs")
+  }
+
+  private var resolvedEventUrl: URL? {
+    resolveUrl(config.eventUrl, defaultPath: "builds/{id}/events")
   }
 
   private func resolveDeviceId() -> String? {

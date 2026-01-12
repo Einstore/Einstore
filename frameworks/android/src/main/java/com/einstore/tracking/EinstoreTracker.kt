@@ -21,11 +21,13 @@ enum class EinstoreService(val key: String) {
   USAGE("usage");
 
   companion object {
-    fun defaults(): Set<EinstoreService> = values().toSet()
+    fun defaults(): Set<EinstoreService> = setOf(DISTRIBUTION, DEVICES)
   }
 }
 
 data class EinstoreTrackingConfig(
+  val baseUrl: String? = "https://api.einstore.dev",
+  val buildId: String? = null,
   val downloadUrl: String? = null,
   val launchUrl: String? = null,
   val eventUrl: String? = null,
@@ -64,13 +66,13 @@ class EinstoreTracker(
   }
 
   fun trackDownload(callback: ((Result<Unit>) -> Unit)? = null) {
-    trackAsync(config.downloadUrl, requiredService = EinstoreService.DISTRIBUTION, callback = callback)
+    trackAsync(resolvedDownloadUrl(), requiredService = EinstoreService.DISTRIBUTION, callback = callback)
   }
 
   fun trackLaunch(callback: ((Result<Unit>) -> Unit)? = null) {
     startNewSession()
     trackAsync(
-      config.launchUrl,
+      resolvedLaunchUrl(),
       event = AnalyticsEvent("app_launch", emptyMap()),
       requiredService = EinstoreService.ANALYTICS,
       callback = callback
@@ -99,7 +101,7 @@ class EinstoreTracker(
     val payload = properties.toMutableMap()
     payload["screen"] = screenName
     trackAsync(
-      config.eventUrl ?: config.launchUrl,
+      resolvedEventUrl(),
       event = AnalyticsEvent("screen_view", payload),
       requiredService = EinstoreService.ANALYTICS,
       callback = callback
@@ -112,7 +114,7 @@ class EinstoreTracker(
     callback: ((Result<Unit>) -> Unit)? = null
   ) {
     trackAsync(
-      config.eventUrl ?: config.launchUrl,
+      resolvedEventUrl(),
       event = AnalyticsEvent(name, properties),
       requiredService = EinstoreService.ANALYTICS,
       callback = callback
@@ -126,11 +128,36 @@ class EinstoreTracker(
     callback: ((Result<Unit>) -> Unit)? = null
   ) {
     trackAsync(
-      config.eventUrl ?: config.launchUrl,
+      resolvedEventUrl(),
       errorInfo = ErrorInfo(message, stackTrace, properties),
       requiredService = EinstoreService.ERRORS,
       callback = callback
     )
+  }
+
+  private fun resolvedDownloadUrl(): String? {
+    return resolveUrl(config.downloadUrl, "builds/{id}/downloads")
+  }
+
+  private fun resolvedLaunchUrl(): String? {
+    return resolveUrl(config.launchUrl, "builds/{id}/installs")
+  }
+
+  private fun resolvedEventUrl(): String? {
+    return resolveUrl(config.eventUrl, "builds/{id}/events") ?: resolveUrl(config.launchUrl, "builds/{id}/installs")
+  }
+
+  private fun resolveUrl(provided: String?, defaultPath: String): String? {
+    if (!provided.isNullOrBlank()) {
+      return provided
+    }
+    val base = config.baseUrl
+    val buildId = config.buildId
+    if (base.isNullOrBlank() || buildId.isNullOrBlank()) {
+      return null
+    }
+    val path = defaultPath.replace("{id}", buildId)
+    return if (base.endsWith("/")) base + path else "$base/$path"
   }
 
   private fun trackAsync(

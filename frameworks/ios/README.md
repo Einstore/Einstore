@@ -11,9 +11,8 @@ import EinstoreTracking
 
 let tracker = EinstoreTracker(
   config: EinstoreTrackingConfig(
-    downloadUrl: URL(string: "https://api.einstore.dev/builds/BUILD_ID/downloads"),
-    launchUrl: URL(string: "https://api.einstore.dev/builds/BUILD_ID/ios/installs/track?token=TOKEN"),
-    eventUrl: URL(string: "https://api.einstore.dev/builds/BUILD_ID/events"),
+    baseUrl: URL(string: "https://api.einstore.dev"),
+    buildId: "BUILD_ID",
     headers: [
       "Authorization": "Bearer USER_TOKEN",
       "X-Team-Id": "TEAM_ID",
@@ -37,5 +36,5 @@ Pass the sections you want to track via `services`:
 ## Notes
 - Crashes are not tracked yet.
 - If you use the iOS install link flow, downloads are already recorded by `/builds/:id/ios/download`.
-- Point `launchUrl` at `/builds/:id/ios/installs/track?token=...` when using install tokens.
-- `eventUrl` can override where analytics/errors events are posted (defaults to `launchUrl`).
+- If you need signed install tracking, set a tokenized `launchUrl`; otherwise the SDK builds `/builds/{id}/installs` from `baseUrl` + `buildId`.
+- If you omit `baseUrl`, you can still pass full URLs via `downloadUrl` / `launchUrl` / `eventUrl`.

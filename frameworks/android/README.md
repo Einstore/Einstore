@@ -10,9 +10,8 @@ Android library for recording app downloads, launches, and analytics events agai
 val tracker = EinstoreTracker(
   context = applicationContext,
   config = EinstoreTrackingConfig(
-    downloadUrl = "https://api.einstore.dev/builds/BUILD_ID/downloads",
-    launchUrl = "https://api.einstore.dev/builds/BUILD_ID/installs",
-    eventUrl = "https://api.einstore.dev/builds/BUILD_ID/events",
+    baseUrl = "https://api.einstore.dev",
+    buildId = "BUILD_ID",
     headers = mapOf(
       "Authorization" to "Bearer USER_TOKEN",
       "X-Team-Id" to "TEAM_ID"
@@ -40,5 +39,6 @@ Pass the sections you want to track via `services`:
 
 ## Notes
 - Crashes are not tracked yet.
-- `eventUrl` can override where analytics/errors events are posted (defaults to `launchUrl`).
+- If you omit `baseUrl`, you can still pass full URLs via `downloadUrl` / `launchUrl` / `eventUrl`.
+- `eventUrl` can override where analytics/errors events are posted (defaults to `launchUrl` or `baseUrl/builds/{id}/events`).
 - If your endpoint requires auth, pass headers in the config.
