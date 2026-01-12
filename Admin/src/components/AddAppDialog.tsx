@@ -43,7 +43,11 @@ const AddAppDialog = ({
   return (
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 transition-opacity duration-150 ${overlayOpacity}`}
-      onClick={handleClose}
+      onMouseDown={(event) => {
+        // Only close when the actual overlay is clicked; ignore clicks inside the dialog or during upload
+        if (event.target !== event.currentTarget || busy) return;
+        handleClose();
+      }}
     >
       <Panel
         className="w-full max-w-lg space-y-6 p-6"
