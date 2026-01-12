@@ -3,6 +3,7 @@ import { PlatformKind, Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma.js";
 import { requireTeam } from "../auth/guard.js";
 import { requireBuildForTeam } from "../lib/team-access.js";
+const TRACKING_METADATA_MAX_BYTES = 64 * 1024; // 64KB max metadata payload
 const sessionSchema = z.object({
     id: z.string().min(1).optional(),
     startedAt: z.string().datetime().optional(),
@@ -266,6 +267,12 @@ export async function trackingEventRoutes(app) {
             return reply.status(400).send({ error: "invalid_payload" });
         }
         const meta = parsed.data.metadata ?? {};
+        const metaSize = Buffer.byteLength(JSON.stringify(meta), "utf8");
+        if (metaSize > TRACKING_METADATA_MAX_BYTES) {
+            return reply
+                .status(413)
+                .send({ error: "metadata_too_large", message: "Metadata exceeds 64KB limit" });
+        }
         const services = ensureServices(meta);
         if (!services.length) {
             return reply.status(400).send({ error: "invalid_payload", message: "No services provided" });

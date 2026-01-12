@@ -8,6 +8,7 @@ const configSchema = z.object({
     INBOUND_EMAIL_DOMAIN: z.string().default("local.einstore"),
     CORS_ORIGINS: z.string().optional(),
     UPLOAD_MAX_BYTES: z.coerce.number().default(8 * 1024 * 1024 * 1024),
+    INSTALL_BASE_URL: z.string().url().optional(),
     API_KEY_SECRET: z.string().min(1).optional(),
 });
 export function loadConfig() {

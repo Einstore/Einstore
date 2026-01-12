@@ -65,11 +65,18 @@ export async function commentRoutes(app: FastifyInstance) {
         orderBy: { createdAt: "asc" },
         skip: pagination.offset,
         take: pagination.perPage,
-        include: {
-          user: { select: { id: true, username: true, email: true, fullName: true, avatarUrl: true } },
-        },
       }),
     ]);
+
+    const userIds = Array.from(new Set(items.map((item) => item.userId).filter(Boolean))) as string[];
+    const users = userIds.length
+      ? await prisma.user.findMany({
+          where: { id: { in: userIds } },
+          select: { id: true, username: true, email: true, fullName: true, avatarUrl: true },
+        })
+      : [];
+    const userMap = new Map(users.map((user) => [user.id, user]));
+    const itemsWithUser = items.map((item) => ({ ...item, user: item.userId ? userMap.get(item.userId) ?? null : null }));
 
     const meta = buildPaginationMeta({ page: pagination.page, perPage: pagination.perPage, total });
     return reply.send({ items, ...meta });
@@ -97,11 +104,16 @@ export async function commentRoutes(app: FastifyInstance) {
         text: text.trim(),
         userId: request.auth?.user.id,
       },
-      include: {
-        user: { select: { id: true, username: true, email: true, fullName: true, avatarUrl: true } },
-      },
     });
 
-    return reply.status(201).send(created);
+    const user =
+      created.userId
+        ? await prisma.user.findUnique({
+            where: { id: created.userId },
+            select: { id: true, username: true, email: true, fullName: true, avatarUrl: true },
+          })
+        : null;
+
+    return reply.status(201).send({ ...created, user });
   });
 }
