@@ -103,6 +103,8 @@ const AppBuildsPage = ({
         icons={buildIcons}
         platforms={buildPlatforms}
         onSelect={onSelectBuild}
+        onInstall={onInstallBuild}
+        onDownload={onDownloadBuild}
       />
       <Pagination
         page={pagination.page}

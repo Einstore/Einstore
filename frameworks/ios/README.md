@@ -13,6 +13,7 @@ let tracker = EinstoreTracker(
   config: EinstoreTrackingConfig(
     downloadUrl: URL(string: "https://api.einstore.dev/builds/BUILD_ID/downloads"),
     launchUrl: URL(string: "https://api.einstore.dev/builds/BUILD_ID/ios/installs/track?token=TOKEN"),
+    eventUrl: URL(string: "https://api.einstore.dev/builds/BUILD_ID/events"),
     headers: [
       "Authorization": "Bearer USER_TOKEN",
       "X-Team-Id": "TEAM_ID",

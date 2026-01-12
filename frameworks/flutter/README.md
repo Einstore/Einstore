@@ -17,6 +17,7 @@ final tracker = EinstoreTracker(
   EinstoreTrackingConfig(
     downloadUrl: Uri.parse("https://api.einstore.dev/builds/BUILD_ID/downloads"),
     launchUrl: Uri.parse("https://api.einstore.dev/builds/BUILD_ID/installs"),
+    eventUrl: Uri.parse("https://api.einstore.dev/builds/BUILD_ID/events"),
     headers: {
       "Authorization": "Bearer USER_TOKEN",
       "X-Team-Id": "TEAM_ID",

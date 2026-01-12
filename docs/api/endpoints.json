@@ -745,6 +745,51 @@
           }
         },
         "additionalProperties": false
+      },
+      "TrackingEvent": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "buildId": { "type": "string" },
+          "teamId": { "type": "string" },
+          "userId": { "type": "string", "nullable": true },
+          "platform": {
+            "type": "string",
+            "enum": ["ios", "watchos", "tvos", "visionos", "android", "wearos", "auto"],
+            "nullable": true
+          },
+          "targetId": { "type": "string", "nullable": true },
+          "deviceId": { "type": "string", "nullable": true },
+          "service": {
+            "type": "string",
+            "enum": ["analytics", "errors", "distribution", "devices", "usage"]
+          },
+          "eventName": { "type": "string", "nullable": true },
+          "message": { "type": "string", "nullable": true },
+          "stackTrace": { "type": "string", "nullable": true },
+          "sessionId": { "type": "string", "nullable": true },
+          "sessionStartedAt": { "type": "string", "nullable": true },
+          "sessionDurationMs": { "type": "integer", "nullable": true },
+          "timeZone": { "type": "string", "nullable": true },
+          "timeZoneOffsetMinutes": { "type": "integer", "nullable": true },
+          "locale": { "type": "string", "nullable": true },
+          "deviceModel": { "type": "string", "nullable": true },
+          "deviceManufacturer": { "type": "string", "nullable": true },
+          "deviceOsVersion": { "type": "string", "nullable": true },
+          "deviceAppVersion": { "type": "string", "nullable": true },
+          "deviceBuildNumber": { "type": "string", "nullable": true },
+          "installSource": { "type": "string", "nullable": true },
+          "appVersion": { "type": "string", "nullable": true },
+          "buildNumber": { "type": "string", "nullable": true },
+          "eventProperties": { "type": "object", "nullable": true },
+          "userProperties": { "type": "object", "nullable": true },
+          "distribution": { "type": "object", "nullable": true },
+          "device": { "type": "object", "nullable": true },
+          "usage": { "type": "object", "nullable": true },
+          "custom": { "type": "object", "nullable": true },
+          "occurredAt": { "type": "string" },
+          "createdAt": { "type": "string" }
+        }
       }
     },
     "parameters": {
@@ -2043,6 +2088,148 @@
         "responses": {
           "200": {
             "description": "List"
+          }
+        }
+      }
+    },
+    "/builds/{id}/events": {
+      "post": {
+        "summary": "Record tracking events",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuildEventTrackRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TrackingEvent"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List tracking events",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 25
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "service",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "analytics",
+                "errors",
+                "distribution",
+                "devices",
+                "usage"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TrackingEvent"
+                      }
+                    },
+                    "page": { "type": "integer" },
+                    "perPage": { "type": "integer" },
+                    "total": { "type": "integer" },
+                    "totalPages": { "type": "integer" }
+                  }
+                }
+              }
+            }
           }
         }
       }

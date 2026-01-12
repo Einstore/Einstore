@@ -24,7 +24,7 @@ All platforms share the same conceptual inputs.
 
 - `downloadUrl`: POST endpoint for download events (ex: `/builds/:id/downloads`).
 - `launchUrl`: POST endpoint for launch events (ex: `/builds/:id/installs` or iOS install track URL).
-- `eventUrl`: optional override for analytics/errors events; falls back to `launchUrl`.
+- `eventUrl`: optional override for analytics/errors events; point this to `/builds/:id/events` to capture analytics/errors/device/usage.
 - `headers`: auth headers (ex: `Authorization` and `X-Team-Id`).
 - `services`: list of sections to include in the payload.
 - `distributionInfo`: custom fields for distribution rollout/source tracking.
@@ -49,6 +49,7 @@ let tracker = EinstoreTracker(
       "Authorization": "Bearer USER_TOKEN",
       "X-Team-Id": "TEAM_ID",
     ],
+    eventUrl: URL(string: "https://api.einstore.dev/builds/BUILD_ID/events"),
     services: [.analytics, .distribution, .devices, .usage],
     distributionInfo: ["installSource": "email"],
     targetId: "ios-app"
@@ -80,6 +81,7 @@ val tracker = EinstoreTracker(
       "Authorization" to "Bearer USER_TOKEN",
       "X-Team-Id" to "TEAM_ID"
     ),
+    eventUrl = "https://api.einstore.dev/builds/BUILD_ID/events",
     services = setOf(
       EinstoreService.ANALYTICS,
       EinstoreService.DISTRIBUTION,
@@ -118,6 +120,7 @@ final tracker = EinstoreTracker(
       "Authorization": "Bearer USER_TOKEN",
       "X-Team-Id": "TEAM_ID",
     },
+    eventUrl: Uri.parse("https://api.einstore.dev/builds/BUILD_ID/events"),
     services: const [
       EinstoreService.analytics,
       EinstoreService.distribution,

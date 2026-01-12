@@ -19,6 +19,7 @@ import { realtimeRoutes } from "./realtime.js";
 import { usageRoutes } from "./usage.js";
 import { buildEventRoutes } from "./build-events.js";
 import { iosInstallRoutes } from "./ios-install.js";
+import { trackingEventRoutes } from "./tracking-events.js";
 import { apiKeyRoutes } from "./api-keys.js";
 import { teamStatsRoutes } from "./team-stats.js";
 import { settingsRoutes } from "./settings.js";
@@ -60,6 +61,7 @@ export async function registerRoutes(app: FastifyInstance) {
   await app.register(usageRoutes);
   await app.register(buildEventRoutes);
   await app.register(iosInstallRoutes);
+  await app.register(trackingEventRoutes);
   await app.register(apiKeyRoutes);
   await app.register(settingsRoutes);
   await app.register(searchRoutes);

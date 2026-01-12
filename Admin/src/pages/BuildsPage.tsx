@@ -10,6 +10,8 @@ type BuildsPageProps = {
   buildIcons?: Record<string, string>;
   buildPlatforms?: Record<string, string>;
   onSelectBuild?: (id: string) => void;
+  onInstallBuild?: (id: string) => void;
+  onDownloadBuild?: (id: string) => void;
   pagination: PaginationMeta;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
@@ -21,6 +23,8 @@ const BuildsPage = ({
   buildIcons,
   buildPlatforms,
   onSelectBuild,
+  onInstallBuild,
+  onDownloadBuild,
   pagination,
   onPageChange,
   onPerPageChange,
@@ -49,6 +53,8 @@ const BuildsPage = ({
             icons={buildIcons}
             platforms={buildPlatforms}
             onSelect={onSelectBuild}
+            onInstall={onInstallBuild}
+            onDownload={onDownloadBuild}
           />
           <Pagination
             page={pagination.page}

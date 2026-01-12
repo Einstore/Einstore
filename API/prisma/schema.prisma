@@ -52,6 +52,14 @@ enum BuildEventKind {
   install
 }
 
+enum TrackingService {
+  analytics
+  errors
+  distribution
+  devices
+  usage
+}
+
 enum UserStatus {
   active
   disabled
@@ -476,6 +484,51 @@ model BuildEvent {
   @@index([teamId])
   @@index([userId])
   @@index([kind])
+}
+
+model TrackingEvent {
+  id                     String           @id @default(uuid())
+  buildId                String
+  teamId                 String
+  userId                 String?
+  platform               PlatformKind?
+  targetId               String?
+  deviceId               String?
+  service                TrackingService
+  eventName              String?
+  message                String?
+  stackTrace             String?
+  sessionId              String?
+  sessionStartedAt       DateTime?
+  sessionDurationMs      Int?
+  timeZone               String?
+  timeZoneOffsetMinutes  Int?
+  locale                 String?
+  deviceModel            String?
+  deviceManufacturer     String?
+  deviceOsVersion        String?
+  deviceAppVersion       String?
+  deviceBuildNumber      String?
+  installSource          String?
+  appVersion             String?
+  buildNumber            String?
+  eventProperties        Json?
+  userProperties         Json?
+  distribution           Json?
+  device                 Json?
+  usage                  Json?
+  custom                 Json?
+  occurredAt             DateTime         @default(now())
+  createdAt              DateTime         @default(now())
+
+  build                  Build            @relation(fields: [buildId], references: [id], onDelete: Cascade)
+  team                   Team             @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user                   User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([buildId])
+  @@index([teamId])
+  @@index([service])
+  @@index([occurredAt])
 }
 
 model Tag {

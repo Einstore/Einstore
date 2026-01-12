@@ -3213,6 +3213,108 @@
       ]
     },
     {
+      "name": "Record Tracking Events",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/builds/{{buildId}}/events",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "builds",
+            "{{buildId}}",
+            "events"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"platform\": \"ios\",\n  \"deviceId\": \"device-123\",\n  \"metadata\": {\n    \"services\": [\"analytics\", \"errors\", \"usage\"],\n    \"analytics\": {\n      \"event\": { \"name\": \"app_launch\", \"properties\": { \"screen\": \"home\" } },\n      \"session\": { \"id\": \"sess-1\", \"startedAt\": \"2024-01-01T00:00:00Z\", \"durationMs\": 120000 }\n    },\n    \"errors\": { \"message\": \"Handled error\", \"stackTrace\": \"Error: ...\" },\n    \"usage\": { \"timestamp\": \"2024-01-01T00:00:00Z\", \"timeZone\": \"UTC\", \"locale\": \"en-US\" }\n  }\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Tracking events recorded', function () {",
+              "  pm.expect(pm.response.code).to.equal(201);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "List Tracking Events",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/builds/{{buildId}}/events?service=analytics&page=1&perPage=10",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "builds",
+            "{{buildId}}",
+            "events"
+          ],
+          "query": [
+            {
+              "key": "service",
+              "value": "analytics"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "perPage",
+              "value": "10"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Tracking events list ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
       "name": "Team Stats",
       "request": {
         "method": "GET",

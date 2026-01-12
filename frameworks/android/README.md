@@ -12,6 +12,7 @@ val tracker = EinstoreTracker(
   config = EinstoreTrackingConfig(
     downloadUrl = "https://api.einstore.dev/builds/BUILD_ID/downloads",
     launchUrl = "https://api.einstore.dev/builds/BUILD_ID/installs",
+    eventUrl = "https://api.einstore.dev/builds/BUILD_ID/events",
     headers = mapOf(
       "Authorization" to "Bearer USER_TOKEN",
       "X-Team-Id" to "TEAM_ID"

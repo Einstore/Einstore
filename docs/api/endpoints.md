@@ -176,6 +176,22 @@ Team-scoped endpoints:
 - Side effects: none
 - Platform relevance: all
 
+## POST /builds/{id}/events
+- Purpose: Record tracking events (analytics, errors, distribution, devices, usage)
+- Auth scope: Bearer (rafiki270/auth) + Team membership
+- Request schema: `{ platform?: PlatformKind, targetId?: string, deviceId?: string, metadata?: TrackingMetadata }`
+- Response schema: `{ items: TrackingEvent[] }`
+- Side effects: Creates one row per requested service
+- Platform relevance: all
+
+## GET /builds/{id}/events
+- Purpose: List tracking events
+- Auth scope: Bearer (rafiki270/auth) + Team membership
+- Request schema: query `{ page?: number, perPage?: number, limit?: number, offset?: number, service?: "analytics"|"errors"|"distribution"|"devices"|"usage" }`
+- Response schema: `{ items: TrackingEvent[], page: number, perPage: number, total: number, totalPages: number }`
+- Side effects: none
+- Platform relevance: all
+
 ## POST /builds/{id}/ios/install-link
 - Purpose: Create a short-lived iOS install link (manifest + download)
 - Auth scope: Bearer (rafiki270/auth) + Team membership
