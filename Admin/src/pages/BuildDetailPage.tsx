@@ -32,7 +32,7 @@ type BuildDetailPageProps = {
   onDownload?: (buildId: string) => void;
   tags?: ApiTag[];
   availableTags?: ApiTag[];
-  onChangeTags?: (tags: string[]) => void;
+  onChangeTags?: (tags: string[]) => Promise<void> | void;
   downloads?: ApiBuildEvent[];
   downloadMeta?: PaginationMeta;
   onDownloadPageChange?: (page: number) => void;
@@ -170,6 +170,7 @@ const BuildDetailPage = ({
   const [isDownloadsOpen, setIsDownloadsOpen] = useState(false);
   const [isTargetsOpen, setIsTargetsOpen] = useState(false);
   const [isArtifactsOpen, setIsArtifactsOpen] = useState(false);
+  const [tagAlert, setTagAlert] = useState<string | null>(null);
 
   useEffect(() => {
     setTagDraft(tags.map((tag) => tag.name));
@@ -192,6 +193,11 @@ const BuildDetailPage = ({
 
   return (
     <div className="space-y-6">
+      {tagAlert ? (
+        <div className="fixed left-1/2 top-4 z-50 -translate-x-1/2 transform rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-lg dark:bg-slate-800">
+          {tagAlert}
+        </div>
+      ) : null}
       {error ? (
         <Panel className="border border-rose-200 bg-rose-50 text-rose-700">
           {error}
@@ -417,9 +423,16 @@ const BuildDetailPage = ({
                   </div>
                   <TagInput
                     value={tagDraft}
-                    onChange={(next) => {
+                    onChange={async (next) => {
                       setTagDraft(next);
-                      onChangeTags?.(next);
+                      try {
+                        await onChangeTags?.(next);
+                        setTagAlert("Tags saved");
+                        setTimeout(() => setTagAlert(null), 2000);
+                      } catch {
+                        setTagAlert("Could not save tags");
+                        setTimeout(() => setTagAlert(null), 2000);
+                      }
                     }}
                     suggestions={availableTags.map((tag) => tag.name)}
                     placeholder="Add a tag (e.g. release, beta, hotfix)"
@@ -451,23 +464,6 @@ const BuildDetailPage = ({
                       ))}
                     </div>
                   </details>
-                  {tags.length ? (
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                      <span className="font-semibold uppercase tracking-wide">Saved</span>
-                      {tags.map((tag) => (
-                        <span
-                          key={tag.id}
-                          className="rounded-full bg-slate-100 px-3 py-1 text-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                        >
-                          {tag.name}
-                        </span>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
-                      No tags yet. Add some to make search easier.
-                    </p>
-                  )}
                 </Panel>
               </div>
 
