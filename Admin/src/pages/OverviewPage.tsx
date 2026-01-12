@@ -1,8 +1,5 @@
 import OverviewSection from "../sections/OverviewSection";
-import ReleasesSection from "../sections/ReleasesSection";
 import StorageSection from "../sections/StorageSection";
-import BuildQueueSection from "../sections/BuildQueueSection";
-import SplitLayout from "../components/SplitLayout";
 import Panel from "../components/Panel";
 import BuildQueueList from "../components/BuildQueueList";
 import ActivityItemCard from "../components/ActivityItemCard";
@@ -89,68 +86,64 @@ const OverviewPage = ({
         </Panel>
       </div>
       {showMetrics ? <OverviewSection metrics={metrics} /> : null}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-            Preview builds
-          </p>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Builds tagged with “preview” (max 4)
-          </p>
-        </div>
-        {previewBuilds.length ? (
-          <BuildQueueList
-            jobs={previewBuilds.slice(0, 4).map((build) => ({
-              id: build.id,
-              name: build.displayName || build.appName || "Preview build",
-              buildNumber: build.buildNumber,
-              createdAt: build.createdAt,
-              appId: build.appId,
-            }))}
-            appIcons={appIconsByApp}
-            onInstall={onInstallBuild}
-            onDownload={onDownloadBuild}
-          />
-        ) : (
-          <Panel>
-            <p className="text-sm text-slate-600 dark:text-slate-300">
-              No preview builds yet. Add the <strong>preview</strong> tag to any build to feature it here.
-            </p>
-          </Panel>
-        )}
-      </div>
-      {showActivity ? (
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-              Latest downloads & installs
+              Preview builds
             </p>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Newest install/download events (5)
+              Builds tagged with “preview” (max 4)
             </p>
           </div>
-          {activity.length ? (
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {activity.slice(0, 5).map((item) => (
-                <ActivityItemCard key={item.id} {...item} />
-              ))}
-            </div>
+          {previewBuilds.length ? (
+            <BuildQueueList
+              jobs={previewBuilds.slice(0, 4).map((build) => ({
+                id: build.id,
+                name: build.displayName || build.appName || "Preview build",
+                buildNumber: build.buildNumber,
+                createdAt: build.createdAt,
+                appId: build.appId,
+              }))}
+              appIcons={appIconsByApp}
+              onInstall={onInstallBuild}
+              onDownload={onDownloadBuild}
+            />
           ) : (
             <Panel>
               <p className="text-sm text-slate-600 dark:text-slate-300">
-                No download activity yet. Once builds are downloaded or installed, the newest five
-                events will appear here.
+                No preview builds yet. Add the <strong>preview</strong> tag to any build to feature it here.
               </p>
             </Panel>
           )}
         </div>
-      ) : null}
-      <SplitLayout
-        left={<ReleasesSection apps={apps} />}
-        right={<BuildQueueSection jobs={buildQueue} />}
-        leftClassName="col-span-12 xl:col-span-7"
-        rightClassName="col-span-12 xl:col-span-5"
-      />
+        {showActivity ? (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                Latest downloads & installs
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Newest install/download events (5)
+              </p>
+            </div>
+            {activity.length ? (
+              <div className="grid grid-cols-1 gap-3">
+                {activity.slice(0, 5).map((item) => (
+                  <ActivityItemCard key={item.id} {...item} />
+                ))}
+              </div>
+            ) : (
+              <Panel>
+                <p className="text-sm text-slate-600 dark:text-slate-300">
+                  No download activity yet. Once builds are downloaded or installed, the newest five
+                  events will appear here.
+                </p>
+              </Panel>
+            )}
+          </div>
+        ) : null}
+      </div>
       {showStorage ? (
         <StorageSection
           users={storageUsage}
