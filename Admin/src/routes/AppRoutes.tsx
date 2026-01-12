@@ -606,6 +606,44 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
   const [iconUrl, setIconUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const installBuild = useCallback(
+    async (id: string) => {
+      try {
+        const payload = await apiFetch<{ itmsServicesUrl?: string; downloadUrl?: string }>(
+          `/builds/${id}/ios/install-link`,
+          {
+            method: "POST",
+            headers: { "x-team-id": activeTeamId },
+          }
+        );
+        if (payload?.itmsServicesUrl) {
+          window.location.href = payload.itmsServicesUrl;
+        } else if (payload?.downloadUrl) {
+          window.open(payload.downloadUrl, "_blank", "noopener,noreferrer");
+        }
+      } catch {
+        // ignore install errors for now
+      }
+    },
+    [activeTeamId]
+  );
+
+  const downloadBuild = useCallback(
+    async (id: string) => {
+      try {
+        const payload = await apiFetch<{ downloadUrl?: string }>(`/builds/${id}/ios/install-link`, {
+          method: "POST",
+          headers: { "x-team-id": activeTeamId },
+        });
+        if (payload?.downloadUrl) {
+          window.open(payload.downloadUrl, "_blank", "noopener,noreferrer");
+        }
+      } catch {
+        // ignore download errors for now
+      }
+    },
+    [activeTeamId]
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -667,7 +705,16 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
     };
   }, [buildId]);
 
-  return <BuildDetailPage build={build} iconUrl={iconUrl} isLoading={isLoading} error={error} />;
+  return (
+    <BuildDetailPage
+      build={build}
+      iconUrl={iconUrl}
+      isLoading={isLoading}
+      error={error}
+      onInstall={installBuild}
+      onDownload={downloadBuild}
+    />
+  );
 };
 
 const LatestBuildsRoute = ({
