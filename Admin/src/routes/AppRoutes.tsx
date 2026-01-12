@@ -428,37 +428,55 @@ const AppRoutes = () => {
         return;
       }
       const contentType = file.type || "application/octet-stream";
-      let presignedFailed = false;
-      try {
-        const presign = await apiFetch<{ uploadUrl: string; key: string; headers?: Record<string, string> }>(
-          "/ingest/upload-url",
-          {
-            method: "POST",
-            body: JSON.stringify({ filename: file.name, sizeBytes: file.size, contentType }),
-          }
-        );
-        const headers = new Headers(presign.headers);
-        if (!headers.has("Content-Type")) {
-          headers.set("Content-Type", contentType);
-        }
-        const uploadResponse = await fetch(presign.uploadUrl, {
-          method: "PUT",
-          headers,
-          body: file,
-        });
-        if (!uploadResponse.ok) {
-          throw new Error("Upload failed");
-        }
-        await apiFetch("/ingest/complete-upload", {
-          method: "POST",
-          body: JSON.stringify({ key: presign.key, filename: file.name, sizeBytes: file.size }),
-        });
-      } catch {
-        presignedFailed = true;
-        const fallbackForm = new FormData();
-        fallbackForm.append("file", file);
-        await apiUpload("/ingest/upload", fallbackForm);
+      const toError = (code: string, message: string) => {
+        const err = new Error(`${message} [${code}]`);
+        (err as any).code = code;
+        return err;
+      };
+      const maxBytes = 8 * 1024 * 1024 * 1024; // match API default limit
+      if (file.size <= 0) {
+        throw toError("INGEST-EMPTY", "File is empty");
       }
+      if (file.size > maxBytes) {
+        throw toError("INGEST-TOO-LARGE", "File exceeds 8GB limit");
+      }
+
+      const presign = await apiFetch<{ uploadUrl: string; key: string; headers?: Record<string, string> }>(
+        "/ingest/upload-url",
+        {
+          method: "POST",
+          body: JSON.stringify({ filename: file.name, sizeBytes: file.size, contentType }),
+        }
+      ).catch((err) => {
+        throw toError("INGEST-PRESIGN", err instanceof Error ? err.message : "Could not create upload link");
+      });
+
+      const headers = new Headers(presign.headers);
+      if (!headers.has("Content-Type")) {
+        headers.set("Content-Type", contentType);
+      }
+
+      const uploadResponse = await fetch(presign.uploadUrl, {
+        method: "PUT",
+        headers,
+        body: file,
+      }).catch((err) => {
+        throw toError("INGEST-PUT-NET", err instanceof Error ? err.message : "Upload network error");
+      });
+
+      if (!uploadResponse.ok) {
+        const code = uploadResponse.status === 403 ? "INGEST-CORS" : "INGEST-PUT";
+        const msg = uploadResponse.status === 403 ? "Upload blocked by storage CORS/ACL" : "Upload failed";
+        throw toError(code, `${msg} (status ${uploadResponse.status})`);
+      }
+
+      await apiFetch("/ingest/complete-upload", {
+        method: "POST",
+        body: JSON.stringify({ key: presign.key, filename: file.name, sizeBytes: file.size }),
+      }).catch((err) => {
+        throw toError("INGEST-COMPLETE", err instanceof Error ? err.message : "Finalize failed");
+      });
+
       await loadApps();
       setIngestNonce((current) => current + 1);
     },
