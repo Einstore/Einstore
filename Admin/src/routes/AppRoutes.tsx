@@ -820,6 +820,49 @@ const AppBuildsRoute = ({
   });
   const selectedApp = apps.find((app) => app.id === appId) ?? null;
   const appIcon = appId ? appIcons[appId] : undefined;
+  const installBuild = useCallback(
+    async (buildId: string) => {
+      try {
+        const payload = await apiFetch<{
+          itmsServicesUrl?: string;
+          downloadUrl?: string;
+        }>(`/builds/${buildId}/ios/install-link`, {
+          method: "POST",
+          headers: { "x-team-id": activeTeamId },
+        });
+        if (payload?.itmsServicesUrl) {
+          window.location.href = payload.itmsServicesUrl;
+          return;
+        }
+        if (payload?.downloadUrl) {
+          window.open(payload.downloadUrl, "_blank", "noopener,noreferrer");
+        }
+      } catch {
+        // ignore install errors in this context
+      }
+    },
+    [activeTeamId]
+  );
+
+  const downloadBuild = useCallback(
+    async (buildId: string) => {
+      try {
+        const payload = await apiFetch<{ downloadUrl?: string }>(
+          `/builds/${buildId}/ios/install-link`,
+          {
+            method: "POST",
+            headers: { "x-team-id": activeTeamId },
+          }
+        );
+        if (payload?.downloadUrl) {
+          window.open(payload.downloadUrl, "_blank", "noopener,noreferrer");
+        }
+      } catch {
+        // ignore download errors in this context
+      }
+    },
+    [activeTeamId]
+  );
 
   useEffect(() => {
     setPage(1);
@@ -921,6 +964,8 @@ const AppBuildsRoute = ({
       buildIcons={buildIcons}
       buildPlatforms={buildPlatforms}
       onSelectBuild={(id) => navigate(appId ? `/apps/${appId}/builds/${id}` : `/builds/${id}`)}
+      onInstallBuild={installBuild}
+      onDownloadBuild={downloadBuild}
       pagination={pagination}
       onPageChange={setPage}
       onPerPageChange={(nextPerPage) => {
