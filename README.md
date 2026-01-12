@@ -15,9 +15,10 @@ Modern private app distribution platform for iOS + Android.
 - This is a ground-up refactor; legacy code is reference-only.
 
 ## Run (local)
-- `make launch` starts the API and Admin dev servers plus Caddy for local domains.
+- `make launch` starts the API and Admin dev servers (without bundling a local Caddy).
+- Or use `docker-compose up api admin caddy db` to run everything with the bundled Caddy in `docker/Caddyfile`.
+- Add `/etc/hosts` entries pointing `admin.local.einstore.pro`, `api.local.einstore.pro`, and `local.einstore.pro` to `127.0.0.1`; Docker Desktop will forward 80/443 to the Caddy container, which proxies to the Admin/API containers.
 - For App Platform build/run simulation, see `docs/app-platform-local-sim.md`.
-- With DNS entries for `admin.local.einstore.pro`, `api.local.einstore.pro`, and `local.einstore.pro`, you can access the dev stack from other devices at `https://admin.local.einstore.pro` and `https://api.local.einstore.pro` (Caddy terminates HTTPS with local certificates; override `DEV_*` vars in the Makefile if you need different ports).
 - Default ports now live in the 8100 range: API 8100, Admin 8101, Postgres 8102 (Docker host), and the test runner on 8103.
 
 ## Uploading a binary to Einstore
