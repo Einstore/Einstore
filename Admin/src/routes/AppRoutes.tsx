@@ -48,6 +48,7 @@ import { navItems, pageConfig, type RouteConfig } from "./config";
 import { adminFeatureFlagDefinitions } from "../data/featureFlagDefinitions";
 import type { StorageUsageResponse, StorageUsageUser } from "../types/usage";
 import type { AnalyticsSettings } from "../types/settings";
+import type { SearchBuildResult, SearchResponse } from "../lib/search";
 import {
   privateNavItems,
   privatePageConfig,
@@ -75,6 +76,7 @@ const AppRoutes = () => {
   const [storageUsageTotalBytes, setStorageUsageTotalBytes] = useState(0);
   const [isLoadingStorageUsage, setIsLoadingStorageUsage] = useState(false);
   const [analyticsKey, setAnalyticsKey] = useState<string | null>(null);
+  const [previewBuilds, setPreviewBuilds] = useState<SearchBuildResult[]>([]);
   const {
     hasToken,
     isSuperUser,
@@ -250,6 +252,34 @@ const AppRoutes = () => {
   }, [activeTeamId, hasToken, ingestNonce]);
 
   useEffect(() => {
+    if (!hasToken || !activeTeamId) {
+      setPreviewBuilds([]);
+      return;
+    }
+    let isMounted = true;
+    const params = new URLSearchParams({
+      q: "preview",
+      appPerPage: "0",
+      buildPerPage: "4",
+    });
+    apiFetch<SearchResponse>(`/search?${params.toString()}`, {
+      headers: { "x-team-id": activeTeamId },
+    })
+      .then((payload) => {
+        if (!isMounted) return;
+        setPreviewBuilds(payload?.builds?.items ?? []);
+      })
+      .catch(() => {
+        if (isMounted) {
+          setPreviewBuilds([]);
+        }
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [activeTeamId, hasToken, ingestNonce]);
+
+  useEffect(() => {
     if (analyticsKey) {
       enableAnalytics(analyticsKey);
       trackPageView(location.pathname + location.search);
@@ -341,6 +371,48 @@ const AppRoutes = () => {
     [loadApps]
   );
 
+  const handleInstallBuild = useCallback(
+    async (buildId: string) => {
+      try {
+        const payload = await apiFetch<{ itmsServicesUrl?: string; downloadUrl?: string }>(
+          `/builds/${buildId}/ios/install-link`,
+          {
+            method: "POST",
+            headers: { "x-team-id": activeTeamId },
+          }
+        );
+        if (payload?.itmsServicesUrl) {
+          window.location.href = payload.itmsServicesUrl;
+        } else if (payload?.downloadUrl) {
+          window.open(payload.downloadUrl, "_blank", "noopener,noreferrer");
+        }
+      } catch {
+        // ignore errors
+      }
+    },
+    [activeTeamId]
+  );
+
+  const handleDownloadBuild = useCallback(
+    async (buildId: string) => {
+      try {
+        const payload = await apiFetch<{ downloadUrl?: string }>(
+          `/builds/${buildId}/ios/install-link`,
+          {
+            method: "POST",
+            headers: { "x-team-id": activeTeamId },
+          }
+        );
+        if (payload?.downloadUrl) {
+          window.open(payload.downloadUrl, "_blank", "noopener,noreferrer");
+        }
+      } catch {
+        // ignore errors
+      }
+    },
+    [activeTeamId]
+  );
+
   const coreRoutes: RouteConfig[] = [
     {
       id: "overview",
@@ -350,6 +422,10 @@ const AppRoutes = () => {
           metrics={metrics}
           apps={overviewApps}
           buildQueue={buildQueue}
+          previewBuilds={previewBuilds}
+          appIconsByApp={appIcons}
+          onInstallBuild={handleInstallBuild}
+          onDownloadBuild={handleDownloadBuild}
           appsTotal={appsPagination.total || badges.apps || apps.length}
           buildsTotal={badges.builds}
           activity={activity}

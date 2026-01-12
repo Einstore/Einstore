@@ -30,7 +30,7 @@ const BuildRow = ({
 }: BuildRowProps) => {
   const clientPlatform = getClientPlatform();
   const showInstall = shouldShowInstall(platform);
-  const showDownloadButton = showDownload || clientPlatform === "web";
+  const showDownloadButton = !showInstall && (showDownload || clientPlatform === "web");
 
   return (
     <button

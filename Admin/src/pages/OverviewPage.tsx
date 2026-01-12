@@ -4,8 +4,10 @@ import StorageSection from "../sections/StorageSection";
 import BuildQueueSection from "../sections/BuildQueueSection";
 import SplitLayout from "../components/SplitLayout";
 import Panel from "../components/Panel";
+import BuildQueueList from "../components/BuildQueueList";
 import type { AppSummary, BuildJob, Metric } from "../data/mock";
 import type { StorageUsageUser } from "../types/usage";
+import type { SearchBuildResult } from "../lib/search";
 
 type OverviewPageProps = {
   metrics: Metric[];
@@ -18,6 +20,10 @@ type OverviewPageProps = {
   showStorage?: boolean;
   appsTotal?: number;
   buildsTotal?: number;
+  previewBuilds?: SearchBuildResult[];
+  appIconsByApp?: Record<string, string>;
+  onInstallBuild?: (id: string) => void;
+  onDownloadBuild?: (id: string) => void;
 };
 
 const OverviewPage = ({
@@ -31,6 +37,10 @@ const OverviewPage = ({
   showStorage = false,
   appsTotal,
   buildsTotal,
+  previewBuilds = [],
+  appIconsByApp,
+  onInstallBuild,
+  onDownloadBuild,
 }: OverviewPageProps) => {
   const appsCount = appsTotal ?? apps?.length ?? 0;
   const buildsCount = buildsTotal ?? buildQueue?.length ?? 0;
@@ -74,6 +84,36 @@ const OverviewPage = ({
         </Panel>
       </div>
       {showMetrics ? <OverviewSection metrics={metrics} /> : null}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+            Preview builds
+          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Builds tagged with “preview” (max 4)
+          </p>
+        </div>
+        {previewBuilds.length ? (
+          <BuildQueueList
+            jobs={previewBuilds.slice(0, 4).map((build) => ({
+              id: build.id,
+              name: build.displayName || build.appName || "Preview build",
+              buildNumber: build.buildNumber,
+              createdAt: build.createdAt,
+              appId: build.appId,
+            }))}
+            appIcons={appIconsByApp}
+            onInstall={onInstallBuild}
+            onDownload={onDownloadBuild}
+          />
+        ) : (
+          <Panel>
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              No preview builds yet. Add the <strong>preview</strong> tag to any build to feature it here.
+            </p>
+          </Panel>
+        )}
+      </div>
       <SplitLayout
         left={<ReleasesSection apps={apps} />}
         right={<BuildQueueSection jobs={buildQueue} />}

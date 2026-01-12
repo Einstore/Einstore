@@ -255,10 +255,25 @@ const BuildDetailPage = ({
             </Panel>
 
             <Panel className="col-span-12 space-y-4">
-              <SectionHeader
-                title="Tags"
-                subtitle="Tags help you find builds quickly. Add multiple tags; changes save automatically."
-              />
+              <div className="flex items-start justify-between gap-3">
+                <SectionHeader
+                  title="Tags"
+                  subtitle="Tags help you find builds quickly. Add multiple tags; changes save automatically."
+                />
+                <button
+                  type="button"
+                  className="h-10 rounded-lg border border-slate-300 px-3 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
+                  onClick={() => {
+                    if (!tagDraft.includes("preview")) {
+                      const next = [...tagDraft, "preview"];
+                      setTagDraft(next);
+                      onChangeTags?.(next);
+                    }
+                  }}
+                >
+                  Make preview
+                </button>
+              </div>
               <TagInput
                 value={tagDraft}
                 onChange={(next) => {
@@ -268,6 +283,33 @@ const BuildDetailPage = ({
                 suggestions={availableTags.map((tag) => tag.name)}
                 placeholder="Add a tag (e.g. release, beta, hotfix)"
               />
+              <details className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm dark:border-slate-700 dark:bg-slate-800/60">
+                <summary className="cursor-pointer text-sm font-semibold text-slate-700 dark:text-slate-200">
+                  Tag palette
+                </summary>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {[
+                    { name: "bug", className: "bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-200" },
+                    { name: "ok", className: "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-200" },
+                    { name: "preview", className: "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-200" },
+                    { name: "tested", className: "bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-200" },
+                    { name: "needs testing", className: "bg-slate-200 text-slate-700 dark:bg-slate-600 dark:text-slate-100" },
+                  ].map((item) => (
+                    <button
+                      key={item.name}
+                      type="button"
+                      className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${item.className}`}
+                      onClick={() => {
+                        const next = Array.from(new Set([...tagDraft, item.name]));
+                        setTagDraft(next);
+                        onChangeTags?.(next);
+                      }}
+                    >
+                      {item.name}
+                    </button>
+                  ))}
+                </div>
+              </details>
               {tags.length ? (
                 <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                   <span className="font-semibold uppercase tracking-wide">Saved</span>

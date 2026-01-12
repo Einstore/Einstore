@@ -6,13 +6,22 @@ import type { BuildJob } from "../data/mock";
 type BuildQueueListProps = {
   jobs: Array<ApiBuild | (BuildJob & Partial<ApiBuild>)>;
   icons?: Record<string, string>;
+  appIcons?: Record<string, string>;
   onSelect?: (id: string) => void;
   platforms?: Record<string, string>;
   onInstall?: (id: string) => void;
   onDownload?: (id: string) => void;
 };
 
-const BuildQueueList = ({ jobs, icons, platforms, onSelect, onInstall, onDownload }: BuildQueueListProps) => {
+const BuildQueueList = ({
+  jobs,
+  icons,
+  appIcons,
+  platforms,
+  onSelect,
+  onInstall,
+  onDownload,
+}: BuildQueueListProps) => {
   return (
     <div className="rounded-xl bg-white p-5 shadow-sm dark:bg-slate-800">
       <div className="-mx-5">
@@ -32,6 +41,9 @@ const BuildQueueList = ({ jobs, icons, platforms, onSelect, onInstall, onDownloa
         const createdAt = formattedDate === "—" && rawDate ? rawDate : formattedDate;
         const storageKind = "storageKind" in job ? job.storageKind : undefined;
         const platform = platforms?.[job.id] ?? ("platform" in job ? (job as ApiBuild).platform : undefined);
+        const iconUrl =
+          icons?.[job.id] ??
+          (appIcons && "appId" in job ? appIcons[(job as Partial<ApiBuild>).appId ?? ""] : undefined);
 
           return (
             <BuildRow
@@ -41,7 +53,7 @@ const BuildQueueList = ({ jobs, icons, platforms, onSelect, onInstall, onDownloa
               size={size}
               createdAt={createdAt}
               storageKind={storageKind}
-              iconUrl={icons?.[job.id]}
+              iconUrl={iconUrl}
               platform={platform}
               onInstall={onInstall ? () => onInstall(job.id) : undefined}
               onDownload={onDownload ? () => onDownload(job.id) : undefined}
