@@ -136,6 +136,11 @@ model Build {
   storageKind   StorageKind
   storagePath   String
   sizeBytes     Int
+  gitCommit     String?  @db.Text
+  prUrl         String?  @db.Text
+  changeLog     String?  @db.Text
+  notes         String?  @db.Text
+  info          Json?
   createdByUserId String?
 
   version       Version  @relation(fields: [versionId], references: [id])

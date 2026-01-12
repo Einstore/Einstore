@@ -36,6 +36,7 @@ import {
   type ApiBuild,
   type ApiBuildIconResponse,
   type ApiBuildMetadata,
+  type BuildMetadataUpdateInput,
   type ApiTag,
   type ApiBuildEvent,
 } from "../lib/apps";
@@ -802,6 +803,22 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
     [activeTeamId]
   );
 
+  const updateBuildMetadata = useCallback(
+    async (updates: BuildMetadataUpdateInput) => {
+      if (!buildId) {
+        return null;
+      }
+      const payload = await apiFetch<ApiBuildMetadata>(`/builds/${buildId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", "x-team-id": activeTeamId },
+        body: JSON.stringify(updates),
+      });
+      setBuild(payload ?? null);
+      return payload ?? null;
+    },
+    [activeTeamId, buildId]
+  );
+
   useEffect(() => {
     let isMounted = true;
     setBuild(null);
@@ -984,6 +1001,7 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
       onDownloadPageChange={(page) => {
         setDownloadMeta((current) => ({ ...current, page }));
       }}
+      onUpdateMetadata={updateBuildMetadata}
     />
   );
 };

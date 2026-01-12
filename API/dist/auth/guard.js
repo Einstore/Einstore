@@ -2,7 +2,24 @@ import { asAuthError } from "@unlikeother/auth";
 import { authService } from "./service.js";
 import { prisma } from "../lib/prisma.js";
 import { resolveApiKeySecret, verifyApiKey } from "@rafiki270/api-keys";
+const devBypassEnabled = process.env.AUTH_DEV_BYPASS === "true" && process.env.NODE_ENV !== "production";
+const devBypassUserId = process.env.AUTH_DEV_USER_ID ?? "dev-user";
+const devBypassTeamId = process.env.AUTH_DEV_TEAM_ID ?? "dev-team";
+const devBypassRole = process.env.AUTH_DEV_ROLE ?? "owner";
 export async function requireAuth(request, reply) {
+    if (devBypassEnabled) {
+        request.auth = {
+            user: {
+                id: devBypassUserId,
+                username: "dev",
+                email: null,
+                name: "Dev User",
+                avatarUrl: null,
+                status: "active",
+            },
+        };
+        return;
+    }
     const header = request.headers["authorization"];
     if (!header || typeof header !== "string" || !header.startsWith("Bearer ")) {
         return reply.status(401).send({ error: "token_invalid", message: "Missing access token" });
@@ -50,6 +67,11 @@ export async function requireTeam(request, reply) {
     if (reply.sent) {
         return;
     }
+    if (devBypassEnabled) {
+        request.team = { id: devBypassTeamId };
+        request.teamMember = { teamId: devBypassTeamId, userId: devBypassUserId, role: devBypassRole };
+        return;
+    }
     const userId = request.auth?.user.id;
     if (!userId) {
         return reply.status(401).send({ error: "token_invalid", message: "Missing access token" });
@@ -77,6 +99,9 @@ export async function requireTeam(request, reply) {
 export async function requireTeamAdmin(request, reply) {
     await requireTeam(request, reply);
     if (reply.sent) {
+        return;
+    }
+    if (devBypassEnabled) {
         return;
     }
     const role = request.teamMember?.role;

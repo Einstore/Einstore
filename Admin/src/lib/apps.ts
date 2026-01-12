@@ -17,6 +17,11 @@ export type ApiBuild = {
   sizeBytes: number;
   createdAt: string;
   updatedAt: string;
+  gitCommit?: string | null;
+  prUrl?: string | null;
+  changeLog?: string | null;
+  notes?: string | null;
+  info?: Record<string, unknown> | null;
 };
 
 export type ApiTarget = {
@@ -148,4 +153,12 @@ export type ApiBuildEvent = {
     email?: string | null;
     fullName?: string | null;
   } | null;
+};
+
+export type BuildMetadataUpdateInput = {
+  gitCommit?: string | null;
+  prUrl?: string | null;
+  changeLog?: string | null;
+  notes?: string | null;
+  info?: Record<string, unknown> | null;
 };

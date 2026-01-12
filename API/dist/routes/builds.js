@@ -69,6 +69,18 @@ const createBuildSchema = z.object({
     storageKind: z.enum(["local", "s3"]),
     storagePath: z.string().min(1),
     sizeBytes: z.number().int().nonnegative(),
+    gitCommit: z.string().trim().max(200).optional().nullable(),
+    prUrl: z.string().trim().url().max(2048).optional().nullable(),
+    changeLog: z.string().trim().max(20000).optional().nullable(),
+    notes: z.string().trim().max(5000).optional().nullable(),
+    info: z.record(z.string(), z.unknown()).optional().nullable(),
+});
+const updateBuildSchema = z.object({
+    gitCommit: z.string().trim().max(200).optional().nullable(),
+    prUrl: z.string().trim().url().max(2048).optional().nullable(),
+    changeLog: z.string().trim().max(20000).optional().nullable(),
+    notes: z.string().trim().max(5000).optional().nullable(),
+    info: z.record(z.string(), z.unknown()).optional().nullable(),
 });
 const listQuerySchema = z.object({
     appId: z.string().uuid().optional(),
@@ -78,6 +90,35 @@ const listQuerySchema = z.object({
     limit: z.coerce.number().int().positive().max(200).optional(),
     offset: z.coerce.number().int().nonnegative().optional(),
 });
+const normalizeNullableString = (value) => {
+    if (value === undefined)
+        return undefined;
+    if (value === null)
+        return null;
+    const trimmed = value.trim();
+    return trimmed || null;
+};
+const normalizeBuildMetadata = (input) => ({
+    gitCommit: normalizeNullableString(input.gitCommit ?? undefined),
+    prUrl: normalizeNullableString(input.prUrl ?? undefined),
+    changeLog: normalizeNullableString(input.changeLog ?? undefined),
+    notes: normalizeNullableString(input.notes ?? undefined),
+    info: input.info === undefined ? undefined : input.info ?? null,
+});
+const toBuildMetadataData = (metadata) => {
+    const data = {};
+    if (metadata.gitCommit !== undefined)
+        data.gitCommit = metadata.gitCommit;
+    if (metadata.prUrl !== undefined)
+        data.prUrl = metadata.prUrl;
+    if (metadata.changeLog !== undefined)
+        data.changeLog = metadata.changeLog;
+    if (metadata.notes !== undefined)
+        data.notes = metadata.notes;
+    if (metadata.info !== undefined)
+        data.info = metadata.info;
+    return data;
+};
 export async function buildRoutes(app) {
     app.post("/builds", { preHandler: requireTeam }, async (request, reply) => {
         const parsed = createBuildSchema.safeParse(request.body);
@@ -94,6 +135,7 @@ export async function buildRoutes(app) {
             update: { name: input.appName },
             create: { identifier: input.appIdentifier, name: input.appName, teamId },
         });
+        const metadata = normalizeBuildMetadata(input);
         const versionRecord = await prisma.version.upsert({
             where: {
                 appId_version: {
@@ -116,6 +158,7 @@ export async function buildRoutes(app) {
                 storagePath: input.storagePath,
                 sizeBytes: input.sizeBytes,
                 createdByUserId: request.auth?.user.id,
+                ...toBuildMetadataData(metadata),
             },
         });
         await broadcastBadgesUpdate(teamId).catch(() => undefined);
@@ -187,6 +230,40 @@ export async function buildRoutes(app) {
             return reply.status(404).send({ error: "Not found" });
         }
         return reply.send(record);
+    });
+    app.patch("/builds/:id", { preHandler: requireTeam }, async (request, reply) => {
+        const parsed = updateBuildSchema.safeParse(request.body ?? {});
+        if (!parsed.success) {
+            return reply.status(400).send({ error: "Invalid payload" });
+        }
+        const teamId = request.team?.id;
+        if (!teamId) {
+            return reply.status(403).send({ error: "team_required", message: "Team context required" });
+        }
+        const id = request.params.id;
+        const existing = await prisma.build.findFirst({
+            where: { id, version: { app: { teamId } } },
+        });
+        if (!existing) {
+            return reply.status(404).send({ error: "Not found" });
+        }
+        const metadata = normalizeBuildMetadata(parsed.data);
+        const updates = toBuildMetadataData(metadata);
+        if (!Object.keys(updates).length) {
+            return reply.send(existing);
+        }
+        const updated = await prisma.build.update({
+            where: { id },
+            data: updates,
+            include: {
+                version: { include: { app: true } },
+                targets: true,
+                artifacts: true,
+                signing: true,
+            },
+        });
+        const artifactsByKind = groupArtifactsByKind(updated.artifacts);
+        return reply.send({ ...updated, artifactsByKind });
     });
     app.get("/builds/:id/metadata", { preHandler: requireTeam }, async (request, reply) => {
         const teamId = request.team?.id;
