@@ -16,6 +16,8 @@ type OverviewPageProps = {
   isStorageLoading?: boolean;
   showMetrics?: boolean;
   showStorage?: boolean;
+  appsTotal?: number;
+  buildsTotal?: number;
 };
 
 const OverviewPage = ({
@@ -27,9 +29,18 @@ const OverviewPage = ({
   isStorageLoading = false,
   showMetrics = false,
   showStorage = false,
+  appsTotal,
+  buildsTotal,
 }: OverviewPageProps) => {
-  const appsCount = apps?.length ?? 0;
-  const buildsCount = buildQueue?.length ?? 0;
+  const appsCount = appsTotal ?? apps?.length ?? 0;
+  const buildsCount = buildsTotal ?? buildQueue?.length ?? 0;
+  const formatBytes = (value: number) => {
+    if (!value) return "0 B";
+    const units = ["B", "KB", "MB", "GB", "TB"];
+    const power = Math.min(units.length - 1, Math.floor(Math.log(value) / Math.log(1024)));
+    const scaled = value / Math.pow(1024, power);
+    return `${scaled.toFixed(scaled >= 10 || power === 0 ? 0 : 1)} ${units[power]}`;
+  };
 
   return (
     <div className="space-y-10">
@@ -54,8 +65,12 @@ const OverviewPage = ({
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
             Placeholder
           </p>
-          <p className="text-2xl font-semibold text-slate-900 dark:text-slate-100">—</p>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Add a KPI here</p>
+          <p className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+            {formatBytes(storageTotalBytes)}
+          </p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Storage used across this workspace
+          </p>
         </Panel>
       </div>
       {showMetrics ? <OverviewSection metrics={metrics} /> : null}

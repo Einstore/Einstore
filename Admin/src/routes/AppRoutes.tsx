@@ -350,6 +350,8 @@ const AppRoutes = () => {
           metrics={metrics}
           apps={overviewApps}
           buildQueue={buildQueue}
+          appsTotal={appsPagination.total || badges.apps || apps.length}
+          buildsTotal={badges.builds}
           activity={activity}
           storageUsage={storageUsage}
           storageTotalBytes={storageUsageTotalBytes}
