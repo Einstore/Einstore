@@ -146,6 +146,7 @@ model Build {
   createdByUser User?    @relation("BuildCreatedBy", fields: [createdByUserId], references: [id])
   events        BuildEvent[]
   tags          BuildTag[]
+  trackingEvents TrackingEvent[]
 
   @@index([versionId])
   @@index([createdByUserId])
@@ -301,6 +302,7 @@ model User {
   createdBuilds       Build[]             @relation("BuildCreatedBy")
   buildEvents         BuildEvent[]
   createdApiKeys      ApiKey[]            @relation("ApiKeyCreator")
+  trackingEvents      TrackingEvent[]
 }
 
 model ApiKey {
@@ -430,6 +432,7 @@ model Team {
   buildEvents     BuildEvent[]
   apiKeys         ApiKey[]
   tags            Tag[]
+  trackingEvents  TrackingEvent[]
 }
 
 model TeamMember {
