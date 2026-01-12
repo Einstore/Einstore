@@ -158,6 +158,20 @@ model Build {
   @@index([createdByUserId])
 }
 
+model Comment {
+  id        String   @id @default(uuid())
+  parentId  String
+  category  String
+  text      String
+  userId    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User?    @relation("CommentAuthor", fields: [userId], references: [id])
+
+  @@index([parentId, category])
+}
+
 model Target {
   id             String      @id @default(uuid())
   buildId        String
@@ -310,6 +324,7 @@ model User {
   buildEvents         BuildEvent[]
   createdApiKeys      ApiKey[]            @relation("ApiKeyCreator")
   trackingEvents      TrackingEvent[]
+  comments            Comment[]           @relation("CommentAuthor")
 }
 
 model ApiKey {

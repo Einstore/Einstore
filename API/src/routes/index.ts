@@ -32,6 +32,7 @@ import { searchRoutes } from "./search.js";
 import { buildTagRoutes } from "./build-tags.js";
 import { tagRoutes } from "./tags.js";
 import { teamLogoRoutes } from "./team-logo.js";
+import { commentRoutes } from "./comments.js";
 
 export async function registerRoutes(app: FastifyInstance) {
   const config = loadConfig();
@@ -70,6 +71,7 @@ export async function registerRoutes(app: FastifyInstance) {
   await app.register(buildTagRoutes);
   await app.register(tagRoutes);
   await app.register(teamLogoRoutes);
+  await app.register(commentRoutes);
 
   for (const plugin of privateApiPlugins) {
     if (typeof plugin.register !== "function") continue;

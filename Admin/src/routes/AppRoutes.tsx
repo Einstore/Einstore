@@ -40,6 +40,7 @@ import {
   type ApiTag,
   type ApiBuildEvent,
 } from "../lib/apps";
+import type { ApiComment } from "../lib/comments";
 import { enableAnalytics, trackPageView } from "../lib/analytics";
 import { useSessionState } from "../lib/session";
 import type { PaginatedResponse, PaginationMeta } from "../lib/pagination";
@@ -764,6 +765,10 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
     total: 0,
     totalPages: 1,
   });
+  const [comments, setComments] = useState<ApiComment[]>([]);
+  const [isLoadingComments, setIsLoadingComments] = useState(false);
+  const [isPostingComment, setIsPostingComment] = useState(false);
+  const [commentsError, setCommentsError] = useState<string | null>(null);
   const installBuild = useCallback(
     async (id: string) => {
       try {
@@ -819,6 +824,28 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
     [activeTeamId, buildId]
   );
 
+  const submitComment = useCallback(
+    async (text: string) => {
+      if (!buildId) return;
+      setIsPostingComment(true);
+      setCommentsError(null);
+      try {
+        const payload = await apiFetch<ApiComment>(`/comments`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-team-id": activeTeamId },
+          body: JSON.stringify({ parentId: buildId, category: "build", text }),
+        });
+        setComments((current) => [...current, payload]);
+      } catch (err) {
+        setCommentsError(err instanceof Error ? err.message : "Unable to post comment.");
+        throw err;
+      } finally {
+        setIsPostingComment(false);
+      }
+    },
+    [activeTeamId, buildId]
+  );
+
   useEffect(() => {
     let isMounted = true;
     setBuild(null);
@@ -841,6 +868,29 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
       .then((payload) => {
         if (!isMounted) return;
         setBuild(payload ?? null);
+        setComments([]);
+        setCommentsError(null);
+        setIsLoadingComments(true);
+        apiFetch<{ items: ApiComment[] }>(
+          `/comments?${new URLSearchParams({ parentId: buildId, category: "build", perPage: "200" }).toString()}`,
+          {
+            headers: { "x-team-id": activeTeamId },
+          }
+        )
+          .then((commentPayload) => {
+            if (!isMounted) return;
+            setComments(commentPayload?.items ?? []);
+          })
+          .catch(() => {
+            if (!isMounted) return;
+            setComments([]);
+            setCommentsError("Unable to load comments.");
+          })
+          .finally(() => {
+            if (isMounted) {
+              setIsLoadingComments(false);
+            }
+          });
         const appId = payload?.version?.app?.id;
         const params = new URLSearchParams({ perPage: "100" });
         if (appId) {
@@ -1002,6 +1052,12 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
         setDownloadMeta((current) => ({ ...current, page }));
       }}
       onUpdateMetadata={updateBuildMetadata}
+      comments={comments}
+      onSubmitComment={submitComment}
+      isCommentsLoading={isLoadingComments}
+      isCommentSubmitting={isPostingComment}
+      commentsError={commentsError}
+      currentUserId={me?.userId}
     />
   );
 };

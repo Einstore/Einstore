@@ -18,6 +18,8 @@ import { androidManifestKeyDescriptionMap } from "../data/androidManifestKeys";
 import TagInput from "../components/TagInput";
 import Pagination from "../components/Pagination";
 import type { PaginationMeta } from "../lib/pagination";
+import CommentsPanel from "../components/CommentsPanel";
+import type { ApiComment } from "../lib/comments";
 
 const metadataDescriptionMap = { ...infoPlistKeyDescriptionMap, ...androidManifestKeyDescriptionMap };
 
@@ -35,6 +37,12 @@ type BuildDetailPageProps = {
   downloadMeta?: PaginationMeta;
   onDownloadPageChange?: (page: number) => void;
   onUpdateMetadata?: (updates: BuildMetadataUpdateInput) => Promise<ApiBuildMetadata | null | void>;
+  comments?: ApiComment[];
+  onSubmitComment?: (text: string) => Promise<void>;
+  isCommentsLoading?: boolean;
+  isCommentSubmitting?: boolean;
+  commentsError?: string | null;
+  currentUserId?: string | null;
 };
 
 const formatKind = (kind: string) => kind.replace(/_/g, " ");
@@ -117,6 +125,12 @@ const BuildDetailPage = ({
   downloadMeta,
   onDownloadPageChange,
   onUpdateMetadata,
+  comments = [],
+  onSubmitComment,
+  isCommentsLoading = false,
+  isCommentSubmitting = false,
+  commentsError = null,
+  currentUserId,
 }: BuildDetailPageProps) => {
   const primaryTarget = pickPrimaryTarget(build?.targets);
   const appName = build?.version?.app?.name ?? build?.displayName ?? "—";
@@ -376,216 +390,230 @@ const BuildDetailPage = ({
               </div>
             </Panel>
 
-            <Panel className="col-span-12 space-y-4">
-              <div className="flex items-start justify-between gap-3">
-                <SectionHeader
-                  title="Tags"
-                  subtitle="Tags help you find builds quickly. Add multiple tags; changes save automatically."
-                />
-                <button
-                  type="button"
-                  className="h-10 rounded-lg border border-slate-300 px-3 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
-                  onClick={() => {
-                    if (!tagDraft.includes("preview")) {
-                      const next = [...tagDraft, "preview"];
-                      setTagDraft(next);
-                      onChangeTags?.(next);
-                    }
-                  }}
-                >
-                  Make preview
-                </button>
-              </div>
-              <TagInput
-                value={tagDraft}
-                onChange={(next) => {
-                  setTagDraft(next);
-                  onChangeTags?.(next);
-                }}
-                suggestions={availableTags.map((tag) => tag.name)}
-                placeholder="Add a tag (e.g. release, beta, hotfix)"
-              />
-              <details className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm dark:border-slate-700 dark:bg-slate-800/60">
-                <summary className="cursor-pointer text-sm font-semibold text-slate-700 dark:text-slate-200">
-                  Tag palette
-                </summary>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {[
-                    { name: "bug", className: "bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-200" },
-                    { name: "ok", className: "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-200" },
-                    { name: "preview", className: "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-200" },
-                    { name: "tested", className: "bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-200" },
-                    { name: "needs testing", className: "bg-slate-200 text-slate-700 dark:bg-slate-600 dark:text-slate-100" },
-                  ].map((item) => (
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-start">
+              <div className="space-y-6 lg:col-span-5">
+                <Panel className="space-y-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <SectionHeader
+                      title="Tags"
+                      subtitle="Tags help you find builds quickly. Add multiple tags; changes save automatically."
+                    />
                     <button
-                      key={item.name}
                       type="button"
-                      className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${item.className}`}
+                      className="h-10 rounded-lg border border-slate-300 px-3 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
                       onClick={() => {
-                        const next = Array.from(new Set([...tagDraft, item.name]));
-                        setTagDraft(next);
-                        onChangeTags?.(next);
+                        if (!tagDraft.includes("preview")) {
+                          const next = [...tagDraft, "preview"];
+                          setTagDraft(next);
+                          onChangeTags?.(next);
+                        }
                       }}
                     >
-                      {item.name}
+                      Make preview
                     </button>
-                  ))}
-                </div>
-              </details>
-              {tags.length ? (
-                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                  <span className="font-semibold uppercase tracking-wide">Saved</span>
-                  {tags.map((tag) => (
-                    <span
-                      key={tag.id}
-                      className="rounded-full bg-slate-100 px-3 py-1 text-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                    >
-                      {tag.name}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  No tags yet. Add some to make search easier.
-                </p>
-              )}
-            </Panel>
-          </div>
+                  </div>
+                  <TagInput
+                    value={tagDraft}
+                    onChange={(next) => {
+                      setTagDraft(next);
+                      onChangeTags?.(next);
+                    }}
+                    suggestions={availableTags.map((tag) => tag.name)}
+                    placeholder="Add a tag (e.g. release, beta, hotfix)"
+                  />
+                  <details className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm dark:border-slate-700 dark:bg-slate-800/60">
+                    <summary className="cursor-pointer text-sm font-semibold text-slate-700 dark:text-slate-200">
+                      Tag palette
+                    </summary>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {[
+                        { name: "bug", className: "bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-200" },
+                        { name: "ok", className: "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-200" },
+                        { name: "preview", className: "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-200" },
+                        { name: "tested", className: "bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-200" },
+                        { name: "needs testing", className: "bg-slate-200 text-slate-700 dark:bg-slate-600 dark:text-slate-100" },
+                      ].map((item) => (
+                        <button
+                          key={item.name}
+                          type="button"
+                          className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${item.className}`}
+                          onClick={() => {
+                            const next = Array.from(new Set([...tagDraft, item.name]));
+                            setTagDraft(next);
+                            onChangeTags?.(next);
+                          }}
+                        >
+                          {item.name}
+                        </button>
+                      ))}
+                    </div>
+                  </details>
+                  {tags.length ? (
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                      <span className="font-semibold uppercase tracking-wide">Saved</span>
+                      {tags.map((tag) => (
+                        <span
+                          key={tag.id}
+                          className="rounded-full bg-slate-100 px-3 py-1 text-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                        >
+                          {tag.name}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      No tags yet. Add some to make search easier.
+                    </p>
+                  )}
+                </Panel>
 
-          <div className="grid grid-cols-12 gap-6">
-            <Panel className="col-span-12 md:col-span-6 space-y-4">
-              <SectionHeader title="Download history" subtitle="Newest first" />
-              {!downloads.length ? (
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  No downloads recorded for this build yet.
-                </p>
-              ) : (
-                <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
-                  {downloads.map((event, index) => {
-                    const isEven = index % 2 === 0;
-                    const user =
-                      event.user?.fullName ||
-                      event.user?.username ||
-                      event.user?.email ||
-                      "Unknown user";
-                    return (
-                      <div
-                        key={event.id}
-                        className={`flex items-center justify-between px-4 py-3 text-sm ${
-                          isEven ? "bg-slate-50 dark:bg-slate-800" : "bg-white dark:bg-slate-900"
-                        }`}
-                      >
-                        <div className="space-y-1">
-                          <p className="font-semibold text-slate-900 dark:text-slate-100">{user}</p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400">
-                            {event.userAgent || "Download"}
-                          </p>
-                        </div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                          {formatDateTime(event.createdAt)}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-              {downloadMeta && downloadMeta.total > downloadMeta.perPage ? (
-                <Pagination
-                  page={downloadMeta.page}
-                  perPage={downloadMeta.perPage}
-                  totalPages={downloadMeta.totalPages}
-                  onPageChange={onDownloadPageChange}
+                <CommentsPanel
+                  comments={comments}
+                  currentUserId={currentUserId}
+                  onSubmit={onSubmitComment}
+                  isSubmitting={isCommentSubmitting}
+                  isLoading={isCommentsLoading}
+                  error={commentsError || undefined}
                 />
-              ) : null}
-            </Panel>
+              </div>
 
-            <Panel className="col-span-12 md:col-span-6 space-y-4">
-              <SectionHeader title="Targets" />
-              {!build.targets?.length ? (
-                <p className="text-sm text-slate-500">No targets found for this build.</p>
-              ) : (
-                <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
-                  {build.targets.map((target, index) => {
-                    const isEven = index % 2 === 0;
-                    return (
-                      <div
-                        key={target.id}
-                        className={`grid gap-2 px-4 py-3 text-sm ${
-                          isEven ? "bg-slate-50 dark:bg-slate-800" : "bg-white dark:bg-slate-900"
-                        }`}
-                      >
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <div>
-                            <p className="font-semibold text-slate-900 dark:text-slate-100">
-                              {target.bundleId}
-                            </p>
-                            <p className="text-xs text-slate-500">
-                              {target.platform} • {target.role}
-                              {target.minOsVersion ? ` • Min OS ${target.minOsVersion}` : ""}
+              <div className="space-y-6 lg:col-span-7">
+                <Panel className="space-y-4">
+                  <SectionHeader title="Download history" subtitle="Newest first" />
+                  {!downloads.length ? (
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      No downloads recorded for this build yet.
+                    </p>
+                  ) : (
+                    <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
+                      {downloads.map((event, index) => {
+                        const isEven = index % 2 === 0;
+                        const user =
+                          event.user?.fullName ||
+                          event.user?.username ||
+                          event.user?.email ||
+                          "Unknown user";
+                        return (
+                          <div
+                            key={event.id}
+                            className={`flex items-center justify-between px-4 py-3 text-sm ${
+                              isEven ? "bg-slate-50 dark:bg-slate-800" : "bg-white dark:bg-slate-900"
+                            }`}
+                          >
+                            <div className="space-y-1">
+                              <p className="font-semibold text-slate-900 dark:text-slate-100">{user}</p>
+                              <p className="text-xs text-slate-500 dark:text-slate-400">
+                                {event.userAgent || "Download"}
+                              </p>
+                            </div>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                              {formatDateTime(event.createdAt)}
                             </p>
                           </div>
-                          <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-700 dark:bg-slate-700 dark:text-slate-200">
-                            Target
-                          </span>
-                        </div>
-                        {renderMetadataRows(target.metadata)}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </Panel>
+                        );
+                      })}
+                    </div>
+                  )}
+                  {downloadMeta && downloadMeta.total > downloadMeta.perPage ? (
+                    <Pagination
+                      page={downloadMeta.page}
+                      perPage={downloadMeta.perPage}
+                      totalPages={downloadMeta.totalPages}
+                      onPageChange={onDownloadPageChange}
+                    />
+                  ) : null}
+                </Panel>
 
-            <Panel className="col-span-12 md:col-span-6 space-y-4">
-              <SectionHeader title="Artifacts & entitlements" />
-              {!artifactGroups.length ? (
-                <p className="text-sm text-slate-500">No artifacts available.</p>
-              ) : (
-                <div className="space-y-4">
-                  {artifactGroups.map(([kind, items]) => {
-                    if (!items.length) return null;
-                    return (
-                      <div key={kind} className="space-y-2">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                          {formatKind(kind)}
-                        </p>
-                        <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
-                          {items.map((item, index) => {
-                            const isEven = index % 2 === 0;
-                            return (
-                              <div
-                                key={item.id}
-                                className={`grid gap-2 px-4 py-3 text-sm ${
-                                  isEven
-                                    ? "bg-slate-50 dark:bg-slate-800"
-                                    : "bg-white dark:bg-slate-900"
-                                }`}
-                              >
-                                <div className="flex flex-wrap items-center justify-between gap-2">
-                                  <div>
-                                    <p className="font-semibold text-slate-900 dark:text-slate-100">
-                                      {item.label || formatKind(item.kind)}
-                                    </p>
-                                    <p className="text-xs text-slate-500">
-                                      {item.storageKind?.toUpperCase?.() ?? "—"} • {item.storagePath}
-                                    </p>
-                                  </div>
-                                  <p className="text-xs text-slate-500">
-                                    {item.createdAt ? formatDateTime(item.createdAt) : "—"}
-                                  </p>
-                                </div>
-                                {renderMetadataRows(item.metadata)}
+                <Panel className="space-y-4">
+                  <SectionHeader title="Targets" />
+                  {!build.targets?.length ? (
+                    <p className="text-sm text-slate-500">No targets found for this build.</p>
+                  ) : (
+                    <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
+                      {build.targets.map((target, index) => {
+                        const isEven = index % 2 === 0;
+                        return (
+                          <div
+                            key={target.id}
+                            className={`grid gap-2 px-4 py-3 text-sm ${
+                              isEven ? "bg-slate-50 dark:bg-slate-800" : "bg-white dark:bg-slate-900"
+                            }`}
+                          >
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <div>
+                                <p className="font-semibold text-slate-900 dark:text-slate-100">
+                                  {target.bundleId}
+                                </p>
+                                <p className="text-xs text-slate-500">
+                                  {target.platform} • {target.role}
+                                  {target.minOsVersion ? ` • Min OS ${target.minOsVersion}` : ""}
+                                </p>
                               </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </Panel>
+                              <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-700 dark:bg-slate-700 dark:text-slate-200">
+                                Target
+                              </span>
+                            </div>
+                            {renderMetadataRows(target.metadata)}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </Panel>
+
+                <Panel className="space-y-4">
+                  <SectionHeader title="Artifacts & entitlements" />
+                  {!artifactGroups.length ? (
+                    <p className="text-sm text-slate-500">No artifacts available.</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {artifactGroups.map(([kind, items]) => {
+                        if (!items.length) return null;
+                        return (
+                          <div key={kind} className="space-y-2">
+                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                              {formatKind(kind)}
+                            </p>
+                            <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
+                              {items.map((item, index) => {
+                                const isEven = index % 2 === 0;
+                                return (
+                                  <div
+                                    key={item.id}
+                                    className={`grid gap-2 px-4 py-3 text-sm ${
+                                      isEven
+                                        ? "bg-slate-50 dark:bg-slate-800"
+                                        : "bg-white dark:bg-slate-900"
+                                    }`}
+                                  >
+                                    <div className="flex flex-wrap items-center justify-between gap-2">
+                                      <div>
+                                        <p className="font-semibold text-slate-900 dark:text-slate-100">
+                                          {item.label || formatKind(item.kind)}
+                                        </p>
+                                        <p className="text-xs text-slate-500">
+                                          {item.storageKind?.toUpperCase?.() ?? "—"} • {item.storagePath}
+                                        </p>
+                                      </div>
+                                      <p className="text-xs text-slate-500">
+                                        {item.createdAt ? formatDateTime(item.createdAt) : "—"}
+                                      </p>
+                                    </div>
+                                    {renderMetadataRows(item.metadata)}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </Panel>
+              </div>
+            </div>
           </div>
+
         </>
       ) : null}
 
