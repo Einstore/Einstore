@@ -4,4 +4,9 @@ export const adminFeatureFlagDefinitions = [
     description: "Overview performance metrics and KPIs.",
     defaultEnabled: false,
   },
+  {
+    key: "admin.upload_debug",
+    description: "Show upload debug tools in Admin",
+    defaultEnabled: false,
+  },
 ] as const;

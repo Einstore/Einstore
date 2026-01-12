@@ -28,7 +28,7 @@ import {
   securityAudits,
   securityPolicies,
 } from "../data/mock";
-import { apiFetch, apiUpload } from "../lib/api";
+import { API_BASE_URL, apiFetch, apiUpload } from "../lib/api";
 import { buildFeatureFlagMap, getDefaultFeatureFlags } from "../lib/featureFlags";
 import {
   pickPrimaryIcon,
@@ -81,6 +81,21 @@ const AppRoutes = () => {
   const envAnalyticsKey = import.meta.env.VITE_ANALYTICS_KEY ?? "";
   const [previewBuilds, setPreviewBuilds] = useState<SearchBuildResult[]>([]);
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
+  const uploadDebugInfo = useMemo(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    const refreshToken = localStorage.getItem("refreshToken");
+    return JSON.stringify(
+      {
+        apiBaseUrl: API_BASE_URL,
+        teamId: activeTeamId ?? null,
+        accessToken: accessToken ?? null,
+        refreshToken: refreshToken ?? null,
+        timestamp: new Date().toISOString(),
+      },
+      null,
+      2
+    );
+  }, [activeTeamId]);
   const {
     hasToken,
     isSuperUser,
@@ -760,6 +775,8 @@ const AppRoutes = () => {
               activeTeamId={activeTeamId}
               teams={teams}
               onUpload={handleIngest}
+              showUploadDebug={featureFlags["admin.upload_debug"]}
+              uploadDebugInfo={uploadDebugInfo}
               user={me}
               appIcons={appIcons}
             />

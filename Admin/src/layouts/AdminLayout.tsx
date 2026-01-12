@@ -25,6 +25,8 @@ type AdminLayoutProps = {
   activeTeamId: string;
   teams: TeamSummary[];
   onUpload: (file: File) => Promise<void>;
+  showUploadDebug?: boolean;
+  uploadDebugInfo?: string;
   user?: SessionUser | null;
   appIcons?: Record<string, string>;
 };
@@ -40,6 +42,8 @@ const AdminLayout = ({
   activeTeamId,
   teams,
   onUpload,
+  showUploadDebug,
+  uploadDebugInfo,
   user,
   appIcons,
 }: AdminLayoutProps) => {
@@ -138,11 +142,21 @@ const AdminLayout = ({
         isOpen={isAddAppOpen}
         onClose={() => setIsAddAppOpen(false)}
         onUpload={onUpload}
+        debugInfo={uploadDebugInfo}
       />
       <AcceptInviteDialog
         isOpen={isAcceptInviteOpen}
         onClose={() => setIsAcceptInviteOpen(false)}
       />
+      {showUploadDebug ? (
+        <button
+          type="button"
+          className="fixed bottom-6 right-6 z-40 rounded-full bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-lg transition-colors hover:bg-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
+          onClick={() => setIsAddAppOpen(true)}
+        >
+          Upload debug
+        </button>
+      ) : null}
     </AppShell>
   );
 };

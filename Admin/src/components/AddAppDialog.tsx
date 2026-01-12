@@ -8,10 +8,12 @@ const AddAppDialog = ({
   isOpen,
   onClose,
   onUpload,
+  debugInfo,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onUpload: (file: File) => Promise<void>;
+  debugInfo?: string;
 }) => {
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState("");
@@ -72,6 +74,12 @@ const AddAppDialog = ({
           <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-600">
             {error}
           </p>
+        ) : null}
+        {debugInfo ? (
+          <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-3 text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+            <p className="font-semibold">Debug info</p>
+            <p className="mt-1 break-all font-mono">{debugInfo}</p>
+          </div>
         ) : null}
         <div className="flex flex-wrap justify-end gap-3">
           <ActionButton label="Cancel" variant="outline" onClick={handleClose} />

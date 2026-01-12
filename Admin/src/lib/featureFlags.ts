@@ -1,7 +1,8 @@
 import { adminFeatureFlagDefinitions } from "../data/featureFlagDefinitions";
 
 export type FeatureFlagKey =
-  | "admin.overview_metrics";
+  | "admin.overview_metrics"
+  | "admin.upload_debug";
 
 type FeatureFlagRecord = {
   key: string;
@@ -10,6 +11,7 @@ type FeatureFlagRecord = {
 
 const supportedKeys: FeatureFlagKey[] = [
   "admin.overview_metrics",
+  "admin.upload_debug",
 ];
 
 const defaultFeatureFlags: Record<FeatureFlagKey, boolean> = supportedKeys.reduce(
