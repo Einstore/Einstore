@@ -260,5 +260,6 @@ deploy:
 		echo "Unable to determine target App ID for $(DEPLOY_ENVIRONMENT) deployment." >&2; \
 		exit 1; \
 	fi
+	@echo "Deploy start time: $$(date)"
 	@echo "Deploying $(DEPLOY_SPEC_FILE) to $(DEPLOY_ENVIRONMENT) app $(DEPLOY_APP_ID)..."
 	@$(DOCTL) apps update $(DEPLOY_APP_ID) --spec $(DEPLOY_SPEC_FILE) --update-sources
