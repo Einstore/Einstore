@@ -63,14 +63,27 @@ const TeamSwitcher = ({
           aria-haspopup="listbox"
           aria-expanded={open}
         >
-          <span className="flex items-center gap-3">
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300">
-              {initials}
+            <span className="flex items-center gap-3">
+              {activeTeam?.logoUrl ? (
+                <span className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-indigo-100 ring-1 ring-slate-200 dark:bg-slate-700 dark:ring-slate-600">
+                  <img
+                    src={activeTeam.logoUrl}
+                    alt=""
+                    className="h-full w-full object-cover"
+                    onError={(event) => {
+                      (event.currentTarget as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                </span>
+              ) : (
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300">
+                  {initials}
+                </span>
+              )}
+              <span className="text-sm font-medium">
+                {activeTeam?.name ?? "No teams yet"}
+              </span>
             </span>
-            <span className="text-sm font-medium">
-              {activeTeam?.name ?? "No teams yet"}
-            </span>
-          </span>
           <Icon name="chevronDown" className="h-3 w-3 text-slate-400" />
         </button>
         {open ? (
@@ -101,9 +114,22 @@ const TeamSwitcher = ({
                     }`}
                   >
                     <span className="flex items-center gap-3">
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-600 dark:bg-slate-700 dark:text-slate-300">
-                        {teamInitials}
-                      </span>
+                      {team.logoUrl ? (
+                        <span className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200 dark:bg-slate-700 dark:ring-slate-600">
+                          <img
+                            src={team.logoUrl}
+                            alt=""
+                            className="h-full w-full object-cover"
+                            onError={(event) => {
+                              (event.currentTarget as HTMLImageElement).style.display = "none";
+                            }}
+                          />
+                        </span>
+                      ) : (
+                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                          {teamInitials}
+                        </span>
+                      )}
                       {team.name}
                     </span>
                     {isActive ? (

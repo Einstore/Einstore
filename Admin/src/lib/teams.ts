@@ -6,6 +6,7 @@ export type TeamSummary = {
   slug: string;
   inboxBase?: string | null;
   memberRole: TeamRole;
+  logoUrl?: string | null;
 };
 
 export type TeamMember = {

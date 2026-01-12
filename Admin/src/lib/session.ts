@@ -63,7 +63,13 @@ export const useSessionState = (refreshKey?: string) => {
     apiFetch<{ teams: TeamSummary[] }>("/teams")
       .then((payload) => {
         if (!isMounted) return;
-        const list = Array.isArray(payload?.teams) ? payload.teams : [];
+        const version = Date.now();
+        const list = Array.isArray(payload?.teams)
+          ? payload.teams.map((team) => ({
+              ...team,
+              logoUrl: `/teams/${team.id}/logo?v=${version}`,
+            }))
+          : [];
         setTeams(list);
         setActiveTeamId((current) => {
           if (list.length === 0) {

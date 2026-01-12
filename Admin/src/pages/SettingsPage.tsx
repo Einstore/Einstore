@@ -11,6 +11,7 @@ import TextInput from "../components/TextInput";
 import { apiFetch } from "../lib/api";
 import type { TeamMember, TeamSummary } from "../lib/teams";
 import type { AnalyticsSettings } from "../types/settings";
+import { useRef } from "react";
 
 const GA_KEY_PATTERN = /^G-[A-Z0-9]{8,}$/i;
 
@@ -38,6 +39,9 @@ const SettingsPage = ({
   const [isSavingAnalytics, setIsSavingAnalytics] = useState(false);
   const [analyticsError, setAnalyticsError] = useState("");
   const [analyticsMessage, setAnalyticsMessage] = useState("");
+  const [logoMessage, setLogoMessage] = useState("");
+  const [logoError, setLogoError] = useState("");
+  const logoInputRef = useRef<HTMLInputElement | null>(null);
   const activeTeam = useMemo(
     () => teams.find((team) => team.id === activeTeamId) || teams[0],
     [teams, activeTeamId]
@@ -120,6 +124,67 @@ const SettingsPage = ({
             value={activeTeam?.slug ?? ""}
             placeholder="team-slug"
           />
+          <div className="space-y-2">
+            <SectionHeader
+              title="Team logo"
+              description="Upload a 180x180 logo (max 2MB). Shown in the team switcher."
+            />
+            <div className="flex items-center gap-4">
+              <div className="h-14 w-14 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700">
+                {activeTeam?.logoUrl ? (
+                  <img src={activeTeam.logoUrl} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-sm text-slate-400">
+                    —
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-col gap-2">
+                <input
+                  ref={logoInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  className="hidden"
+                  onChange={async (event) => {
+                    const file = event.target.files?.[0];
+                    if (!file) return;
+                    setLogoError("");
+                    setLogoMessage("");
+                    if (file.size > 2 * 1024 * 1024) {
+                      setLogoError("Max size is 2MB.");
+                      return;
+                    }
+                    const formData = new FormData();
+                    formData.append("file", file);
+                    try {
+                      await apiFetch<{ url: string }>("/teams/logo", {
+                        method: "POST",
+                        body: formData,
+                      });
+                      setLogoMessage("Logo updated. If it doesn't show, refresh.");
+                    } catch (err) {
+                      setLogoError(
+                        err instanceof Error ? err.message : "Unable to upload logo. Try again."
+                      );
+                    } finally {
+                      if (logoInputRef.current) {
+                        logoInputRef.current.value = "";
+                      }
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  className="h-11 rounded-lg border border-slate-300 px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
+                  onClick={() => logoInputRef.current?.click()}
+                >
+                  Upload logo
+                </button>
+                {logoMessage ? <p className="text-xs text-green-600">{logoMessage}</p> : null}
+                {logoError ? <p className="text-xs text-red-500">{logoError}</p> : null}
+              </div>
+            </div>
+          </div>
         </Panel>
       ) : (
         <Panel>
