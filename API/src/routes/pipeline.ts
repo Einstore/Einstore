@@ -173,9 +173,6 @@ export async function pipelineRoutes(app: FastifyInstance) {
       return reply.status(400).send({ error: "multipart_required" });
     }
     const contentLength = parseContentLength(request.headers["content-length"]);
-    if (!contentLength) {
-      return reply.status(411).send({ error: "content_length_required" });
-    }
     const part = await request.file();
     if (!part) {
       return reply.status(400).send({ error: "missing_file" });
@@ -185,7 +182,9 @@ export async function pipelineRoutes(app: FastifyInstance) {
       return reply.status(403).send({ error: "team_required", message: "Team context required" });
     }
     try {
-      await ensureStorageCapacity(teamId, contentLength);
+      if (contentLength) {
+        await ensureStorageCapacity(teamId, contentLength);
+      }
     } catch (error) {
       if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
         return reply
@@ -204,9 +203,12 @@ export async function pipelineRoutes(app: FastifyInstance) {
     await fs.promises.mkdir(uploadDir, { recursive: true });
     const uploadName = `${crypto.randomUUID()}${extension}`;
     const filePath = path.join(uploadDir, uploadName);
+    let uploadedBytes: bigint | null = null;
 
     try {
       await pipeline(part.file, fs.createWriteStream(filePath));
+      const stats = await fs.promises.stat(filePath);
+      uploadedBytes = BigInt(stats.size);
     } catch (error) {
       await fs.promises.rm(filePath, { force: true });
       throw error;
@@ -215,6 +217,18 @@ export async function pipelineRoutes(app: FastifyInstance) {
     if (part.file.truncated) {
       await fs.promises.rm(filePath, { force: true });
       return reply.status(413).send({ error: "file_too_large" });
+    }
+
+    try {
+      await ensureStorageCapacity(teamId, uploadedBytes ?? contentLength ?? 0n);
+    } catch (error) {
+      await fs.promises.rm(filePath, { force: true });
+      if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
+        return reply
+          .status((error as { statusCode?: number }).statusCode ?? 413)
+          .send({ error: "storage_limit_exceeded", message: (error as { message?: string }).message });
+      }
+      throw error;
     }
 
     const userId = request.auth?.user.id;
@@ -250,9 +264,6 @@ export async function pipelineRoutes(app: FastifyInstance) {
       return reply.status(400).send({ error: "multipart_required" });
     }
     const contentLength = parseContentLength(request.headers["content-length"]);
-    if (!contentLength) {
-      return reply.status(411).send({ error: "content_length_required" });
-    }
     const part = await request.file();
     if (!part) {
       return reply.status(400).send({ error: "missing_file" });
@@ -262,7 +273,9 @@ export async function pipelineRoutes(app: FastifyInstance) {
       return reply.status(403).send({ error: "team_required", message: "Team context required" });
     }
     try {
-      await ensureStorageCapacity(teamId, contentLength);
+      if (contentLength) {
+        await ensureStorageCapacity(teamId, contentLength);
+      }
     } catch (error) {
       if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
         return reply
@@ -277,9 +290,12 @@ export async function pipelineRoutes(app: FastifyInstance) {
     await fs.promises.mkdir(uploadDir, { recursive: true });
     const uploadName = `${crypto.randomUUID()}${extension}`;
     const filePath = path.join(uploadDir, uploadName);
+    let uploadedBytes: bigint | null = null;
 
     try {
       await pipeline(part.file, fs.createWriteStream(filePath));
+      const stats = await fs.promises.stat(filePath);
+      uploadedBytes = BigInt(stats.size);
     } catch (error) {
       await fs.promises.rm(filePath, { force: true });
       throw error;
@@ -288,6 +304,18 @@ export async function pipelineRoutes(app: FastifyInstance) {
     if (part.file.truncated) {
       await fs.promises.rm(filePath, { force: true });
       return reply.status(413).send({ error: "file_too_large" });
+    }
+
+    try {
+      await ensureStorageCapacity(teamId, uploadedBytes ?? contentLength ?? 0n);
+    } catch (error) {
+      await fs.promises.rm(filePath, { force: true });
+      if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
+        return reply
+          .status((error as { statusCode?: number }).statusCode ?? 413)
+          .send({ error: "storage_limit_exceeded", message: (error as { message?: string }).message });
+      }
+      throw error;
     }
 
     const stats = await fs.promises.stat(filePath);

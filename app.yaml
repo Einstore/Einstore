@@ -174,5 +174,7 @@ static_sites:
     branch: main
     repo: Einstore/Einstore
   name: admin
+  index_document: index.html
+  catchall_document: index.html
   output_dir: dist
   source_dir: /Admin
