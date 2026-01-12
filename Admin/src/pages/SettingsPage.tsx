@@ -5,6 +5,7 @@ import { ApiKeysPanel } from "@rafiki270/api-keys/admin";
 import ActionButton from "../components/ActionButton";
 import Panel from "../components/Panel";
 import SectionHeader from "../components/SectionHeader";
+import InviteUserDialog from "../components/InviteUserDialog";
 import Tabs from "../components/Tabs";
 import TeamMembersTable from "../components/TeamMembersTable";
 import TextInput from "../components/TextInput";
@@ -42,6 +43,7 @@ const SettingsPage = ({
   const [logoMessage, setLogoMessage] = useState("");
   const [logoError, setLogoError] = useState("");
   const logoInputRef = useRef<HTMLInputElement | null>(null);
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
   const activeTeam = useMemo(
     () => teams.find((team) => team.id === activeTeamId) || teams[0],
     [teams, activeTeamId]
@@ -199,10 +201,19 @@ const SettingsPage = ({
       label: "Users",
       content: hasTeam ? (
         <div className="space-y-4">
-          <SectionHeader
-            title="Team members"
-            description="Users can be admins or standard users."
-          />
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <SectionHeader
+              title="Team members"
+              description="Users can be admins or standard users."
+            />
+            <button
+              type="button"
+              className="h-11 rounded-lg bg-indigo-600 px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 dark:bg-indigo-500 dark:hover:bg-indigo-400"
+              onClick={() => setIsInviteOpen(true)}
+            >
+              Invite user
+            </button>
+          </div>
           <TeamMembersTable members={teamMembers} />
         </div>
       ) : (
@@ -294,6 +305,11 @@ const SettingsPage = ({
   return (
     <div className="space-y-6">
       <Tabs items={tabs} activeId={activeTab} onChange={setActiveTab} />
+      <InviteUserDialog
+        isOpen={isInviteOpen}
+        onClose={() => setIsInviteOpen(false)}
+        teamId={activeTeam?.id ?? ""}
+      />
     </div>
   );
 };

@@ -23,7 +23,7 @@ import { trackingEventRoutes } from "./tracking-events.js";
 import { apiKeyRoutes } from "./api-keys.js";
 import { teamStatsRoutes } from "./team-stats.js";
 import { settingsRoutes } from "./settings.js";
-import { registerTeamRoutes, registerUserTeamSettingsRoutes } from "@rafiki270/teams";
+import { registerTeamInviteRoutes, registerTeamRoutes, registerUserTeamSettingsRoutes } from "@rafiki270/teams";
 import { prisma } from "../lib/prisma.js";
 import { loadConfig } from "../lib/config.js";
 import { requireAuth, requireTeam } from "../auth/guard.js";
@@ -57,6 +57,7 @@ export async function registerRoutes(app: FastifyInstance) {
     inboundEmailDomain: config.INBOUND_EMAIL_DOMAIN,
     requireAuth,
   });
+  await registerTeamInviteRoutes(app, { prisma, requireAuth });
   await registerUserTeamSettingsRoutes(app, { prisma, requireAuth });
   await app.register(teamStatsRoutes);
   await app.register(usageRoutes);

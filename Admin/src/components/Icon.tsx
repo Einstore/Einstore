@@ -9,6 +9,7 @@ import {
   faGear,
   faGlobe,
   faGrip,
+  faLink,
   faHouse,
   faKey,
   faLock,
@@ -46,6 +47,7 @@ const icons = {
   menu: faBars,
   key: faKey,
   close: faXmark,
+  link: faLink,
 } as const;
 
 export type IconName = keyof typeof icons;

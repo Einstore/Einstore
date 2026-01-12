@@ -19,6 +19,7 @@ type TopbarProps = {
   user?: SessionUser | null;
   activeTeamId?: string;
   appIcons?: Record<string, string>;
+  onAcceptInvite?: () => void;
 };
 
 const Topbar = ({
@@ -30,6 +31,7 @@ const Topbar = ({
   user,
   activeTeamId,
   appIcons = {},
+  onAcceptInvite,
 }: TopbarProps) => {
   const navigate = useNavigate();
   const [theme, setThemeState] = useState<ThemeMode>(() => getInitialTheme());
@@ -335,6 +337,17 @@ const Topbar = ({
                     </button>
                   </div>
                   <div className="border-t border-slate-200 pt-2 dark:border-slate-700">
+                    <button
+                      type="button"
+                      className="flex h-11 w-full items-center gap-3 rounded-md px-3 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"
+                      onClick={() => {
+                        setIsUserMenuOpen(false);
+                        onAcceptInvite?.();
+                      }}
+                    >
+                      <Icon name="link" className="h-4 w-4" />
+                      Accept invitation
+                    </button>
                     <button
                       type="button"
                       className="flex h-11 w-full items-center gap-3 rounded-md px-3 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"

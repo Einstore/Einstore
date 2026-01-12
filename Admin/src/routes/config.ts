@@ -48,6 +48,11 @@ export const pageConfig = {
     breadcrumbs: [{ label: "Search" }],
     actions: [],
   },
+  "accept-invite": {
+    title: "Accept invitation",
+    breadcrumbs: [{ label: "Invitations" }],
+    actions: [],
+  },
   flags: {
     title: "Future flags",
     breadcrumbs: [{ label: "Governance" }, { label: "Future flags" }],

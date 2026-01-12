@@ -19,6 +19,7 @@ import SearchPage from "../pages/SearchPage";
 import SettingsPage from "../pages/SettingsPage";
 import BuildDetailPage from "../pages/BuildDetailPage";
 import AppBuildsPage from "../pages/AppBuildsPage";
+import AcceptInvitePage from "../pages/AcceptInvitePage";
 import {
   activity,
   buildQueue,
@@ -431,6 +432,11 @@ const AppRoutes = () => {
           activeTeamId={activeTeamId}
         />
       ),
+    },
+    {
+      id: "accept-invite",
+      path: "/accept-invite",
+      element: <AcceptInvitePage />,
     },
     {
       id: "flags",

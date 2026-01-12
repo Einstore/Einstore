@@ -72,6 +72,11 @@ export const useSessionState = (refreshKey?: string) => {
           : [];
         setTeams(list);
         setActiveTeamId((current) => {
+          const pendingTeamId = localStorage.getItem("pendingActiveTeamId");
+          if (pendingTeamId && list.some((team) => team.id === pendingTeamId)) {
+            localStorage.removeItem("pendingActiveTeamId");
+            return pendingTeamId;
+          }
           if (list.length === 0) {
             return "";
           }
@@ -91,7 +96,7 @@ export const useSessionState = (refreshKey?: string) => {
     return () => {
       isMounted = false;
     };
-  }, [hasToken]);
+  }, [hasToken, refreshKey]);
 
   const activeTeam = useMemo(
     () => (activeTeamId ? teams.find((team) => team.id === activeTeamId) || null : null),

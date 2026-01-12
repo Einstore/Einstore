@@ -12,6 +12,7 @@ import { apiFetch } from "../lib/api";
 import type { TeamSummary } from "../lib/teams";
 import type { SessionUser } from "../lib/session";
 import SidebarUploadDropzone from "../components/SidebarUploadDropzone";
+import AcceptInviteDialog from "../components/AcceptInviteDialog";
 
 type AdminLayoutProps = {
   navItems: readonly NavItem[];
@@ -44,6 +45,7 @@ const AdminLayout = ({
 }: AdminLayoutProps) => {
   const [isAddAppOpen, setIsAddAppOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isAcceptInviteOpen, setIsAcceptInviteOpen] = useState(false);
   const navigate = useNavigate();
   const currentYear = new Date().getFullYear();
 
@@ -102,6 +104,7 @@ const AdminLayout = ({
         user={user}
         activeTeamId={activeTeamId}
         appIcons={appIcons}
+        onAcceptInvite={() => setIsAcceptInviteOpen(true)}
         actions={
           <>
             {actions.map((action) => (
@@ -135,6 +138,10 @@ const AdminLayout = ({
         isOpen={isAddAppOpen}
         onClose={() => setIsAddAppOpen(false)}
         onUpload={onUpload}
+      />
+      <AcceptInviteDialog
+        isOpen={isAcceptInviteOpen}
+        onClose={() => setIsAcceptInviteOpen(false)}
       />
     </AppShell>
   );
