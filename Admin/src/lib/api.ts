@@ -22,9 +22,20 @@ type RefreshResponse = {
 };
 
 let refreshPromise: Promise<string | null> | null = null;
+let hasForcedLogout = false;
 
 const shouldRetryAuth = (payload: ApiError | null, status: number) =>
   payload?.error === "token_expired" || status === 401;
+
+const forceLogout = () => {
+  if (hasForcedLogout) {
+    return;
+  }
+  hasForcedLogout = true;
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+  window.location.replace("/login");
+};
 
 const refreshAccessToken = async (): Promise<string | null> => {
   const refreshToken = localStorage.getItem("refreshToken");
@@ -103,8 +114,12 @@ export async function apiFetch<T>(
         return retry.data as T;
       }
       const retryPayload = (retry.data || {}) as ApiError;
+      if (shouldRetryAuth(retryPayload, retry.response.status)) {
+        forceLogout();
+      }
       throw new Error(retryPayload.error || retryPayload.message || "Request failed");
     }
+    forceLogout();
   }
 
   throw new Error(payload.error || payload.message || "Request failed");
@@ -144,8 +159,12 @@ export async function apiUpload<T>(path: string, formData: FormData): Promise<T>
         return retry.data as T;
       }
       const retryPayload = (retry.data || {}) as ApiError;
+      if (shouldRetryAuth(retryPayload, retry.response.status)) {
+        forceLogout();
+      }
       throw new Error(retryPayload.error || retryPayload.message || "Upload failed");
     }
+    forceLogout();
   }
 
   throw new Error(payload.error || payload.message || "Upload failed");
