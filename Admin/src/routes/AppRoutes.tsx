@@ -424,6 +424,9 @@ const AppRoutes = () => {
 
   const handleIngest = useCallback(
     async (file: File) => {
+      if (!file) {
+        return;
+      }
       const contentType = file.type || "application/octet-stream";
       let presignedFailed = false;
       try {
