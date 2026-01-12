@@ -40,6 +40,7 @@ const SettingsPage = ({
   const [isSavingAnalytics, setIsSavingAnalytics] = useState(false);
   const [analyticsError, setAnalyticsError] = useState("");
   const [analyticsMessage, setAnalyticsMessage] = useState("");
+  const envAnalyticsKey = import.meta.env.VITE_ANALYTICS_KEY ?? "";
   const [logoMessage, setLogoMessage] = useState("");
   const [logoError, setLogoError] = useState("");
   const logoInputRef = useRef<HTMLInputElement | null>(null);
@@ -62,6 +63,13 @@ const SettingsPage = ({
       return;
     }
     let isMounted = true;
+    if (envAnalyticsKey) {
+      setGaKey(envAnalyticsKey);
+      setAnalyticsMessage("Managed via environment (VITE_ANALYTICS_KEY).");
+      return () => {
+        isMounted = false;
+      };
+    }
     apiFetch<AnalyticsSettings>("/settings/analytics")
       .then((payload) => {
         if (isMounted) {
@@ -76,7 +84,7 @@ const SettingsPage = ({
     return () => {
       isMounted = false;
     };
-  }, [isSuperUser]);
+  }, [isSuperUser, envAnalyticsKey]);
 
   const handleSaveAnalytics = async () => {
     const trimmed = gaKey.trim();
@@ -263,7 +271,13 @@ const SettingsPage = ({
               onChange={setGaKey}
               placeholder="G-XXXXXXXXXX"
               hint="Only GA4 measurement IDs are allowed. Leave empty to disable analytics."
+              disabled={Boolean(envAnalyticsKey)}
             />
+            {envAnalyticsKey ? (
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                This value is managed via <code>VITE_ANALYTICS_KEY</code> and cannot be edited here.
+              </p>
+            ) : null}
             {analyticsError ? (
               <p className="text-xs text-red-500">{analyticsError}</p>
             ) : null}
@@ -280,7 +294,7 @@ const SettingsPage = ({
               }
               variant="primary"
               onClick={handleSaveAnalytics}
-              disabled={isSavingAnalytics}
+              disabled={isSavingAnalytics || Boolean(envAnalyticsKey)}
             />
           </div>
         </Panel>

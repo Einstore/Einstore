@@ -76,6 +76,7 @@ const AppRoutes = () => {
   const [storageUsageTotalBytes, setStorageUsageTotalBytes] = useState(0);
   const [isLoadingStorageUsage, setIsLoadingStorageUsage] = useState(false);
   const [analyticsKey, setAnalyticsKey] = useState<string | null>(null);
+  const envAnalyticsKey = import.meta.env.VITE_ANALYTICS_KEY ?? "";
   const [previewBuilds, setPreviewBuilds] = useState<SearchBuildResult[]>([]);
   const {
     hasToken,
@@ -188,6 +189,13 @@ const AppRoutes = () => {
     let isMounted = true;
     if (!hasToken) {
       setAnalyticsKey(null);
+      return () => {
+        isMounted = false;
+      };
+    }
+    if (envAnalyticsKey) {
+      setAnalyticsKey(envAnalyticsKey);
+      enableAnalytics(envAnalyticsKey);
       return () => {
         isMounted = false;
       };
