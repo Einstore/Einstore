@@ -317,7 +317,7 @@ const AppRoutes = () => {
     const params = new URLSearchParams({
       q: "preview",
       appLimit: "0",
-      buildPerPage: "4",
+      buildPerPage: "12",
     });
     apiFetch<SearchResponse>(`/search?${params.toString()}`, {
       headers: { "x-team-id": activeTeamId },
