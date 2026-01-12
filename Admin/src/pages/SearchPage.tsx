@@ -129,7 +129,7 @@ const SearchPage = ({ apps, appIcons, activeTeamId }: SearchPageProps) => {
             <Icon name="search" className="h-4 w-4 text-slate-400" />
             <input
               type="search"
-              placeholder="Search builds by name, version, or build number"
+              placeholder="Search builds by name, version, build number, or tag"
               aria-label="Search builds"
               value={query}
               onChange={(event) => setQuery(event.target.value)}

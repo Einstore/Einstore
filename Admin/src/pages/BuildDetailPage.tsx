@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import AppAvatar from "../components/AppAvatar";
 import Panel from "../components/Panel";
 import SectionHeader from "../components/SectionHeader";
@@ -8,9 +9,11 @@ import {
   pickPrimaryTarget,
   type ApiArtifact,
   type ApiBuildMetadata,
+  type ApiTag,
 } from "../lib/apps";
 import { infoPlistKeyDescriptionMap } from "../data/infoPlistKeys";
 import { androidManifestKeyDescriptionMap } from "../data/androidManifestKeys";
+import TagInput from "../components/TagInput";
 
 const metadataDescriptionMap = { ...infoPlistKeyDescriptionMap, ...androidManifestKeyDescriptionMap };
 
@@ -21,6 +24,12 @@ type BuildDetailPageProps = {
   error?: string | null;
   onInstall?: (buildId: string) => void;
   onDownload?: (buildId: string) => void;
+  tags?: ApiTag[];
+  availableTags?: ApiTag[];
+  isSavingTags?: boolean;
+  tagError?: string | null;
+  onSaveTags?: (tags: string[]) => void;
+  lastSavedTagsAt?: string | null;
 };
 
 const formatKind = (kind: string) => kind.replace(/_/g, " ");
@@ -89,7 +98,20 @@ const renderMetadataRows = (metadata: unknown) => {
   );
 };
 
-const BuildDetailPage = ({ build, iconUrl, isLoading, error, onInstall, onDownload }: BuildDetailPageProps) => {
+const BuildDetailPage = ({
+  build,
+  iconUrl,
+  isLoading,
+  error,
+  onInstall,
+  onDownload,
+  tags = [],
+  availableTags = [],
+  isSavingTags,
+  tagError,
+  onSaveTags,
+  lastSavedTagsAt,
+}: BuildDetailPageProps) => {
   const primaryTarget = pickPrimaryTarget(build?.targets);
   const appName = build?.version?.app?.name ?? build?.displayName ?? "—";
   const identifier = build?.version?.app?.identifier ?? primaryTarget?.bundleId ?? "—";
@@ -111,6 +133,17 @@ const BuildDetailPage = ({ build, iconUrl, isLoading, error, onInstall, onDownlo
     }, []);
     return [kind, unique] as const;
   });
+
+  const [tagDraft, setTagDraft] = useState<string[]>(tags.map((tag) => tag.name));
+
+  useEffect(() => {
+    setTagDraft(tags.map((tag) => tag.name));
+  }, [tags]);
+
+  const handleSaveTags = () => {
+    if (!onSaveTags) return;
+    onSaveTags(tagDraft);
+  };
 
   return (
     <div className="space-y-6">
@@ -230,6 +263,38 @@ const BuildDetailPage = ({ build, iconUrl, isLoading, error, onInstall, onDownlo
                   </dd>
                 </div>
               </dl>
+            </Panel>
+
+            <Panel className="col-span-12 space-y-4">
+              <SectionHeader
+                title="Tags"
+                subtitle="Tags help you find builds quickly. Add multiple tags and save to update this build."
+              />
+              {tagError ? (
+                <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:border-rose-800 dark:bg-rose-900/30 dark:text-rose-200">
+                  {tagError}
+                </div>
+              ) : null}
+              <TagInput
+                value={tagDraft}
+                onChange={setTagDraft}
+                suggestions={availableTags.map((tag) => tag.name)}
+                disabled={isSavingTags}
+                placeholder="Add a tag (e.g. release, beta, hotfix)"
+              />
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  className="h-11 rounded-lg bg-indigo-600 px-4 text-sm font-semibold text-white transition-colors hover:bg-indigo-500 disabled:opacity-60"
+                  onClick={handleSaveTags}
+                  disabled={isSavingTags || !onSaveTags}
+                >
+                  {isSavingTags ? "Saving…" : "Save tags"}
+                </button>
+                <span className="text-xs text-slate-500 dark:text-slate-400">
+                  {lastSavedTagsAt ? `Saved ${lastSavedTagsAt}` : "Not saved yet"}
+                </span>
+              </div>
             </Panel>
           </div>
 

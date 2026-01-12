@@ -18,6 +18,7 @@ import {
   faPlus,
   faRocket,
   faSun,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { faApple, faAndroid } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -44,6 +45,7 @@ const icons = {
   sun: faSun,
   menu: faBars,
   key: faKey,
+  close: faXmark,
 } as const;
 
 export type IconName = keyof typeof icons;

@@ -37,6 +37,7 @@ import {
   type ApiBuild,
   type ApiBuildIconResponse,
   type ApiBuildMetadata,
+  type ApiTag,
 } from "../lib/apps";
 import { enableAnalytics, trackPageView } from "../lib/analytics";
 import { useSessionState } from "../lib/session";
@@ -606,6 +607,11 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
   const [iconUrl, setIconUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [tags, setTags] = useState<ApiTag[]>([]);
+  const [availableTags, setAvailableTags] = useState<ApiTag[]>([]);
+  const [isSavingTags, setIsSavingTags] = useState(false);
+  const [tagError, setTagError] = useState<string | null>(null);
+  const [lastSavedTagsAt, setLastSavedTagsAt] = useState<string | null>(null);
   const installBuild = useCallback(
     async (id: string) => {
       try {
@@ -648,6 +654,8 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
   useEffect(() => {
     let isMounted = true;
     setBuild(null);
+    setTags([]);
+    setAvailableTags([]);
     setError(null);
     if (!buildId) {
       setIsLoading(false);
@@ -663,6 +671,19 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
       .then((payload) => {
         if (!isMounted) return;
         setBuild(payload ?? null);
+        const appId = payload?.version?.app?.id;
+        const params = new URLSearchParams({ perPage: "100" });
+        if (appId) {
+          params.set("appId", appId);
+        }
+        apiFetch<{ items: ApiTag[] }>(`/tags?${params.toString()}`, {
+          headers: { "x-team-id": activeTeamId },
+        })
+          .then((tagPayload) => {
+            if (!isMounted) return;
+            setAvailableTags(tagPayload?.items ?? []);
+          })
+          .catch(() => undefined);
       })
       .catch(() => {
         if (!isMounted) return;
@@ -676,7 +697,32 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
     return () => {
       isMounted = false;
     };
-  }, [buildId]);
+  }, [buildId, activeTeamId]);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (!buildId) {
+      setTags([]);
+      return () => {
+        isMounted = false;
+      };
+    }
+    apiFetch<{ tags: ApiTag[] }>(`/builds/${buildId}/tags`, {
+      headers: { "x-team-id": activeTeamId },
+    })
+      .then((payload) => {
+        if (!isMounted) return;
+        setTags(payload?.tags ?? []);
+      })
+      .catch(() => {
+        if (isMounted) {
+          setTags([]);
+        }
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [buildId, activeTeamId]);
 
   useEffect(() => {
     let isMounted = true;
@@ -713,6 +759,39 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
       error={error}
       onInstall={installBuild}
       onDownload={downloadBuild}
+      tags={tags}
+      availableTags={availableTags}
+      isSavingTags={isSavingTags}
+      tagError={tagError}
+      lastSavedTagsAt={lastSavedTagsAt}
+      onSaveTags={async (nextTags) => {
+        if (!buildId) return;
+        setIsSavingTags(true);
+        setTagError(null);
+        try {
+          const payload = await apiFetch<{ tags: ApiTag[] }>(`/builds/${buildId}/tags`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json", "x-team-id": activeTeamId },
+            body: JSON.stringify({ tags: nextTags }),
+          });
+          setTags(payload?.tags ?? []);
+          setLastSavedTagsAt(new Date().toLocaleTimeString());
+          const appId = build?.version?.app?.id;
+          const params = new URLSearchParams({ perPage: "100" });
+          if (appId) {
+            params.set("appId", appId);
+          }
+          apiFetch<{ items: ApiTag[] }>(`/tags?${params.toString()}`, {
+            headers: { "x-team-id": activeTeamId },
+          })
+            .then((tagPayload) => setAvailableTags(tagPayload?.items ?? []))
+            .catch(() => undefined);
+        } catch {
+          setTagError("Unable to save tags. Please try again.");
+        } finally {
+          setIsSavingTags(false);
+        }
+      }}
     />
   );
 };

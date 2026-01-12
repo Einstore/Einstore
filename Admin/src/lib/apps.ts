@@ -53,6 +53,12 @@ export type ApiBuildMetadata = ApiBuild & {
   signing?: { teamId?: string | null; issuer?: string | null; subject?: string | null };
 };
 
+export type ApiTag = {
+  id: string;
+  name: string;
+  usageCount?: number;
+};
+
 export const formatDate = (value?: string | null) => {
   if (!value) return "—";
   const date = new Date(value);
