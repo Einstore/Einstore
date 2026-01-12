@@ -29,6 +29,18 @@ const renderMetadataRows = (metadata: unknown) => {
   if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) return null;
   const entries = Object.entries(metadata as Record<string, unknown>);
   if (!entries.length) return null;
+  const formatValue = (value: unknown) => {
+    if (value == null) return "—";
+    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+      return String(value);
+    }
+    if (Array.isArray(value)) {
+      return value.map((item) => formatValue(item)).join(", ");
+    }
+    return Object.entries(value as Record<string, unknown>)
+      .map(([k, v]) => `${k}: ${formatValue(v)}`)
+      .join("; ");
+  };
   return (
     <div className="mt-2 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
       {entries.map(([key, value], index) => {
@@ -47,10 +59,8 @@ const renderMetadataRows = (metadata: unknown) => {
                 <span className="text-xs text-slate-500 dark:text-slate-400">{description}</span>
               ) : null}
             </div>
-            <div className="break-all font-mono text-xs text-slate-700 dark:text-slate-300">
-              {typeof value === "string" || typeof value === "number"
-                ? String(value)
-                : JSON.stringify(value, null, 2)}
+            <div className="break-words text-xs text-slate-700 dark:text-slate-300">
+              {formatValue(value)}
             </div>
           </div>
         );
