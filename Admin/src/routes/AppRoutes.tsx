@@ -21,7 +21,6 @@ import BuildDetailPage from "../pages/BuildDetailPage";
 import AppBuildsPage from "../pages/AppBuildsPage";
 import AcceptInvitePage from "../pages/AcceptInvitePage";
 import {
-  activity,
   buildQueue,
   metrics,
   apps as overviewApps,
@@ -50,6 +49,7 @@ import { adminFeatureFlagDefinitions } from "../data/featureFlagDefinitions";
 import type { StorageUsageResponse, StorageUsageUser } from "../types/usage";
 import type { AnalyticsSettings } from "../types/settings";
 import type { SearchBuildResult, SearchResponse } from "../lib/search";
+import type { ActivityItem } from "../data/mock";
 import {
   privateNavItems,
   privatePageConfig,
@@ -79,6 +79,7 @@ const AppRoutes = () => {
   const [analyticsKey, setAnalyticsKey] = useState<string | null>(null);
   const envAnalyticsKey = import.meta.env.VITE_ANALYTICS_KEY ?? "";
   const [previewBuilds, setPreviewBuilds] = useState<SearchBuildResult[]>([]);
+  const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
   const {
     hasToken,
     isSuperUser,
@@ -156,6 +157,53 @@ const AppRoutes = () => {
       setAppsPagination({ page: appsPage, perPage: appsPerPage, total: 0, totalPages: 1 });
     }
   }, [activeTeamId, appsPage, appsPerPage, appsPlatform]);
+
+  const mapEventToActivity = useCallback((event: ApiBuildEvent): ActivityItem => {
+    const actor =
+      event.user?.fullName || event.user?.username || event.user?.email || "Unknown user";
+    const buildName =
+      event.build?.version?.app?.name || event.build?.displayName || "Build";
+    const versionLabel = event.build?.version?.version;
+    const buildNumber = event.build?.buildNumber;
+    const titleParts = [
+      buildName,
+      versionLabel,
+      buildNumber ? `(build ${buildNumber})` : null,
+    ].filter(Boolean);
+    const verb = event.kind === "install" ? "installed" : "downloaded";
+    const detail = `${actor} ${verb} ${buildName}${
+      buildNumber ? ` (build ${buildNumber})` : ""
+    }`;
+    const time = Number.isNaN(Date.parse(event.createdAt))
+      ? event.createdAt
+      : new Date(event.createdAt).toLocaleString();
+    return {
+      id: event.id,
+      title: titleParts.join(" "),
+      detail,
+      time,
+      tag: event.kind === "install" ? "Install" : "Download",
+    };
+  }, []);
+
+  const loadRecentBuildEvents = useCallback(async () => {
+    if (!activeTeamId) {
+      setRecentActivity([]);
+      return;
+    }
+    try {
+      const payload = await apiFetch<PaginatedResponse<ApiBuildEvent>>(
+        `/builds/events?perPage=5&kinds=download,install`,
+        {
+          headers: { "x-team-id": activeTeamId },
+        },
+      );
+      const mapped = (payload?.items ?? []).map(mapEventToActivity);
+      setRecentActivity(mapped);
+    } catch {
+      setRecentActivity([]);
+    }
+  }, [activeTeamId, mapEventToActivity]);
 
   useEffect(() => {
     let isMounted = true;
@@ -287,6 +335,10 @@ const AppRoutes = () => {
       isMounted = false;
     };
   }, [activeTeamId, hasToken, ingestNonce]);
+
+  useEffect(() => {
+    void loadRecentBuildEvents();
+  }, [loadRecentBuildEvents, ingestNonce]);
 
   useEffect(() => {
     if (analyticsKey) {
@@ -437,7 +489,7 @@ const AppRoutes = () => {
           onDownloadBuild={handleDownloadBuild}
           appsTotal={appsPagination.total || badges.apps || apps.length}
           buildsTotal={badges.builds}
-          activity={activity}
+          activity={recentActivity}
           storageUsage={storageUsage}
           storageTotalBytes={storageUsageTotalBytes}
           isStorageLoading={isLoadingStorageUsage}

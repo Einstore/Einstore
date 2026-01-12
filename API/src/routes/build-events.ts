@@ -12,6 +12,8 @@ const listQuerySchema = z.object({
   perPage: z.coerce.number().int().min(1).max(200).optional(),
   limit: z.coerce.number().int().positive().max(200).optional(),
   offset: z.coerce.number().int().nonnegative().optional(),
+  kind: z.nativeEnum(BuildEventKind).optional(),
+  kinds: z.string().optional(),
 });
 
 const createEventSchema = z.object({
@@ -118,4 +120,72 @@ export async function buildEventRoutes(app: FastifyInstance) {
   app.get("/builds/:id/downloads", { preHandler: requireTeam }, listHandler("download"));
   app.post("/builds/:id/installs", { preHandler: requireTeam }, createHandler("install"));
   app.get("/builds/:id/installs", { preHandler: requireTeam }, listHandler("install"));
+
+  app.get("/builds/events", { preHandler: requireTeam }, async (request: any, reply: any) => {
+    const parsed = listQuerySchema.safeParse(request.query);
+    if (!parsed.success) {
+      return reply.status(400).send({ error: "Invalid query" });
+    }
+    const teamId = request.team?.id;
+    if (!teamId) {
+      return reply.status(403).send({ error: "team_required", message: "Team context required" });
+    }
+    const pagination = resolvePagination({
+      page: parsed.data.page,
+      perPage: parsed.data.perPage,
+      limit: parsed.data.limit,
+      offset: parsed.data.offset,
+      defaultPerPage: 25,
+      maxPerPage: 200,
+    });
+    const kinds =
+      parsed.data.kinds
+        ?.split(",")
+        .map((kind: string) => kind.trim())
+        .filter(Boolean)
+        .filter((value: any): value is BuildEventKind =>
+          value === BuildEventKind.download || value === BuildEventKind.install,
+        ) ??
+      (parsed.data.kind ? [parsed.data.kind] : undefined);
+    const where = {
+      teamId,
+      ...(kinds?.length ? { kind: { in: kinds } } : undefined),
+    };
+    const [total, items] = await prisma.$transaction([
+      prisma.buildEvent.count({ where }),
+      prisma.buildEvent.findMany({
+        where,
+        skip: pagination.offset,
+        take: pagination.perPage,
+        orderBy: { createdAt: "desc" },
+        include: {
+          user: {
+            select: { id: true, username: true, email: true, fullName: true },
+          },
+          build: {
+            select: {
+              id: true,
+              buildNumber: true,
+              displayName: true,
+              version: {
+                select: {
+                  id: true,
+                  version: true,
+                  app: {
+                    select: { id: true, name: true, identifier: true },
+                  },
+                },
+              },
+            },
+          },
+        },
+      }),
+    ]);
+    const meta = buildPaginationMeta({
+      page: pagination.page,
+      perPage: pagination.perPage,
+      total,
+    });
+    return reply.send({ items, ...meta });
+  });
 }

@@ -3176,6 +3176,55 @@
       ]
     },
     {
+      "name": "List Recent Build Events",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/builds/events?perPage=5&kinds=download,install",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "builds",
+            "events"
+          ],
+          "query": [
+            {
+              "key": "perPage",
+              "value": "5"
+            },
+            {
+              "key": "kinds",
+              "value": "download,install"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Recent events ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
       "name": "Record Build Install",
       "request": {
         "method": "POST",

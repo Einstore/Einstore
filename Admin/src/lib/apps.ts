@@ -132,6 +132,16 @@ export type ApiBuildEvent = {
   createdAt: string;
   ip?: string | null;
   userAgent?: string | null;
+  build?: {
+    id: string;
+    buildNumber?: string | null;
+    displayName?: string | null;
+    version?: {
+      id: string;
+      version?: string | null;
+      app?: { id: string; name?: string | null; identifier?: string | null } | null;
+    } | null;
+  } | null;
   user?: {
     id: string;
     username?: string | null;

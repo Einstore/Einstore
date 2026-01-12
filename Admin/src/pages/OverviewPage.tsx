@@ -5,7 +5,8 @@ import BuildQueueSection from "../sections/BuildQueueSection";
 import SplitLayout from "../components/SplitLayout";
 import Panel from "../components/Panel";
 import BuildQueueList from "../components/BuildQueueList";
-import type { AppSummary, BuildJob, Metric } from "../data/mock";
+import ActivityItemCard from "../components/ActivityItemCard";
+import type { ActivityItem, AppSummary, BuildJob, Metric } from "../data/mock";
 import type { StorageUsageUser } from "../types/usage";
 import type { SearchBuildResult } from "../lib/search";
 
@@ -18,6 +19,8 @@ type OverviewPageProps = {
   isStorageLoading?: boolean;
   showMetrics?: boolean;
   showStorage?: boolean;
+  activity?: ActivityItem[];
+  showActivity?: boolean;
   appsTotal?: number;
   buildsTotal?: number;
   previewBuilds?: SearchBuildResult[];
@@ -35,6 +38,8 @@ const OverviewPage = ({
   isStorageLoading = false,
   showMetrics = false,
   showStorage = false,
+  activity = [],
+  showActivity = false,
   appsTotal,
   buildsTotal,
   previewBuilds = [],
@@ -114,6 +119,32 @@ const OverviewPage = ({
           </Panel>
         )}
       </div>
+      {showActivity ? (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+              Latest downloads & installs
+            </p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Newest install/download events (5)
+            </p>
+          </div>
+          {activity.length ? (
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {activity.slice(0, 5).map((item) => (
+                <ActivityItemCard key={item.id} {...item} />
+              ))}
+            </div>
+          ) : (
+            <Panel>
+              <p className="text-sm text-slate-600 dark:text-slate-300">
+                No download activity yet. Once builds are downloaded or installed, the newest five
+                events will appear here.
+              </p>
+            </Panel>
+          )}
+        </div>
+      ) : null}
       <SplitLayout
         left={<ReleasesSection apps={apps} />}
         right={<BuildQueueSection jobs={buildQueue} />}

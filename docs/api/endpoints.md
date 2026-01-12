@@ -29,6 +29,7 @@ Team-scoped endpoints:
 - `/builds/:id/ios/download`
 - `/builds/:id/ios/installs/track`
 - `/search`
+- `/builds/events`
 - `/builds/:id/tags`
 - `/tags`
 - `/store/upload`
@@ -40,6 +41,17 @@ Team-scoped endpoints:
 - Response schema: `{ "status": "ok" }`
 - Side effects: none
 - Platform relevance: all
+
+## GET /builds/events
+- Purpose: Latest download/install events for the active team (paginated)
+- Auth scope: Team
+- Request schema: query params
+  - `page` (number, optional, default 1): page number
+  - `perPage` (number, optional, default 25, max 200): page size
+  - `limit` and `offset` (legacy, optional)
+  - `kind` (string, optional): filter to one event kind (`download` or `install`)
+  - `kinds` (string, optional): comma-separated kinds to include (`download,install`)
+- Response schema: `{ "items": [{ "id": "evt", "kind": "download", "buildId": "build", "createdAt": "2026-01-11T00:00:00.000Z", "build": { "id": "build", "displayName": "Atlas Field 4.2.1", "buildNumber": "842", "version": { "version": "4.2.1", "app": { "id": "app", "name": "Atlas Field", "identifier": "com.app" } } }, "user": { "id": "user", "fullName": "Maya Singh" } }], "page": 1, "perPage": 25, "total": 1, "totalPages": 1 }`
 
 ## GET /info
 - Purpose: Service metadata
