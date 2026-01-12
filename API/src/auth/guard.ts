@@ -4,7 +4,26 @@ import { authService } from "./service.js";
 import { prisma } from "../lib/prisma.js";
 import { resolveApiKeySecret, verifyApiKey } from "@rafiki270/api-keys";
 
+const devBypassEnabled =
+  process.env.AUTH_DEV_BYPASS === "true" && process.env.NODE_ENV !== "production";
+const devBypassUserId = process.env.AUTH_DEV_USER_ID ?? "dev-user";
+const devBypassTeamId = process.env.AUTH_DEV_TEAM_ID ?? "dev-team";
+const devBypassRole = process.env.AUTH_DEV_ROLE ?? "owner";
+
 export async function requireAuth(request: FastifyRequest, reply: FastifyReply) {
+  if (devBypassEnabled) {
+    request.auth = {
+      user: {
+        id: devBypassUserId,
+        username: "dev",
+        email: null,
+        name: "Dev User",
+        avatarUrl: null,
+        status: "active",
+      },
+    };
+    return;
+  }
   const header = request.headers["authorization"];
   if (!header || typeof header !== "string" || !header.startsWith("Bearer ")) {
     return reply.status(401).send({ error: "token_invalid", message: "Missing access token" });
@@ -53,6 +72,11 @@ export async function requireTeam(request: FastifyRequest, reply: FastifyReply) 
   if (reply.sent) {
     return;
   }
+  if (devBypassEnabled) {
+    request.team = { id: devBypassTeamId } as any;
+    request.teamMember = { teamId: devBypassTeamId, userId: devBypassUserId, role: devBypassRole } as any;
+    return;
+  }
   const userId = request.auth?.user.id;
   if (!userId) {
     return reply.status(401).send({ error: "token_invalid", message: "Missing access token" });
@@ -85,6 +109,9 @@ export async function requireTeam(request: FastifyRequest, reply: FastifyReply) 
 export async function requireTeamAdmin(request: FastifyRequest, reply: FastifyReply) {
   await requireTeam(request, reply);
   if (reply.sent) {
+    return;
+  }
+  if (devBypassEnabled) {
     return;
   }
   const role = request.teamMember?.role;
