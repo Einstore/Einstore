@@ -5,9 +5,11 @@ import { prisma } from "../lib/prisma.js";
 import { requireTeam } from "../auth/guard.js";
 import { generateInstallToken, verifyInstallToken } from "../lib/install-links.js";
 import { presignStorageObject } from "../lib/storage-presign.js";
+import { loadConfig } from "../lib/config.js";
 import { BuildEventKind, PlatformKind, Prisma } from "@prisma/client";
 
 const INSTALL_TTL_SECONDS = 300;
+const config = loadConfig();
 
 const installEventSchema = z.object({
   platform: z.nativeEnum(PlatformKind).optional(),
@@ -16,15 +18,28 @@ const installEventSchema = z.object({
   metadata: z.record(z.unknown()).optional(),
 });
 
+const xmlEscape = (value: string) =>
+  value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+
 const resolveBaseUrl = (request: { headers: Record<string, string | string[] | undefined> }) => {
+  if (config.INSTALL_BASE_URL) {
+    return config.INSTALL_BASE_URL.replace(/\/$/, "");
+  }
   const protoHeader = request.headers["x-forwarded-proto"];
   const hostHeader = request.headers["x-forwarded-host"] ?? request.headers["host"];
   const proto = Array.isArray(protoHeader) ? protoHeader[0] : protoHeader;
   const host = Array.isArray(hostHeader) ? hostHeader[0] : hostHeader;
-  if (!host) {
-    return "http://localhost:8080";
+  const safeHost = typeof host === "string" && /^[a-z0-9.-]+(:\d+)?$/i.test(host) ? host : null;
+  if (!safeHost) {
+    return "https://api.einstore.pro";
   }
-  return `${proto || "http"}://${host}`;
+  const scheme = proto === "http" || proto === "https" ? proto : "https";
+  return `${scheme}://${safeHost}`;
 };
 
 const buildManifest = (payload: {
@@ -48,21 +63,21 @@ const buildManifest = (payload: {
     "          <key>kind</key>",
     "          <string>software-package</string>",
     "          <key>url</key>",
-    `          <string>${payload.downloadUrl}</string>`,
+    `          <string>${xmlEscape(payload.downloadUrl)}</string>`,
     "        </dict>",
     "      </array>",
     "      <key>metadata</key>",
     "      <dict>",
     "        <key>bundle-identifier</key>",
-    `        <string>${payload.bundleId}</string>`,
+    `        <string>${xmlEscape(payload.bundleId)}</string>`,
     "        <key>bundle-version</key>",
-    `        <string>${payload.version}</string>`,
+    `        <string>${xmlEscape(payload.version)}</string>`,
     "        <key>kind</key>",
     "        <string>software</string>",
     "        <key>title</key>",
-    `        <string>${payload.title}</string>`,
+    `        <string>${xmlEscape(payload.title)}</string>`,
     "        <key>build-number</key>",
-    `        <string>${payload.buildNumber}</string>`,
+    `        <string>${xmlEscape(payload.buildNumber)}</string>`,
     "      </dict>",
     "    </dict>",
     "  </array>",
