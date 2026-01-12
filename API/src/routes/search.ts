@@ -68,7 +68,16 @@ export async function searchRoutes(app: FastifyInstance) {
         { version: { version: { contains: q, mode: "insensitive" } } },
         { version: { app: { name: { contains: q, mode: "insensitive" } } } },
         { version: { app: { identifier: { contains: q, mode: "insensitive" } } } },
-        { buildTags: { some: { tag: { normalizedName: normalizedQuery } } } },
+        {
+          buildTags: {
+            some: {
+              OR: [
+                { tag: { normalizedName: normalizedQuery } },
+                { tag: { name: { contains: q, mode: "insensitive" } } },
+              ],
+            },
+          },
+        },
       ],
     } as const;
 

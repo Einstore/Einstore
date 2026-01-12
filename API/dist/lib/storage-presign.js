@@ -1,6 +1,6 @@
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-const resolveS3Client = () => {
+export const resolveS3Client = () => {
     const region = process.env.SPACES_REGION || "us-east-1";
     const endpoint = process.env.SPACES_ENDPOINT;
     const accessKeyId = process.env.SPACES_KEY;

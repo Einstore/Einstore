@@ -18,14 +18,19 @@ import { realtimeRoutes } from "./realtime.js";
 import { usageRoutes } from "./usage.js";
 import { buildEventRoutes } from "./build-events.js";
 import { iosInstallRoutes } from "./ios-install.js";
+import { trackingEventRoutes } from "./tracking-events.js";
 import { apiKeyRoutes } from "./api-keys.js";
 import { teamStatsRoutes } from "./team-stats.js";
 import { settingsRoutes } from "./settings.js";
-import { registerTeamRoutes, registerUserTeamSettingsRoutes } from "@rafiki270/teams";
+import { registerTeamInviteRoutes, registerTeamRoutes, registerUserTeamSettingsRoutes } from "@rafiki270/teams";
 import { prisma } from "../lib/prisma.js";
 import { loadConfig } from "../lib/config.js";
 import { requireAuth, requireTeam } from "../auth/guard.js";
 import { privateApiPlugins } from "../private/registry.js";
+import { searchRoutes } from "./search.js";
+import { buildTagRoutes } from "./build-tags.js";
+import { tagRoutes } from "./tags.js";
+import { teamLogoRoutes } from "./team-logo.js";
 export async function registerRoutes(app) {
     const config = loadConfig();
     await app.register(healthRoutes);
@@ -50,13 +55,19 @@ export async function registerRoutes(app) {
         inboundEmailDomain: config.INBOUND_EMAIL_DOMAIN,
         requireAuth,
     });
+    await registerTeamInviteRoutes(app, { prisma, requireAuth });
     await registerUserTeamSettingsRoutes(app, { prisma, requireAuth });
     await app.register(teamStatsRoutes);
     await app.register(usageRoutes);
     await app.register(buildEventRoutes);
     await app.register(iosInstallRoutes);
+    await app.register(trackingEventRoutes);
     await app.register(apiKeyRoutes);
     await app.register(settingsRoutes);
+    await app.register(searchRoutes);
+    await app.register(buildTagRoutes);
+    await app.register(tagRoutes);
+    await app.register(teamLogoRoutes);
     for (const plugin of privateApiPlugins) {
         if (typeof plugin.register !== "function")
             continue;

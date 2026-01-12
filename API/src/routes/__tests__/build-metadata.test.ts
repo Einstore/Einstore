@@ -36,6 +36,7 @@ vi.mock("../../auth/guard.js", () => ({
 vi.mock("@rafiki270/teams", () => ({
   registerTeamRoutes: async () => {},
   registerUserTeamSettingsRoutes: async () => {},
+  registerTeamInviteRoutes: async () => {},
 }));
 
 vi.mock("../../lib/config.js", () => ({

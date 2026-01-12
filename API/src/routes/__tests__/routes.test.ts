@@ -211,6 +211,7 @@ vi.mock("@rafiki270/teams", () => ({
     app.get("/user-team-settings/:key", async () => ({ value: null }));
     app.put("/user-team-settings/:key", async () => ({ ok: true }));
   },
+  registerTeamInviteRoutes: async () => {},
   deriveInboxBaseForUser: () => "inbox",
   normalizeTeamSlug: (value: string) => value,
   slugify: (value: string) => value,
