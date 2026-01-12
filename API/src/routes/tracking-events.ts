@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { PlatformKind, TrackingService } from "@prisma/client";
+import { PlatformKind, Prisma, TrackingService } from "@prisma/client";
 import { prisma } from "../lib/prisma.js";
 import { requireTeam } from "../auth/guard.js";
 import { requireBuildForTeam } from "../lib/team-access.js";
@@ -129,6 +129,14 @@ const parseDate = (input?: string | null) => {
   return Number.isNaN(parsed.getTime()) ? undefined : parsed;
 };
 
+const toJson = (
+  value: unknown,
+): Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput | undefined => {
+  if (value === undefined) return undefined;
+  if (value === null) return Prisma.JsonNull;
+  return value as Prisma.InputJsonValue;
+};
+
 const resolveBuildByTarget = async (
   teamId: string,
   platform: PlatformKind | undefined,
@@ -171,7 +179,7 @@ const buildTrackingEvents = (
     platform: parsedBody.platform,
     targetId: parsedBody.targetId,
     deviceId: parsedBody.deviceId,
-    custom: meta.custom,
+    custom: toJson(meta.custom),
   };
 
   const events: Parameters<typeof prisma.trackingEvent.create>[0]["data"][] = [];
@@ -183,8 +191,8 @@ const buildTrackingEvents = (
       ...base,
       service: "analytics",
       eventName,
-      eventProperties: meta.analytics?.event?.properties,
-      userProperties: meta.analytics?.userProperties,
+      eventProperties: toJson(meta.analytics?.event?.properties),
+      userProperties: toJson(meta.analytics?.userProperties),
       sessionId: meta.analytics?.session?.id,
       sessionStartedAt: parseDate(meta.analytics?.session?.startedAt),
       sessionDurationMs: meta.analytics?.session?.durationMs,
@@ -200,7 +208,7 @@ const buildTrackingEvents = (
       eventName: "error",
       message,
       stackTrace: meta.errors?.stackTrace,
-      eventProperties: meta.errors?.properties,
+      eventProperties: toJson(meta.errors?.properties),
       occurredAt: now,
     });
   }
@@ -212,8 +220,8 @@ const buildTrackingEvents = (
       installSource: meta.distribution?.installSource,
       appVersion: meta.distribution?.appVersion,
       buildNumber: meta.distribution?.buildNumber,
-      eventProperties: meta.distribution?.metadata,
-      distribution: meta.distribution,
+      eventProperties: toJson(meta.distribution?.metadata),
+      distribution: toJson(meta.distribution),
       occurredAt: now,
     });
   }
@@ -228,7 +236,7 @@ const buildTrackingEvents = (
       locale: meta.device?.locale,
       deviceAppVersion: meta.device?.appVersion,
       deviceBuildNumber: meta.device?.buildNumber,
-      device: meta.device,
+      device: toJson(meta.device),
       occurredAt: now,
     });
   }
@@ -243,7 +251,7 @@ const buildTrackingEvents = (
       timeZone: meta.usage?.timeZone,
       timeZoneOffsetMinutes: meta.usage?.timeZoneOffsetMinutes,
       locale: meta.usage?.locale,
-      usage: meta.usage,
+      usage: toJson(meta.usage),
       occurredAt: usageTimestamp ?? now,
     });
   }
@@ -255,7 +263,7 @@ const buildTrackingEvents = (
       eventName: meta.crash?.exceptionType ?? meta.crash?.signal ?? "crash",
       message: meta.crash?.exceptionType ?? meta.crash?.signal,
       stackTrace: meta.crash?.stackTrace,
-      eventProperties: {
+      eventProperties: toJson({
         threads: meta.crash?.threads,
         breadcrumbs: meta.crash?.breadcrumbs,
         featureFlags: meta.crash?.featureFlags,
@@ -266,14 +274,14 @@ const buildTrackingEvents = (
         foreground: meta.crash?.foreground,
         launchAt: meta.crash?.launchAt,
         lastScreen: meta.crash?.lastScreen,
-      },
+      }),
       installSource: meta.crash?.installSource ?? meta.distribution?.installSource,
       appVersion: meta.crash?.appVersion ?? meta.distribution?.appVersion,
       buildNumber: meta.crash?.buildNumber ?? meta.distribution?.buildNumber,
       environment: meta.crash?.environment,
       binaryHash: meta.crash?.binaryHash,
       signingCertHash: meta.crash?.signingCertHash,
-      crash: meta.crash,
+      crash: toJson(meta.crash),
       occurredAt: parseDate(meta.crash?.occurredAt) ?? now,
     });
   }

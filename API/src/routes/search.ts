@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { z } from "zod";
+import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma.js";
 import { requireTeam } from "../auth/guard.js";
 import { buildPaginationMeta, resolvePagination } from "../lib/pagination.js";
@@ -48,14 +49,14 @@ export async function searchRoutes(app: FastifyInstance) {
       maxPerPage: 100,
     });
 
-    const appWhere = {
+    const appWhere: Prisma.AppWhereInput = {
       teamId,
       OR: [
         { name: { contains: q, mode: "insensitive" } },
         { identifier: { contains: q, mode: "insensitive" } },
       ],
-    } as const;
-    const buildWhere = {
+    };
+    const buildWhere: Prisma.BuildWhereInput = {
       version: {
         app: {
           teamId,
@@ -69,7 +70,7 @@ export async function searchRoutes(app: FastifyInstance) {
         { version: { app: { name: { contains: q, mode: "insensitive" } } } },
         { version: { app: { identifier: { contains: q, mode: "insensitive" } } } },
         {
-          buildTags: {
+          tags: {
             some: {
               OR: [
                 { tag: { normalizedName: normalizedQuery } },
@@ -79,7 +80,11 @@ export async function searchRoutes(app: FastifyInstance) {
           },
         },
       ],
-    } as const;
+    };
+
+    type BuildWithRelations = Prisma.BuildGetPayload<{
+      include: { version: { include: { app: true } } };
+    }>;
 
     const [appTotal, apps] = await prisma.$transaction([
       prisma.app.count({ where: appWhere }),
@@ -91,22 +96,20 @@ export async function searchRoutes(app: FastifyInstance) {
       }),
     ]);
 
-    const [buildTotal, builds] = await prisma.$transaction([
-      prisma.build.count({ where: buildWhere }),
-      prisma.build.findMany({
-        where: buildWhere,
-        orderBy: { createdAt: "desc" },
-        skip: buildPagination.offset,
-        take: buildPagination.perPage,
-        include: {
-          version: {
-            include: {
-              app: true,
-            },
+    const buildTotal = await prisma.build.count({ where: buildWhere });
+    const builds: BuildWithRelations[] = await prisma.build.findMany({
+      where: buildWhere,
+      orderBy: { createdAt: "desc" },
+      skip: buildPagination.offset,
+      take: buildPagination.perPage,
+      include: {
+        version: {
+          include: {
+            app: true,
           },
         },
-      }),
-    ]);
+      },
+    });
 
     const uniqueBuilds = new Map(
       builds.map((build) => [
