@@ -199,6 +199,12 @@ Team-scoped endpoints:
 - Side effects: Creates one row per requested service
 - Platform relevance: all
 
+## Planned Crash API (coming soon)
+- Purpose: Receive crash reports uploaded on next launch (never during the crash).
+- Build identity: derived server-side from app_id/bundleId + platform + version_name + version_code + environment, with binary_hash and signing certificate hash as fallbacks. Clients never send DB build IDs.
+- Payload (draft): crash time, launch time, foreground flag, exception/signal, symbolicated stack, threads, device/OS, last screen/route, breadcrumbs, feature flags/experiments, network type, memory/ANR markers; excludes PII by default.
+- Requirements: dSYM (iOS) and R8/ProGuard mapping (Android) must be uploaded for symbolication/deobfuscation.\n*** End Patch
+
 ## GET /builds/{id}/events
 - Purpose: List tracking events
 - Auth scope: Bearer (rafiki270/auth) + Team membership
@@ -665,6 +671,14 @@ Optional tracking metadata shared by download/install endpoints.
 - Notes:
   - Errors: `400 invalid_archive` when the IPA/APK is not a valid zip archive.
 
+## POST /store/upload
+- Purpose: Upload a binary directly to Einstore storage (any file type)
+- Auth scope: Team or API key (`x-api-key` header or `token` query param)
+- Request schema: multipart form with `file`; `token` query param supported as an alternative to header auth
+- Response schema: `{ "status": "stored", "filePath": "storage/uploads/<generated>", "filename": "original.ext", "sizeBytes": 123, "teamId": "team" }`
+- Side effects: Stores the file locally (subject to storage quota and purge rules)
+- Notes: Request must include `Content-Length` for quota checks; oldest builds are purged automatically to free space (never deletes the last build of an app).
+
 ## POST /feature-flags
 - Purpose: Create/ensure feature flag
 - Auth scope: Bearer (super user)
@@ -712,6 +726,17 @@ Optional tracking metadata shared by download/install endpoints.
 - Response schema: `FeatureFlagOverride`
 - Side effects: Creates or updates override
 - Platform relevance: all
+
+## GET /settings/storage-limit
+- Purpose: Get default storage limit for teams (GB)
+- Auth scope: Superuser
+- Response schema: `{ "defaultLimitGb": 1 }`
+
+## PUT /settings/storage-limit
+- Purpose: Update default storage limit for teams (GB)
+- Auth scope: Superuser
+- Request schema: `{ "defaultLimitGb": number }` (positive, max 10,000)
+- Response schema: `{ "defaultLimitGb": number }`
 
 ## GET /feature-flags/{key}/overrides
 - Purpose: List feature flag overrides

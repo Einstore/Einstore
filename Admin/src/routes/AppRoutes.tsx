@@ -609,7 +609,6 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
   const [error, setError] = useState<string | null>(null);
   const [tags, setTags] = useState<ApiTag[]>([]);
   const [availableTags, setAvailableTags] = useState<ApiTag[]>([]);
-  const [tagError, setTagError] = useState<string | null>(null);
   const installBuild = useCallback(
     async (id: string) => {
       try {
@@ -780,7 +779,7 @@ const BuildDetailRoute = ({ activeTeamId }: { activeTeamId: string }) => {
             .then((tagPayload) => setAvailableTags(tagPayload?.items ?? []))
             .catch(() => undefined);
         } catch {
-          setTagError("Unable to save tags. Please try again.");
+          // Leave tags unchanged on error
         }
       }}
     />

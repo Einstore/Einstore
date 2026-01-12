@@ -28,3 +28,4 @@ Modern private app distribution platform for iOS + Android.
      "https://api.local.einstore.pro/store/upload?token=YOUR_API_KEY_TOKEN"
    ```
 3. The response includes `filePath` and `sizeBytes` confirming the file is stored. Use that path when triggering ingest or other workflows.
+4. Teams have a storage quota (default 1 GB). If an upload would exceed the quota, the API purges the oldest builds first (never deletes the last build of an app). If no space can be freed, the upload is rejected with a clear error.

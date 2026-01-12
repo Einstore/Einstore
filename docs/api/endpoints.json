@@ -367,6 +367,104 @@
         },
         "type": "object"
       },
+      "CrashReport": {
+        "description": "Draft crash payload (uploaded on next launch).",
+        "properties": {
+          "anrMarkers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "appId": {
+            "type": "string"
+          },
+          "binaryHash": {
+            "description": "Hash of the app binary/APK for fallback identification",
+            "type": "string"
+          },
+          "breadcrumbs": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "crashAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "custom": {
+            "type": "object"
+          },
+          "device": {
+            "type": "object"
+          },
+          "environment": {
+            "type": "string"
+          },
+          "exceptionType": {
+            "type": "string"
+          },
+          "featureFlags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "foreground": {
+            "type": "boolean"
+          },
+          "lastScreen": {
+            "type": "string"
+          },
+          "launchAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "memoryWarningCount": {
+            "type": "integer"
+          },
+          "networkType": {
+            "enum": [
+              "wifi",
+              "cell",
+              "offline",
+              "unknown"
+            ],
+            "type": "string"
+          },
+          "platform": {
+            "enum": [
+              "ios",
+              "android"
+            ],
+            "type": "string"
+          },
+          "signal": {
+            "type": "string"
+          },
+          "signingCertHash": {
+            "description": "Hash of signing certificate as additional fallback",
+            "type": "string"
+          },
+          "stackTrace": {
+            "type": "string"
+          },
+          "threads": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "versionCode": {
+            "type": "string"
+          },
+          "versionName": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "FeatureFlag": {
         "properties": {
           "defaultEnabled": {
@@ -3064,6 +3162,63 @@
         "summary": "Set storage config"
       }
     },
+    "/store/upload": {
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          },
+          {
+            "description": "API key token (query alternative to x-api-key header)",
+            "in": "query",
+            "name": "token",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "format": "binary",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Stored file"
+          },
+          "400": {
+            "description": "Invalid payload"
+          },
+          "413": {
+            "description": "File too large"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "summary": "Upload binary to storage"
+      }
+    },
     "/tags": {
       "get": {
         "parameters": [
@@ -3127,63 +3282,6 @@
           }
         ],
         "summary": "List team tags"
-      }
-    },
-    "/store/upload": {
-      "post": {
-        "summary": "Upload binary to storage",
-        "security": [
-          {
-            "bearerAuth": []
-          },
-          {
-            "apiKeyAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          },
-          {
-            "name": "token",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "API key token (query alternative to x-api-key header)"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                },
-                "required": [
-                  "file"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Stored file"
-          },
-          "400": {
-            "description": "Invalid payload"
-          },
-          "413": {
-            "description": "File too large"
-          }
-        }
       }
     },
     "/targets": {
@@ -3817,6 +3915,57 @@
           }
         ],
         "summary": "Get version"
+      }
+    },
+    "/settings/storage-limit": {
+      "get": {
+        "summary": "Get default storage limit (GB)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Default storage limit"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update default storage limit (GB)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "defaultLimitGb": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "defaultLimitGb"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated storage limit"
+          },
+          "400": {
+            "description": "Invalid limit"
+          }
+        }
       }
     },
     "/ws": {

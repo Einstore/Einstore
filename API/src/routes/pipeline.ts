@@ -9,6 +9,7 @@ import { ingestIosIpa } from "../lib/ingest/ios.js";
 import { ensureZipReadable, isInvalidArchiveError } from "../lib/zip.js";
 import { requireTeamOrApiKey } from "../auth/guard.js";
 import { broadcastBadgesUpdate } from "../lib/realtime.js";
+import { prisma } from "../lib/prisma.js";
 
 const ingestSchema = z.object({
   buildId: z.string().uuid().optional(),
@@ -18,6 +19,107 @@ const ingestSchema = z.object({
 
 type IngestRequest = z.infer<typeof ingestSchema>;
 const allowedUploadExtensions = new Set([".apk", ".ipa"]);
+const STORAGE_LIMIT_SETTING_KEY = "storage.defaultLimitGb";
+const ONE_GB_BYTES = 1024n * 1024n * 1024n;
+
+const parseContentLength = (value: unknown) => {
+  const raw = Array.isArray(value) ? value[0] : value;
+  if (typeof raw !== "string") return null;
+  const numeric = Number(raw);
+  return Number.isFinite(numeric) && numeric > 0 ? BigInt(Math.ceil(numeric)) : null;
+};
+
+const gbToBytes = (gb: number) => BigInt(Math.round(gb * 1024 * 1024 * 1024));
+
+const resolveStorageLimitBytes = async (teamId: string) => {
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
+    select: { storageLimitBytes: true },
+  });
+  if (team?.storageLimitBytes) {
+    return BigInt(team.storageLimitBytes);
+  }
+  const setting = await prisma.siteSetting.findUnique({
+    where: { key: STORAGE_LIMIT_SETTING_KEY },
+  });
+  const defaultLimitGb =
+    typeof (setting?.value as { defaultLimitGb?: unknown } | null)?.defaultLimitGb === "number"
+      ? (setting?.value as { defaultLimitGb: number }).defaultLimitGb
+      : 1;
+  return defaultLimitGb > 0 ? gbToBytes(defaultLimitGb) : ONE_GB_BYTES;
+};
+
+const getTeamStorageUsage = async (teamId: string) => {
+  const aggregate = await prisma.build.aggregate({
+    _sum: { sizeBytes: true },
+    where: { version: { app: { teamId } } },
+  });
+  return BigInt(aggregate._sum.sizeBytes ?? 0);
+};
+
+const ensureStorageCapacity = async (teamId: string, requiredBytes: bigint) => {
+  const limitBytes = await resolveStorageLimitBytes(teamId);
+  const usedBytes = await getTeamStorageUsage(teamId);
+  if (usedBytes + requiredBytes <= limitBytes) {
+    return;
+  }
+
+  const neededFree = usedBytes + requiredBytes - limitBytes;
+  const builds = await prisma.build.findMany({
+    where: { version: { app: { teamId } } },
+    select: {
+      id: true,
+      sizeBytes: true,
+      storageKind: true,
+      storagePath: true,
+      createdAt: true,
+      version: { select: { appId: true } },
+    },
+    orderBy: { createdAt: "asc" },
+  });
+
+  const counts = builds.reduce<Map<string, number>>((map, build) => {
+    const appId = build.version.appId;
+    map.set(appId, (map.get(appId) ?? 0) + 1);
+    return map;
+  }, new Map());
+
+  let freed = 0n;
+  const deletable: typeof builds = [];
+  for (const build of builds) {
+    const appId = build.version.appId;
+    const appCount = counts.get(appId) ?? 0;
+    if (appCount <= 1) {
+      continue;
+    }
+    deletable.push(build);
+    counts.set(appId, appCount - 1);
+    freed += BigInt(build.sizeBytes);
+    if (freed >= neededFree) {
+      break;
+    }
+  }
+
+  if (freed < neededFree) {
+    const singleBuildApps = Array.from(counts.values()).every((count) => count <= 1);
+    const message = singleBuildApps
+      ? "Storage limit reached and each app only has one build. Increase storage or delete a build manually."
+      : "Storage limit reached. Delete older builds or increase storage.";
+    const err: Error & { statusCode?: number; code?: string } = new Error(message);
+    err.statusCode = 413;
+    err.code = "storage_limit_exceeded";
+    throw err;
+  }
+
+  const idsToDelete = deletable.map((build) => build.id);
+  await prisma.build.deleteMany({ where: { id: { in: idsToDelete } } });
+
+  await Promise.all(
+    deletable
+      .filter((build) => build.storageKind === "local")
+      .map((build) => fs.promises.rm(build.storagePath, { force: true }).catch(() => undefined))
+  );
+};
 
 export async function pipelineRoutes(app: FastifyInstance) {
   app.post("/ingest", { preHandler: requireTeamOrApiKey }, async (request, reply) => {
@@ -70,6 +172,10 @@ export async function pipelineRoutes(app: FastifyInstance) {
     if (!request.isMultipart()) {
       return reply.status(400).send({ error: "multipart_required" });
     }
+    const contentLength = parseContentLength(request.headers["content-length"]);
+    if (!contentLength) {
+      return reply.status(411).send({ error: "content_length_required" });
+    }
     const part = await request.file();
     if (!part) {
       return reply.status(400).send({ error: "missing_file" });
@@ -77,6 +183,16 @@ export async function pipelineRoutes(app: FastifyInstance) {
     const teamId = request.team?.id;
     if (!teamId) {
       return reply.status(403).send({ error: "team_required", message: "Team context required" });
+    }
+    try {
+      await ensureStorageCapacity(teamId, contentLength);
+    } catch (error) {
+      if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
+        return reply
+          .status((error as { statusCode?: number }).statusCode ?? 413)
+          .send({ error: "storage_limit_exceeded", message: (error as { message?: string }).message });
+      }
+      throw error;
     }
 
     const extension = path.extname(part.filename ?? "").toLowerCase();
@@ -133,6 +249,10 @@ export async function pipelineRoutes(app: FastifyInstance) {
     if (!request.isMultipart()) {
       return reply.status(400).send({ error: "multipart_required" });
     }
+    const contentLength = parseContentLength(request.headers["content-length"]);
+    if (!contentLength) {
+      return reply.status(411).send({ error: "content_length_required" });
+    }
     const part = await request.file();
     if (!part) {
       return reply.status(400).send({ error: "missing_file" });
@@ -140,6 +260,16 @@ export async function pipelineRoutes(app: FastifyInstance) {
     const teamId = request.team?.id;
     if (!teamId) {
       return reply.status(403).send({ error: "team_required", message: "Team context required" });
+    }
+    try {
+      await ensureStorageCapacity(teamId, contentLength);
+    } catch (error) {
+      if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
+        return reply
+          .status((error as { statusCode?: number }).statusCode ?? 413)
+          .send({ error: "storage_limit_exceeded", message: (error as { message?: string }).message });
+      }
+      throw error;
     }
 
     const extension = path.extname(part.filename ?? "").toLowerCase();
