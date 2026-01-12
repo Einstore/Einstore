@@ -11,7 +11,13 @@ import { ensureZipReadable, isInvalidArchiveError } from "../lib/zip.js";
 import { requireTeamOrApiKey } from "../auth/guard.js";
 import { broadcastBadgesUpdate } from "../lib/realtime.js";
 import { prisma } from "../lib/prisma.js";
-import { resolveS3Client, presignPutObject } from "../lib/storage-presign.js";
+import {
+  DEFAULT_CHECKSUM_ALGORITHM,
+  DEFAULT_CHECKSUM_CRC32,
+  DEFAULT_CONTENT_TYPE,
+  resolveS3Client,
+  presignPutObject,
+} from "../lib/storage-presign.js";
 
 const ingestSchema = z.object({
   buildId: z.string().uuid().optional(),
@@ -204,18 +210,26 @@ export async function pipelineRoutes(app: FastifyInstance) {
       throw error;
     }
     const key = `ingest/${teamId}/${crypto.randomUUID()}${extension}`;
-    const contentType = parsed.data.contentType || "application/octet-stream";
+    const contentType = DEFAULT_CONTENT_TYPE;
+    const checksumAlgorithm = DEFAULT_CHECKSUM_ALGORITHM;
+    const checksumValue = DEFAULT_CHECKSUM_CRC32;
     const uploadUrl = await presignPutObject({
       bucket: spaces.bucket,
       key,
       expiresIn: PRESIGNED_TTL_SECONDS,
       contentType,
+      checksumAlgorithm,
+      checksumValue,
     });
     return reply.send({
       uploadUrl,
       key,
       expiresIn: PRESIGNED_TTL_SECONDS,
-      headers: { "Content-Type": contentType },
+      headers: {
+        "Content-Type": contentType,
+        "x-amz-checksum-algorithm": checksumAlgorithm,
+        "x-amz-checksum-crc32": checksumValue,
+      },
     });
   });
 

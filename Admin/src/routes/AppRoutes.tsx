@@ -469,10 +469,19 @@ const AppRoutes = () => {
           throw toError("INGEST-PRESIGN", err instanceof Error ? err.message : "Could not create upload link");
         });
 
-        const headers = new Headers(presign.headers);
-        if (!headers.has("Content-Type")) {
-          headers.set("Content-Type", contentType);
-        }
+        const headers = new Headers();
+        const allowedPresignHeaders = new Set([
+          "content-type",
+          "x-amz-checksum-algorithm",
+          "x-amz-checksum-crc32",
+        ]);
+        Object.entries(presign.headers ?? {}).forEach(([key, value]) => {
+          if (!value) return;
+          const normalizedKey = key.toLowerCase();
+          if (allowedPresignHeaders.has(normalizedKey)) {
+            headers.set(key, value);
+          }
+        });
 
         const uploadResponse = await fetch(presign.uploadUrl, {
           method: "PUT",

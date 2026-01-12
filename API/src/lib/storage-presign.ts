@@ -7,6 +7,11 @@ type PresignInput = {
   expiresIn: number;
 };
 
+export const DEFAULT_CONTENT_TYPE = "application/octet-stream";
+export const DEFAULT_CHECKSUM_ALGORITHM = "CRC32";
+// Placeholder CRC32 to keep headers stable across presign + browser PUT.
+export const DEFAULT_CHECKSUM_CRC32 = "AAAAAA==";
+
 export const resolveS3Client = () => {
   const region = process.env.SPACES_REGION || "us-east-1";
   const endpoint = process.env.SPACES_ENDPOINT;
@@ -37,13 +42,17 @@ type PresignPutInput = {
   key: string;
   expiresIn?: number;
   contentType?: string;
+  checksumAlgorithm?: "CRC32";
+  checksumValue?: string | null;
 };
 
 export const presignPutObject = async ({
   bucket,
   key,
   expiresIn = 900,
-  contentType,
+  contentType = DEFAULT_CONTENT_TYPE,
+  checksumAlgorithm = DEFAULT_CHECKSUM_ALGORITHM,
+  checksumValue = DEFAULT_CHECKSUM_CRC32,
 }: PresignPutInput) => {
   const client = resolveS3Client();
   if (!client) {
@@ -52,9 +61,9 @@ export const presignPutObject = async ({
   const command = new PutObjectCommand({
     Bucket: bucket,
     Key: key,
-    ContentType: contentType,
-    // Avoid signing checksum-related headers to reduce CORS/preflight issues
-    ChecksumAlgorithm: undefined as any,
+    ContentType: contentType || DEFAULT_CONTENT_TYPE,
+    ChecksumAlgorithm: checksumAlgorithm,
+    ...(checksumAlgorithm === "CRC32" && checksumValue ? { ChecksumCRC32: checksumValue } : {}),
   });
   return getSignedUrl(client, command, { expiresIn });
 };
