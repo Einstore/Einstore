@@ -425,29 +425,37 @@ const AppRoutes = () => {
   const handleIngest = useCallback(
     async (file: File) => {
       const contentType = file.type || "application/octet-stream";
-      const presign = await apiFetch<{ uploadUrl: string; key: string; headers?: Record<string, string> }>(
-        "/ingest/upload-url",
-        {
-          method: "POST",
-          body: JSON.stringify({ filename: file.name, sizeBytes: file.size, contentType }),
+      let presignedFailed = false;
+      try {
+        const presign = await apiFetch<{ uploadUrl: string; key: string; headers?: Record<string, string> }>(
+          "/ingest/upload-url",
+          {
+            method: "POST",
+            body: JSON.stringify({ filename: file.name, sizeBytes: file.size, contentType }),
+          }
+        );
+        const headers = new Headers(presign.headers);
+        if (!headers.has("Content-Type")) {
+          headers.set("Content-Type", contentType);
         }
-      );
-      const headers = new Headers(presign.headers);
-      if (!headers.has("Content-Type")) {
-        headers.set("Content-Type", contentType);
+        const uploadResponse = await fetch(presign.uploadUrl, {
+          method: "PUT",
+          headers,
+          body: file,
+        });
+        if (!uploadResponse.ok) {
+          throw new Error("Upload failed");
+        }
+        await apiFetch("/ingest/complete-upload", {
+          method: "POST",
+          body: JSON.stringify({ key: presign.key, filename: file.name, sizeBytes: file.size }),
+        });
+      } catch {
+        presignedFailed = true;
+        const fallbackForm = new FormData();
+        fallbackForm.append("file", file);
+        await apiUpload("/ingest/upload", fallbackForm);
       }
-      const uploadResponse = await fetch(presign.uploadUrl, {
-        method: "PUT",
-        headers,
-        body: file,
-      });
-      if (!uploadResponse.ok) {
-        throw new Error("Upload failed");
-      }
-      await apiFetch("/ingest/complete-upload", {
-        method: "POST",
-        body: JSON.stringify({ key: presign.key, filename: file.name, sizeBytes: file.size }),
-      });
       await loadApps();
       setIngestNonce((current) => current + 1);
     },
