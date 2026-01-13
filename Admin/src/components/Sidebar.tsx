@@ -51,34 +51,38 @@ const Sidebar = ({
 
       {teamSwitcher ? <div className="px-4">{teamSwitcher}</div> : null}
 
-      <nav className="mt-6 flex flex-1 flex-col gap-2 px-2">
-        {items.map((item) => {
-          const isActive = item.id === activeId;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              className={`flex h-11 items-center gap-3 rounded-lg px-4 text-left text-sm font-medium transition-colors ${
-                isActive
-                  ? "bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400"
-                  : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700"
-              }`}
-              aria-current={isActive ? "page" : undefined}
-              onClick={() => onSelect?.(item.id)}
-            >
-              <Icon name={item.icon} className="h-5 w-5" />
-              <span className="flex-1">{item.label}</span>
-              {item.badge ? (
-                <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-600 dark:bg-slate-700 dark:text-slate-300">
-                  {item.badge}
-                </span>
-              ) : null}
-            </button>
-          );
-        })}
-      </nav>
+      <div className="mt-6 flex min-h-0 flex-1 flex-col overflow-y-auto px-2">
+        <nav className="flex flex-col gap-2">
+          {items.map((item) => {
+            const isActive = item.id === activeId;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                className={`flex h-11 items-center gap-3 rounded-lg px-4 text-left text-sm font-medium transition-colors ${
+                  isActive
+                    ? "bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400"
+                    : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700"
+                }`}
+                aria-current={isActive ? "page" : undefined}
+                onClick={() => onSelect?.(item.id)}
+              >
+                <Icon name={item.icon} className="h-5 w-5" />
+                <span className="flex-1">{item.label}</span>
+                {item.badge ? (
+                  <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                    {item.badge}
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
+        </nav>
 
-      {dropzone ? <div className="sticky bottom-0 px-4 pb-4">{dropzone}</div> : null}
+        {dropzone ? (
+          <div className="mt-auto px-4 pb-4 pt-11">{dropzone}</div>
+        ) : null}
+      </div>
       {footer ? (
         <div className="border-t border-slate-200 px-4 py-4 text-xs text-slate-400 dark:border-slate-700 dark:text-slate-500">
           {footer}
