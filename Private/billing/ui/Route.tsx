@@ -166,74 +166,71 @@ const BillingRoute = () => {
           {plans.map((plan) => {
             const isCurrent = plan.id === currentPlan;
             const isProcessing = processingPlan === plan.id;
-            const wrapperClass = plan.featured
-              ? "rounded-[24px] bg-gradient-to-br from-indigo-400 via-sky-400 to-rose-400 p-[1px] shadow-lg"
-              : "rounded-[24px] border border-slate-200 shadow-sm dark:border-slate-700";
-            const innerClass = plan.featured
-              ? "rounded-[23px] bg-white/95 dark:bg-slate-900/85"
-              : "rounded-[23px] bg-white/95 dark:bg-slate-900/80";
 
             return (
-              <div key={plan.id} className={wrapperClass}>
-                <div className={`${innerClass} flex h-full min-w-0 flex-col gap-4 p-5`}>
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-lg font-semibold text-slate-900 dark:text-slate-50">{plan.label}</p>
-                      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{plan.description}</p>
-                    </div>
-                    {plan.featured && (
-                      <span className="rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-200">
-                        Most popular
-                      </span>
-                    )}
+              <div
+                key={plan.id}
+                className={`flex h-full min-w-0 flex-col gap-4 rounded-xl bg-white p-5 shadow-sm dark:bg-slate-800 ${
+                  plan.featured ? "ring-1 ring-indigo-200 dark:ring-indigo-500/40" : ""
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                      {plan.label}
+                    </p>
+                    <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{plan.description}</p>
                   </div>
-
-                  <div className="flex items-end gap-2">
-                    <span className="text-3xl font-semibold text-slate-900 dark:text-slate-50">{plan.price}</span>
-                    <span className="pb-1 text-xs text-slate-500 dark:text-slate-400">per month</span>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => handleChangePlan(plan.id)}
-                    disabled={isProcessing || isCurrent}
-                    className={`inline-flex h-11 w-full items-center justify-center rounded-full px-4 text-sm font-semibold shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 disabled:opacity-60 ${
-                      isCurrent
-                        ? "border border-slate-200 bg-slate-100 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
-                        : plan.featured
-                          ? "bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100"
-                          : "bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
-                    }`}
-                  >
-                    {isProcessing
-                      ? "Working..."
-                      : isCurrent
-                        ? "Current plan"
-                        : plan.id === "free"
-                          ? "Move to Free"
-                          : "Select plan"}
-                  </button>
-
-                  <ul className="mt-auto grid gap-2 text-sm text-slate-600 dark:text-slate-300">
-                    {plan.perks.map((perk) => (
-                      <li key={perk} className="flex items-start gap-2">
-                        <svg
-                          className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-500"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                          aria-hidden="true"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.704 5.29a1 1 0 0 1 .006 1.415l-7.25 7.3a1 1 0 0 1-1.423-.008L3.29 9.24a1 1 0 1 1 1.42-1.408l4.01 4.04 6.54-6.58a1 1 0 0 1 1.444-.002Z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        <span>{perk}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  {plan.featured && (
+                    <span className="rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-200">
+                      Most popular
+                    </span>
+                  )}
                 </div>
+
+                <div className="text-3xl font-semibold text-slate-900 dark:text-slate-100">
+                  {plan.price}{" "}
+                  <span className="text-xs font-normal text-slate-500 dark:text-slate-400">per month</span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleChangePlan(plan.id)}
+                  disabled={isProcessing || isCurrent}
+                  className={`inline-flex h-11 w-full items-center justify-center rounded-full px-4 text-sm font-semibold shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 disabled:opacity-60 ${
+                    isCurrent
+                      ? "border border-slate-200 bg-slate-100 text-slate-600 dark:border-slate-700 dark:bg-slate-700/60 dark:text-slate-300"
+                      : "bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+                  }`}
+                >
+                  {isProcessing
+                    ? "Working..."
+                    : isCurrent
+                      ? "Current plan"
+                      : plan.id === "free"
+                        ? "Move to Free"
+                        : "Select plan"}
+                </button>
+
+                <ul className="mt-auto grid gap-2 text-sm text-slate-600 dark:text-slate-300">
+                  {plan.perks.map((perk) => (
+                    <li key={perk} className="flex items-start gap-2">
+                      <svg
+                        className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-500"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.704 5.29a1 1 0 0 1 .006 1.415l-7.25 7.3a1 1 0 0 1-1.423-.008L3.29 9.24a1 1 0 1 1 1.42-1.408l4.01 4.04 6.54-6.58a1 1 0 0 1 1.444-.002Z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <span>{perk}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             );
           })}
