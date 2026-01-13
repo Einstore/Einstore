@@ -403,8 +403,8 @@ const BuildDetailPage = ({
               </div>
             </Panel>
 
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
-              <div className="space-y-6">
+            <div className="grid grid-cols-12 gap-6 md:items-start">
+              <div className="col-span-12 space-y-6 md:col-span-6">
                 <Panel className="space-y-4">
                   <div className="flex items-start justify-between gap-3">
                     <SectionHeader
@@ -471,7 +471,7 @@ const BuildDetailPage = ({
                 </Panel>
               </div>
 
-              <div className="space-y-6">
+              <div className="col-span-12 space-y-6 md:col-span-6">
                 <Panel className="space-y-4">
                   <div className="flex items-center justify-between">
                     <SectionHeader title="Download history" subtitle="Newest first" />
