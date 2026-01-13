@@ -198,15 +198,26 @@ export type AndroidIngestResult = {
   };
 };
 
+type BillingGuard = {
+  assertCanCreateApp?: (payload: { teamId: string; userId?: string; identifier?: string }) => Promise<void>;
+  assertCanCreateBuild?: (payload: { teamId: string; appId: string }) => Promise<void>;
+};
+
+type IngestOptions = {
+  billingGuard?: BillingGuard;
+};
+
 export async function ingestAndroidApk(
   filePath: string,
   teamId: string,
   createdByUserId?: string,
+  options?: IngestOptions,
 ): Promise<AndroidIngestResult> {
   if (!fs.existsSync(filePath)) {
     throw new Error("APK not found");
   }
 
+  const billingGuard = options?.billingGuard;
   const stats = fs.statSync(filePath);
   const output = parseWithAapt(filePath) ?? parseWithBundledAapt(filePath);
 
@@ -281,11 +292,23 @@ export async function ingestAndroidApk(
     icon: icons[0]?.path,
   };
 
+  if (billingGuard?.assertCanCreateApp) {
+    await billingGuard.assertCanCreateApp({
+      teamId,
+      userId: createdByUserId,
+      identifier: packageName,
+    });
+  }
+
   const appRecord = await prisma.app.upsert({
     where: { teamId_identifier: { teamId, identifier: packageName } },
     update: { name: resolvedAppNameNormalized },
     create: { identifier: packageName, name: resolvedAppNameNormalized, teamId },
   });
+
+  if (billingGuard?.assertCanCreateBuild) {
+    await billingGuard.assertCanCreateBuild({ teamId, appId: appRecord.id });
+  }
 
   const versionRecord = await prisma.version.upsert({
     where: {

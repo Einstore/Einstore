@@ -1,4 +1,4 @@
-import { FastifyInstance } from "fastify";
+import { FastifyInstance, FastifyReply } from "fastify";
 import { z } from "zod";
 import fs from "node:fs";
 import path from "node:path";
@@ -11,6 +11,10 @@ import { BuildEventKind, PlatformKind, Prisma } from "@prisma/client";
 
 const INSTALL_TTL_SECONDS = 300;
 const config = loadConfig();
+
+type BillingGuard = {
+  assertCanDownloadBuild?: (payload: { teamId: string; buildId: string }) => Promise<void>;
+};
 
 const installEventSchema = z.object({
   platform: z.nativeEnum(PlatformKind).optional(),
@@ -26,6 +30,19 @@ const xmlEscape = (value: string) =>
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;");
+
+const sendBillingError = (reply: FastifyReply, error: unknown) => {
+  if (!error || typeof error !== "object" || !(error as { code?: string }).code) {
+    throw error;
+  }
+  const statusCode = typeof (error as { statusCode?: number }).statusCode === "number"
+    ? (error as { statusCode?: number }).statusCode
+    : 403;
+  return reply.status(statusCode).send({
+    error: (error as { code: string }).code,
+    message: (error as { message?: string }).message ?? "Plan limit reached.",
+  });
+};
 
 const sanitizeFileFragment = (value: string, fallback: string, allowDots = false) => {
   const trimmed = value.trim();
@@ -116,6 +133,8 @@ const buildManifest = (payload: {
 };
 
 export async function iosInstallRoutes(app: FastifyInstance) {
+  const billingGuard = (app as { billingGuard?: BillingGuard }).billingGuard;
+
   app.post("/builds/:id/ios/install-link", { preHandler: requireTeam }, async (request, reply) => {
     const buildId = (request.params as { id: string }).id;
     const teamId = request.team?.id;
@@ -173,6 +192,14 @@ export async function iosInstallRoutes(app: FastifyInstance) {
     });
     if (!build) {
       return reply.status(404).send({ error: "Not found" });
+    }
+
+    if (billingGuard?.assertCanDownloadBuild) {
+      try {
+        await billingGuard.assertCanDownloadBuild({ teamId: payload.teamId, buildId: build.id });
+      } catch (error) {
+        return sendBillingError(reply, error);
+      }
     }
 
     const baseUrl = resolveBaseUrl(request);
@@ -241,6 +268,14 @@ export async function iosInstallRoutes(app: FastifyInstance) {
     });
     if (!build) {
       return reply.status(404).send({ error: "Not found" });
+    }
+
+    if (billingGuard?.assertCanDownloadBuild) {
+      try {
+        await billingGuard.assertCanDownloadBuild({ teamId: payload.teamId, buildId: build.id });
+      } catch (error) {
+        return sendBillingError(reply, error);
+      }
     }
 
     await prisma.buildEvent.create({

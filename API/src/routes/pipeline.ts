@@ -1,4 +1,4 @@
-import { FastifyInstance } from "fastify";
+import { FastifyInstance, FastifyReply } from "fastify";
 import { z } from "zod";
 import { pipeline } from "node:stream/promises";
 import crypto from "node:crypto";
@@ -12,6 +12,12 @@ import { requireTeamOrApiKey } from "../auth/guard.js";
 import { broadcastBadgesUpdate } from "../lib/realtime.js";
 import { prisma } from "../lib/prisma.js";
 import { resolveS3Client, presignPutObject } from "../lib/storage-presign.js";
+
+type BillingGuard = {
+  assertCanUploadBytes?: (payload: { teamId: string; requiredBytes: bigint | number }) => Promise<void>;
+  assertCanCreateApp?: (payload: { teamId: string; userId?: string; identifier?: string }) => Promise<void>;
+  assertCanCreateBuild?: (payload: { teamId: string; appId: string }) => Promise<void>;
+};
 
 const ingestSchema = z.object({
   buildId: z.string().uuid().optional(),
@@ -144,6 +150,19 @@ const ensureStorageCapacity = async (teamId: string, requiredBytes: bigint) => {
   );
 };
 
+const sendBillingError = (reply: FastifyReply, error: unknown) => {
+  if (!error || typeof error !== "object" || !(error as { code?: string }).code) {
+    throw error;
+  }
+  const statusCode = typeof (error as { statusCode?: number }).statusCode === "number"
+    ? (error as { statusCode?: number }).statusCode
+    : 403;
+  return reply.status(statusCode).send({
+    error: (error as { code: string }).code,
+    message: (error as { message?: string }).message ?? "Plan limit reached.",
+  });
+};
+
 const resolveSpacesConfig = () => {
   const client = resolveS3Client();
   const bucket = process.env.SPACES_BUCKET;
@@ -185,6 +204,8 @@ const deleteSpacesObject = async (bucket: string, key: string) => {
 };
 
 export async function pipelineRoutes(app: FastifyInstance) {
+  const billingGuard = (app as { billingGuard?: BillingGuard }).billingGuard;
+
   app.post("/ingest/upload-url", { preHandler: requireTeamOrApiKey }, async (request, reply) => {
     const parsed = presignUploadSchema.safeParse(request.body);
     if (!parsed.success) {
@@ -204,8 +225,14 @@ export async function pipelineRoutes(app: FastifyInstance) {
     }
     const sizeBytes = BigInt(parsed.data.sizeBytes);
     try {
+      if (billingGuard?.assertCanUploadBytes) {
+        await billingGuard.assertCanUploadBytes({ teamId, requiredBytes: sizeBytes });
+      }
       await ensureStorageCapacity(teamId, sizeBytes);
     } catch (error) {
+      if ((error as { code?: string }).code && (error as { code?: string }).code !== "storage_limit_exceeded") {
+        return sendBillingError(reply, error);
+      }
       if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
         return reply
           .status((error as { statusCode?: number }).statusCode ?? 413)
@@ -254,8 +281,14 @@ export async function pipelineRoutes(app: FastifyInstance) {
       return reply.status(411).send({ error: "content_length_required" });
     }
     try {
+      if (billingGuard?.assertCanUploadBytes) {
+        await billingGuard.assertCanUploadBytes({ teamId, requiredBytes: expectedSize });
+      }
       await ensureStorageCapacity(teamId, expectedSize);
     } catch (error) {
+      if ((error as { code?: string }).code && (error as { code?: string }).code !== "storage_limit_exceeded") {
+        return sendBillingError(reply, error);
+      }
       if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
         return reply
           .status((error as { statusCode?: number }).statusCode ?? 413)
@@ -269,9 +302,15 @@ export async function pipelineRoutes(app: FastifyInstance) {
       const download = await downloadSpacesObject(spaces.bucket, parsed.data.key, extension);
       filePath = download.filePath;
       try {
+        if (billingGuard?.assertCanUploadBytes) {
+          await billingGuard.assertCanUploadBytes({ teamId, requiredBytes: download.sizeBytes });
+        }
         await ensureStorageCapacity(teamId, download.sizeBytes);
       } catch (error) {
         await fs.promises.rm(filePath, { force: true }).catch(() => undefined);
+        if ((error as { code?: string }).code && (error as { code?: string }).code !== "storage_limit_exceeded") {
+          return sendBillingError(reply, error);
+        }
         if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
           return reply
             .status((error as { statusCode?: number }).statusCode ?? 413)
@@ -290,12 +329,12 @@ export async function pipelineRoutes(app: FastifyInstance) {
         throw error;
       }
       if (extension === ".apk") {
-        const result = await ingestAndroidApk(filePath, teamId, userId);
+        const result = await ingestAndroidApk(filePath, teamId, userId, { billingGuard });
         await deleteSpacesObject(spaces.bucket, parsed.data.key);
         await broadcastBadgesUpdate(teamId).catch(() => undefined);
         return reply.status(201).send({ status: "ingested", result });
       }
-      const result = await ingestIosIpa(filePath, teamId, userId);
+      const result = await ingestIosIpa(filePath, teamId, userId, { billingGuard });
       await deleteSpacesObject(spaces.bucket, parsed.data.key);
       await broadcastBadgesUpdate(teamId).catch(() => undefined);
       return reply.status(201).send({ status: "ingested", result });
@@ -331,7 +370,7 @@ export async function pipelineRoutes(app: FastifyInstance) {
         }
         throw error;
       }
-      const result = await ingestAndroidApk(payload.filePath, teamId, userId);
+      const result = await ingestAndroidApk(payload.filePath, teamId, userId, { billingGuard });
       await broadcastBadgesUpdate(teamId).catch(() => undefined);
       return reply.status(201).send({ status: "ingested", result });
     }
@@ -345,7 +384,7 @@ export async function pipelineRoutes(app: FastifyInstance) {
         }
         throw error;
       }
-      const result = await ingestIosIpa(payload.filePath, teamId, userId);
+      const result = await ingestIosIpa(payload.filePath, teamId, userId, { billingGuard });
       await broadcastBadgesUpdate(teamId).catch(() => undefined);
       return reply.status(201).send({ status: "ingested", result });
     }
@@ -371,9 +410,15 @@ export async function pipelineRoutes(app: FastifyInstance) {
     }
     try {
       if (contentLength) {
+        if (billingGuard?.assertCanUploadBytes) {
+          await billingGuard.assertCanUploadBytes({ teamId, requiredBytes: contentLength });
+        }
         await ensureStorageCapacity(teamId, contentLength);
       }
     } catch (error) {
+      if ((error as { code?: string }).code && (error as { code?: string }).code !== "storage_limit_exceeded") {
+        return sendBillingError(reply, error);
+      }
       if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
         return reply
           .status((error as { statusCode?: number }).statusCode ?? 413)
@@ -408,9 +453,16 @@ export async function pipelineRoutes(app: FastifyInstance) {
     }
 
     try {
-      await ensureStorageCapacity(teamId, uploadedBytes ?? contentLength ?? 0n);
+      const requiredBytes = uploadedBytes ?? contentLength ?? 0n;
+      if (billingGuard?.assertCanUploadBytes) {
+        await billingGuard.assertCanUploadBytes({ teamId, requiredBytes });
+      }
+      await ensureStorageCapacity(teamId, requiredBytes);
     } catch (error) {
       await fs.promises.rm(filePath, { force: true });
+      if ((error as { code?: string }).code && (error as { code?: string }).code !== "storage_limit_exceeded") {
+        return sendBillingError(reply, error);
+      }
       if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
         return reply
           .status((error as { statusCode?: number }).statusCode ?? 413)
@@ -431,12 +483,12 @@ export async function pipelineRoutes(app: FastifyInstance) {
     }
     try {
       if (extension === ".apk") {
-        const result = await ingestAndroidApk(filePath, teamId, userId);
+        const result = await ingestAndroidApk(filePath, teamId, userId, { billingGuard });
         await broadcastBadgesUpdate(teamId).catch(() => undefined);
         return reply.status(201).send({ status: "ingested", result });
       }
 
-      const result = await ingestIosIpa(filePath, teamId, userId);
+      const result = await ingestIosIpa(filePath, teamId, userId, { billingGuard });
       await broadcastBadgesUpdate(teamId).catch(() => undefined);
       return reply.status(201).send({ status: "ingested", result });
     } catch (error) {
@@ -462,9 +514,15 @@ export async function pipelineRoutes(app: FastifyInstance) {
     }
     try {
       if (contentLength) {
+        if (billingGuard?.assertCanUploadBytes) {
+          await billingGuard.assertCanUploadBytes({ teamId, requiredBytes: contentLength });
+        }
         await ensureStorageCapacity(teamId, contentLength);
       }
     } catch (error) {
+      if ((error as { code?: string }).code && (error as { code?: string }).code !== "storage_limit_exceeded") {
+        return sendBillingError(reply, error);
+      }
       if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
         return reply
           .status((error as { statusCode?: number }).statusCode ?? 413)
@@ -495,9 +553,16 @@ export async function pipelineRoutes(app: FastifyInstance) {
     }
 
     try {
-      await ensureStorageCapacity(teamId, uploadedBytes ?? contentLength ?? 0n);
+      const requiredBytes = uploadedBytes ?? contentLength ?? 0n;
+      if (billingGuard?.assertCanUploadBytes) {
+        await billingGuard.assertCanUploadBytes({ teamId, requiredBytes });
+      }
+      await ensureStorageCapacity(teamId, requiredBytes);
     } catch (error) {
       await fs.promises.rm(filePath, { force: true });
+      if ((error as { code?: string }).code && (error as { code?: string }).code !== "storage_limit_exceeded") {
+        return sendBillingError(reply, error);
+      }
       if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
         return reply
           .status((error as { statusCode?: number }).statusCode ?? 413)

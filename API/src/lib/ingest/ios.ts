@@ -316,10 +316,20 @@ export type IosIngestResult = {
   distribution: IosDistributionInfo;
 };
 
+type BillingGuard = {
+  assertCanCreateApp?: (payload: { teamId: string; userId?: string; identifier?: string }) => Promise<void>;
+  assertCanCreateBuild?: (payload: { teamId: string; appId: string }) => Promise<void>;
+};
+
+type IngestOptions = {
+  billingGuard?: BillingGuard;
+};
+
 export async function ingestIosIpa(
   filePath: string,
   teamId: string,
   createdByUserId?: string,
+  options?: IngestOptions,
 ): Promise<IosIngestResult> {
   if (!fs.existsSync(filePath)) {
     throw new Error("IPA not found");
@@ -411,11 +421,24 @@ export async function ingestIosIpa(
   const resolvedVersion = mainTarget.version || "1.0.0";
   const resolvedBuild = mainTarget.build || "1";
 
+  const billingGuard = options?.billingGuard;
+  if (billingGuard?.assertCanCreateApp) {
+    await billingGuard.assertCanCreateApp({
+      teamId,
+      userId: createdByUserId,
+      identifier: mainTarget.bundleId,
+    });
+  }
+
   const appRecord = await prisma.app.upsert({
     where: { teamId_identifier: { teamId, identifier: mainTarget.bundleId } },
     update: { name: resolvedAppName },
     create: { identifier: mainTarget.bundleId, name: resolvedAppName, teamId },
   });
+
+  if (billingGuard?.assertCanCreateBuild) {
+    await billingGuard.assertCanCreateBuild({ teamId, appId: appRecord.id });
+  }
 
   const versionRecord = await prisma.version.upsert({
     where: {

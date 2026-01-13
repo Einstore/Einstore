@@ -1,4 +1,4 @@
-import { FastifyInstance } from "fastify";
+import { FastifyInstance, FastifyReply } from "fastify";
 import fs from "node:fs";
 import path from "node:path";
 import { z } from "zod";
@@ -19,6 +19,12 @@ const groupArtifactsByKind = <T extends { kind: string; createdAt: Date }>(items
     list.sort((left, right) => right.createdAt.getTime() - left.createdAt.getTime());
   }
   return grouped;
+};
+
+type BillingGuard = {
+  assertCanCreateApp?: (payload: { teamId: string; userId?: string; identifier?: string }) => Promise<void>;
+  assertCanCreateBuild?: (payload: { teamId: string; appId: string }) => Promise<void>;
+  assertCanUploadBytes?: (payload: { teamId: string; requiredBytes: bigint | number }) => Promise<void>;
 };
 
 type IconBitmap = {
@@ -131,6 +137,19 @@ const normalizeBuildMetadata = (input: Partial<CreateBuildInput | UpdateBuildInp
   info: input.info === undefined ? undefined : input.info ?? null,
 });
 
+const sendBillingError = (reply: FastifyReply, error: unknown) => {
+  if (!error || typeof error !== "object" || !(error as { code?: string }).code) {
+    throw error;
+  }
+  const statusCode = typeof (error as { statusCode?: number }).statusCode === "number"
+    ? (error as { statusCode?: number }).statusCode
+    : 403;
+  return reply.status(statusCode).send({
+    error: (error as { code: string }).code,
+    message: (error as { message?: string }).message ?? "Plan limit reached.",
+  });
+};
+
 const toBuildMetadataData = (metadata: NormalizedBuildMetadata) => {
   const data: Record<string, unknown> = {};
   if (metadata.gitCommit !== undefined) data.gitCommit = metadata.gitCommit;
@@ -142,6 +161,8 @@ const toBuildMetadataData = (metadata: NormalizedBuildMetadata) => {
 };
 
 export async function buildRoutes(app: FastifyInstance) {
+  const billingGuard = (app as { billingGuard?: BillingGuard }).billingGuard;
+
   app.post("/builds", { preHandler: requireTeam }, async (request, reply) => {
     const parsed = createBuildSchema.safeParse(request.body);
     if (!parsed.success) {
@@ -153,11 +174,39 @@ export async function buildRoutes(app: FastifyInstance) {
       return reply.status(403).send({ error: "team_required", message: "Team context required" });
     }
 
+    if (billingGuard?.assertCanCreateApp) {
+      try {
+        await billingGuard.assertCanCreateApp({
+          teamId,
+          userId: request.auth?.user?.id,
+          identifier: input.appIdentifier,
+        });
+      } catch (error) {
+        return sendBillingError(reply, error);
+      }
+    }
+
     const appRecord = await prisma.app.upsert({
       where: { teamId_identifier: { teamId, identifier: input.appIdentifier } },
       update: { name: input.appName },
       create: { identifier: input.appIdentifier, name: input.appName, teamId },
     });
+
+    if (billingGuard?.assertCanCreateBuild) {
+      try {
+        await billingGuard.assertCanCreateBuild({ teamId, appId: appRecord.id });
+      } catch (error) {
+        return sendBillingError(reply, error);
+      }
+    }
+
+    if (billingGuard?.assertCanUploadBytes) {
+      try {
+        await billingGuard.assertCanUploadBytes({ teamId, requiredBytes: input.sizeBytes });
+      } catch (error) {
+        return sendBillingError(reply, error);
+      }
+    }
 
     const metadata = normalizeBuildMetadata(input);
 

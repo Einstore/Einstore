@@ -829,13 +829,23 @@ describe("routes", () => {
       { authorization: "Bearer token" }
     );
     expect(apkResponse.statusCode).toBe(201);
-    expect(ingestAndroidMock).toHaveBeenCalledWith("/tmp/app.apk", "team-1", "user-1");
+    expect(ingestAndroidMock).toHaveBeenCalledWith(
+      "/tmp/app.apk",
+      "team-1",
+      "user-1",
+      { billingGuard: undefined },
+    );
     const ipaResponse = await postJson(
       "/ingest",
       { filePath: "/tmp/app.ipa", kind: "ipa" },
       { authorization: "Bearer token" }
     );
     expect(ipaResponse.statusCode).toBe(201);
-    expect(ingestIosMock).toHaveBeenCalledWith("/tmp/app.ipa", "team-1", "user-1");
+    expect(ingestIosMock).toHaveBeenCalledWith(
+      "/tmp/app.ipa",
+      "team-1",
+      "user-1",
+      { billingGuard: undefined },
+    );
   });
 });

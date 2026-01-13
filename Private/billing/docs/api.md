@@ -2,6 +2,14 @@
 
 This module handles Stripe Checkout flows and subscription changes for billing.
 
+## Enforcement
+When the private billing module is enabled, plan limits are enforced across core APIs:
+- App and build caps: enforced during app creation and ingest/build creation.
+- Storage caps: enforced during upload/ingest (returns `storage_limit_exceeded`, 413).
+- Transfer caps: enforced for iOS download/manifest links (returns `transfer_limit_exceeded`, 403).
+- User seats: enforced on team invite creation and invite acceptance (`seat_limit_exceeded`).
+- Free plan anti-cheat: a user may only have one app across all free teams (`free_plan_app_limit`).
+
 ## Endpoints
 
 ### GET /billing/status

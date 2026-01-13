@@ -1,79 +1,21 @@
-const STRIPE_BASE_URL = "https://api.stripe.com/v1";
-const planCatalog = {
-  starter: { priceId: "price_1Sp9PrGY1l8e0vu2V2Ep6xlt", productId: "prod_TmiripgNgIJUFy", rank: 1 },
-  team: { priceId: "price_1Sp9QkGY1l8e0vu2DjSwqnMe", productId: "prod_TmisKIoVsTAvhy", rank: 2 },
-  enterprise: { priceId: "price_1Sp9RcGY1l8e0vu22WPQX0Ai", productId: "prod_Tmit1SlwXMLDca", rank: 3 },
-};
-const addOnCatalog = {
-  "priority-support": { priceId: "price_1Sp9SWGY1l8e0vu2FqEt8OFm", productId: "prod_Tmiu00y3BRAyUm" },
-};
-const paidPlanIds = new Set(Object.keys(planCatalog));
-const planPriceLookup = Object.entries(planCatalog).reduce((acc, [planId, plan]) => {
-  acc[plan.priceId] = planId;
-  return acc;
-}, {});
+import { addOnCatalog, paidPlanIds, normalizePlanId, getPlanRank, planCatalog } from "./catalog.js";
+import { stripeRequest } from "./stripe-client.js";
+import {
+  createCheckoutSession,
+  ensureCustomer,
+  getAddonSubscription,
+  getMainSubscription,
+  releaseSchedule,
+  resolvePlanFromSubscription,
+  scheduleDowngrade,
+  syncTeamPlan,
+} from "./subscriptions.js";
+import { createBillingGuard } from "./guards.js";
+
 const adminRoles = new Set(["owner", "admin"]);
+
 const isObject = (value) => typeof value === "object" && value !== null;
-const appendFormValue = (form, key, value) => {
-  if (value === undefined || value === null) return;
-  if (Array.isArray(value)) {
-    value.forEach((item, index) => appendFormValue(form, `${key}[${index}]`, item));
-    return;
-  }
-  if (isObject(value) && !(value instanceof Date)) {
-    Object.entries(value).forEach(([childKey, childValue]) => {
-      appendFormValue(form, `${key}[${childKey}]`, childValue);
-    });
-    return;
-  }
-  form.append(key, String(value));
-};
-const buildForm = (params) => {
-  const form = new URLSearchParams();
-  if (!params) return form;
-  Object.entries(params).forEach(([key, value]) => appendFormValue(form, key, value));
-  return form;
-};
-const stripeRequest = async ({ method, path, params }) => {
-  const stripeKey = process.env.STRIPE_SECRET_KEY;
-  if (!stripeKey) {
-    throw new Error("Stripe secret key missing.");
-  }
-  const url = new URL(`${STRIPE_BASE_URL}${path}`);
-  const headers = { Authorization: `Bearer ${stripeKey}` };
-  let body;
-  if (method === "GET") {
-    const query = buildForm(params);
-    if (query.toString()) {
-      url.search = query.toString();
-    }
-  } else {
-    const form = buildForm(params);
-    body = form.toString();
-    headers["Content-Type"] = "application/x-www-form-urlencoded";
-  }
-  const response = await fetch(url, { method, headers, body });
-  const payload = await response.json();
-  if (!response.ok) {
-    const message = payload?.error?.message || "Stripe request failed.";
-    const err = new Error(message);
-    err.statusCode = response.status;
-    throw err;
-  }
-  return payload;
-};
-const normalizePlanId = (planId) => (planId || "").toString().trim().toLowerCase();
-const getPlanRank = (planId) => (planCatalog[planId]?.rank ?? 0);
-const resolvePlanFromSubscription = (subscription) => {
-  if (!subscription?.items?.data?.length) return null;
-  const planItem = subscription.items.data.find((item) => planPriceLookup[item?.price?.id]);
-  if (!planItem) return null;
-  return {
-    planId: planPriceLookup[planItem.price.id],
-    itemId: planItem.id,
-    priceId: planItem.price.id,
-  };
-};
+
 const ensureAdmin = async (request, reply, requireTeam) => {
   await requireTeam(request, reply);
   if (reply.sent) return false;
@@ -84,140 +26,83 @@ const ensureAdmin = async (request, reply, requireTeam) => {
   }
   return true;
 };
-const ensureCustomer = async ({ prisma, team, user }) => {
-  if (team.stripeCustomerId) {
-    return team.stripeCustomerId;
+
+const normalizeSessionId = (input) => (typeof input === "string" ? input.trim() : "");
+
+const sendBillingError = (reply, error) => {
+  if (!error || typeof error !== "object" || !error.code) {
+    throw error;
   }
-  const customer = await stripeRequest({
-    method: "POST",
-    path: "/customers",
-    params: {
-      email: user?.email || undefined,
-      name: team.name,
-      metadata: {
-        einstore_team_id: team.id,
-        einstore_team_slug: team.slug,
-      },
-    },
-  });
-  await prisma.team.update({
-    where: { id: team.id },
-    data: { stripeCustomerId: customer.id },
-  });
-  return customer.id;
+  const statusCode = typeof error.statusCode === "number" ? error.statusCode : 403;
+  return reply.status(statusCode).send({ error: error.code, message: error.message });
 };
-const listSubscriptions = async (customerId) =>
-  stripeRequest({
-    method: "GET",
-    path: "/subscriptions",
-    params: {
-      customer: customerId,
-      status: "all",
-      limit: 100,
-      "expand[]": ["data.items"],
-    },
-  });
-const getMainSubscription = async ({ team, prisma, customerId }) => {
-  if (team.stripeSubscriptionId) {
-    try {
-      return await stripeRequest({
-        method: "GET",
-        path: `/subscriptions/${team.stripeSubscriptionId}`,
-        params: { "expand[]": ["items", "schedule"] },
-      });
-    } catch (err) {
-      if (err.statusCode !== 404) {
-        throw err;
+
+const parseInviteToken = (value) => {
+  if (typeof value !== "string") return "";
+  return value.trim();
+};
+
+export async function register(app, { prisma, requireAuth, requireTeam }) {
+  const billingGuard = createBillingGuard({ prisma });
+  app.decorate("billingGuard", billingGuard);
+
+  app.addHook("preHandler", async (request, reply) => {
+    const routePath = request.routeOptions?.url || request.routerPath;
+    if (request.method === "POST" && routePath === "/teams/:teamId/invites") {
+      await requireTeam(request, reply);
+      if (reply.sent) return;
+      try {
+        await billingGuard.assertCanInviteUser({ teamId: request.team?.id });
+      } catch (err) {
+        return sendBillingError(reply, err);
       }
     }
-  }
-  const subscriptions = await listSubscriptions(customerId);
-  const match = subscriptions.data.find(
-    (subscription) => subscription.metadata?.einstore_kind !== "addon" && subscription.status !== "canceled",
-  );
-  if (match && match.id !== team.stripeSubscriptionId) {
-    await prisma.team.update({
-      where: { id: team.id },
-      data: { stripeSubscriptionId: match.id },
-    });
-  }
-  return match || null;
-};
-const getAddonSubscription = async (customerId) => {
-  const subscriptions = await listSubscriptions(customerId);
-  return subscriptions.data.find((subscription) => {
-    if (subscription.metadata?.einstore_kind === "addon") return true;
-    return subscription.items?.data?.some(
-      (item) => item?.price?.id === addOnCatalog["priority-support"].priceId,
-    );
+
+    if (request.method === "POST" && routePath === "/invites/:token/accept") {
+      await requireAuth(request, reply);
+      if (reply.sent) return;
+      const token = parseInviteToken((request.params || {}).token);
+      if (!token) return;
+      const invite = await prisma.teamInvite.findUnique({ where: { token }, select: { teamId: true } });
+      if (!invite) return;
+      try {
+        await billingGuard.assertCanAcceptInvite({
+          teamId: invite.teamId,
+          userId: request.auth?.user?.id ?? request.user?.id,
+        });
+      } catch (err) {
+        return sendBillingError(reply, err);
+      }
+    }
   });
-};
-const createCheckoutSession = async ({ customerId, priceId, successUrl, cancelUrl, metadata }) =>
-  stripeRequest({
-    method: "POST",
-    path: "/checkout/sessions",
-    params: {
-      mode: "subscription",
-      customer: customerId,
-      success_url: successUrl,
-      cancel_url: cancelUrl,
-      client_reference_id: metadata?.einstore_team_id,
-      line_items: [{ price: priceId, quantity: 1 }],
-      metadata,
-      subscription_data: { metadata },
-    },
-  });
-const releaseSchedule = async (scheduleId) =>
-  stripeRequest({
-    method: "POST",
-    path: `/subscription_schedules/${scheduleId}/release`,
-  });
-const scheduleDowngrade = async ({ subscription, currentPriceId, targetPriceId }) => {
-  const scheduleId =
-    subscription.schedule?.id ||
-    (
-      await stripeRequest({
-        method: "POST",
-        path: "/subscription_schedules",
-        params: { from_subscription: subscription.id },
-      })
-    ).id;
-  return stripeRequest({
-    method: "POST",
-    path: `/subscription_schedules/${scheduleId}`,
-    params: {
-      end_behavior: "release",
-      phases: [
-        {
-          start_date: subscription.current_period_start,
-          end_date: subscription.current_period_end,
-          items: [{ price: currentPriceId, quantity: 1 }],
-          proration_behavior: "none",
-        },
-        {
-          start_date: subscription.current_period_end,
-          items: [{ price: targetPriceId, quantity: 1 }],
-          proration_behavior: "none",
-        },
-      ],
-      metadata: { einstore_pending_plan: planPriceLookup[targetPriceId] },
-    },
-  });
-};
-export async function register(app, { prisma, requireTeam }) {
+
   app.get("/billing/status", { preHandler: requireTeam }, async (request, reply) => {
     try {
       const team = request.team;
       if (!team?.stripeCustomerId) {
         return reply.send({ planId: "free", status: "free", addOn: { enabled: false } });
       }
+
       const subscription = await getMainSubscription({
         team,
         prisma,
         customerId: team.stripeCustomerId,
       });
       const planInfo = subscription ? resolvePlanFromSubscription(subscription) : null;
-      const addOnSubscription = await getAddonSubscription(team.stripeCustomerId);
+      if (planInfo && planInfo.planId !== team.planName) {
+        await syncTeamPlan({
+          prisma,
+          teamId: team.id,
+          planId: planInfo.planId,
+          subscription,
+          customerId: team.stripeCustomerId,
+        });
+      }
+
+      const addOnSubscription = await getAddonSubscription(
+        team.stripeCustomerId,
+        addOnCatalog["priority-support"].priceId,
+      );
       let pendingPlan = subscription?.metadata?.einstore_pending_plan || null;
       if (subscription?.schedule) {
         const scheduleId =
@@ -230,6 +115,7 @@ export async function register(app, { prisma, requireTeam }) {
           pendingPlan = schedule?.metadata?.einstore_pending_plan || pendingPlan;
         }
       }
+
       reply.send({
         planId: planInfo?.planId ?? "free",
         status: subscription?.status ?? "free",
@@ -248,13 +134,16 @@ export async function register(app, { prisma, requireTeam }) {
       reply.status(502).send({ error: "stripe_error", message: err.message });
     }
   });
+
   app.post("/billing/checkout", { preHandler: requireTeam }, async (request, reply) => {
     const canProceed = await ensureAdmin(request, reply, requireTeam);
     if (!canProceed) return;
+
     const body = isObject(request.body) ? request.body : {};
     const planId = normalizePlanId(body.planId);
     const successUrl = body.successUrl;
     const cancelUrl = body.cancelUrl;
+
     if (!paidPlanIds.has(planId)) {
       return reply.status(400).send({ error: "invalid_plan", message: "Paid plan required." });
     }
@@ -263,6 +152,7 @@ export async function register(app, { prisma, requireTeam }) {
         .status(400)
         .send({ error: "invalid_redirect", message: "Missing success/cancel URLs." });
     }
+
     try {
       const team = request.team;
       const customerId = await ensureCustomer({ prisma, team, user: request.auth?.user });
@@ -272,6 +162,7 @@ export async function register(app, { prisma, requireTeam }) {
           message: "Use /billing/plan to upgrade or downgrade an active plan.",
         });
       }
+
       const session = await createCheckoutSession({
         customerId,
         priceId: planCatalog[planId].priceId,
@@ -283,69 +174,78 @@ export async function register(app, { prisma, requireTeam }) {
           einstore_plan_id: planId,
         },
       });
+
       reply.send({ url: session.url, sessionId: session.id });
     } catch (err) {
       reply.status(502).send({ error: "stripe_error", message: err.message });
     }
   });
+
   app.post("/billing/checkout/complete", { preHandler: requireTeam }, async (request, reply) => {
     const canProceed = await ensureAdmin(request, reply, requireTeam);
     if (!canProceed) return;
+
     const body = isObject(request.body) ? request.body : {};
-    const sessionId = body.sessionId;
-    if (typeof sessionId !== "string" || !sessionId.trim()) {
+    const sessionId = normalizeSessionId(body.sessionId);
+    if (!sessionId) {
       return reply.status(400).send({ error: "invalid_session", message: "Session ID required." });
     }
+
     try {
       const session = await stripeRequest({
         method: "GET",
         path: `/checkout/sessions/${sessionId}`,
         params: { "expand[]": ["subscription", "customer"] },
       });
+
       const teamId = session?.metadata?.einstore_team_id;
       if (!teamId || teamId !== request.team.id) {
         return reply.status(403).send({ error: "forbidden", message: "Session team mismatch." });
       }
+
       if (session.metadata?.einstore_kind === "plan") {
         const subscription = session.subscription;
-        if (!subscription?.id || !session.customer?.id) {
+        const customerId = session.customer?.id;
+        if (!subscription?.id || !customerId) {
           return reply
             .status(400)
             .send({ error: "invalid_session", message: "Subscription missing from session." });
         }
-        await prisma.team.update({
-          where: { id: request.team.id },
-          data: {
-            stripeCustomerId: session.customer.id,
-            stripeSubscriptionId: subscription.id,
-            subscriptionStatus: subscription.status,
-            billingPeriodStart: subscription.current_period_start
-              ? new Date(subscription.current_period_start * 1000)
-              : null,
-            billingPeriodEnd: subscription.current_period_end
-              ? new Date(subscription.current_period_end * 1000)
-              : null,
-          },
+        const planInfo = resolvePlanFromSubscription(subscription);
+        if (!planInfo) {
+          return reply.status(400).send({ error: "invalid_session", message: "Plan missing." });
+        }
+        await syncTeamPlan({
+          prisma,
+          teamId: request.team.id,
+          planId: planInfo.planId,
+          subscription,
+          customerId,
         });
       }
+
       reply.send({ status: "ok" });
     } catch (err) {
       reply.status(502).send({ error: "stripe_error", message: err.message });
     }
   });
+
   app.post("/billing/plan", { preHandler: requireTeam }, async (request, reply) => {
     const canProceed = await ensureAdmin(request, reply, requireTeam);
     if (!canProceed) return;
+
     const body = isObject(request.body) ? request.body : {};
     const planId = normalizePlanId(body.planId);
     if (planId !== "free" && !paidPlanIds.has(planId)) {
       return reply.status(400).send({ error: "invalid_plan", message: "Unknown plan selection." });
     }
+
     try {
       const team = request.team;
       if (!team.stripeCustomerId) {
         return reply.status(400).send({ error: "no_subscription", message: "No active subscription." });
       }
+
       const subscription = await getMainSubscription({
         team,
         prisma,
@@ -354,12 +254,14 @@ export async function register(app, { prisma, requireTeam }) {
       if (!subscription) {
         return reply.status(400).send({ error: "no_subscription", message: "No active subscription." });
       }
+
       const planInfo = resolvePlanFromSubscription(subscription);
       if (!planInfo) {
         return reply
           .status(400)
           .send({ error: "invalid_subscription", message: "Plan item not found." });
       }
+
       if (planId === "free") {
         if (subscription.schedule?.id) {
           await releaseSchedule(subscription.schedule.id);
@@ -374,9 +276,11 @@ export async function register(app, { prisma, requireTeam }) {
           effectiveAt: updated.current_period_end,
         });
       }
+
       if (planId === planInfo.planId) {
         return reply.send({ status: "unchanged", planId });
       }
+
       const change = getPlanRank(planId) - getPlanRank(planInfo.planId);
       if (change > 0) {
         if (subscription.schedule?.id) {
@@ -394,21 +298,16 @@ export async function register(app, { prisma, requireTeam }) {
             metadata: { einstore_plan_id: planId },
           },
         });
-        await prisma.team.update({
-          where: { id: team.id },
-          data: {
-            stripeSubscriptionId: updated.id,
-            subscriptionStatus: updated.status,
-            billingPeriodStart: updated.current_period_start
-              ? new Date(updated.current_period_start * 1000)
-              : null,
-            billingPeriodEnd: updated.current_period_end
-              ? new Date(updated.current_period_end * 1000)
-              : null,
-          },
+        await syncTeamPlan({
+          prisma,
+          teamId: team.id,
+          planId,
+          subscription: updated,
+          customerId: team.stripeCustomerId,
         });
         return reply.send({ status: "upgraded", planId, effectiveAt: updated.current_period_start });
       }
+
       const schedule = await scheduleDowngrade({
         subscription,
         currentPriceId: planInfo.priceId,
@@ -423,18 +322,22 @@ export async function register(app, { prisma, requireTeam }) {
       reply.status(502).send({ error: "stripe_error", message: err.message });
     }
   });
+
   app.post("/billing/addon", { preHandler: requireTeam }, async (request, reply) => {
     const canProceed = await ensureAdmin(request, reply, requireTeam);
     if (!canProceed) return;
+
     const body = isObject(request.body) ? request.body : {};
     const enabled = Boolean(body.enabled);
     const successUrl = body.successUrl;
     const cancelUrl = body.cancelUrl;
+
     try {
       const team = request.team;
       if (!team.stripeCustomerId) {
         return reply.status(400).send({ error: "no_subscription", message: "No active subscription." });
       }
+
       const subscription = await getMainSubscription({
         team,
         prisma,
@@ -444,7 +347,11 @@ export async function register(app, { prisma, requireTeam }) {
       if (!planInfo) {
         return reply.status(400).send({ error: "no_plan", message: "Paid plan required." });
       }
-      const addOnSubscription = await getAddonSubscription(team.stripeCustomerId);
+
+      const addOnSubscription = await getAddonSubscription(
+        team.stripeCustomerId,
+        addOnCatalog["priority-support"].priceId,
+      );
       if (!enabled) {
         if (!addOnSubscription || addOnSubscription.status === "canceled") {
           return reply.send({ status: "not_active" });
@@ -459,6 +366,7 @@ export async function register(app, { prisma, requireTeam }) {
           effectiveAt: updated.current_period_end,
         });
       }
+
       if (addOnSubscription && addOnSubscription.status !== "canceled") {
         if (addOnSubscription.cancel_at_period_end) {
           await stripeRequest({
@@ -466,7 +374,6 @@ export async function register(app, { prisma, requireTeam }) {
             path: `/subscriptions/${addOnSubscription.id}`,
             params: { cancel_at_period_end: false },
           });
-          return reply.send({ status: "active" });
         }
         return reply.send({ status: "active" });
       }
@@ -475,6 +382,7 @@ export async function register(app, { prisma, requireTeam }) {
           .status(400)
           .send({ error: "invalid_redirect", message: "Missing success/cancel URLs." });
       }
+
       const session = await createCheckoutSession({
         customerId: team.stripeCustomerId,
         priceId: addOnCatalog["priority-support"].priceId,
@@ -486,10 +394,12 @@ export async function register(app, { prisma, requireTeam }) {
           einstore_addon_id: "priority-support",
         },
       });
+
       reply.send({ url: session.url, sessionId: session.id });
     } catch (err) {
       reply.status(502).send({ error: "stripe_error", message: err.message });
     }
   });
 }
+
 export default register;

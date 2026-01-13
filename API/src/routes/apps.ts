@@ -1,10 +1,14 @@
-import { FastifyInstance } from "fastify";
+import { FastifyInstance, FastifyReply } from "fastify";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { requireTeam } from "../auth/guard.js";
 import { broadcastBadgesUpdate } from "../lib/realtime.js";
 import { buildPaginationMeta, resolvePagination } from "../lib/pagination.js";
 import { PlatformKind } from "@prisma/client";
+
+type BillingGuard = {
+  assertCanCreateApp?: (payload: { teamId: string; userId?: string; identifier?: string }) => Promise<void>;
+};
 
 const createAppSchema = z.object({
   name: z.string().min(1),
@@ -19,7 +23,22 @@ const listQuerySchema = z.object({
   platform: z.nativeEnum(PlatformKind).optional(),
 });
 
+const sendBillingError = (reply: FastifyReply, error: unknown) => {
+  if (!error || typeof error !== "object" || !(error as { code?: string }).code) {
+    throw error;
+  }
+  const statusCode = typeof (error as { statusCode?: number }).statusCode === "number"
+    ? (error as { statusCode?: number }).statusCode
+    : 403;
+  return reply.status(statusCode).send({
+    error: (error as { code: string }).code,
+    message: (error as { message?: string }).message ?? "Plan limit reached.",
+  });
+};
+
 export async function appRoutes(app: FastifyInstance) {
+  const billingGuard = (app as { billingGuard?: BillingGuard }).billingGuard;
+
   app.post("/apps", { preHandler: requireTeam }, async (request, reply) => {
     const parsed = createAppSchema.safeParse(request.body);
     if (!parsed.success) {
@@ -28,6 +47,17 @@ export async function appRoutes(app: FastifyInstance) {
     const teamId = request.team?.id;
     if (!teamId) {
       return reply.status(403).send({ error: "team_required", message: "Team context required" });
+    }
+    if (billingGuard?.assertCanCreateApp) {
+      try {
+        await billingGuard.assertCanCreateApp({
+          teamId,
+          userId: request.auth?.user?.id,
+          identifier: parsed.data.identifier,
+        });
+      } catch (error) {
+        return sendBillingError(reply, error);
+      }
     }
     const created = await prisma.app.create({ data: { ...parsed.data, teamId } });
     await broadcastBadgesUpdate(teamId).catch(() => undefined);
