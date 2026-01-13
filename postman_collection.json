@@ -241,36 +241,6 @@
       }
     },
     {
-      "name": "Revoke API Key",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Revoke API key ok', function () {",
-              "  pm.expect([200, 404]).to.include(pm.response.code);",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{accessToken}}"
-          },
-          {
-            "key": "x-team-id",
-            "value": "{{teamId}}"
-          }
-        ],
-        "url": "{{baseUrl}}/api-keys/{{apiKeyId}}"
-      }
-    },
-    {
       "name": "Get Team",
       "event": [
         {
@@ -2656,6 +2626,36 @@
           }
         }
       ]
+    },
+    {
+      "name": "Revoke API Key",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Revoke API key ok', function () {",
+              "  pm.expect([200, 404]).to.include(pm.response.code);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api-keys/{{apiKeyId}}"
+      }
     },
     {
       "name": "Auth Password Reset Request",
