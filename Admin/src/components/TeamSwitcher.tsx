@@ -76,8 +76,12 @@ const TeamSwitcher = ({
                   />
                 </span>
               ) : (
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300">
-                  {initials}
+                <span className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200 dark:bg-slate-700 dark:ring-slate-600">
+                  <img
+                    src="/brand/einstore-icon-1024.png"
+                    alt=""
+                    className="h-full w-full object-cover grayscale"
+                  />
                 </span>
               )}
               <span className="text-sm font-medium">
@@ -126,8 +130,12 @@ const TeamSwitcher = ({
                           />
                         </span>
                       ) : (
-                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-600 dark:bg-slate-700 dark:text-slate-300">
-                          {teamInitials}
+                        <span className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200 dark:bg-slate-700 dark:ring-slate-600">
+                          <img
+                            src="/brand/einstore-icon-1024.png"
+                            alt=""
+                            className="h-full w-full object-cover grayscale"
+                          />
                         </span>
                       )}
                       {team.name}
