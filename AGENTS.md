@@ -40,6 +40,7 @@ postgresql://postgres@localhost:8102/einstore?schema=public
 - If something is unknown or might be outdated, say so explicitly rather than guessing.
 - Stay focused on the current request; ask before changing unrelated files or content.
 - Parallel/unrelated changes are expected; do not mention or ask about them.
+- A master Caddy runs locally in Docker for all projects and is always on; check that config first for local domain routing.
 - Never stage or commit files you didn’t edit.
 - If a required file already has unrelated changes, edit only what’s needed for the current request and leave everything else untouched.
 - Third-party libraries: use only the latest stable release (no beta) unless no stable release exists; libraries from `rafiki270` are allowed.
