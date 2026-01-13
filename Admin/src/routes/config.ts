@@ -57,7 +57,7 @@ export const pageConfig = {
   flags: {
     title: "Future flags",
     breadcrumbs: [{ label: "Governance" }, { label: "Future flags" }],
-    actions: [{ id: "create-flag", label: "Create flag", variant: "primary" }],
+    actions: [],
   },
   integrations: {
     title: "Integrations",
