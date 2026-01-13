@@ -96,7 +96,7 @@ const BillingRoute = () => {
   const [processingAddOn, setProcessingAddOn] = useState<AddOn["id"] | null>(null);
   const [selectedAddOn, setSelectedAddOn] = useState<AddOn["id"] | null>(null);
   const availability = useBillingAvailability();
-  const panelClass = "rounded-xl bg-white p-5 shadow-sm dark:bg-slate-800";
+
   const parsePrice = (value: string) => {
     const numeric = Number(value.replace(/[^0-9.]/g, ""));
     return Number.isFinite(numeric) ? numeric : 0;
@@ -126,171 +126,177 @@ const BillingRoute = () => {
     }, 700);
   };
 
-  const heroState =
-    availability === "unavailable"
-      ? "Billing module not detected. Running in open-source / self-hosted mode; all gates default to allowed."
-      : "Manage your Einstore subscription: upgrade, downgrade (move to Free to cancel), or adjust add-ons.";
+  const planGridStyle = useMemo(
+    () => ({
+      display: "grid",
+      gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+      gap: "1.5rem",
+    }),
+    [],
+  );
 
   return (
-    <div className="billing-page flex w-full flex-col gap-6 pb-12">
-      <header className={`${panelClass} flex flex-col gap-3`}>
-        {availability === "ready" && currentPlanMeta && (
-          <div className="flex flex-wrap items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
-            <span className="rounded-lg bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200">
-              Active plan
-            </span>
-            <strong>{currentPlanMeta.label}</strong>
-            <span className="text-slate-500 dark:text-slate-400">Renews monthly (simulated)</span>
-            <div className="ml-auto flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-              <span>Storage: 420 GB / 1 TB</span>
-              <span>•</span>
-              <span>Transfer: 1.2 TB / 5 TB</span>
-              <span>•</span>
-              <span>Seats: 18 / 25</span>
-            </div>
+    <div className="billing-page flex w-full flex-col gap-8 pb-12">
+      {availability === "ready" && currentPlanMeta && (
+        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200 bg-white/90 px-5 py-4 text-sm text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200">
+          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200">
+            Active plan
+          </span>
+          <strong>{currentPlanMeta.label}</strong>
+          <span className="text-slate-500 dark:text-slate-400">Renews monthly (simulated)</span>
+          <div className="ml-auto flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+            <span>Storage: 420 GB / 1 TB</span>
+            <span>-</span>
+            <span>Transfer: 1.2 TB / 5 TB</span>
+            <span>-</span>
+            <span>Seats: 18 / 25</span>
           </div>
-        )}
-      </header>
+        </div>
+      )}
 
-      <section className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="flex min-w-0 flex-col gap-6">
-          <div className={`${panelClass}`}>
-            <header className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                  Subscription
-                </p>
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">Choose your plan</h2>
-              </div>
-              <button
-                type="button"
-                className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-200 px-4 text-sm font-semibold text-slate-700 shadow-sm hover:border-slate-300 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 dark:border-slate-600 dark:text-slate-100 dark:hover:border-slate-500"
-                onClick={() => handleChangePlan(currentPlan)}
-                disabled={processingPlan !== null}
-              >
-                Refresh status
-              </button>
-            </header>
+      <section className="flex flex-col gap-6">
+        <header className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Subscription</p>
+            <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50">Choose your plan</h2>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              Pick the plan that matches your team today and upgrade anytime.
+            </p>
+          </div>
+          <button
+            type="button"
+            className="inline-flex h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-500"
+            onClick={() => handleChangePlan(currentPlan)}
+            disabled={processingPlan !== null}
+          >
+            Refresh status
+          </button>
+        </header>
 
-            <div className="mt-5">
-              <div className="grid w-full grid-cols-4 gap-4">
-                {plans.map((plan) => {
-                  const isCurrent = plan.id === currentPlan;
-                  const isProcessing = processingPlan === plan.id;
-                  return (
-                    <div
-                      key={plan.id}
-                      className={`relative flex h-full min-w-0 flex-col gap-3 rounded-xl border border-slate-200 p-4 shadow-sm transition hover:-translate-y-[1px] dark:border-slate-700 ${
-                        plan.featured
-                          ? "bg-indigo-50/70 dark:bg-indigo-900/20"
-                          : "bg-white/90 dark:bg-slate-900/70"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          {plan.featured ? (
-                            <span className="rounded-full bg-indigo-500/90 px-2 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
-                              Recommended
-                            </span>
-                          ) : (
-                            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
-                              {plan.label}
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-lg font-bold text-slate-900 dark:text-slate-50">
-                          {plan.price} / mo
-                        </div>
-                      </div>
-                      <p className="text-sm text-slate-600 dark:text-slate-300">{plan.description}</p>
-                      <ul className="grid gap-2 text-sm text-slate-600 dark:text-slate-300">
-                        {plan.perks.map((perk) => (
-                          <li key={perk} className="flex items-start gap-2">
-                            <span className="mt-1 inline-block h-2 w-2 rounded-full bg-cyan-400" />
-                            <span>{perk}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      <div className="mt-auto pt-2">
-                        <button
-                          type="button"
-                          onClick={() => handleChangePlan(plan.id)}
-                          disabled={isProcessing || isCurrent}
-                          className={`inline-flex h-11 w-full items-center justify-center rounded-lg px-4 text-sm font-semibold shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 disabled:opacity-60 ${
-                            isCurrent
-                              ? "border border-slate-300 bg-white text-slate-600 dark:border-slate-600 dark:bg-slate-950 dark:text-slate-300"
-                              : "bg-indigo-500 text-white hover:bg-indigo-400"
-                          }`}
-                        >
-                          {isProcessing
-                            ? "Working…"
-                            : isCurrent
-                              ? "Current plan"
-                              : plan.id === "free"
-                                ? "Move to Free"
-                                : "Select plan"}
-                        </button>
-                      </div>
+        <div style={planGridStyle}>
+          {plans.map((plan) => {
+            const isCurrent = plan.id === currentPlan;
+            const isProcessing = processingPlan === plan.id;
+            const wrapperClass = plan.featured
+              ? "rounded-[24px] bg-gradient-to-br from-indigo-400 via-sky-400 to-rose-400 p-[1px] shadow-lg"
+              : "rounded-[24px] border border-slate-200 shadow-sm dark:border-slate-700";
+            const innerClass = plan.featured
+              ? "rounded-[23px] bg-white/95 dark:bg-slate-900/85"
+              : "rounded-[23px] bg-white/95 dark:bg-slate-900/80";
+
+            return (
+              <div key={plan.id} className={wrapperClass}>
+                <div className={`${innerClass} flex h-full min-w-0 flex-col gap-4 p-5`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-lg font-semibold text-slate-900 dark:text-slate-50">{plan.label}</p>
+                      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{plan.description}</p>
                     </div>
-                  );
-                })}
+                    {plan.featured && (
+                      <span className="rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-200">
+                        Most popular
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-end gap-2">
+                    <span className="text-3xl font-semibold text-slate-900 dark:text-slate-50">{plan.price}</span>
+                    <span className="pb-1 text-xs text-slate-500 dark:text-slate-400">per month</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleChangePlan(plan.id)}
+                    disabled={isProcessing || isCurrent}
+                    className={`inline-flex h-11 w-full items-center justify-center rounded-full px-4 text-sm font-semibold shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 disabled:opacity-60 ${
+                      isCurrent
+                        ? "border border-slate-200 bg-slate-100 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                        : plan.featured
+                          ? "bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100"
+                          : "bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+                    }`}
+                  >
+                    {isProcessing
+                      ? "Working..."
+                      : isCurrent
+                        ? "Current plan"
+                        : plan.id === "free"
+                          ? "Move to Free"
+                          : "Select plan"}
+                  </button>
+
+                  <ul className="mt-auto grid gap-2 text-sm text-slate-600 dark:text-slate-300">
+                    {plan.perks.map((perk) => (
+                      <li key={perk} className="flex items-start gap-2">
+                        <svg
+                          className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-500"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M16.704 5.29a1 1 0 0 1 .006 1.415l-7.25 7.3a1 1 0 0 1-1.423-.008L3.29 9.24a1 1 0 1 1 1.42-1.408l4.01 4.04 6.54-6.58a1 1 0 0 1 1.444-.002Z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <span>{perk}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <section
+        className="grid gap-6"
+        style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) 320px", gap: "1.5rem" }}
+      >
+        <div className="rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Add-on</p>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">{addOns[0].label}</h3>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{addOns[0].description}</p>
             </div>
+            <span className="text-lg font-semibold text-slate-900 dark:text-slate-50">{addOns[0].price} / mo</span>
           </div>
 
-          <div className={`${panelClass}`}>
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-              Add-on
+          <ul className="mt-4 grid gap-2 text-sm text-slate-600 dark:text-slate-300">
+            {addOns[0].notes.map((note) => (
+              <li key={note} className="flex items-start gap-2">
+                <span className="mt-2 inline-block h-1.5 w-1.5 rounded-full bg-amber-400" />
+                <span>{note}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={() => handleToggleAddOn("priority-support")}
+              disabled={processingAddOn === "priority-support"}
+              className="inline-flex h-11 items-center justify-center rounded-full bg-indigo-500 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 disabled:opacity-60"
+            >
+              {processingAddOn === "priority-support"
+                ? "Updating..."
+                : selectedAddOn
+                  ? "Remove add-on"
+                  : "Add to plan"}
+            </button>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Billed monthly. Applies immediately on activation.
             </p>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Priority Support</h3>
-            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-              Add-on applies to any paid plan. Includes 1 day access to a developer per month, non-transferable.
-            </p>
-            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_180px]">
-              <div className="rounded-lg border border-slate-200 bg-slate-50/70 p-4 dark:border-slate-700 dark:bg-slate-900/50">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
-                      {addOns[0].label}
-                    </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">{addOns[0].description}</p>
-                  </div>
-                  <span className="text-sm font-bold text-slate-900 dark:text-slate-50">{addOns[0].price} / mo</span>
-                </div>
-                <ul className="mt-3 grid gap-2 text-xs text-slate-600 dark:text-slate-300">
-                  {addOns[0].notes.map((note) => (
-                    <li key={note} className="flex items-start gap-2">
-                      <span className="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-amber-400" />
-                      <span>{note}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="flex flex-col gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleToggleAddOn("priority-support")}
-                  disabled={processingAddOn === "priority-support"}
-                  className="inline-flex h-11 items-center justify-center rounded-lg bg-indigo-500 px-4 text-sm font-semibold text-white shadow hover:bg-indigo-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 disabled:opacity-60"
-                >
-                  {processingAddOn === "priority-support"
-                    ? "Updating…"
-                    : selectedAddOn
-                      ? "Remove add-on"
-                      : "Add to plan"}
-                </button>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Billed monthly. Applies immediately on activation.
-                </p>
-              </div>
-            </div>
           </div>
         </div>
 
-        <aside className={`${panelClass} flex h-fit flex-col gap-4`}>
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Basket</p>
+        <aside className="flex h-fit flex-col gap-4 rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Basket</p>
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Summary</h3>
-          <div className="mt-2 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
             <div className="flex items-center justify-between">
               <span>Plan</span>
               <span className="font-semibold">{currentPlanMeta?.label ?? "Free"}</span>
@@ -313,19 +319,19 @@ const BillingRoute = () => {
 
           <button
             type="button"
-            className="inline-flex h-11 items-center justify-center rounded-lg bg-indigo-500 px-4 text-sm font-semibold text-white shadow hover:bg-indigo-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40"
+            className="inline-flex h-11 items-center justify-center rounded-full bg-slate-900 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100"
           >
             Review & Confirm
           </button>
           <button
             type="button"
-            className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-200 px-4 text-sm font-semibold text-slate-700 shadow-sm hover:border-slate-300 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 dark:border-slate-600 dark:text-slate-200 dark:hover:border-slate-500"
+            className="inline-flex h-11 items-center justify-center rounded-full border border-slate-200 px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 dark:border-slate-600 dark:text-slate-200 dark:hover:border-slate-500"
             onClick={() => handleChangePlan("free")}
           >
             Cancel (move to Free)
           </button>
 
-          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
             Changes apply immediately in this preview. API enforcement happens server-side via Billing module.
           </div>
         </aside>
