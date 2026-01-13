@@ -37,7 +37,7 @@ const plans: Plan[] = [
   {
     id: "team",
     label: "Team",
-    price: "$45",
+    price: "$49",
     description: "Unlimited apps, 25 users, unlimited builds, 1 TB storage, 5 TB transfer.",
     perks: ["Hard 1 TB storage cap", "Transfer overages blocked gracefully", "Ideal for product teams"],
     featured: true,
