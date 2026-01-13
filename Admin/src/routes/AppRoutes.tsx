@@ -511,6 +511,8 @@ const AppRoutes = () => {
           throw toError("INGEST-PRESIGN", err instanceof Error ? err.message : "Could not create upload link");
         });
 
+        alert(`Upload headers: ${JSON.stringify(presign.headers ?? {})}`);
+
         try {
           await putToSpacesXHR({
             url: presign.uploadUrl,
