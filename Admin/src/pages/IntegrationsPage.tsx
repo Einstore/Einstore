@@ -140,12 +140,6 @@ const IntegrationsPage = ({ teams, activeTeamId }: IntegrationsPageProps) => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-lg font-semibold text-slate-900">Integrations</h2>
-        <p className="text-sm text-slate-500">
-          Generate API keys and copy a ready-to-run CI script for build uploads.
-        </p>
-      </div>
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
         <div className="space-y-6">
           <Panel className="space-y-4">
