@@ -152,6 +152,49 @@ test:
 	@if [ "$(firstword $(MAKECMDGOALS))" = "migrate" ] && [ "$(MIGRATE_MODE)" = "test" ]; then \
 		echo "Skipping API test suite (triggered via 'make migrate test')."; \
 	else \
+		BASE_URL="$${DATABASE_URL:-}"; \
+		if [ -z "$$BASE_URL" ] && [ -f API/.env ]; then \
+			BASE_LINE=$$(grep -E '^DATABASE_URL=' API/.env | tail -n 1); \
+			if [ -n "$$BASE_LINE" ]; then \
+				BASE_URL=$${BASE_LINE#DATABASE_URL=}; \
+				BASE_URL=$${BASE_URL#\"}; \
+				BASE_URL=$${BASE_URL%\"}; \
+			fi; \
+		fi; \
+		if [ -z "$$BASE_URL" ]; then \
+			BASE_URL="postgresql://postgres@localhost:8102/einstore?schema=public"; \
+		fi; \
+		if ! command -v python3 >/dev/null 2>&1; then \
+			echo "python3 is required to compute test DATABASE_URL." >&2; \
+			exit 1; \
+		fi; \
+		TMP_FILE=$$(mktemp); \
+		TMP_SCRIPT=$$(mktemp).py; \
+		printf '%s\n' \
+			"import os" \
+			"from urllib.parse import urlparse, urlunparse" \
+			"" \
+			"base = os.environ.get('BASE_URL')" \
+			"target = os.environ.get('TARGET_DB')" \
+			"if not base:" \
+			"    raise SystemExit('DATABASE_URL is not defined; set it in the environment or API/.env')" \
+			"parsed = urlparse(base)" \
+			"if not parsed.scheme or not parsed.netloc:" \
+			"    raise SystemExit(f'Invalid DATABASE_URL: {base}')" \
+			"test_uri = parsed._replace(path='/' + target)" \
+			"print(urlunparse(test_uri))" \
+			> "$$TMP_SCRIPT"; \
+		if ! BASE_URL="$$BASE_URL" TARGET_DB="einstore-test" python3 "$$TMP_SCRIPT" >"$$TMP_FILE" 2>&1; then \
+			cat "$$TMP_FILE" >&2; \
+			rm -f "$$TMP_FILE" "$$TMP_SCRIPT"; \
+			exit 1; \
+		fi; \
+		TEST_URL=$$(cat "$$TMP_FILE"); \
+		rm -f "$$TMP_FILE" "$$TMP_SCRIPT"; \
+		if [ -z "$$TEST_URL" ]; then \
+			echo "Failed to derive test DATABASE_URL from $$BASE_URL" >&2; \
+			exit 1; \
+		fi; \
 		npm --prefix Libraries/teams install; \
 		npm --prefix Libraries/teams run build; \
 		npm --prefix API run test:unit; \
@@ -163,7 +206,7 @@ test:
 		AUTH_JWT_AUDIENCE=einstore-api \
 		AUTH_REFRESH_TTL_DAYS=30 \
 		AUTH_ACCESS_TTL_MINUTES=15 \
-		DATABASE_URL="postgresql://postgres@localhost:8102/einstore-test?schema=public" \
+		DATABASE_URL="$$TEST_URL" \
 		NODE_ENV=test \
 		npm --prefix API run prisma:deploy; \
 		PORT=8103 \
@@ -172,7 +215,7 @@ test:
 		AUTH_JWT_AUDIENCE=einstore-api \
 		AUTH_REFRESH_TTL_DAYS=30 \
 		AUTH_ACCESS_TTL_MINUTES=15 \
-		DATABASE_URL="postgresql://postgres@localhost:8102/einstore-test?schema=public" \
+		DATABASE_URL="$$TEST_URL" \
 		NODE_ENV=test \
 		node API/dist/index.js > /tmp/einstore-api-test.log 2>&1 & \
 		PID=$$!; \
