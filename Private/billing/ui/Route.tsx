@@ -179,7 +179,7 @@ const BillingRoute = () => {
               </button>
             </header>
 
-            <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-4">
               {plans.map((plan) => {
                 const isCurrent = plan.id === currentPlan;
                 const isProcessing = processingPlan === plan.id;
