@@ -579,7 +579,7 @@ const AppRoutes = () => {
         if (payload?.itmsServicesUrl) {
           window.location.href = payload.itmsServicesUrl;
         } else if (payload?.downloadUrl) {
-          window.open(payload.downloadUrl, "_blank", "noopener,noreferrer");
+          window.location.assign(payload.downloadUrl);
         }
       } catch {
         // ignore errors
@@ -599,7 +599,7 @@ const AppRoutes = () => {
           }
         );
         if (payload?.downloadUrl) {
-          window.open(payload.downloadUrl, "_blank", "noopener,noreferrer");
+          window.location.assign(payload.downloadUrl);
         }
       } catch {
         // ignore errors
@@ -930,7 +930,7 @@ const BuildDetailRoute = ({
         if (payload?.itmsServicesUrl) {
           window.location.href = payload.itmsServicesUrl;
         } else if (payload?.downloadUrl) {
-          window.open(payload.downloadUrl, "_blank", "noopener,noreferrer");
+          window.location.assign(payload.downloadUrl);
         }
       } catch {
         // ignore install errors for now
@@ -947,7 +947,7 @@ const BuildDetailRoute = ({
           headers: { "x-team-id": activeTeamId },
         });
         if (payload?.downloadUrl) {
-          window.open(payload.downloadUrl, "_blank", "noopener,noreferrer");
+          window.location.assign(payload.downloadUrl);
         }
       } catch {
         // ignore download errors for now
@@ -1330,7 +1330,7 @@ const LatestBuildsRoute = ({
         if (payload?.itmsServicesUrl) {
           window.location.href = payload.itmsServicesUrl;
         } else if (payload?.downloadUrl) {
-          window.open(payload.downloadUrl, "_blank", "noopener,noreferrer");
+          window.location.assign(payload.downloadUrl);
         }
       } catch {
         // ignore install errors for now
@@ -1350,7 +1350,7 @@ const LatestBuildsRoute = ({
           }
         );
         if (payload?.downloadUrl) {
-          window.open(payload.downloadUrl, "_blank", "noopener,noreferrer");
+          window.location.assign(payload.downloadUrl);
         }
       } catch {
         // ignore download errors for now
@@ -1419,7 +1419,7 @@ const AppBuildsRoute = ({
           return;
         }
         if (payload?.downloadUrl) {
-          window.open(payload.downloadUrl, "_blank", "noopener,noreferrer");
+          window.location.assign(payload.downloadUrl);
         }
       } catch {
         // ignore install errors in this context
@@ -1439,7 +1439,7 @@ const AppBuildsRoute = ({
           }
         );
         if (payload?.downloadUrl) {
-          window.open(payload.downloadUrl, "_blank", "noopener,noreferrer");
+          window.location.assign(payload.downloadUrl);
         }
       } catch {
         // ignore download errors in this context

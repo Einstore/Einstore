@@ -1,6 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { z } from "zod";
 import fs from "node:fs";
+import path from "node:path";
 import { prisma } from "../lib/prisma.js";
 import { requireTeam } from "../auth/guard.js";
 import { generateInstallToken, verifyInstallToken } from "../lib/install-links.js";
@@ -25,6 +26,34 @@ const xmlEscape = (value: string) =>
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;");
+
+const sanitizeFileFragment = (value: string, fallback: string, allowDots = false) => {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return fallback;
+  }
+  const pattern = allowDots ? /[^a-z0-9.]+/gi : /[^a-z0-9]+/gi;
+  const cleaned = trimmed.toLowerCase().replace(pattern, "-").replace(/(^-|-$)/g, "");
+  return cleaned || fallback;
+};
+
+const resolveDownloadFilename = (build: {
+  buildNumber: string;
+  storagePath: string;
+  version: { version: string; app: { name: string } };
+}) => {
+  const appName = sanitizeFileFragment(build.version.app.name ?? "", "app");
+  const version = sanitizeFileFragment(build.version.version ?? "", "0", true);
+  const buildNumber = sanitizeFileFragment(build.buildNumber ?? "", "0", true);
+  const ext = path.extname(build.storagePath).replace(".", "");
+  const safeExt = ext ? ext.toLowerCase() : "bin";
+  return `${appName}_v${version}_${buildNumber}.${safeExt}`;
+};
+
+const buildContentDisposition = (filename: string) => {
+  const safe = filename.replace(/"/g, "");
+  return `attachment; filename="${safe}"`;
+};
 
 const resolveBaseUrl = (request: { headers: Record<string, string | string[] | undefined> }) => {
   if (config.INSTALL_BASE_URL) {
@@ -158,6 +187,7 @@ export async function iosInstallRoutes(app: FastifyInstance) {
     );
     let downloadUrl = `${baseUrl}/builds/${build.id}/ios/download?token=${downloadToken}`;
     if (build.storageKind === "s3") {
+      const filename = resolveDownloadFilename(build);
       await prisma.buildEvent.create({
         data: {
           buildId: build.id,
@@ -179,6 +209,7 @@ export async function iosInstallRoutes(app: FastifyInstance) {
         bucket,
         key: build.storagePath,
         expiresIn: INSTALL_TTL_SECONDS,
+        responseContentDisposition: buildContentDisposition(filename),
       });
     }
 
@@ -226,6 +257,7 @@ export async function iosInstallRoutes(app: FastifyInstance) {
       },
     });
 
+    const filename = resolveDownloadFilename(build);
     if (build.storageKind === "s3") {
       const bucket = process.env.SPACES_BUCKET;
       if (!bucket) {
@@ -235,6 +267,7 @@ export async function iosInstallRoutes(app: FastifyInstance) {
         bucket,
         key: build.storagePath,
         expiresIn: INSTALL_TTL_SECONDS,
+        responseContentDisposition: buildContentDisposition(filename),
       });
       return reply.redirect(signedUrl);
     }
@@ -243,6 +276,7 @@ export async function iosInstallRoutes(app: FastifyInstance) {
       return reply.status(404).send({ error: "file_not_found" });
     }
     reply.header("Content-Type", "application/octet-stream");
+    reply.header("Content-Disposition", buildContentDisposition(filename));
     return reply.send(fs.createReadStream(build.storagePath));
   });
 

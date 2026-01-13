@@ -5,6 +5,7 @@ type PresignInput = {
   bucket: string;
   key: string;
   expiresIn: number;
+  responseContentDisposition?: string;
 };
 
 export const resolveS3Client = () => {
@@ -25,12 +26,21 @@ export const resolveS3Client = () => {
   });
 };
 
-export const presignStorageObject = async ({ bucket, key, expiresIn }: PresignInput) => {
+export const presignStorageObject = async ({
+  bucket,
+  key,
+  expiresIn,
+  responseContentDisposition,
+}: PresignInput) => {
   const client = resolveS3Client();
   if (!client) {
     throw new Error("S3 credentials not configured");
   }
-  const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+  const command = new GetObjectCommand({
+    Bucket: bucket,
+    Key: key,
+    ...(responseContentDisposition ? { ResponseContentDisposition: responseContentDisposition } : {}),
+  });
   return getSignedUrl(client, command, { expiresIn });
 };
 
