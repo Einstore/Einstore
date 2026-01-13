@@ -7,7 +7,10 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.758.0",
     "@devicefarmer/adbkit-apkreader": "^3.2.4",
+    "cgbi": "^1.0.2",
     "plist": "^3.1.0",
+    "png-validator": "^2.0.0",
+    "sharp": "^0.34.5",
     "yauzl": "^2.10.0"
   }
 }

@@ -3,6 +3,8 @@ const yauzl = require("yauzl");
 const plist = require("plist");
 const ManifestParser = require("@devicefarmer/adbkit-apkreader/lib/apkreader/parser/manifest");
 const { PassThrough } = require("stream");
+const sharp = require("sharp");
+const { convert: convertCgbi, isCgbiPng } = require("cgbi");
 
 const REQUIRED_ENV = ["SPACES_ENDPOINT", "SPACES_REGION", "SPACES_KEY", "SPACES_SECRET", "SPACES_BUCKET"];
 
@@ -15,6 +17,54 @@ const readPngDimensions = (buffer) => {
   const height = buffer.readUInt32BE(20);
   if (!width || !height) return null;
   return { width, height };
+};
+
+let pngValidatorPromise = null;
+
+const getPngValidator = async () => {
+  if (!pngValidatorPromise) {
+    pngValidatorPromise = import("png-validator")
+      .then((mod) => mod.pngValidator || mod.default || mod)
+      .catch((error) => {
+        console.warn("Failed to load png-validator.", error);
+        return null;
+      });
+  }
+  return pngValidatorPromise;
+};
+
+const normalizeIosIconPng = async (buffer) => {
+  let working = buffer;
+
+  if (isCgbiPng(buffer)) {
+    try {
+      working = Buffer.from(convertCgbi(buffer));
+    } catch (error) {
+      console.warn("CgBI conversion failed, using raw icon PNG.", error);
+      working = buffer;
+    }
+  }
+
+  try {
+    working = await sharp(working)
+      .ensureAlpha()
+      .toColorspace("srgb")
+      .png({ force: true })
+      .toBuffer();
+  } catch (error) {
+    console.warn("PNG normalization failed, using existing icon PNG.", error);
+  }
+
+  const pngValidator = await getPngValidator();
+  if (pngValidator) {
+    try {
+      pngValidator(working);
+    } catch (error) {
+      console.warn("PNG validation reported issues.", error);
+    }
+  }
+
+  return working;
 };
 
 class S3RandomAccessReader extends yauzl.RandomAccessReader {
@@ -242,8 +292,10 @@ exports.main = async (args) => {
     const icon = await extractBestIcon(zipfile, entryNames, mainTarget.root);
     let iconPath = null;
     if (icon) {
-      const iconKey = `extracted/${key}/icon-${icon.width}x${icon.height}.png`;
-      iconPath = await uploadToSpaces(client, bucket, iconKey, icon.buffer, "image/png");
+      const normalized = await normalizeIosIconPng(icon.buffer);
+      const dimensions = readPngDimensions(normalized) || { width: icon.width, height: icon.height };
+      const iconKey = `extracted/${key}/icon-${dimensions.width}x${dimensions.height}.png`;
+      iconPath = await uploadToSpaces(client, bucket, iconKey, normalized, "image/png");
     }
     return {
       ok: true,

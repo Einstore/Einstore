@@ -39,6 +39,7 @@ This document describes the upload and processing flow for IPA/APK/AAB files, op
   - `Payload/<App>.app/Assets.car` (icons)
 - Parse Info.plist files for identifiers, names, versions, orientations, device families.
 - Extract icons by reading only needed PNGs or by extracting from Assets.car (range-read Assets.car, then decode in the Function).
+- Normalize extracted icon PNGs (revert CgBI optimizations, force sRGB + alpha, strip metadata, validate PNG integrity) before upload.
 
 ### APK (Android)
 - Read these entries via range requests:
