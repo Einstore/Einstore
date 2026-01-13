@@ -23,11 +23,7 @@ export const pageConfig = {
   overview: {
     title: "Release operations",
     breadcrumbs: [{ label: "Home" }, { label: "Overview" }],
-    actions: [
-      { id: "new-release", label: "New release" },
-      { id: "invite-team", label: "Invite team" },
-      { id: "audit-policies", label: "Audit policies" },
-    ],
+    actions: [{ id: "upload-build", label: "Upload build", variant: "primary" }],
   },
   apps: {
     title: "Apps",
@@ -47,7 +43,7 @@ export const pageConfig = {
   search: {
     title: "Search builds",
     breadcrumbs: [{ label: "Search" }],
-    actions: [],
+    actions: [{ id: "upload-build", label: "Upload build", variant: "primary" }],
   },
   "accept-invite": {
     title: "Accept invitation",
