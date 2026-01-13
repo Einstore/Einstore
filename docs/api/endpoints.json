@@ -1722,6 +1722,13 @@
             }
           },
           {
+            "in": "query",
+            "name": "buildId",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "$ref": "#/components/parameters/TeamIdHeader"
           }
         ],

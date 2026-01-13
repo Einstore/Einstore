@@ -48,6 +48,48 @@ type BuildDetailPageProps = {
 
 const formatKind = (kind: string) => kind.replace(/_/g, " ");
 
+const readCookie = (key: string) => {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie
+    .split("; ")
+    .find((item) => item.startsWith(`${encodeURIComponent(key)}=`));
+  if (!match) return null;
+  return decodeURIComponent(match.split("=")[1] ?? "");
+};
+
+const writeCookie = (key: string, value: string) => {
+  if (typeof document === "undefined") return;
+  document.cookie = `${encodeURIComponent(key)}=${encodeURIComponent(
+    value
+  )}; Path=/; Max-Age=31536000; SameSite=Lax`;
+};
+
+const resolveDeviceLabel = (userAgent?: string | null) => {
+  const ua = (userAgent ?? "").toLowerCase();
+  if (!ua) return "Unknown device";
+  if (ua.includes("iphone") || ua.includes("ipod")) return "iPhone";
+  if (ua.includes("ipad")) return "iPad";
+  if (ua.includes("android")) return ua.includes("mobile") ? "Android" : "Android tablet";
+  if (ua.includes("macintosh") || ua.includes("mac os")) return "Mac";
+  if (ua.includes("windows")) return "PC";
+  if (ua.includes("linux")) return "PC";
+  return "Unknown device";
+};
+
+const tagPaletteClasses: Record<string, string> = {
+  bug: "bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-200",
+  ok: "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-200",
+  preview: "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-200",
+  tested: "bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-200",
+  "needs testing": "bg-slate-200 text-slate-700 dark:bg-slate-600 dark:text-slate-100",
+};
+
+const tagPaletteOrder = ["bug", "ok", "preview", "tested", "needs testing"];
+
+const getTagClassName = (tag: string) =>
+  tagPaletteClasses[tag.toLowerCase()] ??
+  "bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-100";
+
 const renderMetadataRows = (metadata: unknown) => {
   if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) return null;
   const entries = Object.entries(metadata as Record<string, unknown>);
@@ -172,7 +214,21 @@ const BuildDetailPage = ({
   const [isDownloadsOpen, setIsDownloadsOpen] = useState(false);
   const [isTargetsOpen, setIsTargetsOpen] = useState(false);
   const [isArtifactsOpen, setIsArtifactsOpen] = useState(false);
+  const [isTagPaletteOpen, setIsTagPaletteOpen] = useState(false);
   const [tagAlert, setTagAlert] = useState<string | null>(null);
+
+  const cookiePrefix = build?.id ? `build-detail:${build.id}:` : "build-detail:default:";
+
+  useEffect(() => {
+    const downloads = readCookie(`${cookiePrefix}downloads`);
+    const targets = readCookie(`${cookiePrefix}targets`);
+    const artifacts = readCookie(`${cookiePrefix}artifacts`);
+    const palette = readCookie(`${cookiePrefix}tagPalette`);
+    setIsDownloadsOpen(downloads === "1");
+    setIsTargetsOpen(targets === "1");
+    setIsArtifactsOpen(artifacts === "1");
+    setIsTagPaletteOpen(palette === "1");
+  }, [cookiePrefix]);
 
   useEffect(() => {
     setTagDraft(tags.map((tag) => tag.name));
@@ -425,11 +481,12 @@ const BuildDetailPage = ({
                       Make preview
                     </button>
                   </div>
-                  <TagInput
-                    value={tagDraft}
-                    onChange={async (next) => {
-                      setTagDraft(next);
-                      try {
+                    <TagInput
+                      value={tagDraft}
+                      getTagClassName={getTagClassName}
+                      onChange={async (next) => {
+                        setTagDraft(next);
+                        try {
                         await onChangeTags?.(next);
                         setTagAlert("Tags saved");
                         setTimeout(() => setTagAlert(null), 2000);
@@ -441,34 +498,45 @@ const BuildDetailPage = ({
                     suggestions={availableTags.map((tag) => tag.name)}
                     placeholder="Add a tag (e.g. release, beta, hotfix)"
                   />
-                  <details className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm dark:border-slate-700 dark:bg-slate-800/60">
+                  <details
+                    open={isTagPaletteOpen}
+                    onToggle={(event) => {
+                      const open = event.currentTarget.open;
+                      setIsTagPaletteOpen(open);
+                      writeCookie(`${cookiePrefix}tagPalette`, open ? "1" : "0");
+                    }}
+                    className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm dark:border-slate-700 dark:bg-slate-800/60"
+                  >
                     <summary className="cursor-pointer text-sm font-semibold text-slate-700 dark:text-slate-200">
                       Tag palette
                     </summary>
                     <div className="mt-3 flex flex-wrap gap-2">
-                      {[
-                        { name: "bug", className: "bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-200" },
-                        { name: "ok", className: "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-200" },
-                        { name: "preview", className: "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-200" },
-                        { name: "tested", className: "bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-200" },
-                        { name: "needs testing", className: "bg-slate-200 text-slate-700 dark:bg-slate-600 dark:text-slate-100" },
-                      ].map((item) => (
+                      {tagPaletteOrder.map((name) => (
                         <button
-                          key={item.name}
+                          key={name}
                           type="button"
-                          className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${item.className}`}
+                          className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${tagPaletteClasses[name]}`}
                           onClick={() => {
-                            const next = Array.from(new Set([...tagDraft, item.name]));
+                            const next = Array.from(new Set([...tagDraft, name]));
                             setTagDraft(next);
                             onChangeTags?.(next);
                           }}
                         >
-                          {item.name}
+                          {name}
                         </button>
                       ))}
                     </div>
                   </details>
                 </Panel>
+
+                <CommentsPanel
+                  comments={comments}
+                  currentUserId={currentUserId}
+                  onSubmit={onSubmitComment}
+                  isSubmitting={isCommentSubmitting}
+                  isLoading={isCommentsLoading}
+                  error={commentsError || undefined}
+                />
               </div>
 
               <div className="col-span-12 space-y-6 md:col-span-6">
@@ -478,7 +546,13 @@ const BuildDetailPage = ({
                     <button
                       type="button"
                       className="text-xs font-semibold text-indigo-600 transition-colors hover:text-indigo-500 dark:text-indigo-300"
-                      onClick={() => setIsDownloadsOpen((current) => !current)}
+                      onClick={() => {
+                        setIsDownloadsOpen((current) => {
+                          const next = !current;
+                          writeCookie(`${cookiePrefix}downloads`, next ? "1" : "0");
+                          return next;
+                        });
+                      }}
                     >
                       {isDownloadsOpen ? "Collapse" : "Expand"}
                     </button>
@@ -498,6 +572,9 @@ const BuildDetailPage = ({
                               event.user?.username ||
                               event.user?.email ||
                               "Unknown user";
+                            const deviceLabel = resolveDeviceLabel(event.userAgent);
+                            const actionLabel =
+                              event.kind === "install" ? "Install" : "Download";
                             return (
                               <div
                                 key={event.id}
@@ -508,7 +585,7 @@ const BuildDetailPage = ({
                                 <div className="space-y-1">
                                   <p className="font-semibold text-slate-900 dark:text-slate-100">{user}</p>
                                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                                    {event.userAgent || "Download"}
+                                    {actionLabel} • {deviceLabel}
                                   </p>
                                 </div>
                                 <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -531,22 +608,19 @@ const BuildDetailPage = ({
                   ) : null}
                 </Panel>
 
-                <CommentsPanel
-                  comments={comments}
-                  currentUserId={currentUserId}
-                  onSubmit={onSubmitComment}
-                  isSubmitting={isCommentSubmitting}
-                  isLoading={isCommentsLoading}
-                  error={commentsError || undefined}
-                />
-
                 <Panel className="space-y-4">
                   <div className="flex items-center justify-between">
                     <SectionHeader title="Targets" />
                     <button
                       type="button"
                       className="text-xs font-semibold text-indigo-600 transition-colors hover:text-indigo-500 dark:text-indigo-300"
-                      onClick={() => setIsTargetsOpen((current) => !current)}
+                      onClick={() => {
+                        setIsTargetsOpen((current) => {
+                          const next = !current;
+                          writeCookie(`${cookiePrefix}targets`, next ? "1" : "0");
+                          return next;
+                        });
+                      }}
                     >
                       {isTargetsOpen ? "Collapse" : "Expand"}
                     </button>
@@ -594,7 +668,13 @@ const BuildDetailPage = ({
                     <button
                       type="button"
                       className="text-xs font-semibold text-indigo-600 transition-colors hover:text-indigo-500 dark:text-indigo-300"
-                      onClick={() => setIsArtifactsOpen((current) => !current)}
+                      onClick={() => {
+                        setIsArtifactsOpen((current) => {
+                          const next = !current;
+                          writeCookie(`${cookiePrefix}artifacts`, next ? "1" : "0");
+                          return next;
+                        });
+                      }}
                     >
                       {isArtifactsOpen ? "Collapse" : "Expand"}
                     </button>

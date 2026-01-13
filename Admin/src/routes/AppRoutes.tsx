@@ -1082,8 +1082,12 @@ const BuildDetailRoute = ({
         perPage: String(downloadMeta.perPage),
       });
       try {
+        params.set("kinds", "download,install");
+        if (buildId) {
+          params.set("buildId", buildId);
+        }
         const payload = await apiFetch<PaginatedResponse<ApiBuildEvent>>(
-          `/builds/${buildId}/downloads?${params.toString()}`,
+          `/builds/events?${params.toString()}`,
           {
             headers: { "x-team-id": activeTeamId },
           }

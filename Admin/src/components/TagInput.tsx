@@ -7,11 +7,19 @@ type TagInputProps = {
   suggestions?: string[];
   placeholder?: string;
   disabled?: boolean;
+  getTagClassName?: (tag: string) => string;
 };
 
 const cleanTag = (value: string) => value.trim().replace(/\s+/g, " ").toLowerCase();
 
-const TagInput = ({ value, onChange, suggestions = [], placeholder, disabled }: TagInputProps) => {
+const TagInput = ({
+  value,
+  onChange,
+  suggestions = [],
+  placeholder,
+  disabled,
+  getTagClassName,
+}: TagInputProps) => {
   const [input, setInput] = useState("");
 
   const normalized = useMemo(() => value.map((tag) => tag.toLowerCase()), [value]);
@@ -46,7 +54,11 @@ const TagInput = ({ value, onChange, suggestions = [], placeholder, disabled }: 
         {value.map((tag) => (
           <span
             key={tag}
-            className="group inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-100"
+            className={`group inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
+              getTagClassName
+                ? getTagClassName(tag)
+                : "bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-100"
+            }`}
           >
             {tag}
             <button
