@@ -195,7 +195,7 @@ const BillingRoute = () => {
                   className={`inline-flex h-11 w-full items-center justify-center rounded-full px-4 text-sm font-semibold shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 disabled:opacity-60 ${
                     isCurrent
                       ? "border border-emerald-500 bg-emerald-500 text-white hover:bg-emerald-500 disabled:opacity-100 disabled:cursor-default dark:border-emerald-500 dark:bg-emerald-500 dark:text-white"
-                      : "bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+                      : "bg-indigo-500 text-white hover:bg-indigo-400 dark:bg-indigo-500 dark:text-white dark:hover:bg-indigo-400"
                   }`}
                 >
                   {isProcessing
