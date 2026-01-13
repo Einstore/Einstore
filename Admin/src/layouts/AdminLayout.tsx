@@ -142,7 +142,7 @@ const AdminLayout = ({
         isOpen={isAddAppOpen}
         onClose={() => setIsAddAppOpen(false)}
         onUpload={onUpload}
-        debugInfo={uploadDebugInfo}
+        debugInfo={showUploadDebug ? uploadDebugInfo : undefined}
       />
       <AcceptInviteDialog
         isOpen={isAcceptInviteOpen}
