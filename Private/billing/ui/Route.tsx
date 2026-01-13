@@ -144,14 +144,7 @@ const BillingRoute = () => {
       )}
 
       <section className="flex flex-col gap-6">
-        <header className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Subscription</p>
-            <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50">Choose your plan</h2>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-              Pick the plan that matches your team today and upgrade anytime.
-            </p>
-          </div>
+        <header className="flex justify-end">
           <button
             type="button"
             className="inline-flex h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-500"
