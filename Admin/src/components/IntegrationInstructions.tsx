@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 
 import CodeBlock from "./CodeBlock";
 import Tabs from "./Tabs";
+import { useAlerts } from "../lib/alerts";
 
 type IntegrationInstructionsProps = {
   apiBaseUrl: string;
@@ -17,6 +18,7 @@ const IntegrationInstructions = ({
   selectedKeyName,
 }: IntegrationInstructionsProps) => {
   const [activeTab, setActiveTab] = useState("github-actions");
+  const { pushAlert } = useAlerts();
 
   const tokenValue = apiKeyToken || "YOUR_API_KEY";
   const fileValue = "/path/to/app.ipa";
@@ -61,7 +63,12 @@ curl -fsSL ${scriptUrl} | bash`,
           <p className="text-sm text-slate-600 dark:text-slate-300">
             Store the API key as a secret named <span className="font-semibold">EINSTORE_API_KEY</span>.
           </p>
-          <CodeBlock code={githubActionsSnippet} />
+          <CodeBlock
+            code={githubActionsSnippet}
+            onCopy={() =>
+              pushAlert({ kind: "ok", message: "GitHub Actions snippet copied." })
+            }
+          />
         </div>
       ),
     },
@@ -73,7 +80,10 @@ curl -fsSL ${scriptUrl} | bash`,
           <p className="text-sm text-slate-600 dark:text-slate-300">
             Export the required environment variables, then run the script.
           </p>
-          <CodeBlock code={genericSnippet} />
+          <CodeBlock
+            code={genericSnippet}
+            onCopy={() => pushAlert({ kind: "ok", message: "CI snippet copied." })}
+          />
         </div>
       ),
     },
@@ -103,7 +113,10 @@ curl -fsSL ${scriptUrl} | bash`,
         <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
           Quick command
         </p>
-        <CodeBlock code={command} />
+        <CodeBlock
+          code={command}
+          onCopy={() => pushAlert({ kind: "ok", message: "Command copied." })}
+        />
       </div>
       <Tabs items={tabs} activeId={activeTab} onChange={setActiveTab} />
       <p className="text-xs text-slate-500 dark:text-slate-400">

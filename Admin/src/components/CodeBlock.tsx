@@ -1,12 +1,14 @@
 type CodeBlockProps = {
   code: string;
   className?: string;
+  onCopy?: () => void;
 };
 
-const CodeBlock = ({ code, className = "" }: CodeBlockProps) => {
+const CodeBlock = ({ code, className = "", onCopy }: CodeBlockProps) => {
   const handleCopy = async () => {
     try {
       await navigator.clipboard?.writeText(code);
+      onCopy?.();
     } catch {
       // Ignore copy failures (permissions, unsupported browsers).
     }
