@@ -1,7 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
 
-import { ApiKeysPanel } from "@rafiki270/api-keys/admin";
-
 import ActionButton from "../components/ActionButton";
 import Panel from "../components/Panel";
 import SectionHeader from "../components/SectionHeader";
@@ -50,12 +48,6 @@ const SettingsPage = ({
     [teams, activeTeamId]
   );
   const hasTeam = Boolean(activeTeam);
-
-  useEffect(() => {
-    if (initialTab && initialTab !== activeTab) {
-      setActiveTab(initialTab);
-    }
-  }, [activeTab, initialTab]);
 
   useEffect(() => {
     if (!isSuperUser) {
@@ -233,25 +225,6 @@ const SettingsPage = ({
         </Panel>
       ),
     },
-    {
-      id: "api-keys",
-      label: "API keys",
-      content: hasTeam ? (
-        <div className="space-y-4 api-keys-page">
-          <SectionHeader
-            title="API keys"
-            description="Create keys for CI uploads. Keys are shown only once."
-          />
-          <ApiKeysPanel apiFetch={apiFetch} teamId={activeTeam?.id ?? ""} />
-        </div>
-      ) : (
-        <Panel>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Create a team to manage API keys.
-          </p>
-        </Panel>
-      ),
-    },
   ];
 
   if (isSuperUser) {
@@ -316,6 +289,22 @@ const SettingsPage = ({
       ),
     });
   }
+
+  useEffect(() => {
+    if (
+      initialTab &&
+      initialTab !== activeTab &&
+      tabs.some((tab) => tab.id === initialTab)
+    ) {
+      setActiveTab(initialTab);
+    }
+  }, [activeTab, initialTab, tabs]);
+
+  useEffect(() => {
+    if (!tabs.some((tab) => tab.id === activeTab)) {
+      setActiveTab(tabs[0]?.id ?? "team");
+    }
+  }, [activeTab, tabs]);
 
   return (
     <div className="space-y-6">
