@@ -134,13 +134,6 @@ const BillingRoute = () => {
   return (
     <div className="billing-page flex w-full flex-col gap-6 pb-12">
       <header className={`${panelClass} flex flex-col gap-3`}>
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
-            {availability === "ready" ? "Billing module active" : "Billing module optional"}
-          </span>
-          <h1 className="text-3xl font-semibold text-slate-900 dark:text-slate-50">Billing</h1>
-        </div>
-        <p className="max-w-4xl text-sm text-slate-600 dark:text-slate-400">{heroState}</p>
         {availability === "ready" && currentPlanMeta && (
           <div className="flex flex-wrap items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
             <span className="rounded-lg bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200">
