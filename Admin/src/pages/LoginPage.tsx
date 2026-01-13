@@ -91,7 +91,7 @@ const LoginPage = () => {
     }
     attemptedAuthCodeRef.current = authCode;
     writeExchangeStatus(authCode, "pending");
-    let cancelled = false;
+    let ignoreErrors = false;
     const exchange = async () => {
       setBusy(true);
       setStatus("Signing you in...");
@@ -104,15 +104,12 @@ const LoginPage = () => {
             body: JSON.stringify({ authCode }),
           }
         );
-        if (cancelled) {
-          return;
-        }
         writeExchangeStatus(authCode, "done");
         localStorage.setItem("accessToken", payload.session.accessToken);
         localStorage.setItem("refreshToken", payload.session.refreshToken);
         navigate(redirectTarget, { replace: true });
       } catch (err) {
-        if (!cancelled) {
+        if (!ignoreErrors) {
           writeExchangeStatus(authCode, null);
           setBusy(false);
           setStatus("");
@@ -122,7 +119,7 @@ const LoginPage = () => {
     };
     void exchange();
     return () => {
-      cancelled = true;
+      ignoreErrors = true;
     };
   }, [authCode, navigate, redirectTarget]);
 
