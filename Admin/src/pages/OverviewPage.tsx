@@ -246,7 +246,7 @@ const OverviewPage = ({
                 Latest downloads & installs
               </p>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Newest install/download events (5)
+                Newest install/download events (15)
               </p>
             </div>
             {activity.length ? (
@@ -259,7 +259,7 @@ const OverviewPage = ({
                   <span className="text-right"> </span>
                 </div>
                 <div className="divide-y divide-slate-200 dark:divide-slate-700">
-                  {activity.slice(0, 5).map((item) => {
+                  {activity.slice(0, 15).map((item) => {
                     const iconUrl = item.appId ? appIconsByApp?.[item.appId] : null;
                     const who = item.actor ?? item.detail.replace(/^(Installed|Downloaded) by /i, "");
                     return (

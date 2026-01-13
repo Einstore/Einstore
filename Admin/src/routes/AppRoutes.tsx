@@ -266,7 +266,7 @@ const AppRoutes = () => {
     }
     try {
       const payload = await apiFetch<PaginatedResponse<ApiBuildEvent>>(
-        `/builds/events?perPage=5&kinds=download,install`,
+        `/builds/events?perPage=15&kinds=download,install`,
         {
           headers: { "x-team-id": activeTeamId },
         },
