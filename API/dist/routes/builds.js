@@ -105,6 +105,17 @@ const normalizeBuildMetadata = (input) => ({
     notes: normalizeNullableString(input.notes ?? undefined),
     info: input.info === undefined ? undefined : input.info ?? null,
 });
+const sendBillingError = (reply, error) => {
+    if (!error || typeof error !== "object" || !error.code) {
+        throw error;
+    }
+    const candidate = error.statusCode;
+    const statusCode = typeof candidate === "number" ? candidate : 403;
+    return reply.status(statusCode).send({
+        error: error.code,
+        message: error.message ?? "Plan limit reached.",
+    });
+};
 const toBuildMetadataData = (metadata) => {
     const data = {};
     if (metadata.gitCommit !== undefined)
@@ -120,6 +131,7 @@ const toBuildMetadataData = (metadata) => {
     return data;
 };
 export async function buildRoutes(app) {
+    const billingGuard = app.billingGuard;
     app.post("/builds", { preHandler: requireTeam }, async (request, reply) => {
         const parsed = createBuildSchema.safeParse(request.body);
         if (!parsed.success) {
@@ -130,11 +142,39 @@ export async function buildRoutes(app) {
         if (!teamId) {
             return reply.status(403).send({ error: "team_required", message: "Team context required" });
         }
+        if (billingGuard?.assertCanCreateApp) {
+            try {
+                await billingGuard.assertCanCreateApp({
+                    teamId,
+                    userId: request.auth?.user?.id,
+                    identifier: input.appIdentifier,
+                });
+            }
+            catch (error) {
+                return sendBillingError(reply, error);
+            }
+        }
         const appRecord = await prisma.app.upsert({
             where: { teamId_identifier: { teamId, identifier: input.appIdentifier } },
             update: { name: input.appName },
             create: { identifier: input.appIdentifier, name: input.appName, teamId },
         });
+        if (billingGuard?.assertCanCreateBuild) {
+            try {
+                await billingGuard.assertCanCreateBuild({ teamId, appId: appRecord.id });
+            }
+            catch (error) {
+                return sendBillingError(reply, error);
+            }
+        }
+        if (billingGuard?.assertCanUploadBytes) {
+            try {
+                await billingGuard.assertCanUploadBytes({ teamId, requiredBytes: input.sizeBytes });
+            }
+            catch (error) {
+                return sendBillingError(reply, error);
+            }
+        }
         const metadata = normalizeBuildMetadata(input);
         const versionRecord = await prisma.version.upsert({
             where: {

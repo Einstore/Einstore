@@ -11,6 +11,7 @@ const listQuerySchema = z.object({
     offset: z.coerce.number().int().nonnegative().optional(),
     kind: z.nativeEnum(BuildEventKind).optional(),
     kinds: z.string().optional(),
+    buildId: z.string().min(1).optional(),
 });
 const createEventSchema = z.object({
     platform: z.nativeEnum(PlatformKind).optional(),
@@ -131,6 +132,7 @@ export async function buildEventRoutes(app) {
             (parsed.data.kind ? [parsed.data.kind] : undefined);
         const where = {
             teamId,
+            ...(parsed.data.buildId ? { buildId: parsed.data.buildId } : undefined),
             ...(kinds?.length ? { kind: { in: kinds } } : undefined),
         };
         const [total, items] = await prisma.$transaction([

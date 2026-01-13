@@ -1,5 +1,6 @@
 import { z } from "zod";
 import fs from "node:fs";
+import path from "node:path";
 import { prisma } from "../lib/prisma.js";
 import { requireTeam } from "../auth/guard.js";
 import { generateInstallToken, verifyInstallToken } from "../lib/install-links.js";
@@ -20,6 +21,38 @@ const xmlEscape = (value) => value
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;");
+const sendBillingError = (reply, error) => {
+    if (!error || typeof error !== "object" || !error.code) {
+        throw error;
+    }
+    const candidate = error.statusCode;
+    const statusCode = typeof candidate === "number" ? candidate : 403;
+    return reply.status(statusCode).send({
+        error: error.code,
+        message: error.message ?? "Plan limit reached.",
+    });
+};
+const sanitizeFileFragment = (value, fallback, allowDots = false) => {
+    const trimmed = value.trim();
+    if (!trimmed) {
+        return fallback;
+    }
+    const pattern = allowDots ? /[^a-z0-9.]+/gi : /[^a-z0-9]+/gi;
+    const cleaned = trimmed.toLowerCase().replace(pattern, "-").replace(/(^-|-$)/g, "");
+    return cleaned || fallback;
+};
+const resolveDownloadFilename = (build) => {
+    const appName = sanitizeFileFragment(build.version.app.name ?? "", "app");
+    const version = sanitizeFileFragment(build.version.version ?? "", "0", true);
+    const buildNumber = sanitizeFileFragment(build.buildNumber ?? "", "0", true);
+    const ext = path.extname(build.storagePath).replace(".", "");
+    const safeExt = ext ? ext.toLowerCase() : "bin";
+    return `${appName}_v${version}_${buildNumber}.${safeExt}`;
+};
+const buildContentDisposition = (filename) => {
+    const safe = filename.replace(/"/g, "");
+    return `attachment; filename="${safe}"`;
+};
 const resolveBaseUrl = (request) => {
     if (config.INSTALL_BASE_URL) {
         return config.INSTALL_BASE_URL.replace(/\/$/, "");
@@ -73,6 +106,7 @@ const buildManifest = (payload) => {
     ].join("\n");
 };
 export async function iosInstallRoutes(app) {
+    const billingGuard = app.billingGuard;
     app.post("/builds/:id/ios/install-link", { preHandler: requireTeam }, async (request, reply) => {
         const buildId = request.params.id;
         const teamId = request.team?.id;
@@ -114,6 +148,14 @@ export async function iosInstallRoutes(app) {
         if (!build) {
             return reply.status(404).send({ error: "Not found" });
         }
+        if (billingGuard?.assertCanDownloadBuild) {
+            try {
+                await billingGuard.assertCanDownloadBuild({ teamId: payload.teamId, buildId: build.id });
+            }
+            catch (error) {
+                return sendBillingError(reply, error);
+            }
+        }
         const baseUrl = resolveBaseUrl(request);
         const downloadToken = generateInstallToken({
             buildId: build.id,
@@ -123,6 +165,7 @@ export async function iosInstallRoutes(app) {
         }, INSTALL_TTL_SECONDS);
         let downloadUrl = `${baseUrl}/builds/${build.id}/ios/download?token=${downloadToken}`;
         if (build.storageKind === "s3") {
+            const filename = resolveDownloadFilename(build);
             await prisma.buildEvent.create({
                 data: {
                     buildId: build.id,
@@ -144,6 +187,7 @@ export async function iosInstallRoutes(app) {
                 bucket,
                 key: build.storagePath,
                 expiresIn: INSTALL_TTL_SECONDS,
+                responseContentDisposition: buildContentDisposition(filename),
             });
         }
         const plist = buildManifest({
@@ -172,6 +216,14 @@ export async function iosInstallRoutes(app) {
         if (!build) {
             return reply.status(404).send({ error: "Not found" });
         }
+        if (billingGuard?.assertCanDownloadBuild) {
+            try {
+                await billingGuard.assertCanDownloadBuild({ teamId: payload.teamId, buildId: build.id });
+            }
+            catch (error) {
+                return sendBillingError(reply, error);
+            }
+        }
         await prisma.buildEvent.create({
             data: {
                 buildId: build.id,
@@ -185,6 +237,7 @@ export async function iosInstallRoutes(app) {
                     : undefined,
             },
         });
+        const filename = resolveDownloadFilename(build);
         if (build.storageKind === "s3") {
             const bucket = process.env.SPACES_BUCKET;
             if (!bucket) {
@@ -194,6 +247,7 @@ export async function iosInstallRoutes(app) {
                 bucket,
                 key: build.storagePath,
                 expiresIn: INSTALL_TTL_SECONDS,
+                responseContentDisposition: buildContentDisposition(filename),
             });
             return reply.redirect(signedUrl);
         }
@@ -201,6 +255,7 @@ export async function iosInstallRoutes(app) {
             return reply.status(404).send({ error: "file_not_found" });
         }
         reply.header("Content-Type", "application/octet-stream");
+        reply.header("Content-Disposition", buildContentDisposition(filename));
         return reply.send(fs.createReadStream(build.storagePath));
     });
     app.post("/builds/:id/ios/installs/track", async (request, reply) => {

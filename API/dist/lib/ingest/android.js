@@ -146,10 +146,11 @@ const extractBestIconBitmap = async (apkPath, outputDir, iconEntries) => {
         sizeBytes: resolved.size,
     };
 };
-export async function ingestAndroidApk(filePath, teamId, createdByUserId) {
+export async function ingestAndroidApk(filePath, teamId, createdByUserId, options) {
     if (!fs.existsSync(filePath)) {
         throw new Error("APK not found");
     }
+    const billingGuard = options?.billingGuard;
     const stats = fs.statSync(filePath);
     const output = parseWithAapt(filePath) ?? parseWithBundledAapt(filePath);
     let packageName = "";
@@ -228,11 +229,21 @@ export async function ingestAndroidApk(filePath, teamId, createdByUserId) {
         permissions,
         icon: icons[0]?.path,
     };
+    if (billingGuard?.assertCanCreateApp) {
+        await billingGuard.assertCanCreateApp({
+            teamId,
+            userId: createdByUserId,
+            identifier: packageName,
+        });
+    }
     const appRecord = await prisma.app.upsert({
         where: { teamId_identifier: { teamId, identifier: packageName } },
         update: { name: resolvedAppNameNormalized },
         create: { identifier: packageName, name: resolvedAppNameNormalized, teamId },
     });
+    if (billingGuard?.assertCanCreateBuild) {
+        await billingGuard.assertCanCreateBuild({ teamId, appId: appRecord.id });
+    }
     const versionRecord = await prisma.version.upsert({
         where: {
             appId_version: {

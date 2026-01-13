@@ -243,7 +243,7 @@ const resolveTargetRoots = (entries) => {
     }
     return Array.from(roots);
 };
-export async function ingestIosIpa(filePath, teamId, createdByUserId) {
+export async function ingestIosIpa(filePath, teamId, createdByUserId, options) {
     if (!fs.existsSync(filePath)) {
         throw new Error("IPA not found");
     }
@@ -315,11 +315,22 @@ export async function ingestIosIpa(filePath, teamId, createdByUserId) {
     const resolvedAppName = mainTarget.name;
     const resolvedVersion = mainTarget.version || "1.0.0";
     const resolvedBuild = mainTarget.build || "1";
+    const billingGuard = options?.billingGuard;
+    if (billingGuard?.assertCanCreateApp) {
+        await billingGuard.assertCanCreateApp({
+            teamId,
+            userId: createdByUserId,
+            identifier: mainTarget.bundleId,
+        });
+    }
     const appRecord = await prisma.app.upsert({
         where: { teamId_identifier: { teamId, identifier: mainTarget.bundleId } },
         update: { name: resolvedAppName },
         create: { identifier: mainTarget.bundleId, name: resolvedAppName, teamId },
     });
+    if (billingGuard?.assertCanCreateBuild) {
+        await billingGuard.assertCanCreateBuild({ teamId, appId: appRecord.id });
+    }
     const versionRecord = await prisma.version.upsert({
         where: {
             appId_version: {

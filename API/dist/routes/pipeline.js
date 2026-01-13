@@ -126,6 +126,17 @@ const ensureStorageCapacity = async (teamId, requiredBytes) => {
         .filter((build) => build.storageKind === "local")
         .map((build) => fs.promises.rm(build.storagePath, { force: true }).catch(() => undefined)));
 };
+const sendBillingError = (reply, error) => {
+    if (!error || typeof error !== "object" || !error.code) {
+        throw error;
+    }
+    const candidate = error.statusCode;
+    const statusCode = typeof candidate === "number" ? candidate : 403;
+    return reply.status(statusCode).send({
+        error: error.code,
+        message: error.message ?? "Plan limit reached.",
+    });
+};
 const resolveSpacesConfig = () => {
     const client = resolveS3Client();
     const bucket = process.env.SPACES_BUCKET;
@@ -166,6 +177,7 @@ const deleteSpacesObject = async (bucket, key) => {
     await spaces.client.send(new DeleteObjectCommand({ Bucket: bucket, Key: key })).catch(() => undefined);
 };
 export async function pipelineRoutes(app) {
+    const billingGuard = app.billingGuard;
     app.post("/ingest/upload-url", { preHandler: requireTeamOrApiKey }, async (request, reply) => {
         const parsed = presignUploadSchema.safeParse(request.body);
         if (!parsed.success) {
@@ -185,9 +197,15 @@ export async function pipelineRoutes(app) {
         }
         const sizeBytes = BigInt(parsed.data.sizeBytes);
         try {
+            if (billingGuard?.assertCanUploadBytes) {
+                await billingGuard.assertCanUploadBytes({ teamId, requiredBytes: sizeBytes });
+            }
             await ensureStorageCapacity(teamId, sizeBytes);
         }
         catch (error) {
+            if (error.code && error.code !== "storage_limit_exceeded") {
+                return sendBillingError(reply, error);
+            }
             if (error.code === "storage_limit_exceeded") {
                 return reply
                     .status(error.statusCode ?? 413)
@@ -233,9 +251,15 @@ export async function pipelineRoutes(app) {
             return reply.status(411).send({ error: "content_length_required" });
         }
         try {
+            if (billingGuard?.assertCanUploadBytes) {
+                await billingGuard.assertCanUploadBytes({ teamId, requiredBytes: expectedSize });
+            }
             await ensureStorageCapacity(teamId, expectedSize);
         }
         catch (error) {
+            if (error.code && error.code !== "storage_limit_exceeded") {
+                return sendBillingError(reply, error);
+            }
             if (error.code === "storage_limit_exceeded") {
                 return reply
                     .status(error.statusCode ?? 413)
@@ -248,10 +272,16 @@ export async function pipelineRoutes(app) {
             const download = await downloadSpacesObject(spaces.bucket, parsed.data.key, extension);
             filePath = download.filePath;
             try {
+                if (billingGuard?.assertCanUploadBytes) {
+                    await billingGuard.assertCanUploadBytes({ teamId, requiredBytes: download.sizeBytes });
+                }
                 await ensureStorageCapacity(teamId, download.sizeBytes);
             }
             catch (error) {
                 await fs.promises.rm(filePath, { force: true }).catch(() => undefined);
+                if (error.code && error.code !== "storage_limit_exceeded") {
+                    return sendBillingError(reply, error);
+                }
                 if (error.code === "storage_limit_exceeded") {
                     return reply
                         .status(error.statusCode ?? 413)
@@ -271,12 +301,12 @@ export async function pipelineRoutes(app) {
                 throw error;
             }
             if (extension === ".apk") {
-                const result = await ingestAndroidApk(filePath, teamId, userId);
+                const result = await ingestAndroidApk(filePath, teamId, userId, { billingGuard });
                 await deleteSpacesObject(spaces.bucket, parsed.data.key);
                 await broadcastBadgesUpdate(teamId).catch(() => undefined);
                 return reply.status(201).send({ status: "ingested", result });
             }
-            const result = await ingestIosIpa(filePath, teamId, userId);
+            const result = await ingestIosIpa(filePath, teamId, userId, { billingGuard });
             await deleteSpacesObject(spaces.bucket, parsed.data.key);
             await broadcastBadgesUpdate(teamId).catch(() => undefined);
             return reply.status(201).send({ status: "ingested", result });
@@ -312,7 +342,7 @@ export async function pipelineRoutes(app) {
                 }
                 throw error;
             }
-            const result = await ingestAndroidApk(payload.filePath, teamId, userId);
+            const result = await ingestAndroidApk(payload.filePath, teamId, userId, { billingGuard });
             await broadcastBadgesUpdate(teamId).catch(() => undefined);
             return reply.status(201).send({ status: "ingested", result });
         }
@@ -326,7 +356,7 @@ export async function pipelineRoutes(app) {
                 }
                 throw error;
             }
-            const result = await ingestIosIpa(payload.filePath, teamId, userId);
+            const result = await ingestIosIpa(payload.filePath, teamId, userId, { billingGuard });
             await broadcastBadgesUpdate(teamId).catch(() => undefined);
             return reply.status(201).send({ status: "ingested", result });
         }
@@ -350,10 +380,16 @@ export async function pipelineRoutes(app) {
         }
         try {
             if (contentLength) {
+                if (billingGuard?.assertCanUploadBytes) {
+                    await billingGuard.assertCanUploadBytes({ teamId, requiredBytes: contentLength });
+                }
                 await ensureStorageCapacity(teamId, contentLength);
             }
         }
         catch (error) {
+            if (error.code && error.code !== "storage_limit_exceeded") {
+                return sendBillingError(reply, error);
+            }
             if (error.code === "storage_limit_exceeded") {
                 return reply
                     .status(error.statusCode ?? 413)
@@ -384,10 +420,17 @@ export async function pipelineRoutes(app) {
             return reply.status(413).send({ error: "file_too_large" });
         }
         try {
-            await ensureStorageCapacity(teamId, uploadedBytes ?? contentLength ?? 0n);
+            const requiredBytes = uploadedBytes ?? contentLength ?? 0n;
+            if (billingGuard?.assertCanUploadBytes) {
+                await billingGuard.assertCanUploadBytes({ teamId, requiredBytes });
+            }
+            await ensureStorageCapacity(teamId, requiredBytes);
         }
         catch (error) {
             await fs.promises.rm(filePath, { force: true });
+            if (error.code && error.code !== "storage_limit_exceeded") {
+                return sendBillingError(reply, error);
+            }
             if (error.code === "storage_limit_exceeded") {
                 return reply
                     .status(error.statusCode ?? 413)
@@ -408,11 +451,11 @@ export async function pipelineRoutes(app) {
         }
         try {
             if (extension === ".apk") {
-                const result = await ingestAndroidApk(filePath, teamId, userId);
+                const result = await ingestAndroidApk(filePath, teamId, userId, { billingGuard });
                 await broadcastBadgesUpdate(teamId).catch(() => undefined);
                 return reply.status(201).send({ status: "ingested", result });
             }
-            const result = await ingestIosIpa(filePath, teamId, userId);
+            const result = await ingestIosIpa(filePath, teamId, userId, { billingGuard });
             await broadcastBadgesUpdate(teamId).catch(() => undefined);
             return reply.status(201).send({ status: "ingested", result });
         }
@@ -438,10 +481,16 @@ export async function pipelineRoutes(app) {
         }
         try {
             if (contentLength) {
+                if (billingGuard?.assertCanUploadBytes) {
+                    await billingGuard.assertCanUploadBytes({ teamId, requiredBytes: contentLength });
+                }
                 await ensureStorageCapacity(teamId, contentLength);
             }
         }
         catch (error) {
+            if (error.code && error.code !== "storage_limit_exceeded") {
+                return sendBillingError(reply, error);
+            }
             if (error.code === "storage_limit_exceeded") {
                 return reply
                     .status(error.statusCode ?? 413)
@@ -469,10 +518,17 @@ export async function pipelineRoutes(app) {
             return reply.status(413).send({ error: "file_too_large" });
         }
         try {
-            await ensureStorageCapacity(teamId, uploadedBytes ?? contentLength ?? 0n);
+            const requiredBytes = uploadedBytes ?? contentLength ?? 0n;
+            if (billingGuard?.assertCanUploadBytes) {
+                await billingGuard.assertCanUploadBytes({ teamId, requiredBytes });
+            }
+            await ensureStorageCapacity(teamId, requiredBytes);
         }
         catch (error) {
             await fs.promises.rm(filePath, { force: true });
+            if (error.code && error.code !== "storage_limit_exceeded") {
+                return sendBillingError(reply, error);
+            }
             if (error.code === "storage_limit_exceeded") {
                 return reply
                     .status(error.statusCode ?? 413)

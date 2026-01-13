@@ -17,12 +17,16 @@ export const resolveS3Client = () => {
         responseChecksumValidation: "WHEN_REQUIRED",
     });
 };
-export const presignStorageObject = async ({ bucket, key, expiresIn }) => {
+export const presignStorageObject = async ({ bucket, key, expiresIn, responseContentDisposition, }) => {
     const client = resolveS3Client();
     if (!client) {
         throw new Error("S3 credentials not configured");
     }
-    const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+    const command = new GetObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        ...(responseContentDisposition ? { ResponseContentDisposition: responseContentDisposition } : {}),
+    });
     return getSignedUrl(client, command, { expiresIn });
 };
 export const presignPutObject = async ({ bucket, key, expiresIn = 900, contentType, }) => {

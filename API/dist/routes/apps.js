@@ -15,7 +15,19 @@ const listQuerySchema = z.object({
     offset: z.coerce.number().int().nonnegative().optional(),
     platform: z.nativeEnum(PlatformKind).optional(),
 });
+const sendBillingError = (reply, error) => {
+    if (!error || typeof error !== "object" || !error.code) {
+        throw error;
+    }
+    const candidate = error.statusCode;
+    const statusCode = typeof candidate === "number" ? candidate : 403;
+    return reply.status(statusCode).send({
+        error: error.code,
+        message: error.message ?? "Plan limit reached.",
+    });
+};
 export async function appRoutes(app) {
+    const billingGuard = app.billingGuard;
     app.post("/apps", { preHandler: requireTeam }, async (request, reply) => {
         const parsed = createAppSchema.safeParse(request.body);
         if (!parsed.success) {
@@ -24,6 +36,18 @@ export async function appRoutes(app) {
         const teamId = request.team?.id;
         if (!teamId) {
             return reply.status(403).send({ error: "team_required", message: "Team context required" });
+        }
+        if (billingGuard?.assertCanCreateApp) {
+            try {
+                await billingGuard.assertCanCreateApp({
+                    teamId,
+                    userId: request.auth?.user?.id,
+                    identifier: parsed.data.identifier,
+                });
+            }
+            catch (error) {
+                return sendBillingError(reply, error);
+            }
         }
         const created = await prisma.app.create({ data: { ...parsed.data, teamId } });
         await broadcastBadgesUpdate(teamId).catch(() => undefined);
