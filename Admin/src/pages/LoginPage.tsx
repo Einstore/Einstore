@@ -12,6 +12,26 @@ const LoginPage = () => {
   const [busy, setBusy] = useState(false);
   const attemptedAuthCodeRef = useRef<string | null>(null);
 
+  const readExchangeStatus = (code: string) => {
+    try {
+      return sessionStorage.getItem(`oauth-exchange:${code}`);
+    } catch {
+      return null;
+    }
+  };
+
+  const writeExchangeStatus = (code: string, value: string | null) => {
+    try {
+      if (value === null) {
+        sessionStorage.removeItem(`oauth-exchange:${code}`);
+      } else {
+        sessionStorage.setItem(`oauth-exchange:${code}`, value);
+      }
+    } catch {
+      // Ignore storage failures (private mode, disabled storage, etc.).
+    }
+  };
+
   const authCode = searchParams.get("authCode");
   const errorCode = searchParams.get("error");
   const errorDescription =
@@ -62,10 +82,15 @@ const LoginPage = () => {
     if (!authCode) {
       return;
     }
+    const persistedStatus = readExchangeStatus(authCode);
+    if (persistedStatus === "pending" || persistedStatus === "done") {
+      return;
+    }
     if (attemptedAuthCodeRef.current === authCode) {
       return;
     }
     attemptedAuthCodeRef.current = authCode;
+    writeExchangeStatus(authCode, "pending");
     let cancelled = false;
     const exchange = async () => {
       setBusy(true);
@@ -82,11 +107,13 @@ const LoginPage = () => {
         if (cancelled) {
           return;
         }
+        writeExchangeStatus(authCode, "done");
         localStorage.setItem("accessToken", payload.session.accessToken);
         localStorage.setItem("refreshToken", payload.session.refreshToken);
         navigate(redirectTarget, { replace: true });
       } catch (err) {
         if (!cancelled) {
+          writeExchangeStatus(authCode, null);
           setBusy(false);
           setStatus("");
           setError(err instanceof Error ? err.message : "Login failed.");
