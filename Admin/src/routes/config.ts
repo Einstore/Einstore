@@ -11,6 +11,7 @@ export const navItems: NavItemConfig[] = [
   { id: "apps", label: "Apps", icon: "apps" },
   { id: "builds", label: "Latest builds", icon: "builds" },
   { id: "flags", label: "Future flags", icon: "flags", superOnly: true },
+  { id: "integrations", label: "Integrations", icon: "link", adminOnly: true },
   {
     id: "settings",
     label: "Settings",
@@ -57,6 +58,11 @@ export const pageConfig = {
     title: "Future flags",
     breadcrumbs: [{ label: "Governance" }, { label: "Future flags" }],
     actions: [{ id: "create-flag", label: "Create flag", variant: "primary" }],
+  },
+  integrations: {
+    title: "Integrations",
+    breadcrumbs: [{ label: "Workspace" }, { label: "Integrations" }],
+    actions: [],
   },
   settings: {
     title: "Team settings",

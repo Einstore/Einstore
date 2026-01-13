@@ -13,6 +13,7 @@ import AdminLayout from "../layouts/AdminLayout";
 import AppsPage from "../pages/AppsPage";
 import BuildsPage from "../pages/BuildsPage";
 import FutureFlagsPage from "../pages/FutureFlagsPage";
+import IntegrationsPage from "../pages/IntegrationsPage";
 import LoginPage from "../pages/LoginPage";
 import OverviewPage from "../pages/OverviewPage";
 import SearchPage from "../pages/SearchPage";
@@ -716,6 +717,13 @@ const AppRoutes = () => {
       element: <FutureFlagsPage />,
       navId: "flags",
       superOnly: true,
+    },
+    {
+      id: "integrations",
+      path: "/integrations",
+      element: <IntegrationsPage teams={teams} activeTeamId={activeTeamId} />,
+      navId: "integrations",
+      adminOnly: true,
     },
     {
       id: "settings",
