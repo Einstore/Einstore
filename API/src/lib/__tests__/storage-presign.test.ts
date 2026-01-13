@@ -36,7 +36,9 @@ describe("presignPutObject", () => {
     const parsed = new URL(signedUrl);
     const signedHeaders = getSignedHeaders(parsed);
 
-    expect(signedHeaders).toEqual(["host"]);
+    expect(signedHeaders).toEqual(expect.arrayContaining(["host"]));
+    expect(signedHeaders).toHaveLength(1);
+    expect(parsed.searchParams.get("x-id")).toBe("PutObject");
 
     const keys = Array.from(parsed.searchParams.keys()).map((key) => key.toLowerCase());
     expect(keys).not.toContain("x-amz-checksum-crc32");
@@ -54,7 +56,9 @@ describe("presignPutObject", () => {
     const parsed = new URL(signedUrl);
     const signedHeaders = getSignedHeaders(parsed);
 
-    expect(signedHeaders).toEqual(["content-type", "host"]);
+    expect(signedHeaders).toEqual(expect.arrayContaining(["content-type", "host"]));
+    expect(signedHeaders).toHaveLength(2);
+    expect(parsed.searchParams.get("x-id")).toBe("PutObject");
 
     const keys = Array.from(parsed.searchParams.keys()).map((key) => key.toLowerCase());
     expect(keys).not.toContain("x-amz-checksum-crc32");
