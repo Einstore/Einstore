@@ -164,7 +164,7 @@ const BillingRoute = () => {
           {plans.map((plan) => {
             const isCurrent = plan.id === currentPlan;
             const isProcessing = processingPlan === plan.id;
-            const cardRadius = plan.featured ? "rounded-[10px]" : "rounded-xl";
+            const cardRadius = plan.featured ? "rounded-[16px]" : "rounded-xl";
             const card = (
               <div
                 className={`flex h-full w-full min-w-0 flex-col gap-4 ${cardRadius} bg-white p-5 shadow-sm dark:bg-slate-800`}
@@ -232,7 +232,10 @@ const BillingRoute = () => {
             return (
               <div key={plan.id} className="h-full">
                 {plan.featured ? (
-                  <div className="rounded-xl p-[2px]" style={{ background: featuredBorderGradient }}>
+                  <div
+                    className="rounded-[18px] p-[2px] overflow-hidden"
+                    style={{ background: featuredBorderGradient }}
+                  >
                     {card}
                   </div>
                 ) : (
