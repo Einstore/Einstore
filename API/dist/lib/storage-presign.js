@@ -13,6 +13,8 @@ export const resolveS3Client = () => {
         endpoint: endpoint || undefined,
         credentials: { accessKeyId, secretAccessKey },
         forcePathStyle: Boolean(endpoint),
+        requestChecksumCalculation: "WHEN_REQUIRED",
+        responseChecksumValidation: "WHEN_REQUIRED",
     });
 };
 export const presignStorageObject = async ({ bucket, key, expiresIn }) => {
@@ -31,7 +33,7 @@ export const presignPutObject = async ({ bucket, key, expiresIn = 900, contentTy
     const command = new PutObjectCommand({
         Bucket: bucket,
         Key: key,
-        ContentType: contentType,
+        ...(contentType ? { ContentType: contentType } : {}),
     });
     return getSignedUrl(client, command, { expiresIn });
 };

@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 import plist from "plist";
 import bplistParser from "bplist-parser";
 import { prisma } from "../prisma.js";
@@ -17,6 +18,87 @@ const readPngDimensions = (buffer) => {
     if (!width || !height)
         return null;
     return { width, height };
+};
+const commandAvailability = new Map();
+const hasCommand = (command) => {
+    const cached = commandAvailability.get(command);
+    if (cached !== undefined)
+        return cached;
+    const result = spawnSync("sh", ["-c", `command -v ${command}`], { stdio: "ignore" });
+    const available = result.status === 0;
+    commandAvailability.set(command, available);
+    return available;
+};
+const runCommand = (command, args) => {
+    const result = spawnSync(command, args, { stdio: "pipe" });
+    if (result.status !== 0) {
+        const stderr = result.stderr?.toString("utf8").trim();
+        const stdout = result.stdout?.toString("utf8").trim();
+        const message = [stderr, stdout].filter(Boolean).join("\n");
+        throw new Error(message || `${command} failed`);
+    }
+};
+const safeUnlink = (filePath, keepPath) => {
+    if (filePath === keepPath)
+        return;
+    if (!fs.existsSync(filePath))
+        return;
+    fs.unlinkSync(filePath);
+};
+const normalizeIosPng = (rawPath, finalPath) => {
+    const baseName = finalPath.replace(/\.png$/i, "");
+    const revertedPath = `${baseName}.reverted.png`;
+    const normalizedPath = `${baseName}.normalized.png`;
+    let workingPath = rawPath;
+    if (hasCommand("pngcrush")) {
+        try {
+            runCommand("pngcrush", ["-revert-iphone-optimizations", rawPath, revertedPath]);
+            workingPath = revertedPath;
+        }
+        catch (error) {
+            console.warn("pngcrush failed, using raw icon PNG.", error);
+        }
+    }
+    const magickCommand = hasCommand("magick")
+        ? "magick"
+        : hasCommand("convert")
+            ? "convert"
+            : null;
+    if (magickCommand) {
+        try {
+            runCommand(magickCommand, [
+                workingPath,
+                "-alpha",
+                "on",
+                "-colorspace",
+                "sRGB",
+                "-strip",
+                normalizedPath,
+            ]);
+            workingPath = normalizedPath;
+        }
+        catch (error) {
+            console.warn("ImageMagick normalization failed, using existing icon PNG.", error);
+        }
+    }
+    if (hasCommand("pngcheck")) {
+        try {
+            runCommand("pngcheck", ["-v", workingPath]);
+        }
+        catch (error) {
+            console.warn("pngcheck reported issues with icon PNG.", error);
+        }
+    }
+    if (workingPath !== finalPath) {
+        if (fs.existsSync(finalPath)) {
+            fs.unlinkSync(finalPath);
+        }
+        fs.renameSync(workingPath, finalPath);
+    }
+    safeUnlink(rawPath, finalPath);
+    safeUnlink(revertedPath, finalPath);
+    safeUnlink(normalizedPath, finalPath);
+    return finalPath;
 };
 const mapDeviceFamily = (family) => {
     if (!Array.isArray(family))
@@ -110,15 +192,18 @@ const extractBestIcon = async (filePath, targetRoot, entries, outputDir, info) =
         return null;
     const resolved = best;
     fs.mkdirSync(outputDir, { recursive: true });
-    const fileName = `icon-${resolved.width}x${resolved.height}.png`;
-    const iconPath = path.join(outputDir, fileName);
-    fs.writeFileSync(iconPath, resolved.buffer);
+    const baseName = `icon-${resolved.width}x${resolved.height}`;
+    const rawPath = path.join(outputDir, `${baseName}.raw.png`);
+    const iconPath = path.join(outputDir, `${baseName}.png`);
+    fs.writeFileSync(rawPath, resolved.buffer);
+    const normalizedPath = normalizeIosPng(rawPath, iconPath);
+    const normalizedStats = fs.statSync(normalizedPath);
     return {
         sourcePath: resolved.entryName,
-        path: iconPath,
+        path: normalizedPath,
         width: resolved.width,
         height: resolved.height,
-        sizeBytes: resolved.size,
+        sizeBytes: normalizedStats.size,
     };
 };
 const parsePlist = (buffer) => {

@@ -37,6 +37,16 @@ const parseContentLength = (value) => {
     const numeric = Number(raw);
     return Number.isFinite(numeric) && numeric > 0 ? BigInt(Math.ceil(numeric)) : null;
 };
+const isMacSafariUserAgent = (value) => {
+    const raw = Array.isArray(value) ? value[0] : value;
+    if (typeof raw !== "string")
+        return false;
+    const isMac = raw.includes("Macintosh");
+    const isSafari = raw.includes("Safari") && !raw.includes("Chrome") && !raw.includes("Chromium");
+    const isIOS = /iPad|iPhone|iPod/.test(raw);
+    const isEdgeOrOpera = raw.includes("Edg") || raw.includes("OPR");
+    return isMac && isSafari && !isIOS && !isEdgeOrOpera;
+};
 const gbToBytes = (gb) => BigInt(Math.round(gb * 1024 * 1024 * 1024));
 const resolveStorageLimitBytes = async (teamId) => {
     const team = await prisma.team.findUnique({
@@ -186,18 +196,18 @@ export async function pipelineRoutes(app) {
             throw error;
         }
         const key = `ingest/${teamId}/${crypto.randomUUID()}${extension}`;
-        const contentType = parsed.data.contentType || "application/octet-stream";
+        const shouldSignContentType = Boolean(parsed.data.contentType && isMacSafariUserAgent(request.headers["user-agent"]));
         const uploadUrl = await presignPutObject({
             bucket: spaces.bucket,
             key,
             expiresIn: PRESIGNED_TTL_SECONDS,
-            contentType,
+            ...(shouldSignContentType ? { contentType: parsed.data.contentType } : {}),
         });
         return reply.send({
             uploadUrl,
             key,
             expiresIn: PRESIGNED_TTL_SECONDS,
-            headers: { "Content-Type": contentType },
+            headers: shouldSignContentType ? { "Content-Type": parsed.data.contentType ?? "" } : {},
         });
     });
     app.post("/ingest/complete-upload", { preHandler: requireTeamOrApiKey }, async (request, reply) => {
