@@ -37,25 +37,25 @@ const ApiKeysTable = ({ apiKeys, selectedId, onSelect, onRevoke }: ApiKeysTableP
         {apiKeys.map((key) => {
           const isSelected = key.id === selectedId;
           return (
-            <div
-              key={key.id}
-              role="button"
-              tabIndex={0}
-              aria-pressed={isSelected}
-              title={`Key prefix: ${key.prefix}...`}
-              onClick={() => onSelect(key)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  onSelect(key);
-                }
-              }}
-              className={`grid grid-cols-[minmax(0,2fr)_minmax(0,1.4fr)_minmax(0,1.4fr)_minmax(0,0.8fr)] gap-4 border-b border-slate-200 px-5 py-4 text-sm last:border-b-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 dark:border-slate-700 ${
-                isSelected
-                  ? "bg-indigo-50 dark:bg-indigo-500/10"
-                  : "hover:bg-slate-50 dark:hover:bg-slate-900"
-              }`}
-            >
+            <div className="relative">
+              <div
+                key={key.id}
+                role="button"
+                tabIndex={0}
+                aria-pressed={isSelected}
+                onClick={() => onSelect(key)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onSelect(key);
+                  }
+                }}
+                className={`group grid grid-cols-[minmax(0,2fr)_minmax(0,1.4fr)_minmax(0,1.4fr)_minmax(0,0.8fr)] gap-4 border-b border-slate-200 px-5 py-4 text-sm last:border-b-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 dark:border-slate-700 ${
+                  isSelected
+                    ? "bg-indigo-50 dark:bg-indigo-500/10"
+                    : "hover:bg-slate-50 dark:hover:bg-slate-900"
+                }`}
+              >
               <div>
                 <div className="font-semibold text-slate-900 dark:text-slate-100">
                   {key.name}
@@ -67,21 +67,25 @@ const ApiKeysTable = ({ apiKeys, selectedId, onSelect, onRevoke }: ApiKeysTableP
               <div className="text-slate-500 dark:text-slate-400">
                 {formatDateTime(key.lastUsedAt)}
               </div>
-              <div className="flex justify-end">
-                {key.revokedAt ? (
-                  <span className="text-xs text-slate-400 dark:text-slate-500">Revoked</span>
-                ) : (
-                  <button
-                    type="button"
+                <div className="flex justify-end">
+                  {key.revokedAt ? (
+                    <span className="text-xs text-slate-400 dark:text-slate-500">Revoked</span>
+                  ) : (
+                    <button
+                      type="button"
                     className="h-9 rounded-lg border border-rose-200 px-3 text-xs font-semibold text-rose-600 transition-colors hover:bg-rose-50 dark:border-rose-500/40 dark:text-rose-200 dark:hover:bg-rose-500/10"
                     onClick={(event) => {
                       event.stopPropagation();
                       onRevoke(key);
                     }}
-                  >
-                    Revoke
-                  </button>
-                )}
+                    >
+                      Revoke
+                    </button>
+                  )}
+                </div>
+              </div>
+              <div className="pointer-events-none absolute left-1/2 top-2 z-20 hidden -translate-x-1/2 -translate-y-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 shadow-sm group-hover:block dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+                Key prefix: <span className="font-mono">{key.prefix}...</span>
               </div>
             </div>
           );
