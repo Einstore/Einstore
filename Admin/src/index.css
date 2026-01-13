@@ -154,6 +154,23 @@ body {
   background-color: #111827;
 }
 
+.billing-page .bg-white,
+.billing-page .border-slate-200 {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.dark .billing-page .bg-white {
+  background-color: #1f2937;
+}
+
+.dark .billing-page .border-slate-200 {
+  border-color: #334155;
+}
+
+.dark .billing-page .bg-slate-50 {
+  background-color: #0b1220;
+}
+
 .api-keys-page .bg-white,
 .api-keys-page .border-slate-200 {
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
