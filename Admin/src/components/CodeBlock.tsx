@@ -5,9 +5,10 @@ type CodeBlockProps = {
 };
 
 const CodeBlock = ({ code, className = "", onCopy }: CodeBlockProps) => {
+  const normalizedCode = code.replace(/\n{2,}/g, "\n").trimEnd();
   const handleCopy = async () => {
     try {
-      await navigator.clipboard?.writeText(code);
+      await navigator.clipboard?.writeText(normalizedCode);
       onCopy?.();
     } catch {
       // Ignore copy failures (permissions, unsupported browsers).
@@ -16,7 +17,7 @@ const CodeBlock = ({ code, className = "", onCopy }: CodeBlockProps) => {
 
   return (
     <pre
-      className={`whitespace-pre-wrap rounded-lg bg-slate-900 p-4 text-xs text-slate-100 ${className} cursor-pointer`}
+      className={`whitespace-pre overflow-hidden rounded-lg bg-slate-900 p-4 text-xs text-slate-100 ${className} cursor-pointer`}
       role="button"
       tabIndex={0}
       onClick={handleCopy}
@@ -28,7 +29,7 @@ const CodeBlock = ({ code, className = "", onCopy }: CodeBlockProps) => {
       }}
       aria-label="Copy code"
     >
-      <code>{code}</code>
+      <code>{normalizedCode}</code>
     </pre>
   );
 };
