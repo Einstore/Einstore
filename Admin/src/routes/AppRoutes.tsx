@@ -57,6 +57,48 @@ import {
   privateRoutes,
 } from "../private/routes.generated";
 
+const putToSpacesXHR = ({
+  url,
+  headers,
+  file,
+  onProgress,
+}: {
+  url: string;
+  headers?: Record<string, string>;
+  file: File;
+  onProgress?: (progress: number) => void;
+}) =>
+  new Promise<void>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT", url, true);
+    const contentType = headers?.["Content-Type"] ?? headers?.["content-type"];
+    if (contentType) {
+      xhr.setRequestHeader("Content-Type", contentType);
+    }
+    if (xhr.upload && onProgress) {
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          onProgress(event.loaded / event.total);
+        }
+      };
+    }
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve();
+        return;
+      }
+      const err = new Error(`PUT failed with status ${xhr.status}`);
+      (err as any).status = xhr.status;
+      reject(err);
+    };
+    xhr.onerror = () => {
+      const err = new Error("PUT network error");
+      (err as any).isNetwork = true;
+      reject(err);
+    };
+    xhr.send(file);
+  });
+
 const AppRoutes = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -438,7 +480,7 @@ const AppRoutes = () => {
 
 
   const handleIngest = useCallback(
-    async (file: File) => {
+    async (file: File, onProgress?: (progress: number) => void) => {
       if (!file) {
         return;
       }
@@ -469,32 +511,21 @@ const AppRoutes = () => {
           throw toError("INGEST-PRESIGN", err instanceof Error ? err.message : "Could not create upload link");
         });
 
-        const headers = new Headers();
-        const allowedPresignHeaders = new Set([
-          "content-type",
-          "x-amz-checksum-algorithm",
-          "x-amz-checksum-crc32",
-        ]);
-        Object.entries(presign.headers ?? {}).forEach(([key, value]) => {
-          if (!value) return;
-          const normalizedKey = key.toLowerCase();
-          if (allowedPresignHeaders.has(normalizedKey)) {
-            headers.set(key, value);
+        try {
+          await putToSpacesXHR({
+            url: presign.uploadUrl,
+            headers: presign.headers,
+            file,
+            onProgress,
+          });
+        } catch (err) {
+          if (err && (err as { isNetwork?: boolean }).isNetwork) {
+            throw toError("INGEST-PUT-NET", "Upload network error (PUT)");
           }
-        });
-
-        const uploadResponse = await fetch(presign.uploadUrl, {
-          method: "PUT",
-          headers,
-          body: file,
-        }).catch((err) => {
-          throw toError("INGEST-PUT-NET", err instanceof Error ? err.message : "Upload network error (PUT)");
-        });
-
-        if (!uploadResponse.ok) {
-          const code = uploadResponse.status === 403 ? "INGEST-CORS" : "INGEST-PUT";
-          const msg = uploadResponse.status === 403 ? "Upload blocked by storage CORS/ACL" : "Upload failed";
-          throw toError(code, `${msg} (status ${uploadResponse.status})`);
+          const status = err && typeof (err as { status?: number }).status === "number" ? (err as { status?: number }).status : null;
+          const code = status === 403 ? "INGEST-CORS" : "INGEST-PUT";
+          const msg = status === 403 ? "Upload blocked by storage CORS/ACL" : "Upload failed";
+          throw toError(code, `${msg} (status ${status ?? "unknown"})`);
         }
 
         await apiFetch("/ingest/complete-upload", {

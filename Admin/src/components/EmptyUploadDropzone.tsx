@@ -1,7 +1,7 @@
 import BuildUploadDropzone from "./BuildUploadDropzone";
 
 type EmptyUploadDropzoneProps = {
-  onUpload: (file: File) => Promise<void>;
+  onUpload: (file: File, onProgress?: (progress: number) => void) => Promise<void>;
   title?: string;
 };
 

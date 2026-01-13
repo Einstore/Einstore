@@ -9,7 +9,7 @@ const isValidFile = (file: File | null) => {
 };
 
 type BuildUploadDropzoneProps = {
-  onUpload: (file: File) => Promise<void>;
+  onUpload: (file: File, onProgress?: (progress: number) => void) => Promise<void>;
   variant: "compact" | "full";
   title?: string;
 };
@@ -24,26 +24,33 @@ const BuildUploadDropzone = ({
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
+  const [progress, setProgress] = useState<number | null>(null);
 
   useEffect(() => {
-    if (!status) return undefined;
+    if (!status || busy) return undefined;
     const timer = window.setTimeout(() => setStatus(""), 1800);
     return () => window.clearTimeout(timer);
-  }, [status]);
+  }, [busy, status]);
 
   const handleFile = async (file: File | null) => {
     if (!file || !isValidFile(file) || busy) return;
     setBusy(true);
     setError("");
     setStatus("Uploading build...");
+    setProgress(0);
     try {
-      await onUpload(file);
+      await onUpload(file, (value) => {
+        const nextValue = Math.min(Math.max(value, 0), 1);
+        setProgress(nextValue);
+        setStatus(`Uploading build... ${Math.round(nextValue * 100)}%`);
+      });
       setStatus("Upload complete");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed.");
       setStatus("");
     } finally {
       setBusy(false);
+      setProgress(null);
       if (inputRef.current) {
         inputRef.current.value = "";
       }

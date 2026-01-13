@@ -53,7 +53,7 @@ type AppsPageProps = {
   pagination: PaginationMeta;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
-  onUpload: (file: File) => Promise<void>;
+  onUpload: (file: File, onProgress?: (progress: number) => void) => Promise<void>;
 };
 
 const AppsPage = ({
