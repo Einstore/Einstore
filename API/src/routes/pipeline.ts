@@ -28,6 +28,7 @@ const presignUploadSchema = z.object({
   filename: z.string().min(1),
   sizeBytes: z.coerce.number().int().positive(),
   contentType: z.string().optional(),
+  signContentType: z.coerce.boolean().optional(),
 });
 const completeUploadSchema = z.object({
   key: z.string().min(1),
@@ -204,16 +205,18 @@ export async function pipelineRoutes(app: FastifyInstance) {
       throw error;
     }
     const key = `ingest/${teamId}/${crypto.randomUUID()}${extension}`;
+    const shouldSignContentType = Boolean(parsed.data.signContentType && parsed.data.contentType);
     const uploadUrl = await presignPutObject({
       bucket: spaces.bucket,
       key,
       expiresIn: PRESIGNED_TTL_SECONDS,
+      ...(shouldSignContentType ? { contentType: parsed.data.contentType } : {}),
     });
     return reply.send({
       uploadUrl,
       key,
       expiresIn: PRESIGNED_TTL_SECONDS,
-      headers: {},
+      headers: shouldSignContentType ? { "Content-Type": parsed.data.contentType ?? "" } : {},
     });
   });
 

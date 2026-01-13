@@ -17,7 +17,7 @@ This document describes the upload and processing flow for IPA/APK/AAB files, op
 ## Upload flow (all platforms)
 - API issues a presigned URL (PUT or POST) for Spaces.
 - Client streams the binary to Spaces using the presigned URL.
-- Browser PUT uploads use XHR and set only the headers returned by the API (typically no custom headers).
+- Browser PUT uploads use XHR and set only the headers returned by the API (typically none; macOS Safari uses a signed `Content-Type` header).
 - Client calls the API with `{ storageKind: "s3", storagePath: "spaces://bucket/key" }` to start processing.
 - For CI pipelines, use an API key (`x-api-key`) to authenticate upload and ingest calls.
 
