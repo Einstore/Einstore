@@ -18,7 +18,7 @@ const CodeBlock = ({ code, className = "", onCopy }: CodeBlockProps) => {
   return (
     <div className="relative">
       <pre
-        className={`whitespace-pre overflow-hidden rounded-lg bg-slate-900 p-4 text-xs text-slate-100 ${className} cursor-pointer`}
+        className={`whitespace-pre overflow-x-auto rounded-lg bg-slate-900 p-4 text-xs text-slate-100 ${className} cursor-pointer`}
         role="button"
         tabIndex={0}
         onClick={handleCopy}
