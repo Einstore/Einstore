@@ -114,7 +114,17 @@ const AppRoutes = () => {
   });
   const [appsPage, setAppsPage] = useState(1);
   const [appsPerPage, setAppsPerPage] = useState(25);
-  const [appsPlatform, setAppsPlatform] = useState("all");
+  const readAppsPlatformCookie = () => {
+    if (typeof document === "undefined") return "all";
+    const match = document.cookie
+      .split(";")
+      .map((part) => part.trim())
+      .find((part) => part.startsWith("apps_platform="));
+    const value = match?.split("=")[1];
+    return value === "ios" || value === "android" ? value : "all";
+  };
+
+  const [appsPlatform, setAppsPlatform] = useState(() => readAppsPlatformCookie());
   const [appIcons, setAppIcons] = useState<Record<string, string>>({});
   const [ingestNonce, setIngestNonce] = useState(0);
   const [storageUsage, setStorageUsage] = useState<StorageUsageUser[]>([]);

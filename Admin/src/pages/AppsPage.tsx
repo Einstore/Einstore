@@ -27,16 +27,6 @@ const writeViewModeCookie = (mode: "list" | "grid") => {
   document.cookie = `${VIEW_MODE_COOKIE}=${mode}; path=/; max-age=${maxAge}`;
 };
 
-const readPlatformCookie = (): string => {
-  if (typeof document === "undefined") return "all";
-  const match = document.cookie
-    .split(";")
-    .map((part) => part.trim())
-    .find((part) => part.startsWith(`${PLATFORM_COOKIE}=`));
-  const value = match?.split("=")[1];
-  return value === "ios" || value === "android" ? value : "all";
-};
-
 const writePlatformCookie = (value: string) => {
   if (typeof document === "undefined") return;
   const normalized = value === "ios" || value === "android" ? value : "all";
@@ -68,7 +58,13 @@ const AppsPage = ({
   onUpload,
 }: AppsPageProps) => {
   const [viewMode, setViewMode] = useState<"list" | "grid">(() => readViewModeCookie());
-  const [platformValue, setPlatformValue] = useState<string>(() => readPlatformCookie());
+  const [platformValue, setPlatformValue] = useState<string>(platform);
+
+  useEffect(() => {
+    if (platformValue !== platform) {
+      setPlatformValue(platform);
+    }
+  }, [platform, platformValue]);
 
   const handlePlatformChange = (value: string) => {
     const next = value === "ios" || value === "android" ? value : "all";
