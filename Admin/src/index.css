@@ -96,7 +96,7 @@ body {
 }
 
 .dark .feature-flags-page .bg-white {
-  background-color: #0f172a;
+  background-color: #1f2937;
 }
 
 .dark .feature-flags-page .border-slate-200 {
@@ -124,7 +124,7 @@ body {
 
 .feature-flags-page input {
   background-color: #ffffff;
-  border-color: #e2e8f0;
+  border-color: #cbd5e1;
   color: #0f172a;
 }
 
@@ -133,9 +133,9 @@ body {
 }
 
 .dark .feature-flags-page input {
-  background-color: #0f172a;
-  border-color: #1f2937;
-  color: #e5e7eb;
+  background-color: #1f2937;
+  border-color: #475569;
+  color: #e2e8f0;
 }
 
 .dark .feature-flags-page input::placeholder {
