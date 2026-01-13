@@ -154,6 +154,14 @@ const renderMetadataRows = (metadata: unknown) => {
   );
 };
 
+const renderMultilineText = (value: string) =>
+  value.split("\n").map((line, index) => (
+    <span key={`${line}-${index}`}>
+      {line}
+      {index < value.split("\n").length - 1 ? <br /> : null}
+    </span>
+  ));
+
 const BuildDetailPage = ({
   build,
   iconUrl,
@@ -199,6 +207,24 @@ const BuildDetailPage = ({
   });
   const infoObject =
     build?.info && typeof build.info === "object" && !Array.isArray(build.info) ? build.info : null;
+  const releaseDetailsRows = [
+    { label: "Git commit", value: build?.gitCommit ?? null, type: "code" as const },
+    { label: "PR link", value: build?.prUrl ?? null, type: "link" as const },
+    { label: "Change log", value: build?.changeLog ?? null, type: "text" as const },
+    { label: "Notes", value: build?.notes ?? null, type: "text" as const },
+    ...(infoObject
+      ? Object.entries(infoObject).map(([key, value]) => ({
+          label: key,
+          value:
+            typeof value === "string"
+              ? value
+              : typeof value === "number" || typeof value === "boolean"
+              ? String(value)
+              : JSON.stringify(value, null, 2),
+          type: "info" as const,
+        }))
+      : []),
+  ];
 
   const [tagDraft, setTagDraft] = useState<string[]>(tags.map((tag) => tag.name));
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -392,70 +418,45 @@ const BuildDetailPage = ({
                   </button>
                 ) : null}
               </div>
-              <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Git commit
-                  </dt>
-                  <dd className="mt-1 break-all text-sm text-slate-900 dark:text-slate-100">
-                    {build?.gitCommit ? <code className="rounded bg-slate-100 px-1 dark:bg-slate-800">{build.gitCommit}</code> : "—"}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    PR link
-                  </dt>
-                  <dd className="mt-1 text-sm text-slate-900 dark:text-slate-100">
-                    {build?.prUrl ? (
-                      <a
-                        href={build.prUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-indigo-600 underline transition-colors hover:text-indigo-500 dark:text-indigo-300"
-                      >
-                        {build.prUrl}
-                      </a>
-                    ) : (
-                      "—"
-                    )}
-                  </dd>
-                </div>
-              </dl>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Change log
-                  </p>
-                  <div className="rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
-                    {build?.changeLog ? (
-                      <p className="whitespace-pre-wrap break-words text-sm">{build.changeLog}</p>
-                    ) : (
-                      <span className="text-slate-500 dark:text-slate-400">Not provided.</span>
-                    )}
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Notes
-                  </p>
-                  <div className="rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
-                    {build?.notes ? (
-                      <p className="whitespace-pre-wrap break-words text-sm">{build.notes}</p>
-                    ) : (
-                      <span className="text-slate-500 dark:text-slate-400">Not provided.</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Info (JSON)</p>
-                <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
-                  {infoObject ? (
-                    <pre className="whitespace-pre-wrap break-words">{JSON.stringify(infoObject, null, 2)}</pre>
-                  ) : (
-                    <span className="text-slate-500 dark:text-slate-400">No additional info.</span>
-                  )}
-                </div>
+              <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
+                {releaseDetailsRows.map((row, index) => {
+                  const isEven = index % 2 === 0;
+                  const value = row.value ?? "—";
+                  return (
+                    <div
+                      key={`${row.label}-${index}`}
+                      className={`grid gap-4 px-4 py-3 text-sm md:grid-cols-[220px_1fr] ${
+                        isEven ? "bg-slate-50 dark:bg-slate-800" : "bg-white dark:bg-slate-900"
+                      }`}
+                    >
+                      <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        {row.label}
+                      </div>
+                      <div className="text-sm text-slate-900 dark:text-slate-100">
+                        {row.type === "link" && row.value ? (
+                          <a
+                            href={row.value}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-indigo-600 underline transition-colors hover:text-indigo-500 dark:text-indigo-300"
+                          >
+                            {row.value}
+                          </a>
+                        ) : row.type === "code" && row.value ? (
+                          <code className="rounded bg-slate-100 px-1 dark:bg-slate-800">
+                            {row.value}
+                          </code>
+                        ) : typeof value === "string" ? (
+                          <span className="break-words">
+                            {renderMultilineText(value)}
+                          </span>
+                        ) : (
+                          value
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </Panel>
 
