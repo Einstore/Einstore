@@ -48,6 +48,7 @@ postgresql://postgres@localhost:8102/einstore?schema=public
 - Worktree safety: never discard/revert uncommitted changes, especially ones not created in the current task context.
 - No destructive commands unless explicitly requested (e.g., `git reset`, `git clean`, `git restore`, `rm`).
 - Commit and push after each turn, but only include files you personally touched that turn—never stage or commit unrelated or pre-existing changes. This is very important: do not stage, commit, or remove any unrelated or pre-existing changes.
+- Never change migrations not made in the current turn.
 - If you add or modify database migrations, run `make migrate test` before committing.
 - Upload presign headers are brittle: the presigned URL is generated with `SignedHeaders=host` only. Any client-sent custom header (including `Content-Type`) will invalidate the signature; keep browser PUTs free of extra headers unless the presign contract changes.
 
