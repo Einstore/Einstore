@@ -153,7 +153,7 @@ const BillingRoute = () => {
       </header>
 
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="flex flex-col gap-6">
+        <div className="flex min-w-0 flex-col gap-6">
           <div className={`${panelClass}`}>
             <header className="flex flex-wrap items-center justify-between gap-3">
               <div>
@@ -172,14 +172,14 @@ const BillingRoute = () => {
               </button>
             </header>
 
-            <div className="mt-5 grid grid-cols-4 gap-4">
+            <div className="mt-5 grid w-full min-w-0 grid-cols-4 gap-4">
               {plans.map((plan) => {
                 const isCurrent = plan.id === currentPlan;
                 const isProcessing = processingPlan === plan.id;
                 return (
                   <div
                     key={plan.id}
-                    className={`relative flex h-full flex-col gap-3 rounded-xl border border-slate-200 p-4 shadow-sm transition hover:-translate-y-[1px] dark:border-slate-700 ${
+                    className={`relative flex h-full min-w-0 flex-col gap-3 rounded-xl border border-slate-200 p-4 shadow-sm transition hover:-translate-y-[1px] dark:border-slate-700 ${
                       plan.featured
                         ? "bg-indigo-50/70 dark:bg-indigo-900/20"
                         : "bg-white/90 dark:bg-slate-900/70"
