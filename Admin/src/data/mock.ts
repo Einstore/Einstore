@@ -32,6 +32,10 @@ export type ActivityItem = {
   detail: string;
   time: string;
   tag: string;
+  buildId?: string;
+  appId?: string;
+  appName?: string;
+  actor?: string;
 };
 
 export type PipelineStage = {
@@ -232,6 +236,10 @@ export const activity: ActivityItem[] = [
     detail: "Downloaded by Maya Singh",
     time: "5 min ago",
     tag: "Download",
+    buildId: "build-1",
+    appId: "app-1",
+    appName: "Atlas Field",
+    actor: "Maya Singh",
   },
   {
     id: "activity-2",
@@ -239,6 +247,10 @@ export const activity: ActivityItem[] = [
     detail: "Installed by Rafael Vega",
     time: "18 min ago",
     tag: "Install",
+    buildId: "build-2",
+    appId: "app-2",
+    appName: "Pulse Monitor",
+    actor: "Rafael Vega",
   },
   {
     id: "activity-3",
@@ -246,6 +258,10 @@ export const activity: ActivityItem[] = [
     detail: "Downloaded by Dina Park",
     time: "42 min ago",
     tag: "Download",
+    buildId: "build-3",
+    appId: "app-3",
+    appName: "Courier Flow",
+    actor: "Dina Park",
   },
   {
     id: "activity-4",
@@ -253,6 +269,10 @@ export const activity: ActivityItem[] = [
     detail: "Installed by Liam Carter",
     time: "1 hour ago",
     tag: "Install",
+    buildId: "build-4",
+    appId: "app-4",
+    appName: "Summit POS",
+    actor: "Liam Carter",
   },
   {
     id: "activity-5",
@@ -260,6 +280,10 @@ export const activity: ActivityItem[] = [
     detail: "Downloaded by Tara Martinez",
     time: "2 hours ago",
     tag: "Download",
+    buildId: "build-5",
+    appId: "app-5",
+    appName: "Transit Hub",
+    actor: "Tara Martinez",
   },
 ];
 

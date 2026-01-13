@@ -252,6 +252,10 @@ const AppRoutes = () => {
       detail,
       time,
       tag: event.kind === "install" ? "Install" : "Download",
+      buildId: event.buildId,
+      appId: event.build?.version?.app?.id ?? undefined,
+      appName: buildName,
+      actor,
     };
   }, []);
 

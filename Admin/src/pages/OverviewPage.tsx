@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import OverviewSection from "../sections/OverviewSection";
 import StorageSection from "../sections/StorageSection";
 import Panel from "../components/Panel";
 import BuildQueueList from "../components/BuildQueueList";
-import ActivityItemCard from "../components/ActivityItemCard";
+import AppAvatar from "../components/AppAvatar";
+import Icon from "../components/Icon";
 import type { ActivityItem, AppSummary, BuildJob, Metric } from "../data/mock";
 import type { StorageUsageUser } from "../types/usage";
 import type { SearchBuildResult } from "../lib/search";
@@ -45,6 +47,7 @@ const OverviewPage = ({
   onInstallBuild,
   onDownloadBuild,
 }: OverviewPageProps) => {
+  const navigate = useNavigate();
   const [previewAppId, setPreviewAppId] = useState<string>("all");
   const [appSearch, setAppSearch] = useState("");
   const [isAppDropdownOpen, setIsAppDropdownOpen] = useState(false);
@@ -97,6 +100,15 @@ const OverviewPage = ({
     const byApp = previewBuilds.filter((build) => build.appId === previewAppId);
     return byApp.slice(0, 8);
   }, [previewBuilds, previewAppId]);
+
+  const handleActivitySelect = (item: ActivityItem) => {
+    if (!item.buildId) return;
+    if (item.appId) {
+      navigate(`/apps/${item.appId}/builds/${item.buildId}`);
+      return;
+    }
+    navigate(`/builds/${item.buildId}`);
+  };
 
   return (
     <div className="space-y-10">
@@ -238,11 +250,49 @@ const OverviewPage = ({
               </p>
             </div>
             {activity.length ? (
-              <div className="grid grid-cols-1 gap-3">
-                {activity.slice(0, 5).map((item) => (
-                  <ActivityItemCard key={item.id} {...item} />
-                ))}
-              </div>
+              <Panel className="overflow-hidden p-0">
+                <div className="grid grid-cols-[auto_minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,0.6fr)_auto] items-center gap-3 border-b border-slate-200 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                  <span className="text-left"> </span>
+                  <span>What</span>
+                  <span>Who</span>
+                  <span>When</span>
+                  <span className="text-right"> </span>
+                </div>
+                <div className="divide-y divide-slate-200 dark:divide-slate-700">
+                  {activity.slice(0, 5).map((item) => {
+                    const iconUrl = item.appId ? appIconsByApp?.[item.appId] : null;
+                    const who = item.actor ?? item.detail.replace(/^(Installed|Downloaded) by /i, "");
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => handleActivitySelect(item)}
+                        disabled={!item.buildId}
+                        className="group grid h-9 w-full grid-cols-[auto_minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,0.6fr)_auto] items-center gap-3 px-4 text-left text-xs text-slate-600 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 disabled:cursor-default disabled:opacity-70 dark:text-slate-300 dark:hover:bg-slate-800"
+                      >
+                        <AppAvatar name={item.appName ?? item.title} iconUrl={iconUrl} size="xs" />
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="truncate font-semibold text-slate-900 dark:text-slate-100">
+                              {item.title}
+                            </span>
+                            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:bg-slate-700 dark:text-slate-300">
+                              {item.tag}
+                            </span>
+                          </div>
+                        </div>
+                        <span className="truncate text-slate-500 dark:text-slate-400">{who}</span>
+                        <span className="truncate text-slate-400 dark:text-slate-500">
+                          {item.time}
+                        </span>
+                        <span className="text-slate-400 transition-colors group-hover:text-slate-500 dark:text-slate-600 dark:group-hover:text-slate-400">
+                          <Icon name="chevronRight" />
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </Panel>
             ) : (
               <Panel>
                 <p className="text-sm text-slate-600 dark:text-slate-300">

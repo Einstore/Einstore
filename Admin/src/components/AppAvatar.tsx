@@ -1,11 +1,12 @@
 type AppAvatarProps = {
   name?: string | null;
   iconUrl?: string | null;
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
   platform?: string | null;
 };
 
 const sizes = {
+  xs: "h-7 w-7 text-[10px]",
   sm: "h-10 w-10 text-base",
   md: "h-11 w-11 text-xl",
   lg: "h-20 w-20 text-2xl",
