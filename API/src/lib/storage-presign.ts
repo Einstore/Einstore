@@ -20,6 +20,8 @@ export const resolveS3Client = () => {
     endpoint: endpoint || undefined,
     credentials: { accessKeyId, secretAccessKey },
     forcePathStyle: Boolean(endpoint),
+    requestChecksumCalculation: "WHEN_REQUIRED",
+    responseChecksumValidation: "WHEN_REQUIRED",
   });
 };
 
