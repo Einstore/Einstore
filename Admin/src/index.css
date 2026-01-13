@@ -114,6 +114,10 @@ body {
   color: #cbd5e1;
 }
 
+.feature-flags-page > .space-y-6 > div:first-child {
+  display: none;
+}
+
 .api-keys-page .bg-white,
 .api-keys-page .border-slate-200 {
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
