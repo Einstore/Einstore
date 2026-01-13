@@ -12,7 +12,7 @@ const AddAppDialog = ({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  onUpload: (file: File) => Promise<void>;
+  onUpload: (file: File, onProgress?: (progress: number) => void) => Promise<void>;
   debugInfo?: string;
 }) => {
   const [file, setFile] = useState<File | null>(null);
