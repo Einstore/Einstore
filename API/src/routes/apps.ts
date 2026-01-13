@@ -27,9 +27,8 @@ const sendBillingError = (reply: FastifyReply, error: unknown) => {
   if (!error || typeof error !== "object" || !(error as { code?: string }).code) {
     throw error;
   }
-  const statusCode = typeof (error as { statusCode?: number }).statusCode === "number"
-    ? (error as { statusCode?: number }).statusCode
-    : 403;
+  const candidate = (error as { statusCode?: number }).statusCode;
+  const statusCode = typeof candidate === "number" ? candidate : 403;
   return reply.status(statusCode).send({
     error: (error as { code: string }).code,
     message: (error as { message?: string }).message ?? "Plan limit reached.",
