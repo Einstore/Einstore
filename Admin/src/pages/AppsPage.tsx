@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import AppsTable from "../components/AppsTable";
 import EmptyUploadDropzone from "../components/EmptyUploadDropzone";
