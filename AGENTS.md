@@ -48,8 +48,7 @@ postgresql://postgres@localhost:8102/einstore?schema=public
 - No destructive commands unless explicitly requested (e.g., `git reset`, `git clean`, `git restore`, `rm`).
 - Commit and push after each turn, but only include files you personally touched that turn—never stage or commit unrelated or pre-existing changes. This is very important: do not stage, commit, or remove any unrelated or pre-existing changes.
 - If you add or modify database migrations, run `make migrate test` before committing.
-- Upload presign headers are brittle: the API and Admin must keep the exact signed headers (`Content-Type`, `x-amz-checksum-*`) aligned with CORS for Spaces uploads. Changing or adding headers will break browser uploads; update the presign response, client, and Spaces CORS together if adjustments are ever needed.
-- Browser PUTs must only send the pre-signed headers (Content-Type + x-amz-checksum-*). Do not introduce any additional custom headers in the upload path; keep the allowlist tight.
+- Upload presign headers are brittle: the presigned URL is generated with `SignedHeaders=host` only. Any client-sent custom header (including `Content-Type`) will invalidate the signature; keep browser PUTs free of extra headers unless the presign contract changes.
 
 ## Pagination standard
 

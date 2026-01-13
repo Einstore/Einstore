@@ -24,7 +24,7 @@ type AdminLayoutProps = {
   onCreateTeam?: (name: string) => Promise<void>;
   activeTeamId: string;
   teams: TeamSummary[];
-  onUpload: (file: File) => Promise<void>;
+  onUpload: (file: File, onProgress?: (progress: number) => void) => Promise<void>;
   showUploadDebug?: boolean;
   uploadDebugInfo?: string;
   user?: SessionUser | null;

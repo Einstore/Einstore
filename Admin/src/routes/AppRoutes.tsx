@@ -863,7 +863,7 @@ const AppsRoute = ({
   pagination: PaginationMeta;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
-  onUpload: (file: File) => Promise<void>;
+  onUpload: (file: File, onProgress?: (progress: number) => void) => Promise<void>;
 }) => {
   return (
     <AppsPage
@@ -1205,7 +1205,7 @@ const LatestBuildsRoute = ({
 }: {
   ingestNonce: number;
   activeTeamId: string;
-  onUpload: (file: File) => Promise<void>;
+  onUpload: (file: File, onProgress?: (progress: number) => void) => Promise<void>;
 }) => {
   const navigate = useNavigate();
   const [builds, setBuilds] = useState<ApiBuild[]>([]);
