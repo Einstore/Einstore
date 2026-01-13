@@ -152,6 +152,7 @@ test:
 	@if [ "$(firstword $(MAKECMDGOALS))" = "migrate" ] && [ "$(MIGRATE_MODE)" = "test" ]; then \
 		echo "Skipping API test suite (triggered via 'make migrate test')."; \
 	else \
+		$(MAKE) migrate test; \
 		BASE_URL="$${DATABASE_URL:-}"; \
 		if [ -z "$$BASE_URL" ] && [ -f API/.env ]; then \
 			BASE_LINE=$$(grep -E '^DATABASE_URL=' API/.env | tail -n 1); \
@@ -184,7 +185,7 @@ test:
 			"test_uri = parsed._replace(path='/' + target)" \
 			"print(urlunparse(test_uri))" \
 			> "$$TMP_SCRIPT"; \
-		if ! BASE_URL="$$BASE_URL" TARGET_DB="einstore-test" python3 "$$TMP_SCRIPT" >"$$TMP_FILE" 2>&1; then \
+		if ! BASE_URL="$$BASE_URL" TARGET_DB="$(MIGRATION_TEST_DB)" python3 "$$TMP_SCRIPT" >"$$TMP_FILE" 2>&1; then \
 			cat "$$TMP_FILE" >&2; \
 			rm -f "$$TMP_FILE" "$$TMP_SCRIPT"; \
 			exit 1; \
