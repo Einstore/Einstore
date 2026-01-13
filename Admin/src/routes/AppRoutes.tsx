@@ -99,16 +99,6 @@ const putToSpacesXHR = ({
     xhr.send(file);
   });
 
-const isMacSafari = () => {
-  if (typeof navigator === "undefined") return false;
-  const ua = navigator.userAgent;
-  const isMac = ua.includes("Macintosh");
-  const isSafari = ua.includes("Safari") && !ua.includes("Chrome") && !ua.includes("Chromium");
-  const isIOS = /iPad|iPhone|iPod/.test(ua);
-  const isEdgeOrOpera = ua.includes("Edg") || ua.includes("OPR");
-  return isMac && isSafari && !isIOS && !isEdgeOrOpera;
-};
-
 const AppRoutes = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -511,7 +501,6 @@ const AppRoutes = () => {
       let primaryError: Error | null = null;
 
       try {
-        const signContentType = isMacSafari();
         const presign = await apiFetch<{ uploadUrl: string; key: string; headers?: Record<string, string> }>(
           "/ingest/upload-url",
           {
@@ -520,7 +509,6 @@ const AppRoutes = () => {
               filename: file.name,
               sizeBytes: file.size,
               contentType,
-              signContentType,
             }),
           }
         ).catch((err) => {

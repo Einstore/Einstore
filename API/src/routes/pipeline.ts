@@ -28,7 +28,6 @@ const presignUploadSchema = z.object({
   filename: z.string().min(1),
   sizeBytes: z.coerce.number().int().positive(),
   contentType: z.string().optional(),
-  signContentType: z.coerce.boolean().optional(),
 });
 const completeUploadSchema = z.object({
   key: z.string().min(1),
@@ -41,6 +40,16 @@ const parseContentLength = (value: unknown) => {
   if (typeof raw !== "string") return null;
   const numeric = Number(raw);
   return Number.isFinite(numeric) && numeric > 0 ? BigInt(Math.ceil(numeric)) : null;
+};
+
+const isMacSafariUserAgent = (value: unknown) => {
+  const raw = Array.isArray(value) ? value[0] : value;
+  if (typeof raw !== "string") return false;
+  const isMac = raw.includes("Macintosh");
+  const isSafari = raw.includes("Safari") && !raw.includes("Chrome") && !raw.includes("Chromium");
+  const isIOS = /iPad|iPhone|iPod/.test(raw);
+  const isEdgeOrOpera = raw.includes("Edg") || raw.includes("OPR");
+  return isMac && isSafari && !isIOS && !isEdgeOrOpera;
 };
 
 const gbToBytes = (gb: number) => BigInt(Math.round(gb * 1024 * 1024 * 1024));
@@ -205,7 +214,9 @@ export async function pipelineRoutes(app: FastifyInstance) {
       throw error;
     }
     const key = `ingest/${teamId}/${crypto.randomUUID()}${extension}`;
-    const shouldSignContentType = Boolean(parsed.data.signContentType && parsed.data.contentType);
+    const shouldSignContentType = Boolean(
+      parsed.data.contentType && isMacSafariUserAgent(request.headers["user-agent"])
+    );
     const uploadUrl = await presignPutObject({
       bucket: spaces.bucket,
       key,
