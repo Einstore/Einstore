@@ -403,7 +403,7 @@ const BuildDetailPage = ({
               </div>
             </Panel>
 
-            <div className="grid grid-cols-12 gap-6 md:items-start">
+            <div className="col-span-12 grid grid-cols-12 gap-6 md:items-start">
               <div className="col-span-12 space-y-6 md:col-span-6">
                 <Panel className="space-y-4">
                   <div className="flex items-start justify-between gap-3">
