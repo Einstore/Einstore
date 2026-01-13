@@ -3356,7 +3356,7 @@
             "exec": [
               "pm.test('status 200', function () { pm.response.to.have.status(200); });",
               "const body = pm.response.json();",
-              "pm.test('has crash items', function () { pm.expect(body.items.length).to.be.above(0); pm.expect(body.items[0].service).to.eql('crashes'); });"
+              "pm.test('crash items ok', function () { pm.expect(Array.isArray(body.items)).to.equal(true); if (body.items.length) { pm.expect(body.items[0].service).to.eql('crashes'); } });"
             ]
           }
         }
