@@ -46,8 +46,8 @@ const plans: Plan[] = [
     id: "enterprise",
     label: "Enterprise",
     price: "$499",
-    description: "Unlimited everything. 10 TB storage, 100 TB transfer. CI-heavy ready.",
-    perks: ["Hard caps only", "Priority roadmap + SSO options", "Best for large orgs"],
+    description: "Unlimited teams & users. 1 TB storage, 10 TB transfer. CI-heavy ready.",
+    perks: ["Hard caps only", "Priority roadmap + SSO options", "For higher data limits, please contact us"],
   },
 ];
 
