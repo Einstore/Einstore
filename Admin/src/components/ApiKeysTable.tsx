@@ -42,6 +42,7 @@ const ApiKeysTable = ({ apiKeys, selectedId, onSelect, onRevoke }: ApiKeysTableP
               role="button"
               tabIndex={0}
               aria-pressed={isSelected}
+              title={`Key prefix: ${key.prefix}...`}
               onClick={() => onSelect(key)}
               onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === " ") {
