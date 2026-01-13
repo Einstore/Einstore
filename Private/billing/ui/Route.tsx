@@ -172,66 +172,68 @@ const BillingRoute = () => {
               </button>
             </header>
 
-            <div className="mt-5 overflow-x-auto">
-              <div className="grid min-w-[1200px] grid-cols-4 gap-4">
-              {plans.map((plan) => {
-                const isCurrent = plan.id === currentPlan;
-                const isProcessing = processingPlan === plan.id;
-                return (
-                  <div
-                    key={plan.id}
-                    className={`relative flex h-full min-w-0 flex-col gap-3 rounded-xl border border-slate-200 p-4 shadow-sm transition hover:-translate-y-[1px] dark:border-slate-700 ${
-                      plan.featured
-                        ? "bg-indigo-50/70 dark:bg-indigo-900/20"
-                        : "bg-white/90 dark:bg-slate-900/70"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        {plan.featured ? (
-                          <span className="rounded-full bg-indigo-500/90 px-2 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
-                            Recommended
-                          </span>
-                        ) : (
-                          <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
-                            {plan.label}
-                          </span>
-                        )}
+            <div className="mt-5">
+              <div className="grid w-full grid-cols-4 gap-4">
+                {plans.map((plan) => {
+                  const isCurrent = plan.id === currentPlan;
+                  const isProcessing = processingPlan === plan.id;
+                  return (
+                    <div
+                      key={plan.id}
+                      className={`relative flex h-full min-w-0 flex-col gap-3 rounded-xl border border-slate-200 p-4 shadow-sm transition hover:-translate-y-[1px] dark:border-slate-700 ${
+                        plan.featured
+                          ? "bg-indigo-50/70 dark:bg-indigo-900/20"
+                          : "bg-white/90 dark:bg-slate-900/70"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          {plan.featured ? (
+                            <span className="rounded-full bg-indigo-500/90 px-2 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
+                              Recommended
+                            </span>
+                          ) : (
+                            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
+                              {plan.label}
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-lg font-bold text-slate-900 dark:text-slate-50">
+                          {plan.price} / mo
+                        </div>
                       </div>
-                      <div className="text-lg font-bold text-slate-900 dark:text-slate-50">{plan.price} / mo</div>
+                      <p className="text-sm text-slate-600 dark:text-slate-300">{plan.description}</p>
+                      <ul className="grid gap-2 text-sm text-slate-600 dark:text-slate-300">
+                        {plan.perks.map((perk) => (
+                          <li key={perk} className="flex items-start gap-2">
+                            <span className="mt-1 inline-block h-2 w-2 rounded-full bg-cyan-400" />
+                            <span>{perk}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="mt-auto pt-2">
+                        <button
+                          type="button"
+                          onClick={() => handleChangePlan(plan.id)}
+                          disabled={isProcessing || isCurrent}
+                          className={`inline-flex h-11 w-full items-center justify-center rounded-lg px-4 text-sm font-semibold shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 disabled:opacity-60 ${
+                            isCurrent
+                              ? "border border-slate-300 bg-white text-slate-600 dark:border-slate-600 dark:bg-slate-950 dark:text-slate-300"
+                              : "bg-indigo-500 text-white hover:bg-indigo-400"
+                          }`}
+                        >
+                          {isProcessing
+                            ? "Working…"
+                            : isCurrent
+                              ? "Current plan"
+                              : plan.id === "free"
+                                ? "Move to Free"
+                                : "Select plan"}
+                        </button>
+                      </div>
                     </div>
-                    <p className="text-sm text-slate-600 dark:text-slate-300">{plan.description}</p>
-                    <ul className="grid gap-2 text-sm text-slate-600 dark:text-slate-300">
-                      {plan.perks.map((perk) => (
-                        <li key={perk} className="flex items-start gap-2">
-                          <span className="mt-1 inline-block h-2 w-2 rounded-full bg-cyan-400" />
-                          <span>{perk}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="mt-auto pt-2">
-                      <button
-                        type="button"
-                        onClick={() => handleChangePlan(plan.id)}
-                        disabled={isProcessing || isCurrent}
-                        className={`inline-flex h-11 w-full items-center justify-center rounded-lg px-4 text-sm font-semibold shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 disabled:opacity-60 ${
-                          isCurrent
-                            ? "border border-slate-300 bg-white text-slate-600 dark:border-slate-600 dark:bg-slate-950 dark:text-slate-300"
-                            : "bg-indigo-500 text-white hover:bg-indigo-400"
-                        }`}
-                      >
-                        {isProcessing
-                          ? "Working…"
-                          : isCurrent
-                            ? "Current plan"
-                            : plan.id === "free"
-                              ? "Move to Free"
-                              : "Select plan"}
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
               </div>
             </div>
           </div>
