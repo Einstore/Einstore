@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 import { API_BASE_URL, apiFetch } from "../lib/api";
@@ -10,6 +10,7 @@ const LoginPage = () => {
   const [status, setStatus] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [busy, setBusy] = useState(false);
+  const attemptedAuthCodeRef = useRef<string | null>(null);
 
   const authCode = searchParams.get("authCode");
   const errorCode = searchParams.get("error");
@@ -61,6 +62,10 @@ const LoginPage = () => {
     if (!authCode) {
       return;
     }
+    if (attemptedAuthCodeRef.current === authCode) {
+      return;
+    }
+    attemptedAuthCodeRef.current = authCode;
     let cancelled = false;
     const exchange = async () => {
       setBusy(true);
