@@ -115,6 +115,11 @@ const BillingRoute = () => {
     }, 700);
   };
 
+  const featuredBorderGradient = useMemo(() => {
+    const stops = ["#f97316", "#ec4899", "#a855f7", "#3b82f6", "#22c55e"];
+    return `linear-gradient(135deg, ${stops.join(", ")})`;
+  }, []);
+
   const planGridStyle = useMemo(
     () => ({
       display: "grid",
@@ -159,13 +164,10 @@ const BillingRoute = () => {
           {plans.map((plan) => {
             const isCurrent = plan.id === currentPlan;
             const isProcessing = processingPlan === plan.id;
-
-            return (
+            const cardRadius = plan.featured ? "rounded-[10px]" : "rounded-xl";
+            const card = (
               <div
-                key={plan.id}
-                className={`flex h-full min-w-0 flex-col gap-4 rounded-xl bg-white p-5 shadow-sm dark:bg-slate-800 ${
-                  plan.featured ? "ring-1 ring-indigo-200 dark:ring-indigo-500/40" : ""
-                }`}
+                className={`flex h-full w-full min-w-0 flex-col gap-4 ${cardRadius} bg-white p-5 shadow-sm dark:bg-slate-800`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -224,6 +226,18 @@ const BillingRoute = () => {
                     </li>
                   ))}
                 </ul>
+              </div>
+            );
+
+            return (
+              <div key={plan.id} className="h-full">
+                {plan.featured ? (
+                  <div className="rounded-xl p-[2px]" style={{ background: featuredBorderGradient }}>
+                    {card}
+                  </div>
+                ) : (
+                  card
+                )}
               </div>
             );
           })}
