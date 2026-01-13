@@ -45,6 +45,8 @@ export default defineConfig({
           const result = await transform(code, {
             loader: "jsx",
             sourcefile: id,
+            jsx: "automatic",
+            jsxImportSource: "react",
           });
           return {
             code: result.code,
