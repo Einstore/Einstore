@@ -123,7 +123,7 @@ const BillingRoute = () => {
   const planGridStyle = useMemo(
     () => ({
       display: "grid",
-      gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+      gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",
       gap: "1.5rem",
     }),
     [],
@@ -247,42 +247,48 @@ const BillingRoute = () => {
         </div>
       </section>
 
-      <section className="mt-12 rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Add-on</p>
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">{addOns[0].label}</h3>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{addOns[0].description}</p>
+      <section className="mt-12">
+        <div style={planGridStyle}>
+          <div className="rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Add-on</p>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">{addOns[0].label}</h3>
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{addOns[0].description}</p>
+              </div>
+              <span className="text-lg font-semibold text-slate-900 dark:text-slate-50">
+                {addOns[0].price} / mo
+              </span>
             </div>
-            <span className="text-lg font-semibold text-slate-900 dark:text-slate-50">{addOns[0].price} / mo</span>
-          </div>
 
-          <ul className="mt-4 grid gap-2 text-sm text-slate-600 dark:text-slate-300">
-            {addOns[0].notes.map((note) => (
-              <li key={note} className="flex items-start gap-2">
-                <span className="mt-2 inline-block h-1.5 w-1.5 rounded-full bg-amber-400" />
-                <span>{note}</span>
-              </li>
-            ))}
-          </ul>
+            <ul className="mt-4 grid gap-2 text-sm text-slate-600 dark:text-slate-300">
+              {addOns[0].notes.map((note) => (
+                <li key={note} className="flex items-start gap-2">
+                  <span className="mt-2 inline-block h-1.5 w-1.5 rounded-full bg-amber-400" />
+                  <span>{note}</span>
+                </li>
+              ))}
+            </ul>
 
-          <div className="mt-5 flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              onClick={() => handleToggleAddOn("priority-support")}
-              disabled={processingAddOn === "priority-support"}
-              className="inline-flex h-11 items-center justify-center rounded-full bg-indigo-500 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 disabled:opacity-60"
-            >
-              {processingAddOn === "priority-support"
-                ? "Updating..."
-                : selectedAddOn
-                  ? "Remove add-on"
-                  : "Add to plan"}
-            </button>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Billed monthly. Applies immediately on activation.
-            </p>
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={() => handleToggleAddOn("priority-support")}
+                disabled={processingAddOn === "priority-support"}
+                className="inline-flex h-11 items-center justify-center rounded-full bg-indigo-500 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 disabled:opacity-60"
+              >
+                {processingAddOn === "priority-support"
+                  ? "Updating..."
+                  : selectedAddOn
+                    ? "Remove add-on"
+                    : "Add to plan"}
+              </button>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Billed monthly. Applies immediately on activation.
+              </p>
+            </div>
           </div>
+        </div>
       </section>
 
       {availability === "unavailable" && (
