@@ -132,7 +132,7 @@ const BillingRoute = () => {
   return (
     <div className="billing-page flex w-full flex-col gap-8 pb-12">
       {availability === "ready" && currentPlanMeta && (
-        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200 bg-white/90 px-5 py-4 text-sm text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200">
+        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
           <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200">
             Active plan
           </span>
@@ -148,7 +148,7 @@ const BillingRoute = () => {
         </div>
       )}
 
-      <section className="flex flex-col gap-6">
+      <section className="mt-6 flex flex-col gap-6">
         <header className="flex justify-end">
           <button
             type="button"
