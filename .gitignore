@@ -18,3 +18,5 @@ Private/*
 API/.env
 /frameworks/flutter/.dart_tool
 .DS_Store
+/API/Admin
+/API/API
