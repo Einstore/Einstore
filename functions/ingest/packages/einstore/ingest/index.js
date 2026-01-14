@@ -38,7 +38,8 @@ const normalizeIosIconPng = async (buffer) => {
 
   if (isCgbiPng(buffer)) {
     try {
-      working = Buffer.from(convertCgbi(buffer));
+      const converted = await convertCgbi(buffer);
+      working = Buffer.from(converted);
     } catch (error) {
       console.warn("CgBI conversion failed, using raw icon PNG.", error);
       working = buffer;
