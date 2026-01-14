@@ -24,7 +24,6 @@ import AppBuildsPage from "../pages/AppBuildsPage";
 import AcceptInvitePage from "../pages/AcceptInvitePage";
 import {
   buildQueue,
-  metrics,
   pipelineAlerts,
   pipelineStages,
   securityAudits,
@@ -629,7 +628,6 @@ const AppRoutes = () => {
       path: "/overview",
       element: (
         <OverviewPage
-          metrics={metrics}
           apps={apps}
           buildQueue={buildQueue}
           previewBuilds={previewBuilds}
@@ -642,7 +640,6 @@ const AppRoutes = () => {
           storageUsage={storageUsage}
           storageTotalBytes={storageUsageTotalBytes}
           isStorageLoading={isLoadingStorageUsage}
-          showMetrics={featureFlags["admin.overview_metrics"]}
           showActivity
           showStorage
         />

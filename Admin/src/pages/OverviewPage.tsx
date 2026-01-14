@@ -1,24 +1,21 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import OverviewSection from "../sections/OverviewSection";
 import StorageSection from "../sections/StorageSection";
 import ActionButton from "../components/ActionButton";
 import Panel from "../components/Panel";
 import BuildQueueList from "../components/BuildQueueList";
 import AppAvatar from "../components/AppAvatar";
 import Icon from "../components/Icon";
-import type { ActivityItem, AppSummary, BuildJob, Metric } from "../data/mock";
+import type { ActivityItem, AppSummary, BuildJob } from "../data/mock";
 import type { StorageUsageUser } from "../types/usage";
 import type { SearchBuildResult } from "../lib/search";
 
 type OverviewPageProps = {
-  metrics: Metric[];
   apps: AppSummary[];
   buildQueue: BuildJob[];
   storageUsage: StorageUsageUser[];
   storageTotalBytes: number;
   isStorageLoading?: boolean;
-  showMetrics?: boolean;
   showStorage?: boolean;
   activity?: ActivityItem[];
   showActivity?: boolean;
@@ -31,13 +28,11 @@ type OverviewPageProps = {
 };
 
 const OverviewPage = ({
-  metrics,
   apps,
   buildQueue,
   storageUsage,
   storageTotalBytes,
   isStorageLoading = false,
-  showMetrics = false,
   showStorage = false,
   activity = [],
   showActivity = false,
@@ -142,7 +137,6 @@ const OverviewPage = ({
           </p>
         </Panel>
       </div>
-      {showMetrics ? <OverviewSection metrics={metrics} /> : null}
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <div className="space-y-3">
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
