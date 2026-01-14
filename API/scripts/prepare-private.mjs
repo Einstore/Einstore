@@ -3,8 +3,9 @@ import path from "path";
 
 const projectRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..", "..");
 const privateRoot = path.join(projectRoot, "Private");
-const billingRoot = path.resolve(projectRoot, "..", "Billing");
-const moduleRoots = [privateRoot, billingRoot];
+const billingRootSibling = path.resolve(projectRoot, "..", "Billing");
+const billingRootLocal = path.resolve(projectRoot, "Billing");
+const moduleRoots = [privateRoot, billingRootSibling, billingRootLocal];
 const apiPrivateDir = path.join(projectRoot, "API", "Private");
 
 const apiRegistryPath = path.join(projectRoot, "API", "src", "private", "registry.ts");
