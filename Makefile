@@ -56,6 +56,7 @@ launch:
 	trap - INT TERM EXIT
 
 migrate:
+	@npm --prefix API run private:prepare
 	@if [ "$(MIGRATE_MODE)" = "test" ]; then \
 		clear; \
 		echo "Running migration test cycle against '$(MIGRATION_TEST_DB)'..."; \
