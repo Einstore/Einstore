@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import OverviewSection from "../sections/OverviewSection";
 import StorageSection from "../sections/StorageSection";
+import ActionButton from "../components/ActionButton";
 import Panel from "../components/Panel";
 import BuildQueueList from "../components/BuildQueueList";
 import AppAvatar from "../components/AppAvatar";
@@ -245,9 +246,7 @@ const OverviewPage = ({
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                 Latest downloads & installs
               </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Newest install/download events (15)
-              </p>
+              <ActionButton label="See all" variant="primary" onClick={() => navigate("/activity")} />
             </div>
             {activity.length ? (
               <Panel className="overflow-hidden p-0">

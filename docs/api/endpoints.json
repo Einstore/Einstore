@@ -1729,6 +1729,20 @@
             }
           },
           {
+            "in": "query",
+            "name": "appId",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "userId",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "$ref": "#/components/parameters/TeamIdHeader"
           }
         ],

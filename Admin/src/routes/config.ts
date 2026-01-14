@@ -25,6 +25,11 @@ export const pageConfig = {
     breadcrumbs: [{ label: "Home" }, { label: "Overview" }],
     actions: [{ id: "upload-build", label: "Upload build", variant: "primary" }],
   },
+  activity: {
+    title: "Activity",
+    breadcrumbs: [{ label: "Home" }, { label: "Activity" }],
+    actions: [],
+  },
   apps: {
     title: "Apps",
     breadcrumbs: [{ label: "Apps" }, { label: "Catalog" }],

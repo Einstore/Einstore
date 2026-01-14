@@ -52,6 +52,8 @@ Team-scoped endpoints:
   - `kind` (string, optional): filter to one event kind (`download` or `install`)
   - `kinds` (string, optional): comma-separated kinds to include (`download,install`)
   - `buildId` (string, optional): filter to a single build ID
+  - `appId` (string, optional): filter to a single app ID
+  - `userId` (string, optional): filter to a single user ID
 - Response schema: `{ "items": [{ "id": "evt", "kind": "download", "buildId": "build", "createdAt": "2026-01-11T00:00:00.000Z", "build": { "id": "build", "displayName": "Atlas Field 4.2.1", "buildNumber": "842", "version": { "version": "4.2.1", "app": { "id": "app", "name": "Atlas Field", "identifier": "com.app" } } }, "user": { "id": "user", "fullName": "Maya Singh" } }], "page": 1, "perPage": 25, "total": 1, "totalPages": 1 }`
 
 ## GET /info

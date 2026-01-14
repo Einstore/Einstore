@@ -15,6 +15,7 @@ import BuildsPage from "../pages/BuildsPage";
 import FutureFlagsPage from "../pages/FutureFlagsPage";
 import IntegrationsPage from "../pages/IntegrationsPage";
 import LoginPage from "../pages/LoginPage";
+import ActivityPage from "../pages/ActivityPage";
 import OverviewPage from "../pages/OverviewPage";
 import SearchPage from "../pages/SearchPage";
 import SettingsPage from "../pages/SettingsPage";
@@ -644,6 +645,19 @@ const AppRoutes = () => {
           showMetrics={featureFlags["admin.overview_metrics"]}
           showActivity
           showStorage
+        />
+      ),
+      navId: "overview",
+    },
+    {
+      id: "activity",
+      path: "/activity",
+      element: (
+        <ActivityPage
+          apps={apps}
+          appIcons={appIcons}
+          teamMembers={teamMembers}
+          activeTeamId={activeTeamId ?? ""}
         />
       ),
       navId: "overview",

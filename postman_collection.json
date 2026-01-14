@@ -3206,6 +3206,16 @@
             {
               "key": "kinds",
               "value": "download,install"
+            },
+            {
+              "key": "appId",
+              "value": "{{appId}}",
+              "disabled": true
+            },
+            {
+              "key": "userId",
+              "value": "{{userId}}",
+              "disabled": true
             }
           ]
         }

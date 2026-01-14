@@ -15,6 +15,8 @@ const listQuerySchema = z.object({
   kind: z.nativeEnum(BuildEventKind).optional(),
   kinds: z.string().optional(),
   buildId: z.string().min(1).optional(),
+  appId: z.string().min(1).optional(),
+  userId: z.string().min(1).optional(),
 });
 
 const createEventSchema = z.object({
@@ -94,7 +96,12 @@ export async function buildEventRoutes(app: FastifyInstance) {
       defaultPerPage: 25,
       maxPerPage: 200,
     });
-    const where = { buildId, teamId, kind };
+    const where = {
+      buildId,
+      teamId,
+      kind,
+      ...(parsed.data.userId ? { userId: parsed.data.userId } : undefined),
+    };
     const [total, items] = await prisma.$transaction([
       prisma.buildEvent.count({ where }),
       prisma.buildEvent.findMany({
@@ -151,6 +158,10 @@ export async function buildEventRoutes(app: FastifyInstance) {
     const where = {
       teamId,
       ...(parsed.data.buildId ? { buildId: parsed.data.buildId } : undefined),
+      ...(parsed.data.appId
+        ? { build: { version: { appId: parsed.data.appId } } }
+        : undefined),
+      ...(parsed.data.userId ? { userId: parsed.data.userId } : undefined),
       ...(kinds?.length ? { kind: { in: kinds } } : undefined),
     };
     const [total, items] = await prisma.$transaction([
