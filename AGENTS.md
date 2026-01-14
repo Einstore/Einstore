@@ -11,6 +11,7 @@ postgresql://postgres@localhost:8102/einstore?schema=public
 - Keep `postman_collection.json` in the repo root up to date.
 - Keep all docs in `docs/` up to date with API and behavior changes.
 - Alert system usage: see `docs/alerts.md`.
+- Local build debug reference: `docs/doctl-apps-dev-build.md`.
 - Build failures: reproduce and fix locally first; only deploy after the local build passes.
 - Always debug DigitalOcean/App Platform issues with `doctl` first.
 - Deployment debugging: use `doctl` (e.g., `doctl apps logs/get/list`) before changing configs or code.
