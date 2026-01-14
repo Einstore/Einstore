@@ -244,22 +244,14 @@ const copyDir = async (source, destination) => {
   await fs.cp(source, destination, { recursive: true, force: true });
 };
 
-const isUnderPrivateRoot = (dir) => {
-  const rel = path.relative(privateRoot, dir);
-  return !rel.startsWith("..") && !path.isAbsolute(rel);
-};
-
 const syncApiPrivateDir = async (modules) => {
-  if (!modules.length) return [];
+  const apiModules = modules.filter((mod) => mod.apiEntry);
+  if (!apiModules.length) return [];
 
   await fs.rm(apiPrivateDir, { recursive: true, force: true });
 
   const synced = [];
-  for (const mod of modules) {
-    if (!isUnderPrivateRoot(mod.dir)) {
-      synced.push(mod);
-      continue;
-    }
+  for (const mod of apiModules) {
     const targetDir = path.join(apiPrivateDir, mod.id);
     await copyDir(mod.dir, targetDir);
     const entryRel = mod.apiEntry ? path.relative(mod.dir, mod.apiEntry) : null;
