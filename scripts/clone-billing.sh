@@ -7,7 +7,7 @@ fi
 
 BILLING_REPO="${BILLING_REPO:-git@github.com:Einstore/Billing.git}"
 BILLING_REF="${BILLING_REF:-}"
-BILLING_DIR="${BILLING_DIR:-../Private/billing}"
+BILLING_DIR="${BILLING_DIR:-../Billing}"
 
 mkdir -p ~/.ssh
 echo "$BILLING_DEPLOY_KEY" > ~/.ssh/id_rsa

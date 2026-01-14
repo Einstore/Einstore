@@ -1,3 +1,6 @@
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "public";
+
 -- CreateEnum
 CREATE TYPE "PlatformKind" AS ENUM ('ios', 'watchos', 'tvos', 'visionos', 'android', 'wearos', 'auto');
 
@@ -15,6 +18,9 @@ CREATE TYPE "StorageKind" AS ENUM ('local', 's3');
 
 -- CreateEnum
 CREATE TYPE "BuildEventKind" AS ENUM ('download', 'install');
+
+-- CreateEnum
+CREATE TYPE "TrackingService" AS ENUM ('analytics', 'errors', 'distribution', 'devices', 'usage', 'crashes');
 
 -- CreateEnum
 CREATE TYPE "UserStatus" AS ENUM ('active', 'disabled');
@@ -68,9 +74,27 @@ CREATE TABLE "Build" (
     "storageKind" "StorageKind" NOT NULL,
     "storagePath" TEXT NOT NULL,
     "sizeBytes" INTEGER NOT NULL,
+    "gitCommit" TEXT,
+    "prUrl" TEXT,
+    "changeLog" TEXT,
+    "notes" TEXT,
+    "info" JSONB,
     "createdByUserId" TEXT,
 
     CONSTRAINT "Build_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Comment" (
+    "id" TEXT NOT NULL,
+    "parentId" TEXT NOT NULL,
+    "category" TEXT NOT NULL,
+    "text" TEXT NOT NULL,
+    "userId" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Comment_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -300,22 +324,6 @@ CREATE TABLE "Team" (
     "vertical" "TeamVertical" NOT NULL DEFAULT 'regular',
     "inboxBase" TEXT NOT NULL,
     "createdByUserId" TEXT NOT NULL,
-    "planName" TEXT NOT NULL DEFAULT 'free',
-    "planLimit" INTEGER NOT NULL DEFAULT 25,
-    "planPriceOverrideOne" INTEGER,
-    "planPriceOverrideTeam" INTEGER,
-    "stripeCustomerId" TEXT,
-    "stripeSubscriptionId" TEXT,
-    "subscriptionStatus" TEXT,
-    "billingInterval" TEXT,
-    "billingCurrency" TEXT DEFAULT 'GBP',
-    "seatBundleCount" INTEGER NOT NULL DEFAULT 1,
-    "storageAddOnCount" INTEGER NOT NULL DEFAULT 0,
-    "integrationAddOnCount" INTEGER NOT NULL DEFAULT 0,
-    "prioritySupportAddOnCount" INTEGER NOT NULL DEFAULT 0,
-    "billingPeriodStart" TIMESTAMP(3),
-    "billingPeriodEnd" TIMESTAMP(3),
-    "billingCycleStartAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "defaultCurrency" TEXT DEFAULT 'GBP',
     "country" TEXT,
     "timezone" TEXT,
@@ -374,6 +382,83 @@ CREATE TABLE "BuildEvent" (
     CONSTRAINT "BuildEvent_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "TrackingEvent" (
+    "id" TEXT NOT NULL,
+    "buildId" TEXT NOT NULL,
+    "teamId" TEXT NOT NULL,
+    "userId" TEXT,
+    "platform" "PlatformKind",
+    "targetId" TEXT,
+    "deviceId" TEXT,
+    "service" "TrackingService" NOT NULL,
+    "eventName" TEXT,
+    "message" TEXT,
+    "stackTrace" TEXT,
+    "sessionId" TEXT,
+    "sessionStartedAt" TIMESTAMP(3),
+    "sessionDurationMs" INTEGER,
+    "timeZone" TEXT,
+    "timeZoneOffsetMinutes" INTEGER,
+    "locale" TEXT,
+    "deviceModel" TEXT,
+    "deviceManufacturer" TEXT,
+    "deviceOsVersion" TEXT,
+    "deviceAppVersion" TEXT,
+    "deviceBuildNumber" TEXT,
+    "installSource" TEXT,
+    "appVersion" TEXT,
+    "buildNumber" TEXT,
+    "eventProperties" JSONB,
+    "userProperties" JSONB,
+    "distribution" JSONB,
+    "device" JSONB,
+    "usage" JSONB,
+    "crash" JSONB,
+    "environment" TEXT,
+    "binaryHash" TEXT,
+    "signingCertHash" TEXT,
+    "custom" JSONB,
+    "occurredAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "TrackingEvent_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "TeamInvite" (
+    "id" TEXT NOT NULL,
+    "teamId" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+    "createdByUserId" TEXT NOT NULL,
+    "maxUses" INTEGER NOT NULL DEFAULT 0,
+    "usedCount" INTEGER NOT NULL DEFAULT 0,
+    "allowedDomain" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "TeamInvite_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Tag" (
+    "id" TEXT NOT NULL,
+    "teamId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "normalizedName" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Tag_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "BuildTag" (
+    "buildId" TEXT NOT NULL,
+    "tagId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "BuildTag_pkey" PRIMARY KEY ("buildId","tagId")
+);
+
 -- CreateIndex
 CREATE INDEX "App_teamId_idx" ON "App"("teamId");
 
@@ -388,6 +473,9 @@ CREATE INDEX "Build_versionId_idx" ON "Build"("versionId");
 
 -- CreateIndex
 CREATE INDEX "Build_createdByUserId_idx" ON "Build"("createdByUserId");
+
+-- CreateIndex
+CREATE INDEX "Comment_parentId_category_idx" ON "Comment"("parentId", "category");
 
 -- CreateIndex
 CREATE INDEX "Target_buildId_idx" ON "Target"("buildId");
@@ -468,12 +556,6 @@ CREATE UNIQUE INDEX "PasswordResetToken_tokenHash_key" ON "PasswordResetToken"("
 CREATE UNIQUE INDEX "Team_slug_key" ON "Team"("slug");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Team_stripeCustomerId_key" ON "Team"("stripeCustomerId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Team_stripeSubscriptionId_key" ON "Team"("stripeSubscriptionId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "TeamMember_teamId_userId_key" ON "TeamMember"("teamId", "userId");
 
 -- CreateIndex
@@ -496,6 +578,36 @@ CREATE INDEX "BuildEvent_userId_idx" ON "BuildEvent"("userId");
 
 -- CreateIndex
 CREATE INDEX "BuildEvent_kind_idx" ON "BuildEvent"("kind");
+
+-- CreateIndex
+CREATE INDEX "TrackingEvent_buildId_idx" ON "TrackingEvent"("buildId");
+
+-- CreateIndex
+CREATE INDEX "TrackingEvent_teamId_idx" ON "TrackingEvent"("teamId");
+
+-- CreateIndex
+CREATE INDEX "TrackingEvent_service_idx" ON "TrackingEvent"("service");
+
+-- CreateIndex
+CREATE INDEX "TrackingEvent_occurredAt_idx" ON "TrackingEvent"("occurredAt");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "TeamInvite_token_key" ON "TeamInvite"("token");
+
+-- CreateIndex
+CREATE INDEX "TeamInvite_teamId_idx" ON "TeamInvite"("teamId");
+
+-- CreateIndex
+CREATE INDEX "Tag_teamId_normalizedName_idx" ON "Tag"("teamId", "normalizedName");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Tag_teamId_normalizedName_key" ON "Tag"("teamId", "normalizedName");
+
+-- CreateIndex
+CREATE INDEX "BuildTag_tagId_idx" ON "BuildTag"("tagId");
+
+-- CreateIndex
+CREATE INDEX "BuildTag_buildId_idx" ON "BuildTag"("buildId");
 
 -- AddForeignKey
 ALTER TABLE "App" ADD CONSTRAINT "App_teamId_fkey" FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -583,3 +695,28 @@ ALTER TABLE "BuildEvent" ADD CONSTRAINT "BuildEvent_teamId_fkey" FOREIGN KEY ("t
 
 -- AddForeignKey
 ALTER TABLE "BuildEvent" ADD CONSTRAINT "BuildEvent_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TrackingEvent" ADD CONSTRAINT "TrackingEvent_buildId_fkey" FOREIGN KEY ("buildId") REFERENCES "Build"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TrackingEvent" ADD CONSTRAINT "TrackingEvent_teamId_fkey" FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TrackingEvent" ADD CONSTRAINT "TrackingEvent_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TeamInvite" ADD CONSTRAINT "TeamInvite_teamId_fkey" FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TeamInvite" ADD CONSTRAINT "TeamInvite_createdByUserId_fkey" FOREIGN KEY ("createdByUserId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Tag" ADD CONSTRAINT "Tag_teamId_fkey" FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "BuildTag" ADD CONSTRAINT "BuildTag_buildId_fkey" FOREIGN KEY ("buildId") REFERENCES "Build"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "BuildTag" ADD CONSTRAINT "BuildTag_tagId_fkey" FOREIGN KEY ("tagId") REFERENCES "Tag"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+

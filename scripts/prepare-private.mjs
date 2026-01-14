@@ -3,6 +3,8 @@ import path from "path";
 
 const projectRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const privateRoot = path.join(projectRoot, "Private");
+const billingRoot = path.resolve(projectRoot, "..", "Billing");
+const moduleRoots = [privateRoot, billingRoot];
 const apiPrivateDir = path.join(projectRoot, "API", "Private");
 
 const apiRegistryPath = path.join(projectRoot, "API", "src", "private", "registry.ts");
@@ -25,28 +27,54 @@ const toPosixImport = (fromFile, targetFile) => {
   return normalized.startsWith(".") ? normalized : `./${normalized}`;
 };
 
-const readManifests = async () => {
-  if (!(await exists(privateRoot))) return [];
-  const entries = await fs.readdir(privateRoot, { withFileTypes: true });
-  const manifests = [];
+const manifestFileForDir = async (dir) => {
+  const pluginManifest = path.join(dir, "plugin.manifest.json");
+  if (await exists(pluginManifest)) return pluginManifest;
+  const privateManifest = path.join(dir, "private.manifest.json");
+  if (await exists(privateManifest)) return privateManifest;
+  return null;
+};
+
+const collectModulesFromRoot = async (rootDir) => {
+  if (!(await exists(rootDir))) return [];
+  const manifestPath = await manifestFileForDir(rootDir);
+  if (manifestPath) {
+    return [{ dir: rootDir, manifestPath }];
+  }
+  const entries = await fs.readdir(rootDir, { withFileTypes: true });
+  const modules = [];
   for (const entry of entries) {
     if (!entry.isDirectory()) continue;
-    const moduleDir = path.join(privateRoot, entry.name);
-    const manifestPath = path.join(moduleDir, "private.manifest.json");
-    if (!(await exists(manifestPath))) continue;
-    const raw = JSON.parse(await fs.readFile(manifestPath, "utf8"));
-    const id = raw.id ?? entry.name;
+    const moduleDir = path.join(rootDir, entry.name);
+    const moduleManifest = await manifestFileForDir(moduleDir);
+    if (!moduleManifest) continue;
+    modules.push({ dir: moduleDir, manifestPath: moduleManifest });
+  }
+  return modules;
+};
+
+const readManifests = async () => {
+  const manifestEntries = [];
+  for (const root of moduleRoots) {
+    const entries = await collectModulesFromRoot(root);
+    manifestEntries.push(...entries);
+  }
+
+  const manifestsById = new Map();
+  for (const entry of manifestEntries) {
+    const raw = JSON.parse(await fs.readFile(entry.manifestPath, "utf8"));
+    const id = raw.id ?? path.basename(entry.dir);
     const routePath = raw.ui?.routePath;
     const menuLabel = raw.ui?.menu?.label ?? raw.name ?? id;
     const navId = (raw.ui?.menu?.id ?? (routePath ? routePath.replace(/^\//, "") : id)) || id;
     const module = {
       id,
       name: raw.name ?? id,
-      dir: moduleDir,
-      apiEntry: raw.api?.entry ? path.resolve(moduleDir, raw.api.entry) : null,
+      dir: entry.dir,
+      apiEntry: raw.api?.entry ? path.resolve(entry.dir, raw.api.entry) : null,
       ui: raw.ui && raw.ui.component && raw.ui.routePath
         ? {
-            component: path.resolve(moduleDir, raw.ui.component),
+            component: path.resolve(entry.dir, raw.ui.component),
             routePath: raw.ui.routePath,
             navId,
             menuLabel,
@@ -60,14 +88,17 @@ const readManifests = async () => {
         : null,
       db: raw.db?.schema
         ? {
-            schema: path.resolve(moduleDir, raw.db.schema),
-            migrations: raw.db.migrations ? path.resolve(moduleDir, raw.db.migrations) : null,
+            schema: path.resolve(entry.dir, raw.db.schema),
+            migrations: raw.db.migrations ? path.resolve(entry.dir, raw.db.migrations) : null,
           }
         : null,
     };
-    manifests.push(module);
+    if (!manifestsById.has(id)) {
+      manifestsById.set(id, module);
+    }
   }
-  return manifests.sort((a, b) => a.id.localeCompare(b.id));
+
+  return Array.from(manifestsById.values()).sort((a, b) => a.id.localeCompare(b.id));
 };
 
 const writeIfChanged = async (target, content) => {
@@ -209,6 +240,11 @@ const copyDir = async (source, destination) => {
   await fs.cp(source, destination, { recursive: true, force: true });
 };
 
+const isUnderPrivateRoot = (dir) => {
+  const rel = path.relative(privateRoot, dir);
+  return !rel.startsWith("..") && !path.isAbsolute(rel);
+};
+
 const syncApiPrivateDir = async (modules) => {
   if (!modules.length) return [];
 
@@ -216,6 +252,10 @@ const syncApiPrivateDir = async (modules) => {
 
   const synced = [];
   for (const mod of modules) {
+    if (!isUnderPrivateRoot(mod.dir)) {
+      synced.push(mod);
+      continue;
+    }
     const targetDir = path.join(apiPrivateDir, mod.id);
     await copyDir(mod.dir, targetDir);
     const entryRel = mod.apiEntry ? path.relative(mod.dir, mod.apiEntry) : null;
@@ -227,23 +267,74 @@ const syncApiPrivateDir = async (modules) => {
   return synced;
 };
 
+const extractSchemaInjects = (schemaContent) => {
+  const injectPattern = /\/\/\s*@inject\s+([A-Za-z0-9_]+)\s*\n([\s\S]*?)\/\/\s*@endinject/g;
+  const injects = [];
+  let match;
+  while ((match = injectPattern.exec(schemaContent)) !== null) {
+    injects.push({
+      model: match[1],
+      body: match[2],
+    });
+  }
+  const withoutInjects = schemaContent.replace(injectPattern, "").trim();
+  return { injects, schema: withoutInjects };
+};
+
+const applySchemaInjects = (schemaContent, injects) => {
+  let nextSchema = schemaContent;
+  for (const inject of injects) {
+    const trimmed = inject.body
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0)
+      .join("\n");
+    if (!trimmed) continue;
+    const indented = trimmed
+      .split("\n")
+      .map((line) => `  ${line}`)
+      .join("\n");
+    const modelPattern = new RegExp(`model\\s+${inject.model}\\s*\\{([\\s\\S]*?)\\n\\}`, "m");
+    if (!modelPattern.test(nextSchema)) {
+      throw new Error(`Unable to inject schema for missing model: ${inject.model}`);
+    }
+    nextSchema = nextSchema.replace(modelPattern, (match, body) => {
+      const suffix = body.endsWith("\n") ? "" : "\n";
+      return `model ${inject.model} {${body}${suffix}${indented}\n}`;
+    });
+  }
+  return nextSchema;
+};
+
 const generatePrismaArtifacts = async (modules) => {
   const baseSchemaPath = path.join(projectRoot, "API", "prisma", "schema.prisma");
   const baseMigrationsDir = path.join(projectRoot, "API", "prisma", "migrations");
 
-  const schemaParts = [await fs.readFile(baseSchemaPath, "utf8")];
+  const schemaInjects = [];
+  let baseSchema = await fs.readFile(baseSchemaPath, "utf8");
   for (const mod of modules) {
     if (!mod.db?.schema) continue;
     const fragment = await fs.readFile(mod.db.schema, "utf8");
     if (/^\s*(generator|datasource)\s+/m.test(fragment)) {
       throw new Error(`Private module ${mod.id} schema must not declare generator/datasource`);
     }
-    schemaParts.push(`\n// ---- Private schema: ${mod.id} ----\n${fragment}\n`);
+    const { injects, schema } = extractSchemaInjects(fragment);
+    if (injects.length) {
+      schemaInjects.push(...injects);
+    }
+    if (schema.trim()) {
+      baseSchema += `\n// ---- Private schema: ${mod.id} ----\n${schema}\n`;
+    }
+  }
+
+  if (schemaInjects.length) {
+    const directInjects = schemaInjects.filter((inject) => inject.model);
+    baseSchema = applySchemaInjects(baseSchema, directInjects);
   }
 
   await fs.rm(generatedPrismaDir, { recursive: true, force: true });
   await fs.mkdir(path.join(generatedPrismaDir, "migrations"), { recursive: true });
-  await writeIfChanged(path.join(generatedPrismaDir, "schema.prisma"), schemaParts.join("\n"));
+  await writeIfChanged(path.join(generatedPrismaDir, "schema.prisma"), baseSchema);
 
   if (await exists(baseMigrationsDir)) {
     await copyDir(baseMigrationsDir, path.join(generatedPrismaDir, "migrations"));

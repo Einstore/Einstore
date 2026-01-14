@@ -6,6 +6,7 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const privateDir = path.resolve(__dirname, "..", "Private");
+const billingDir = path.resolve(__dirname, "..", "..", "Billing");
 const devHost = process.env.ADMIN_DEV_HOST || "0.0.0.0";
 const devPort = Number(process.env.ADMIN_DEV_PORT || 8101);
 const publicHost = process.env.ADMIN_PUBLIC_HOST || "";
@@ -16,13 +17,14 @@ export default defineConfig({
   server: {
     host: devHost === "true" ? true : devHost,
     port: devPort,
+    allowedHosts: [publicHost || "admin.local.einstore.pro"],
     hmr: {
       ...(publicHost ? { host: publicHost } : {}),
       clientPort: hmrClientPort,
       protocol: hmrProtocol,
     },
     fs: {
-      allow: [privateDir, path.resolve(__dirname)],
+      allow: [privateDir, billingDir, path.resolve(__dirname)],
     },
   },
   optimizeDeps: {

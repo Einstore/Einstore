@@ -1,14 +1,14 @@
 # Private Modules
 
-Closed-source modules live in `/Private/<module>/`. Each module provides:
-- `private.manifest.json`: declarative manifest (see example below).
+Closed-source modules live in `/Private/<module>/` or in sibling repos like `/Billing`. Each module provides:
+- `plugin.manifest.json` (preferred) or `private.manifest.json`: declarative manifest (see example below).
 - API plugin entry (ESM JavaScript) for Fastify routing.
 - Optional Admin route component for UI + menu.
 - Optional Prisma schema fragment and migrations.
 
 The build step `node scripts/prepare-private.mjs` discovers modules, generates API/Admin registries, and stitches private Prisma schema/migrations. The regular build succeeds when `/Private` is empty.
 
-## Manifest schema (`Private/private.manifest.json`)
+## Manifest schema (`plugin.manifest.json` or `private.manifest.json`)
 ```json
 {
   "id": "billing",
@@ -44,10 +44,10 @@ Notes:
 ## DigitalOcean deploy (private modules)
 - Add a deploy key to this repo (read-only).
 - Set `BILLING_DEPLOY_KEY` as a build-time secret in DO.
-- Pre-build (already wired in `app.yaml`): write the key to `~/.ssh`, add `github.com` to `known_hosts`, `git clone git@github.com:Einstore/Billing.git ../Private/billing`, then run the normal build so `prepare-private.mjs` picks it up.
+- Pre-build (already wired in `app.yaml`): write the key to `~/.ssh`, add `github.com` to `known_hosts`, `git clone git@github.com:Einstore/Billing.git ../Billing`, then run the normal build so `prepare-private.mjs` picks it up.
 
 ## Adding a module
-1) Create `/Private/<module>/private.manifest.json` as above.
+1) Create `/Private/<module>/plugin.manifest.json` (or `private.manifest.json`) as above.
 2) Add `api/` plugin (ESM) and optional `ui/` route component.
 3) Add optional Prisma fragment + migrations (timestamps recommended).
 4) Run `node scripts/prepare-private.mjs`.

@@ -5,7 +5,7 @@ This mirrors the App Platform build/run flow locally to reproduce failures witho
 ## Setup
 - Copy `scripts/app-platform.env.example` to `scripts/app-platform.env` and fill in secrets.
 - `DATABASE_URL` in the example points at the local Docker Postgres (`do-db`).
-- Export `BILLING_DEPLOY_KEY` before build commands if you need the Billing clone step.
+- Export `BILLING_DEPLOY_KEY` before build commands if you need the Billing clone step (clones into `../Billing`).
 
 ## API build (mirrors DO buildpack)
 ```
