@@ -1,7 +1,10 @@
 import fs from "fs/promises";
 import path from "path";
 
-const projectRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
+let projectRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
+if (path.basename(projectRoot) === "API") {
+  projectRoot = path.resolve(projectRoot, "..");
+}
 const privateRoot = path.join(projectRoot, "Private");
 const billingRootSibling = path.resolve(projectRoot, "..", "Billing");
 const billingRootLocal = path.resolve(projectRoot, "Billing");
