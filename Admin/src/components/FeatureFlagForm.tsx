@@ -41,7 +41,7 @@ const FeatureFlagForm = ({
         <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
           {t(
             "flags.form.subtitle",
-            "Use future flags to prepare staged rollouts before they are activated."
+            "Use feature flags to prepare staged rollouts before they are activated."
           )}
         </p>
       </div>

@@ -12,7 +12,7 @@ export const createNavItems = (t: Translator): NavItemConfig[] => [
   { id: "search", label: t("nav.search", "Search"), icon: "search" },
   { id: "apps", label: t("nav.apps", "Apps"), icon: "apps" },
   { id: "builds", label: t("nav.builds.latest", "Latest builds"), icon: "builds" },
-  { id: "flags", label: t("nav.flags", "Future flags"), icon: "flags", superOnly: true },
+  { id: "flags", label: t("nav.flags", "Feature flags"), icon: "flags", superOnly: true },
   { id: "integrations", label: t("nav.integrations", "Integrations"), icon: "link", adminOnly: true },
   {
     id: "settings",
@@ -80,8 +80,8 @@ export const createPageConfig = (t: Translator): Record<PageKey, PageConfigEntry
     actions: [],
   },
   flags: {
-    title: t("page.flags.title", "Future flags"),
-    breadcrumbs: [{ label: t("breadcrumb.governance", "Governance") }, { label: t("breadcrumb.flags", "Future flags") }],
+    title: t("page.flags.title", "Feature flags"),
+    breadcrumbs: [{ label: t("breadcrumb.governance", "Governance") }, { label: t("breadcrumb.flags", "Feature flags") }],
     actions: [],
   },
   integrations: {
