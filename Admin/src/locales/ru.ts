@@ -457,9 +457,11 @@ export const ruMessages: Record<string, MessageValue> = {
   "brand.admin": "Admin",
   "brand.einstore": "Einstore",
   "brand.initials": "E",
-  "one": "Сохранен {count} билд",
-  "few": "Сохранено {count} билда",
-  "other": "Сохранено {count} билдов"
+  "storage.buildsStored": {
+    "one": "Сохранен {count} билд",
+    "few": "Сохранено {count} билда",
+    "other": "Сохранено {count} билдов"
+  },
   "nav.billing": "Биллинг",
   "page.billing.title": "Биллинг",
   "breadcrumb.billing": "Биллинг",
