@@ -6,6 +6,7 @@ import Panel from "../components/Panel";
 import SectionHeader from "../components/SectionHeader";
 import { API_BASE_URL, apiFetch } from "../lib/api";
 import type { TeamSummary } from "../lib/teams";
+import { useI18n } from "../lib/i18n";
 
 type IntegrationsPageProps = {
   teams: TeamSummary[];
@@ -25,6 +26,7 @@ const SCRIPT_URL =
   "https://raw.githubusercontent.com/Einstore/Einstore/refs/heads/main/ingest.sh";
 
 const IntegrationsPage = ({ teams, activeTeamId }: IntegrationsPageProps) => {
+  const { t } = useI18n();
   const activeTeam = useMemo(
     () => teams.find((team) => team.id === activeTeamId) || teams[0],
     [teams, activeTeamId]
@@ -80,7 +82,7 @@ const IntegrationsPage = ({ teams, activeTeamId }: IntegrationsPageProps) => {
     if (!activeTeam?.id) return;
     const trimmed = apiKeyName.trim();
     if (!trimmed) {
-      setApiKeyError("Key name is required.");
+      setApiKeyError(t("integrations.apiKeys.error.required", "Key name is required."));
       return;
     }
     setApiKeyError("");
@@ -99,11 +101,11 @@ const IntegrationsPage = ({ teams, activeTeamId }: IntegrationsPageProps) => {
       setSelectedKeyId(payload.apiKey.id);
       setApiKeyName("");
     } catch {
-      setApiKeyError("Unable to create API key.");
+      setApiKeyError(t("integrations.apiKeys.error.create", "Unable to create API key."));
     } finally {
       setIsCreatingKey(false);
     }
-  }, [activeTeam?.id, apiKeyName, headers]);
+  }, [activeTeam?.id, apiKeyName, headers, t]);
 
   const handleConfirmRevoke = useCallback(async () => {
     if (!pendingRevoke || !activeTeam?.id) return;
@@ -133,7 +135,9 @@ const IntegrationsPage = ({ teams, activeTeamId }: IntegrationsPageProps) => {
   if (!hasTeam) {
     return (
       <Panel>
-        <p className="text-sm text-slate-500">Create a team to manage integrations.</p>
+        <p className="text-sm text-slate-500">
+          {t("integrations.noTeam", "Create a team to manage integrations.")}
+        </p>
       </Panel>
     );
   }
@@ -144,22 +148,22 @@ const IntegrationsPage = ({ teams, activeTeamId }: IntegrationsPageProps) => {
         <div className="space-y-6">
           <Panel className="space-y-4">
             <SectionHeader
-              title="Create API key"
-              description="Keys are shown only once. Store the token securely."
+              title={t("integrations.apiKeys.create.title", "Create API key")}
+              description={t("integrations.apiKeys.create.subtitle", "Keys are shown only once. Store the token securely.")}
             />
             <div>
               <label
                 htmlFor="integrations-api-key"
                 className="text-xs font-semibold uppercase tracking-wide text-slate-500"
               >
-                Key name
+                {t("integrations.apiKeys.label", "Key name")}
               </label>
               <input
                 id="integrations-api-key"
                 value={apiKeyName}
                 onChange={(event) => setApiKeyName(event.target.value)}
                 className="mt-2 h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-                placeholder="CI uploads"
+                placeholder={t("integrations.apiKeys.placeholder", "CI uploads")}
               />
             </div>
             <div className="flex flex-wrap items-center gap-3">
@@ -169,26 +173,34 @@ const IntegrationsPage = ({ teams, activeTeamId }: IntegrationsPageProps) => {
                 onClick={handleCreateApiKey}
                 disabled={isCreatingKey || !apiKeyName.trim()}
               >
-                {isCreatingKey ? "Creating..." : "Create key"}
+                {isCreatingKey
+                  ? t("integrations.apiKeys.creating", "Creating...")
+                  : t("integrations.apiKeys.create.cta", "Create key")}
               </button>
-              <p className="text-xs text-slate-500">Use these tokens in CI workflows.</p>
+              <p className="text-xs text-slate-500">
+                {t("integrations.apiKeys.help", "Use these tokens in CI workflows.")}
+              </p>
             </div>
             {apiKeyError ? <p className="text-xs text-red-500">{apiKeyError}</p> : null}
           </Panel>
 
           {isLoadingKeys ? (
             <Panel>
-              <p className="text-sm text-slate-500">Loading API keys...</p>
+              <p className="text-sm text-slate-500">
+                {t("integrations.apiKeys.loading", "Loading API keys...")}
+              </p>
             </Panel>
           ) : apiKeys.length === 0 ? (
             <Panel>
-              <p className="text-sm text-slate-500">No API keys yet. Create one to begin.</p>
+              <p className="text-sm text-slate-500">
+                {t("integrations.apiKeys.empty", "No API keys yet. Create one to begin.")}
+              </p>
             </Panel>
           ) : (
             <div className="space-y-2">
               <SectionHeader
-                title="API keys"
-                description="Select a key to generate CI instructions."
+                title={t("integrations.apiKeys.title", "API keys")}
+                description={t("integrations.apiKeys.description", "Select a key to generate CI instructions.")}
               />
               <ApiKeysTable
                 apiKeys={apiKeys}
@@ -211,9 +223,11 @@ const IntegrationsPage = ({ teams, activeTeamId }: IntegrationsPageProps) => {
       {apiKeyToken ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-semibold text-slate-900">Copy your new API key</h3>
+            <h3 className="text-lg font-semibold text-slate-900">
+              {t("integrations.apiKeys.modal.title", "Copy your new API key")}
+            </h3>
             <p className="mt-2 text-sm text-slate-500">
-              This key will only be shown once. Store it securely.
+              {t("integrations.apiKeys.modal.subtitle", "This key will only be shown once. Store it securely.")}
             </p>
             <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700">
               <span className="break-all font-mono">{apiKeyToken}</span>
@@ -224,14 +238,14 @@ const IntegrationsPage = ({ teams, activeTeamId }: IntegrationsPageProps) => {
                 className="h-10 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-slate-600"
                 onClick={handleCopyKey}
               >
-                Copy
+                {t("common.copy", "Copy")}
               </button>
               <button
                 type="button"
                 className="h-10 rounded-lg bg-indigo-600 px-4 text-sm font-semibold text-white"
                 onClick={() => setApiKeyToken(null)}
               >
-                I saved it
+                {t("integrations.apiKeys.modal.confirm", "I saved it")}
               </button>
             </div>
           </div>
@@ -241,9 +255,13 @@ const IntegrationsPage = ({ teams, activeTeamId }: IntegrationsPageProps) => {
       {pendingRevoke ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-semibold text-slate-900">Revoke API key?</h3>
+            <h3 className="text-lg font-semibold text-slate-900">
+              {t("integrations.apiKeys.revoke.title", "Revoke API key?")}
+            </h3>
             <p className="mt-2 text-sm text-slate-500">
-              Revoke "{pendingRevoke.name}"? CI uploads using this key will stop working.
+              {t("integrations.apiKeys.revoke.subtitle", "Revoke \"{name}\"? CI uploads using this key will stop working.", {
+                name: pendingRevoke.name,
+              })}
             </p>
             <div className="mt-5 flex items-center justify-end gap-3">
               <button
@@ -251,7 +269,7 @@ const IntegrationsPage = ({ teams, activeTeamId }: IntegrationsPageProps) => {
                 className="h-10 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-slate-600"
                 onClick={() => setPendingRevoke(null)}
               >
-                Cancel
+                {t("common.cancel", "Cancel")}
               </button>
               <button
                 type="button"
@@ -259,7 +277,9 @@ const IntegrationsPage = ({ teams, activeTeamId }: IntegrationsPageProps) => {
                 onClick={handleConfirmRevoke}
                 disabled={isRevoking}
               >
-                {isRevoking ? "Revoking..." : "Revoke key"}
+                {isRevoking
+                  ? t("integrations.apiKeys.revoke.busy", "Revoking...")
+                  : t("integrations.apiKeys.revoke.cta", "Revoke key")}
               </button>
             </div>
           </div>

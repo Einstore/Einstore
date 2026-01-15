@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import ActionButton from "./ActionButton";
 import Panel from "./Panel";
 import { buildInviteAcceptPath, extractInviteToken } from "../lib/invites";
+import { useI18n } from "../lib/i18n";
 
 type AcceptInviteDialogProps = {
   isOpen: boolean;
@@ -11,6 +12,7 @@ type AcceptInviteDialogProps = {
 };
 
 const AcceptInviteDialog = ({ isOpen, onClose }: AcceptInviteDialogProps) => {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [input, setInput] = useState("");
   const [error, setError] = useState("");
@@ -29,7 +31,7 @@ const AcceptInviteDialog = ({ isOpen, onClose }: AcceptInviteDialogProps) => {
   const handleGo = () => {
     const token = extractInviteToken(input);
     if (!token) {
-      setError("Enter an invite link or token.");
+      setError(t("invite.accept.error.missing", "Enter an invite link or token."));
       return;
     }
     setError("");
@@ -42,10 +44,13 @@ const AcceptInviteDialog = ({ isOpen, onClose }: AcceptInviteDialogProps) => {
       <Panel className="w-full max-w-lg space-y-6 p-6">
         <div>
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-            Accept invitation
+            {t("invite.accept.title", "Accept invitation")}
           </h3>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-            Paste an invite link to join a team. You may need to sign in first.
+            {t(
+              "invite.accept.subtitle",
+              "Paste an invite link to join a team. You may need to sign in first."
+            )}
           </p>
         </div>
         <div className="space-y-2">
@@ -53,14 +58,17 @@ const AcceptInviteDialog = ({ isOpen, onClose }: AcceptInviteDialogProps) => {
             htmlFor="accept-invite-input"
             className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400"
           >
-            Invitation link
+            {t("invite.accept.label", "Invitation link")}
           </label>
           <input
             id="accept-invite-input"
             type="url"
             value={input}
             onChange={(event) => setInput(event.target.value)}
-            placeholder="https://admin.local.einstore.pro/accept-invite?token=..."
+            placeholder={t(
+              "invite.accept.placeholder",
+              "https://admin.local.einstore.pro/accept-invite?token=..."
+            )}
             className="h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           />
         </div>
@@ -70,8 +78,8 @@ const AcceptInviteDialog = ({ isOpen, onClose }: AcceptInviteDialogProps) => {
           </p>
         ) : null}
         <div className="flex flex-wrap justify-end gap-3">
-          <ActionButton label="Cancel" variant="outline" onClick={onClose} />
-          <ActionButton label="Continue" variant="primary" onClick={handleGo} />
+          <ActionButton label={t("common.cancel", "Cancel")} variant="outline" onClick={onClose} />
+          <ActionButton label={t("common.continue", "Continue")} variant="primary" onClick={handleGo} />
         </div>
       </Panel>
     </div>

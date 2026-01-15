@@ -7,6 +7,7 @@ import StatusPill from "../components/StatusPill";
 import type { ApiApp, ApiBuild } from "../lib/apps";
 import { formatDateTime } from "../lib/apps";
 import type { PaginationMeta } from "../lib/pagination";
+import { useI18n } from "../lib/i18n";
 
 type AppBuildsPageProps = {
   app: ApiApp | null;
@@ -35,8 +36,9 @@ const AppBuildsPage = ({
   onPageChange,
   onPerPageChange,
 }: AppBuildsPageProps) => {
+  const { t } = useI18n();
   const latestBuild = builds[0] ?? null;
-  const lastUploaded = latestBuild ? formatDateTime(latestBuild.createdAt) : "—";
+  const lastUploaded = latestBuild ? formatDateTime(latestBuild.createdAt) : t("common.emptyDash", "—");
 
   return (
     <div className="space-y-6">
@@ -47,13 +49,13 @@ const AppBuildsPage = ({
               <AppAvatar name={app?.name ?? latestBuild?.displayName} iconUrl={appIcon} size="lg" />
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                  {app?.identifier ?? "App"}
+                  {app?.identifier ?? t("app.fallback", "App")}
                 </p>
                 <p className="mt-1 text-xl font-semibold text-slate-900 dark:text-slate-100">
-                  {app?.name ?? latestBuild?.displayName ?? "App"}
+                  {app?.name ?? latestBuild?.displayName ?? t("app.fallback", "App")}
                 </p>
                 <p className="text-sm text-slate-500 dark:text-slate-400">
-                  Last uploaded {lastUploaded}
+                  {t("app.lastUploaded", "Last uploaded {date}", { date: lastUploaded })}
                 </p>
               </div>
             </div>
@@ -63,17 +65,19 @@ const AppBuildsPage = ({
           <Panel className="flex h-full items-center justify-between gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                Latest build
+                {t("build.latest", "Latest build")}
               </p>
               <p className="mt-2 text-lg font-semibold text-slate-900 dark:text-slate-100">
-                {latestBuild ? latestBuild.displayName : "—"}
+                {latestBuild ? latestBuild.displayName : t("common.emptyDash", "—")}
               </p>
               <p className="text-sm text-slate-500 dark:text-slate-400">
-                Build #{latestBuild?.buildNumber ?? "—"}
+                {t("build.row.number", "Build #{number}", {
+                  number: latestBuild?.buildNumber ?? t("common.emptyDash", "—"),
+                })}
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <StatusPill status="running" label="App builds" />
+              <StatusPill status="running" label={t("builds.app.label", "App builds")} />
               {latestBuild ? (
                 <div className="flex items-center gap-2">
                   <button
@@ -81,14 +85,14 @@ const AppBuildsPage = ({
                     className="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-500"
                     onClick={() => onInstallBuild?.(latestBuild.id)}
                   >
-                    Install
+                    {t("build.action.install", "Install")}
                   </button>
                   <button
                     type="button"
                     className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
                     onClick={() => onDownloadBuild?.(latestBuild.id)}
                   >
-                    Download
+                    {t("build.action.download", "Download")}
                   </button>
                 </div>
               ) : null}
@@ -97,7 +101,7 @@ const AppBuildsPage = ({
         </div>
       </div>
 
-      <SectionHeader title="Builds" />
+      <SectionHeader title={t("common.builds", "Builds")} />
       <BuildQueueList
         jobs={builds}
         icons={buildIcons}

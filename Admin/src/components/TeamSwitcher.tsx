@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { TeamSummary } from "../lib/teams";
 import Icon from "./Icon";
+import { useI18n } from "../lib/i18n";
 
 const TeamSwitcher = ({
   teams,
@@ -14,6 +15,7 @@ const TeamSwitcher = ({
   onChange: (teamId: string) => void;
   onCreateTeam?: (name: string) => Promise<void>;
 }) => {
+  const { t } = useI18n();
   const hasTeams = teams.length > 0;
   const [open, setOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -28,7 +30,7 @@ const TeamSwitcher = ({
   );
 
   const initials = useMemo(() => {
-    if (!activeTeam?.name) return "E";
+    if (!activeTeam?.name) return t("brand.initials", "E");
     return activeTeam.name
       .split(" ")
       .filter(Boolean)
@@ -52,7 +54,7 @@ const TeamSwitcher = ({
   return (
     <div className="space-y-2">
       <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-        Team
+        {t("teamSwitcher.label", "Team")}
       </p>
       <div ref={containerRef} className="relative">
         <button
@@ -85,7 +87,7 @@ const TeamSwitcher = ({
                 </span>
               )}
               <span className="text-sm font-medium">
-                {activeTeam?.name ?? "No teams yet"}
+                {activeTeam?.name ?? t("teamSwitcher.empty", "No teams yet")}
               </span>
             </span>
           <Icon name="chevronDown" className="h-3 w-3 text-slate-400" />
@@ -141,7 +143,7 @@ const TeamSwitcher = ({
                       {team.name}
                     </span>
                     {isActive ? (
-                      <span className="text-xs font-semibold">Active</span>
+                      <span className="text-xs font-semibold">{t("teamSwitcher.active", "Active")}</span>
                     ) : null}
                   </button>
                 );
@@ -155,7 +157,7 @@ const TeamSwitcher = ({
                       type="text"
                       value={newTeamName}
                       onChange={(event) => setNewTeamName(event.target.value)}
-                      placeholder="Team name"
+                      placeholder={t("teamSwitcher.create.placeholder", "Team name")}
                       className="h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                     />
                     {error ? (
@@ -176,14 +178,14 @@ const TeamSwitcher = ({
                             setOpen(false);
                           } catch (err) {
                             setError(
-                              err instanceof Error ? err.message : "Unable to create team."
+                              err instanceof Error ? err.message : t("teamSwitcher.create.error", "Unable to create team.")
                             );
                           } finally {
                             setBusy(false);
                           }
                         }}
                       >
-                        Create
+                        {t("teamSwitcher.create.cta", "Create")}
                       </button>
                       <button
                         type="button"
@@ -194,7 +196,7 @@ const TeamSwitcher = ({
                           setError("");
                         }}
                       >
-                        Cancel
+                        {t("common.cancel", "Cancel")}
                       </button>
                     </div>
                   </div>
@@ -205,7 +207,7 @@ const TeamSwitcher = ({
                     onClick={() => setIsCreating(true)}
                   >
                     <Icon name="plus" className="h-4 w-4" />
-                    Create new team
+                    {t("teamSwitcher.create.title", "Create new team")}
                   </button>
                 )}
               </div>

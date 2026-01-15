@@ -9,6 +9,7 @@ import type { SessionUser } from "../lib/session";
 import { apiFetch } from "../lib/api";
 import type { SearchResponse } from "../lib/search";
 import type { PaginatedResponse } from "../lib/pagination";
+import { useI18n } from "../lib/i18n";
 
 type TopbarProps = {
   title: string;
@@ -33,6 +34,7 @@ const Topbar = ({
   appIcons = {},
   onAcceptInvite,
 }: TopbarProps) => {
+  const { t, locale, setLocale } = useI18n();
   const navigate = useNavigate();
   const [theme, setThemeState] = useState<ThemeMode>(() => getInitialTheme());
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -54,7 +56,7 @@ const Topbar = ({
   const userMenuRef = useRef<HTMLDivElement | null>(null);
   const searchRef = useRef<HTMLDivElement | null>(null);
   const avatarUrl = user?.avatarUrl ?? null;
-  const userLabel = user?.name || user?.email || user?.username || "User";
+  const userLabel = user?.name || user?.email || user?.username || t("common.user", "User");
   const trimmedQuery = searchValue.trim();
 
   const buildResults = useMemo(() => {
@@ -133,6 +135,10 @@ const Topbar = ({
     setTheme(next);
   };
 
+  const toggleLocale = () => {
+    setLocale(locale === "cs" ? "en" : "cs");
+  };
+
   return (
     <header className="z-20 border-b border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-900">
       <div className="space-y-4 px-6 py-4">
@@ -141,7 +147,7 @@ const Topbar = ({
             <button
               type="button"
               className="flex h-11 w-11 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 md:hidden dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100"
-              aria-label="Open menu"
+              aria-label={t("topbar.menu", "Open menu")}
               onClick={onToggleSidebar}
             >
               <Icon name="menu" className="h-4 w-4" />
@@ -151,8 +157,8 @@ const Topbar = ({
                 <Icon name="search" className="h-4 w-4 text-slate-400" />
                 <input
                   type="search"
-                  placeholder="Search apps or builds"
-                  aria-label="Search"
+                  placeholder={t("topbar.search.placeholder", "Search apps or builds")}
+                  aria-label={t("topbar.search.label", "Search")}
                   value={searchValue}
                   onChange={(event) => setSearchValue(event.target.value)}
                   onFocus={() => {
@@ -182,23 +188,23 @@ const Topbar = ({
                       setIsSearchOpen(false);
                     }}
                   >
-                    See all &gt;
+                    {t("topbar.search.seeAll", "See all")} &gt;
                   </button>
                   <div className="max-h-80 overflow-y-auto p-2">
                     {isSearching ? (
                       <p className="px-2 py-3 text-xs text-slate-500 dark:text-slate-400">
-                        Searching...
+                        {t("topbar.search.searching", "Searching...")}
                       </p>
                     ) : null}
                     {!isSearching && !appResults.length && !buildResults.length ? (
                       <p className="px-2 py-3 text-xs text-slate-500 dark:text-slate-400">
-                        No results yet.
+                        {t("topbar.search.empty", "No results yet.")}
                       </p>
                     ) : null}
                     {appResults.length ? (
                       <div className="space-y-1">
                         <p className="px-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                          Apps
+                          {t("common.apps", "Apps")}
                         </p>
                         {appResults.map((app) => (
                           <button
@@ -228,7 +234,7 @@ const Topbar = ({
                     {buildResults.length ? (
                       <div className="mt-3 space-y-1">
                         <p className="px-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                          Builds
+                          {t("common.builds", "Builds")}
                         </p>
                         {buildResults.map((build) => (
                           <button
@@ -265,14 +271,15 @@ const Topbar = ({
               <button
                 type="button"
                 className="flex h-11 w-11 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100"
-                aria-label="Language"
+                aria-label={t("topbar.language", "Language")}
+                onClick={toggleLocale}
               >
                 <Icon name="globe" className="h-4 w-4" />
               </button>
               <button
                 type="button"
                 className="flex h-11 w-11 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100"
-                aria-label="Theme"
+                aria-label={t("topbar.theme", "Theme")}
                 aria-pressed={theme === "dark"}
                 onClick={toggleTheme}
               >
@@ -281,7 +288,7 @@ const Topbar = ({
               <button
                 type="button"
                 className="flex h-11 w-11 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100"
-                aria-label="Notifications"
+                aria-label={t("topbar.notifications", "Notifications")}
               >
                 <Icon name="bell" className="h-4 w-4" />
               </button>
@@ -290,7 +297,7 @@ const Topbar = ({
               <button
                 type="button"
                 className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-200"
-                aria-label="User menu"
+                aria-label={t("topbar.userMenu", "User menu")}
                 aria-expanded={isUserMenuOpen}
                 onClick={() => setIsUserMenuOpen((current) => !current)}
               >
@@ -313,9 +320,22 @@ const Topbar = ({
                       className="flex h-11 w-full items-center gap-3 rounded-md px-3 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"
                       onClick={() => setIsUserMenuOpen(false)}
                     >
-                      <Icon name="globe" className="h-4 w-4" />
-                      Language
+                      <Icon name="bell" className="h-4 w-4" />
+                      {t("topbar.notifications", "Notifications")}
                     </button>
+                    <button
+                      type="button"
+                      className="flex h-11 w-full items-center gap-3 rounded-md px-3 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"
+                      onClick={() => {
+                        toggleLocale();
+                        setIsUserMenuOpen(false);
+                      }}
+                    >
+                      <Icon name="globe" className="h-4 w-4" />
+                      {t("topbar.language", "Language")}
+                    </button>
+                  </div>
+                  <div>
                     <button
                       type="button"
                       className="flex h-11 w-full items-center gap-3 rounded-md px-3 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"
@@ -325,18 +345,10 @@ const Topbar = ({
                       }}
                     >
                       <Icon name={theme === "dark" ? "sun" : "moon"} className="h-4 w-4" />
-                      Theme
+                      {theme === "dark"
+                        ? t("topbar.lightMode", "Light mode")
+                        : t("topbar.darkMode", "Dark mode")}
                     </button>
-                    <button
-                      type="button"
-                      className="flex h-11 w-full items-center gap-3 rounded-md px-3 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"
-                      onClick={() => setIsUserMenuOpen(false)}
-                    >
-                      <Icon name="bell" className="h-4 w-4" />
-                      Notifications
-                    </button>
-                  </div>
-                  <div className="border-t border-slate-200 pt-2 dark:border-slate-700">
                     <button
                       type="button"
                       className="flex h-11 w-full items-center gap-3 rounded-md px-3 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"
@@ -346,8 +358,9 @@ const Topbar = ({
                       }}
                     >
                       <Icon name="link" className="h-4 w-4" />
-                      Accept invitation
+                      {t("invite.accept.title", "Accept invitation")}
                     </button>
+                    <div className="border-t border-slate-200 pt-2 dark:border-slate-700" />
                     <button
                       type="button"
                       className="flex h-11 w-full items-center gap-3 rounded-md px-3 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"
@@ -357,7 +370,7 @@ const Topbar = ({
                       }}
                     >
                       <Icon name="lock" className="h-4 w-4" />
-                      Logout
+                      {t("common.logout", "Logout")}
                     </button>
                   </div>
                 </div>

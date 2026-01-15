@@ -3,6 +3,7 @@ import AppAvatar from "./AppAvatar";
 import Icon from "./Icon";
 import type { ApiApp } from "../lib/apps";
 import { formatDate } from "../lib/apps";
+import { useI18n } from "../lib/i18n";
 
 type AppsTableProps = {
   apps: ApiApp[];
@@ -12,6 +13,7 @@ type AppsTableProps = {
 };
 
 const AppsTable = ({ apps, appIcons, onSelectApp, viewMode }: AppsTableProps) => {
+  const { t } = useI18n();
   return (
     <div className="rounded-xl bg-white p-5 shadow-sm dark:bg-slate-800">
       {viewMode === "grid" ? (
@@ -33,7 +35,7 @@ const AppsTable = ({ apps, appIcons, onSelectApp, viewMode }: AppsTableProps) =>
                 <p className="font-semibold text-slate-900 dark:text-slate-100">{app.name}</p>
                 <p className="text-slate-500 dark:text-slate-400">{app.identifier}</p>
                 <p className="text-xs text-slate-400 dark:text-slate-500">
-                  Updated {formatDate(app.updatedAt)}
+                  {t("apps.updated", "Updated {date}", { date: formatDate(app.updatedAt) })}
                 </p>
               </div>
             </button>
@@ -43,9 +45,9 @@ const AppsTable = ({ apps, appIcons, onSelectApp, viewMode }: AppsTableProps) =>
         <div className="mt-4">
           <div className="-mx-5 border-b border-slate-200 pb-3 dark:border-slate-700">
             <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)] gap-4 px-5 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-              <span>App</span>
-              <span>Updated</span>
-              <span>Created</span>
+              <span>{t("apps.header.app", "App")}</span>
+              <span>{t("apps.header.updated", "Updated")}</span>
+              <span>{t("apps.header.created", "Created")}</span>
             </div>
           </div>
           <div className="-mx-5">

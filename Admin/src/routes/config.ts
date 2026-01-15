@@ -5,81 +5,101 @@ import type { FeatureFlagKey } from "../lib/featureFlags";
 
 export type NavItemConfig = NavItem & { superOnly?: boolean; adminOnly?: boolean };
 
-export const navItems: NavItemConfig[] = [
-  { id: "overview", label: "Overview", icon: "overview" },
-  { id: "search", label: "Search", icon: "search" },
-  { id: "apps", label: "Apps", icon: "apps" },
-  { id: "builds", label: "Latest builds", icon: "builds" },
-  { id: "flags", label: "Future flags", icon: "flags", superOnly: true },
-  { id: "integrations", label: "Integrations", icon: "link", adminOnly: true },
+export type Translator = (key: string, fallback: string) => string;
+
+export const createNavItems = (t: Translator): NavItemConfig[] => [
+  { id: "overview", label: t("nav.overview", "Overview"), icon: "overview" },
+  { id: "search", label: t("nav.search", "Search"), icon: "search" },
+  { id: "apps", label: t("nav.apps", "Apps"), icon: "apps" },
+  { id: "builds", label: t("nav.builds.latest", "Latest builds"), icon: "builds" },
+  { id: "flags", label: t("nav.flags", "Future flags"), icon: "flags", superOnly: true },
+  { id: "integrations", label: t("nav.integrations", "Integrations"), icon: "link", adminOnly: true },
   {
     id: "settings",
-    label: "Settings",
+    label: t("nav.settings", "Settings"),
     icon: "settings",
   },
+];
+
+export const pageKeys = [
+  "overview",
+  "activity",
+  "apps",
+  "builds",
+  "build-detail",
+  "search",
+  "accept-invite",
+  "flags",
+  "integrations",
+  "settings",
+  "api-keys",
 ] as const;
 
-export const pageConfig = {
+export type PageKey = (typeof pageKeys)[number];
+
+export type PageConfigEntry = {
+  title: string;
+  breadcrumbs: { label: string }[];
+  actions: { id: string; label: string; variant?: "primary" | "outline" }[];
+};
+
+export const createPageConfig = (t: Translator): Record<PageKey, PageConfigEntry> => ({
   overview: {
-    title: "Release operations",
-    breadcrumbs: [{ label: "Home" }, { label: "Overview" }],
-    actions: [{ id: "upload-build", label: "Upload build", variant: "primary" }],
+    title: t("page.overview.title", "Release operations"),
+    breadcrumbs: [{ label: t("breadcrumb.home", "Home") }, { label: t("breadcrumb.overview", "Overview") }],
+    actions: [{ id: "upload-build", label: t("actions.uploadBuild", "Upload build"), variant: "primary" }],
   },
   activity: {
-    title: "Activity",
-    breadcrumbs: [{ label: "Home" }, { label: "Activity" }],
+    title: t("page.activity.title", "Activity"),
+    breadcrumbs: [{ label: t("breadcrumb.home", "Home") }, { label: t("breadcrumb.activity", "Activity") }],
     actions: [],
   },
   apps: {
-    title: "Apps",
-    breadcrumbs: [{ label: "Apps" }, { label: "Catalog" }],
-    actions: [{ id: "upload-build", label: "Upload build", variant: "primary" }],
+    title: t("page.apps.title", "Apps"),
+    breadcrumbs: [{ label: t("breadcrumb.apps", "Apps") }, { label: t("breadcrumb.catalog", "Catalog") }],
+    actions: [{ id: "upload-build", label: t("actions.uploadBuild", "Upload build"), variant: "primary" }],
   },
   builds: {
-    title: "Latest builds",
-    breadcrumbs: [{ label: "Builds" }, { label: "Latest" }],
-    actions: [{ id: "upload-build", label: "Upload build", variant: "primary" }],
+    title: t("page.builds.title", "Latest builds"),
+    breadcrumbs: [{ label: t("breadcrumb.builds", "Builds") }, { label: t("breadcrumb.latest", "Latest") }],
+    actions: [{ id: "upload-build", label: t("actions.uploadBuild", "Upload build"), variant: "primary" }],
   },
   "build-detail": {
-    title: "Build detail",
-    breadcrumbs: [{ label: "Builds" }, { label: "Detail" }],
-    actions: [{ id: "upload-build", label: "Upload build", variant: "primary" }],
+    title: t("page.buildDetail.title", "Build detail"),
+    breadcrumbs: [{ label: t("breadcrumb.builds", "Builds") }, { label: t("breadcrumb.detail", "Detail") }],
+    actions: [{ id: "upload-build", label: t("actions.uploadBuild", "Upload build"), variant: "primary" }],
   },
   search: {
-    title: "Search builds",
-    breadcrumbs: [{ label: "Search" }],
-    actions: [{ id: "upload-build", label: "Upload build", variant: "primary" }],
+    title: t("page.search.title", "Search builds"),
+    breadcrumbs: [{ label: t("breadcrumb.search", "Search") }],
+    actions: [{ id: "upload-build", label: t("actions.uploadBuild", "Upload build"), variant: "primary" }],
   },
   "accept-invite": {
-    title: "Accept invitation",
-    breadcrumbs: [{ label: "Invitations" }],
+    title: t("page.acceptInvite.title", "Accept invitation"),
+    breadcrumbs: [{ label: t("breadcrumb.invitations", "Invitations") }],
     actions: [],
   },
   flags: {
-    title: "Future flags",
-    breadcrumbs: [{ label: "Governance" }, { label: "Future flags" }],
+    title: t("page.flags.title", "Future flags"),
+    breadcrumbs: [{ label: t("breadcrumb.governance", "Governance") }, { label: t("breadcrumb.flags", "Future flags") }],
     actions: [],
   },
   integrations: {
-    title: "Integrations",
-    breadcrumbs: [{ label: "Workspace" }, { label: "Integrations" }],
+    title: t("page.integrations.title", "Integrations"),
+    breadcrumbs: [{ label: t("breadcrumb.workspace", "Workspace") }, { label: t("breadcrumb.integrations", "Integrations") }],
     actions: [],
   },
   settings: {
-    title: "Team settings",
-    breadcrumbs: [{ label: "Workspace" }, { label: "Settings" }],
-    actions: [{ id: "save-settings", label: "Save changes", variant: "primary" }],
+    title: t("page.settings.title", "Team settings"),
+    breadcrumbs: [{ label: t("breadcrumb.workspace", "Workspace") }, { label: t("breadcrumb.settings", "Settings") }],
+    actions: [{ id: "save-settings", label: t("actions.saveChanges", "Save changes"), variant: "primary" }],
   },
   "api-keys": {
-    title: "API keys",
-    breadcrumbs: [{ label: "Workspace" }, { label: "API keys" }],
+    title: t("page.apiKeys.title", "API keys"),
+    breadcrumbs: [{ label: t("breadcrumb.workspace", "Workspace") }, { label: t("breadcrumb.apiKeys", "API keys") }],
     actions: [],
   },
-};
-
-export type PageKey = keyof typeof pageConfig;
-
-export type PageConfigEntry = (typeof pageConfig)[PageKey];
+});
 
 export type RouteConfig = {
   id: PageKey | string;

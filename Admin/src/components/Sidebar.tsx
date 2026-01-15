@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import Icon, { type IconName } from "./Icon";
 import type { FeatureFlagKey } from "../lib/featureFlags";
+import { useI18n } from "../lib/i18n";
 
 export type NavItem = {
   id: string;
@@ -28,24 +29,25 @@ const Sidebar = ({
   teamSwitcher,
   dropzone,
 }: SidebarProps) => {
+  const { t } = useI18n();
   return (
     <aside className="flex h-screen w-64 min-w-64 flex-col border-r border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
       <button
         type="button"
         className="flex w-full items-center gap-4 px-6 py-6 text-left"
         onClick={() => onSelect?.("overview")}
-        aria-label="Go to overview"
+        aria-label={t("sidebar.overview", "Go to overview")}
       >
         <img
           src="/brand/einstore-icon-1024.png"
-          alt="Einstore"
+          alt={t("brand.einstore", "Einstore")}
           className="h-20 w-20 rounded-xl"
         />
         <div className="-ml-[18px]">
           <p className="text-2xl font-semibold uppercase tracking-wide text-slate-900 dark:text-slate-100">
-            Einstore
+            {t("brand.einstore", "Einstore")}
           </p>
-          <p className="mt-0.5 text-xs text-slate-400">Admin</p>
+          <p className="mt-0.5 text-xs text-slate-400">{t("brand.admin", "Admin")}</p>
         </div>
       </button>
 

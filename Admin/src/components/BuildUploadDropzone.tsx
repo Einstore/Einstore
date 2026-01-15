@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useI18n } from "../lib/i18n";
 
 const allowedExtensions = [".ipa", ".apk"];
 
@@ -17,14 +18,16 @@ type BuildUploadDropzoneProps = {
 const BuildUploadDropzone = ({
   onUpload,
   variant,
-  title = "Upload your first build here",
+  title,
 }: BuildUploadDropzoneProps) => {
+  const { t } = useI18n();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [progress, setProgress] = useState<number | null>(null);
+  const resolvedTitle = title ?? t("upload.title.default", "Upload your first build here");
 
   useEffect(() => {
     if (!status || busy) return undefined;
@@ -36,17 +39,21 @@ const BuildUploadDropzone = ({
     if (!file || !isValidFile(file) || busy) return;
     setBusy(true);
     setError("");
-    setStatus("Uploading build...");
+    setStatus(t("upload.status.uploading", "Uploading build..."));
     setProgress(0);
     try {
       await onUpload(file, (value) => {
         const nextValue = Math.min(Math.max(value, 0), 1);
         setProgress(nextValue);
-        setStatus(`Uploading build... ${Math.round(nextValue * 100)}%`);
+        setStatus(
+          t("upload.status.progress", "Uploading build... {percent}%", {
+            percent: Math.round(nextValue * 100),
+          })
+        );
       });
-      setStatus("Upload complete");
+      setStatus(t("upload.status.complete", "Upload complete"));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed.");
+      setError(err instanceof Error ? err.message : t("upload.error.failed", "Upload failed."));
       setStatus("");
     } finally {
       setBusy(false);
@@ -60,7 +67,7 @@ const BuildUploadDropzone = ({
   const handleFiles = (files: FileList | null) => {
     const file = files?.[0] ?? null;
     if (file && !isValidFile(file)) {
-      setError("Only .ipa or .apk files are supported.");
+      setError(t("upload.error.fileType", "Only .ipa or .apk files are supported."));
       return;
     }
     void handleFile(file);
@@ -116,10 +123,10 @@ const BuildUploadDropzone = ({
           </span>
           <div className="flex-1">
             <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-              Upload build
+              {t("upload.compact.title", "Upload build")}
             </p>
             <p className="text-xs text-slate-500">
-              Drop IPA/APK or click to browse. Uploads immediately.
+              {t("upload.compact.help", "Drop IPA/APK or click to browse. Uploads immediately.")}
             </p>
             {status ? <p className="mt-1 text-xs text-indigo-600">{status}</p> : null}
             {error ? <p className="mt-1 text-xs text-rose-600">{error}</p> : null}
@@ -128,9 +135,9 @@ const BuildUploadDropzone = ({
       ) : (
         <>
           <div className="space-y-2">
-            <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{title}</p>
+            <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{resolvedTitle}</p>
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              Drop an IPA/APK file or browse to upload.
+              {t("upload.full.help", "Drop an IPA/APK file or browse to upload.")}
             </p>
           </div>
           <button
@@ -142,7 +149,7 @@ const BuildUploadDropzone = ({
             }}
             disabled={busy}
           >
-            Browse
+            {t("common.browse", "Browse")}
           </button>
           {status ? <p className="text-xs text-indigo-600">{status}</p> : null}
           {error ? <p className="text-xs text-rose-600">{error}</p> : null}

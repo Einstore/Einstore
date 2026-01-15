@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useI18n } from "../lib/i18n";
 
 type AppShellProps = {
   sidebar: ReactNode;
@@ -8,6 +9,7 @@ type AppShellProps = {
 };
 
 const AppShell = ({ sidebar, children, isSidebarOpen, onSidebarClose }: AppShellProps) => {
+  const { t } = useI18n();
   return (
     <div className="flex h-screen w-full bg-slate-50 dark:bg-slate-900">
       <div className="z-30 hidden md:block">{sidebar}</div>
@@ -18,7 +20,7 @@ const AppShell = ({ sidebar, children, isSidebarOpen, onSidebarClose }: AppShell
         <>
           <button
             type="button"
-            aria-label="Close menu"
+            aria-label={t("topbar.menu.close", "Close menu")}
             className="fixed inset-0 z-40 bg-black/40 md:hidden"
             onClick={onSidebarClose}
           />

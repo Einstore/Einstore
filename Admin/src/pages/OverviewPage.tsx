@@ -9,6 +9,8 @@ import Icon from "../components/Icon";
 import type { ActivityItem, AppSummary, BuildJob } from "../data/mock";
 import type { StorageUsageUser } from "../types/usage";
 import type { SearchBuildResult } from "../lib/search";
+import { useI18n } from "../lib/i18n";
+import { formatBytes } from "../lib/apps";
 
 type OverviewPageProps = {
   apps: AppSummary[];
@@ -43,6 +45,7 @@ const OverviewPage = ({
   onInstallBuild,
   onDownloadBuild,
 }: OverviewPageProps) => {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [previewAppId, setPreviewAppId] = useState<string>("all");
   const [appSearch, setAppSearch] = useState("");
@@ -50,24 +53,20 @@ const OverviewPage = ({
 
   const appsCount = appsTotal ?? apps?.length ?? 0;
   const buildsCount = buildsTotal ?? buildQueue?.length ?? 0;
-  const formatBytes = (value: number) => {
-    if (!value) return "0 B";
-    const units = ["B", "KB", "MB", "GB", "TB"];
-    const power = Math.min(units.length - 1, Math.floor(Math.log(value) / Math.log(1024)));
-    const scaled = value / Math.pow(1024, power);
-    return `${scaled.toFixed(scaled >= 10 || power === 0 ? 0 : 1)} ${units[power]}`;
-  };
 
   const appOptions = useMemo(
     () => [
-      { id: "all", name: "All apps" },
-      ...apps.map((app) => ({ id: app.id, name: app.name || app.identifier || "App" })),
+      { id: "all", name: t("overview.apps.all", "All apps") },
+      ...apps.map((app) => ({
+        id: app.id,
+        name: app.name || app.identifier || t("app.fallback", "App"),
+      })),
     ],
-    [apps]
+    [apps, t]
   );
 
   const selectedAppLabel =
-    appOptions.find((option) => option.id === previewAppId)?.name ?? "All apps";
+    appOptions.find((option) => option.id === previewAppId)?.name ?? t("overview.apps.all", "All apps");
 
   const filteredAppOptions = useMemo(
     () =>
@@ -111,29 +110,33 @@ const OverviewPage = ({
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <Panel className="flex flex-col gap-2">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Apps
+            {t("common.apps", "Apps")}
           </p>
           <p className="text-2xl font-semibold text-slate-900 dark:text-slate-100">{appsCount}</p>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Total apps in this workspace</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            {t("overview.apps.total", "Total apps in this workspace")}
+          </p>
         </Panel>
         <Panel className="flex flex-col gap-2">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Builds
+            {t("common.builds", "Builds")}
           </p>
           <p className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
             {buildsCount}
           </p>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Recent builds listed below</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            {t("overview.builds.recent", "Recent builds listed below")}
+          </p>
         </Panel>
         <Panel className="flex flex-col gap-2">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Placeholder
+            {t("overview.storage.label", "Storage")}
           </p>
           <p className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
             {formatBytes(storageTotalBytes)}
           </p>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Storage used across this workspace
+            {t("overview.storage.subtitle", "Storage used across this workspace")}
           </p>
         </Panel>
       </div>
@@ -141,7 +144,7 @@ const OverviewPage = ({
         <div className="space-y-3">
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-              Preview builds
+              {t("overview.preview.title", "Preview builds")}
             </p>
             <div className="flex flex-col gap-1 text-xs text-slate-500 dark:text-slate-400 md:flex-row md:items-center md:gap-3">
               <div className="relative w-full min-w-[220px] md:w-64">
@@ -158,8 +161,8 @@ const OverviewPage = ({
                     setTimeout(() => setIsAppDropdownOpen(false), 100);
                   }}
                   className="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 pr-8 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-                  placeholder="Filter apps"
-                  aria-label="Filter preview builds by app"
+                  placeholder={t("overview.preview.filter.placeholder", "Filter apps")}
+                  aria-label={t("overview.preview.filter.label", "Filter preview builds by app")}
                 />
                 <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">
                   ▼
@@ -199,13 +202,15 @@ const OverviewPage = ({
                             </span>
                             <span>{option.name}</span>
                           </div>
-                          {option.id === previewAppId ? <span className="text-xs">Selected</span> : null}
+                          {option.id === previewAppId ? (
+                            <span className="text-xs">{t("common.selected", "Selected")}</span>
+                          ) : null}
                         </button>
                       );
                     })}
                     {!filteredAppOptions.length ? (
                       <div className="px-3 py-2 text-xs text-slate-500 dark:text-slate-400">
-                        No apps found
+                        {t("overview.preview.empty", "No apps found")}
                       </div>
                     ) : null}
                   </div>
@@ -217,7 +222,7 @@ const OverviewPage = ({
             <BuildQueueList
               jobs={displayPreviewBuilds.map((build) => ({
                 id: build.id,
-                name: build.displayName || build.appName || "Preview build",
+                name: build.displayName || build.appName || t("overview.preview.fallback", "Preview build"),
                 buildNumber: build.buildNumber,
                 createdAt: build.createdAt,
                 appId: build.appId,
@@ -229,7 +234,9 @@ const OverviewPage = ({
           ) : (
             <Panel>
               <p className="text-sm text-slate-600 dark:text-slate-300">
-                No preview builds yet. Add the <strong>preview</strong> tag to any build to feature it here.
+                {t("overview.preview.emptyPrefix", "No preview builds yet. Add the")}{" "}
+                <strong>{t("overview.preview.tag", "preview")}</strong>{" "}
+                {t("overview.preview.emptySuffix", "tag to any build to feature it here.")}
               </p>
             </Panel>
           )}
@@ -238,17 +245,21 @@ const OverviewPage = ({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                Latest downloads & installs
+                {t("overview.activity.title", "Latest downloads & installs")}
               </p>
-              <ActionButton label="See all" variant="primary" onClick={() => navigate("/activity")} />
+              <ActionButton
+                label={t("common.seeAll", "See all")}
+                variant="primary"
+                onClick={() => navigate("/activity")}
+              />
             </div>
             {activity.length ? (
               <Panel className="overflow-hidden p-0">
                 <div className="grid grid-cols-[auto_minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,0.6fr)_auto] items-center gap-3 border-b border-slate-200 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500 dark:border-slate-700 dark:text-slate-400">
                   <span className="text-left"> </span>
-                  <span>What</span>
-                  <span>Who</span>
-                  <span>When</span>
+                  <span>{t("activity.header.what", "What")}</span>
+                  <span>{t("activity.header.who", "Who")}</span>
+                  <span>{t("activity.header.when", "When")}</span>
                   <span className="text-right"> </span>
                 </div>
                 <div className="divide-y divide-slate-200 dark:divide-slate-700">
@@ -289,8 +300,10 @@ const OverviewPage = ({
             ) : (
               <Panel>
                 <p className="text-sm text-slate-600 dark:text-slate-300">
-                  No download activity yet. Once builds are downloaded or installed, the newest five
-                  events will appear here.
+                  {t(
+                    "overview.activity.empty",
+                    "No download activity yet. Once builds are downloaded or installed, the newest five events will appear here."
+                  )}
                 </p>
               </Panel>
             )}

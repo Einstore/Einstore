@@ -1,3 +1,5 @@
+import { useI18n } from "../lib/i18n";
+
 type CodeBlockProps = {
   code: string;
   className?: string;
@@ -5,6 +7,7 @@ type CodeBlockProps = {
 };
 
 const CodeBlock = ({ code, className = "", onCopy }: CodeBlockProps) => {
+  const { t } = useI18n();
   const normalizedCode = code.replace(/\n{2,}/g, "\n").trimEnd();
   const handleCopy = async () => {
     try {
@@ -28,7 +31,7 @@ const CodeBlock = ({ code, className = "", onCopy }: CodeBlockProps) => {
             handleCopy();
           }
         }}
-        aria-label="Copy code"
+        aria-label={t("common.copyCode", "Copy code")}
       >
         <code>{normalizedCode}</code>
       </pre>
@@ -39,7 +42,7 @@ const CodeBlock = ({ code, className = "", onCopy }: CodeBlockProps) => {
           event.stopPropagation();
           handleCopy();
         }}
-        aria-label="Copy code"
+        aria-label={t("common.copyCode", "Copy code")}
       >
         <svg
           aria-hidden="true"

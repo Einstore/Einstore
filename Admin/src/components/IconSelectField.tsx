@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import FormField from "./FormField";
 import Icon, { type IconName } from "./Icon";
+import { useI18n } from "../lib/i18n";
 
 type IconSelectOption = {
   value: string;
@@ -28,6 +29,7 @@ const IconSelectField = ({
   disabled,
   onChange,
 }: IconSelectFieldProps) => {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -62,7 +64,7 @@ const IconSelectField = ({
         >
           <span className="flex items-center gap-2">
             {selected?.icon ? <Icon name={selected.icon} className="h-4 w-4" /> : null}
-            {selected?.label ?? "Select"}
+            {selected?.label ?? t("common.select", "Select")}
           </span>
           <span className="text-xs text-slate-400 dark:text-slate-500">▼</span>
         </button>

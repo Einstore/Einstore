@@ -4,6 +4,7 @@ import Panel from "../components/Panel";
 import Pagination from "../components/Pagination";
 import type { ApiBuild } from "../lib/apps";
 import type { PaginationMeta } from "../lib/pagination";
+import { useI18n } from "../lib/i18n";
 
 type BuildsPageProps = {
   builds: ApiBuild[];
@@ -30,6 +31,7 @@ const BuildsPage = ({
   onPerPageChange,
   onUpload,
 }: BuildsPageProps) => {
+  const { t } = useI18n();
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-12 gap-6">
@@ -37,7 +39,7 @@ const BuildsPage = ({
           <Panel className="flex h-full items-center justify-between gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                Total builds
+                {t("builds.total", "Total builds")}
               </p>
               <p className="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">
                 {builds.length}

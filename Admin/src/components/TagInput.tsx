@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import Icon from "./Icon";
+import { useI18n } from "../lib/i18n";
 
 type TagInputProps = {
   value: string[];
@@ -20,6 +21,7 @@ const TagInput = ({
   disabled,
   getTagClassName,
 }: TagInputProps) => {
+  const { t } = useI18n();
   const [input, setInput] = useState("");
 
   const normalized = useMemo(() => value.map((tag) => tag.toLowerCase()), [value]);
@@ -65,7 +67,7 @@ const TagInput = ({
               type="button"
               className="text-indigo-500 transition-colors hover:text-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 dark:text-indigo-200"
               onClick={() => removeTag(tag)}
-              aria-label={`Remove tag ${tag}`}
+              aria-label={t("tags.remove", "Remove tag {tag}", { tag })}
               disabled={disabled}
             >
               <Icon name="close" className="h-3 w-3" />
@@ -85,14 +87,14 @@ const TagInput = ({
             }
           }}
           className="h-8 flex-1 min-w-[140px] bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400 disabled:cursor-not-allowed disabled:opacity-60 dark:text-slate-100 dark:placeholder:text-slate-500"
-          placeholder={placeholder ?? "Add a tag and press Enter"}
+          placeholder={placeholder ?? t("tags.placeholder", "Add a tag and press Enter")}
           disabled={disabled}
         />
       </div>
       {availableSuggestions.length ? (
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Suggestions
+            {t("tags.suggestions", "Suggestions")}
           </span>
           {availableSuggestions.map((tag) => (
             <button

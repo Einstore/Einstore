@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { apiFetch } from "./api";
 import { isTeamAdmin, type TeamMember, type TeamSummary } from "./teams";
+import { translate } from "./i18n";
 
 export type SessionUser = {
   userId: string;
@@ -204,7 +205,7 @@ export const useSessionState = (refreshKey?: string) => {
   const createTeam = useCallback(async (name: string) => {
     const trimmed = name.trim();
     if (!trimmed) {
-      throw new Error("Team name is required.");
+      throw new Error(translate("team.error.nameRequired", "Team name is required."));
     }
     const payload = await apiFetch<{ team?: TeamSummary } | TeamSummary>("/teams", {
       method: "POST",

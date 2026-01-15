@@ -11,6 +11,7 @@ import { apiFetch } from "../lib/api";
 import type { TeamMember, TeamSummary } from "../lib/teams";
 import type { AnalyticsSettings } from "../types/settings";
 import { useRef } from "react";
+import { useI18n } from "../lib/i18n";
 
 const GA_KEY_PATTERN = /^G-[A-Z0-9]{8,}$/i;
 
@@ -33,6 +34,7 @@ const SettingsPage = ({
   initialTab,
   onAnalyticsKeySaved,
 }: SettingsPageProps) => {
+  const { t } = useI18n();
   const [activeTab, setActiveTab] = useState(initialTab ?? "team");
   const [gaKey, setGaKey] = useState("");
   const [isSavingAnalytics, setIsSavingAnalytics] = useState(false);
@@ -57,7 +59,7 @@ const SettingsPage = ({
     let isMounted = true;
     if (envAnalyticsKey) {
       setGaKey(envAnalyticsKey);
-      setAnalyticsMessage("Managed via environment (VITE_ANALYTICS_KEY).");
+      setAnalyticsMessage(t("settings.analytics.managed", "Managed via environment (VITE_ANALYTICS_KEY)."));
       return () => {
         isMounted = false;
       };
@@ -76,13 +78,13 @@ const SettingsPage = ({
     return () => {
       isMounted = false;
     };
-  }, [isSuperUser, envAnalyticsKey]);
+  }, [isSuperUser, envAnalyticsKey, t]);
 
   const handleSaveAnalytics = async () => {
     const trimmed = gaKey.trim();
     const nextValue = trimmed === "" ? null : trimmed;
     if (nextValue && !GA_KEY_PATTERN.test(nextValue)) {
-      setAnalyticsError("Enter a valid GA4 measurement ID (e.g., G-XXXXXXXX).");
+      setAnalyticsError(t("settings.analytics.error.invalid", "Enter a valid GA4 measurement ID (e.g., G-XXXXXXXX)."));
       setAnalyticsMessage("");
       return;
     }
@@ -99,10 +101,12 @@ const SettingsPage = ({
       });
       const savedKey = payload?.gaMeasurementId ?? "";
       setGaKey(savedKey ?? "");
-      setAnalyticsMessage(savedKey ? "Analytics key saved." : "Analytics tracking disabled.");
+      setAnalyticsMessage(
+        savedKey ? t("settings.analytics.saved", "Analytics key saved.") : t("settings.analytics.disabled", "Analytics tracking disabled.")
+      );
       onAnalyticsKeySaved?.(payload?.gaMeasurementId ?? null);
     } catch {
-      setAnalyticsError("Unable to save analytics key.");
+      setAnalyticsError(t("settings.analytics.error.save", "Unable to save analytics key."));
     } finally {
       setIsSavingAnalytics(false);
     }
@@ -111,25 +115,25 @@ const SettingsPage = ({
   const tabs = [
     {
       id: "team",
-      label: "Team",
+      label: t("settings.tabs.team", "Team"),
       content: hasTeam ? (
         <Panel className="space-y-6">
           <TextInput
             id="team-name"
-            label="Team name"
+            label={t("settings.team.name.label", "Team name")}
             value={activeTeam?.name ?? ""}
-            placeholder="Team name"
+            placeholder={t("settings.team.name.placeholder", "Team name")}
           />
           <TextInput
             id="team-slug"
-            label="Team slug"
+            label={t("settings.team.slug.label", "Team slug")}
             value={activeTeam?.slug ?? ""}
-            placeholder="team-slug"
+            placeholder={t("settings.team.slug.placeholder", "team-slug")}
           />
           <div className="space-y-2">
             <SectionHeader
-              title="Team logo"
-              description="Upload a 180x180 logo (max 2MB). Shown in the team switcher."
+              title={t("settings.team.logo.title", "Team logo")}
+              description={t("settings.team.logo.subtitle", "Upload a 180x180 logo (max 2MB). Shown in the team switcher.")}
             />
             <div className="flex items-center gap-4">
               <div className="h-14 w-14 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700">
@@ -153,7 +157,7 @@ const SettingsPage = ({
                     setLogoError("");
                     setLogoMessage("");
                     if (file.size > 2 * 1024 * 1024) {
-                      setLogoError("Max size is 2MB.");
+                      setLogoError(t("settings.team.logo.error.size", "Max size is 2MB."));
                       return;
                     }
                     const formData = new FormData();
@@ -164,10 +168,12 @@ const SettingsPage = ({
                         headers: { "x-team-id": activeTeamId },
                         body: formData,
                       });
-                      setLogoMessage("Logo updated. If it doesn't show, refresh.");
+                      setLogoMessage(
+                        t("settings.team.logo.success", "Logo updated. If it doesn't show, refresh.")
+                      );
                     } catch (err) {
                       setLogoError(
-                        err instanceof Error ? err.message : "Unable to upload logo. Try again."
+                        err instanceof Error ? err.message : t("settings.team.logo.error.upload", "Unable to upload logo. Try again.")
                       );
                     } finally {
                       if (logoInputRef.current) {
@@ -181,7 +187,7 @@ const SettingsPage = ({
                   className="h-11 rounded-lg border border-slate-300 px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
                   onClick={() => logoInputRef.current?.click()}
                 >
-                  Upload logo
+                  {t("settings.team.logo.cta", "Upload logo")}
                 </button>
                 {logoMessage ? <p className="text-xs text-green-600">{logoMessage}</p> : null}
                 {logoError ? <p className="text-xs text-red-500">{logoError}</p> : null}
@@ -192,27 +198,27 @@ const SettingsPage = ({
       ) : (
         <Panel>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            No team is available yet.
+            {t("settings.team.empty", "No team is available yet.")}
           </p>
         </Panel>
       ),
     },
     {
       id: "users",
-      label: "Users",
+      label: t("settings.tabs.users", "Users"),
       content: hasTeam ? (
         <div className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <SectionHeader
-              title="Team members"
-              description="Users can be admins or standard users."
+              title={t("settings.users.title", "Team members")}
+              description={t("settings.users.subtitle", "Users can be admins or standard users.")}
             />
             <button
               type="button"
               className="h-11 rounded-lg bg-indigo-600 px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 dark:bg-indigo-500 dark:hover:bg-indigo-400"
               onClick={() => setIsInviteOpen(true)}
             >
-              Invite user
+              {t("settings.users.invite", "Invite user")}
             </button>
           </div>
           <TeamMembersTable members={teamMembers} />
@@ -220,7 +226,7 @@ const SettingsPage = ({
       ) : (
         <Panel>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Invite teammates once you have a team.
+            {t("settings.users.empty", "Invite teammates once you have a team.")}
           </p>
         </Panel>
       ),
@@ -230,26 +236,32 @@ const SettingsPage = ({
   if (isSuperUser) {
     tabs.push({
       id: "analytics",
-      label: "Analytics",
+      label: t("settings.tabs.analytics", "Analytics"),
       content: (
         <Panel className="space-y-4">
           <SectionHeader
-            title="Google Analytics"
-            description="Provide a GA4 measurement ID to enable analytics across the admin. Only super users can manage this."
+            title={t("settings.analytics.title", "Google Analytics")}
+            description={t(
+              "settings.analytics.subtitle",
+              "Provide a GA4 measurement ID to enable analytics across the admin. Only super users can manage this."
+            )}
           />
           <div className="space-y-3">
             <TextInput
               id="ga-key"
-              label="Measurement ID"
+              label={t("settings.analytics.label", "Measurement ID")}
               value={gaKey}
               onChange={setGaKey}
-              placeholder="G-XXXXXXXXXX"
-              hint="Only GA4 measurement IDs are allowed. Leave empty to disable analytics."
+              placeholder={t("settings.analytics.placeholder", "G-XXXXXXXXXX")}
+              hint={t("settings.analytics.hint", "Only GA4 measurement IDs are allowed. Leave empty to disable analytics.")}
               disabled={Boolean(envAnalyticsKey)}
             />
             {envAnalyticsKey ? (
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                This value is managed via <code>VITE_ANALYTICS_KEY</code> and cannot be edited here.
+                {t(
+                  "settings.analytics.envNotice",
+                  "This value is managed via VITE_ANALYTICS_KEY and cannot be edited here."
+                )}
               </p>
             ) : null}
             {analyticsError ? (
@@ -261,10 +273,10 @@ const SettingsPage = ({
             <ActionButton
               label={
                 isSavingAnalytics
-                  ? "Saving..."
+                  ? t("settings.analytics.saving", "Saving...")
                   : gaKey.trim()
-                  ? "Save analytics key"
-                  : "Disable analytics"
+                  ? t("settings.analytics.save", "Save analytics key")
+                  : t("settings.analytics.disable", "Disable analytics")
               }
               variant="primary"
               onClick={handleSaveAnalytics}
@@ -279,11 +291,11 @@ const SettingsPage = ({
   if (isSaas) {
     tabs.push({
       id: "billing",
-      label: "Billing",
+      label: t("settings.tabs.billing", "Billing"),
       content: (
         <Panel>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Billing settings are available only in the SaaS version.
+            {t("settings.billing.notice", "Billing settings are available only in the SaaS version.")}
           </p>
         </Panel>
       ),

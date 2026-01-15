@@ -2,6 +2,7 @@ import ActionButton from "./ActionButton";
 import CheckboxField from "./CheckboxField";
 import Panel from "./Panel";
 import TextInput from "./TextInput";
+import { useI18n } from "../lib/i18n";
 
 export type FeatureFlagFormValues = {
   key: string;
@@ -30,14 +31,18 @@ const FeatureFlagForm = ({
   onSubmit,
   onCancel,
 }: FeatureFlagFormProps) => {
+  const { t } = useI18n();
   return (
     <Panel className="space-y-6">
       <div>
         <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-          {isEditing ? "Edit flag" : "Create flag"}
+          {isEditing ? t("flags.form.editTitle", "Edit flag") : t("flags.form.createTitle", "Create flag")}
         </h2>
         <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-          Use future flags to prepare staged rollouts before they are activated.
+          {t(
+            "flags.form.subtitle",
+            "Use future flags to prepare staged rollouts before they are activated."
+          )}
         </p>
       </div>
       <form
@@ -50,23 +55,23 @@ const FeatureFlagForm = ({
         <div className="grid gap-4 lg:grid-cols-[minmax(220px,1fr)_minmax(220px,2fr)_auto]">
           <TextInput
             id="flag-key"
-            label="Flag key"
+            label={t("flags.form.key.label", "Flag key")}
             value={values.key}
-            placeholder="release_notes_v2"
+            placeholder={t("flags.form.key.placeholder", "release_notes_v2")}
             onChange={(next) => onChange({ ...values, key: next })}
             disabled={keyLocked}
           />
           <TextInput
             id="flag-description"
-            label="Description"
+            label={t("flags.form.description.label", "Description")}
             value={values.description}
-            placeholder="Explain how the flag will be used"
+            placeholder={t("flags.form.description.placeholder", "Explain how the flag will be used")}
             onChange={(next) => onChange({ ...values, description: next })}
           />
           <div className="flex items-end gap-3">
             <CheckboxField
               id="flag-enabled"
-              label="Default"
+              label={t("flags.form.default.label", "Default")}
               checked={values.defaultEnabled}
               onChange={(checked) =>
                 onChange({ ...values, defaultEnabled: checked })
@@ -76,13 +81,13 @@ const FeatureFlagForm = ({
         </div>
         <div className="flex flex-wrap gap-3">
           <ActionButton
-            label={isEditing ? "Update flag" : "Create flag"}
+            label={isEditing ? t("flags.form.update", "Update flag") : t("flags.form.create", "Create flag")}
             variant="primary"
             type="submit"
             disabled={isSubmitting}
           />
           {isEditing && onCancel ? (
-            <ActionButton label="Cancel" variant="outline" onClick={onCancel} />
+            <ActionButton label={t("common.cancel", "Cancel")} variant="outline" onClick={onCancel} />
           ) : null}
         </div>
       </form>

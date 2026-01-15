@@ -21,8 +21,10 @@ import type { PaginationMeta } from "../lib/pagination";
 import CommentsPanel from "../components/CommentsPanel";
 import type { ApiComment } from "../lib/comments";
 import { canInstallForPlatforms } from "../lib/platform";
+import { useI18n } from "../lib/i18n";
 
 const metadataDescriptionMap = { ...infoPlistKeyDescriptionMap, ...androidManifestKeyDescriptionMap };
+type Translate = (key: string, fallback: string, params?: Record<string, string | number>) => string;
 
 type BuildDetailPageProps = {
   build: ApiBuildMetadata | null;
@@ -64,16 +66,20 @@ const writeCookie = (key: string, value: string) => {
   )}; Path=/; Max-Age=31536000; SameSite=Lax`;
 };
 
-const resolveDeviceLabel = (userAgent?: string | null) => {
+const resolveDeviceLabel = (userAgent: string | null | undefined, t: Translate) => {
   const ua = (userAgent ?? "").toLowerCase();
-  if (!ua) return "Unknown device";
-  if (ua.includes("iphone") || ua.includes("ipod")) return "iPhone";
-  if (ua.includes("ipad")) return "iPad";
-  if (ua.includes("android")) return ua.includes("mobile") ? "Android" : "Android tablet";
-  if (ua.includes("macintosh") || ua.includes("mac os")) return "Mac";
-  if (ua.includes("windows")) return "PC";
-  if (ua.includes("linux")) return "PC";
-  return "Unknown device";
+  if (!ua) return t("device.unknown", "Unknown device");
+  if (ua.includes("iphone") || ua.includes("ipod")) return t("device.iphone", "iPhone");
+  if (ua.includes("ipad")) return t("device.ipad", "iPad");
+  if (ua.includes("android")) {
+    return ua.includes("mobile")
+      ? t("device.android", "Android")
+      : t("device.androidTablet", "Android tablet");
+  }
+  if (ua.includes("macintosh") || ua.includes("mac os")) return t("device.mac", "Mac");
+  if (ua.includes("windows")) return t("device.pc", "PC");
+  if (ua.includes("linux")) return t("device.pc", "PC");
+  return t("device.unknown", "Unknown device");
 };
 
 const tagPaletteClasses: Record<string, string> = {
@@ -90,12 +96,12 @@ const getTagClassName = (tag: string) =>
   tagPaletteClasses[tag.toLowerCase()] ??
   "bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-100";
 
-const renderMetadataRows = (metadata: unknown) => {
+const renderMetadataRows = (metadata: unknown, t: Translate) => {
   if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) return null;
   const entries = Object.entries(metadata as Record<string, unknown>);
   if (!entries.length) return null;
   const formatValue = (value: unknown): string => {
-    if (value == null) return "—";
+    if (value == null) return t("common.emptyDash", "—");
     if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
       return String(value);
     }
@@ -122,7 +128,9 @@ const renderMetadataRows = (metadata: unknown) => {
     <div className="mt-2 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
       {entries.map(([key, value], index) => {
         const isEven = index % 2 === 0;
-        const description = metadataDescriptionMap[key];
+        const description = metadataDescriptionMap[key]
+          ? t(`metadata.${key}`, metadataDescriptionMap[key])
+          : null;
         const segments = toSegments(value);
         return (
           <div
@@ -143,7 +151,7 @@ const renderMetadataRows = (metadata: unknown) => {
                   key={`${key}-${segmentIndex}`}
                   className="rounded-md bg-slate-100 px-2 py-1 dark:bg-slate-700/60"
                 >
-                  {segment || "—"}
+                  {segment || t("common.emptyDash", "—")}
                 </div>
               ))}
             </div>
@@ -183,17 +191,19 @@ const BuildDetailPage = ({
   commentsError = null,
   currentUserId,
 }: BuildDetailPageProps) => {
+  const { t, locale } = useI18n();
   const primaryTarget = pickPrimaryTarget(build?.targets);
-  const appName = build?.version?.app?.name ?? build?.displayName ?? "—";
-  const identifier = build?.version?.app?.identifier ?? primaryTarget?.bundleId ?? "—";
-  const platform = primaryTarget?.platform ?? "—";
-  const version = build?.version?.version ?? "—";
-  const buildNumber = build?.buildNumber ?? "—";
+  const appName = build?.version?.app?.name ?? build?.displayName ?? t("common.emptyDash", "—");
+  const identifier = build?.version?.app?.identifier ?? primaryTarget?.bundleId ?? t("common.emptyDash", "—");
+  const platform = primaryTarget?.platform ?? t("common.emptyDash", "—");
+  const version = build?.version?.version ?? t("common.emptyDash", "—");
+  const buildNumber = build?.buildNumber ?? t("common.emptyDash", "—");
   const size = formatBytes(build?.sizeBytes);
   const created = formatDateTime(build?.createdAt);
-  const signingIssuer = build?.signing?.issuer ?? "—";
-  const signingSubject = build?.signing?.subject ?? "—";
+  const signingIssuer = build?.signing?.issuer ?? t("common.emptyDash", "—");
+  const signingSubject = build?.signing?.subject ?? t("common.emptyDash", "—");
   const canInstall = canInstallForPlatforms(build?.targets?.map((target) => target.platform) ?? []);
+  const tagLabel = (name: string) => t(`tag.palette.${name.replace(/\s+/g, "_")}`, name);
   const artifactsByKind = build?.artifactsByKind ?? {};
   const artifactGroups = Object.entries(artifactsByKind).map(([kind, items]) => {
     const unique = (items ?? []).filter(Boolean).reduce<ApiArtifact[]>((acc, current) => {
@@ -208,10 +218,10 @@ const BuildDetailPage = ({
   const infoObject =
     build?.info && typeof build.info === "object" && !Array.isArray(build.info) ? build.info : null;
   const releaseDetailsRows = [
-    { label: "Git commit", value: build?.gitCommit ?? null, type: "code" as const },
-    { label: "PR link", value: build?.prUrl ?? null, type: "link" as const },
-    { label: "Change log", value: build?.changeLog ?? null, type: "text" as const },
-    { label: "Notes", value: build?.notes ?? null, type: "text" as const },
+    { label: t("build.release.gitCommit", "Git commit"), value: build?.gitCommit ?? null, type: "code" as const },
+    { label: t("build.release.prLink", "PR link"), value: build?.prUrl ?? null, type: "link" as const },
+    { label: t("build.release.changeLog", "Change log"), value: build?.changeLog ?? null, type: "text" as const },
+    { label: t("build.release.notes", "Notes"), value: build?.notes ?? null, type: "text" as const },
     ...(infoObject
       ? Object.entries(infoObject).map(([key, value]) => ({
           label: key,
@@ -287,8 +297,10 @@ const BuildDetailPage = ({
           {error}
         </Panel>
       ) : null}
-      {isLoading ? <Panel>Loading build…</Panel> : null}
-      {!isLoading && !build ? <Panel>No build details found.</Panel> : null}
+      {isLoading ? <Panel>{t("build.loading", "Loading build…")}</Panel> : null}
+      {!isLoading && !build ? (
+        <Panel>{t("build.empty", "No build details found.")}</Panel>
+      ) : null}
 
       {build ? (
         <>
@@ -304,9 +316,18 @@ const BuildDetailPage = ({
                 <p className="text-sm text-slate-500 dark:text-slate-400">{identifier}</p>
               </div>
               <div className="flex flex-wrap justify-center gap-2">
-                <StatusPill status="running" label={`Platform: ${platform}`} />
-                <StatusPill status="running" label={`Version ${version}`} />
-                <StatusPill status="running" label={`Build ${buildNumber}`} />
+                <StatusPill
+                  status="running"
+                  label={t("build.platformLabel", "Platform: {platform}", { platform })}
+                />
+                <StatusPill
+                  status="running"
+                  label={t("build.versionLabel", "Version {version}", { version })}
+                />
+                <StatusPill
+                  status="running"
+                  label={t("build.numberLabel", "Build {number}", { number: buildNumber })}
+                />
               </div>
               <div className="flex flex-wrap justify-center gap-3 pt-2">
                 {canInstall ? (
@@ -316,7 +337,7 @@ const BuildDetailPage = ({
                     onClick={() => build?.id && onInstall?.(build.id)}
                     disabled={!build}
                   >
-                    Install
+                    {t("build.action.install", "Install")}
                   </button>
                 ) : null}
                 <button
@@ -325,41 +346,41 @@ const BuildDetailPage = ({
                   onClick={() => build?.id && onDownload?.(build.id)}
                   disabled={!build}
                 >
-                  Download
+                  {t("build.action.download", "Download")}
                 </button>
               </div>
             </Panel>
 
             <Panel className="col-span-12 md:col-span-8 space-y-4">
-              <SectionHeader title="Build information" />
+              <SectionHeader title={t("build.info.title", "Build information")} />
               <dl className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
                 <div>
                   <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    App
+                    {t("common.app", "App")}
                   </dt>
                   <dd className="text-sm text-slate-900 dark:text-slate-100">{appName}</dd>
                 </div>
                 <div>
                   <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Identifier
+                    {t("build.info.identifier", "Identifier")}
                   </dt>
                   <dd className="text-sm text-slate-900 dark:text-slate-100">{identifier}</dd>
                 </div>
                 <div>
                   <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Version
+                    {t("common.version", "Version")}
                   </dt>
                   <dd className="text-sm text-slate-900 dark:text-slate-100">{version}</dd>
                 </div>
                 <div>
                   <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Build number
+                    {t("build.info.buildNumber", "Build number")}
                   </dt>
                   <dd className="text-sm text-slate-900 dark:text-slate-100">{buildNumber}</dd>
                 </div>
                 <div>
                   <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Storage
+                    {t("build.info.storage", "Storage")}
                   </dt>
                   <dd className="text-sm text-slate-900 dark:text-slate-100">
                     {build.storageKind.toUpperCase()}
@@ -367,36 +388,36 @@ const BuildDetailPage = ({
                 </div>
                 <div>
                   <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Size
+                    {t("build.info.size", "Size")}
                   </dt>
                   <dd className="text-sm text-slate-900 dark:text-slate-100">{size}</dd>
                 </div>
                 <div>
                   <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Created
+                    {t("build.info.created", "Created")}
                   </dt>
                   <dd className="text-sm text-slate-900 dark:text-slate-100">{created}</dd>
                 </div>
                 <div>
                   <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Build ID
+                    {t("build.info.buildId", "Build ID")}
                   </dt>
                   <dd className="text-sm text-slate-900 dark:text-slate-100">{build.id}</dd>
                 </div>
                 <div>
                   <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Signing issuer
+                    {t("build.info.signingIssuer", "Signing issuer")}
                   </dt>
                   <dd className="text-sm text-slate-900 dark:text-slate-100">
-                    {signingIssuer || "—"}
+                    {signingIssuer || t("common.emptyDash", "—")}
                   </dd>
                 </div>
                 <div>
                   <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Signing subject
+                    {t("build.info.signingSubject", "Signing subject")}
                   </dt>
                   <dd className="text-sm text-slate-900 dark:text-slate-100">
-                    {signingSubject || "—"}
+                    {signingSubject || t("common.emptyDash", "—")}
                   </dd>
                 </div>
               </dl>
@@ -405,8 +426,11 @@ const BuildDetailPage = ({
             <Panel className="col-span-12 space-y-4">
               <div className="flex items-start justify-between gap-3">
                 <SectionHeader
-                  title="Release details"
-                  subtitle="Optional metadata that helps connect builds back to code and release notes."
+                  title={t("build.release.title", "Release details")}
+                  subtitle={t(
+                    "build.release.subtitle",
+                    "Optional metadata that helps connect builds back to code and release notes."
+                  )}
                 />
                 {onUpdateMetadata ? (
                   <button
@@ -414,14 +438,14 @@ const BuildDetailPage = ({
                     className="h-10 rounded-lg border border-slate-300 px-3 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
                     onClick={() => setIsEditOpen(true)}
                   >
-                    Edit details
+                    {t("build.release.edit", "Edit details")}
                   </button>
                 ) : null}
               </div>
               <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
                 {releaseDetailsRows.map((row, index) => {
                   const isEven = index % 2 === 0;
-                  const value = row.value ?? "—";
+                  const value = row.value ?? t("common.emptyDash", "—");
                   return (
                     <div
                       key={`${row.label}-${index}`}
@@ -465,8 +489,11 @@ const BuildDetailPage = ({
                 <Panel className="space-y-4">
                   <div className="flex items-start justify-between gap-3">
                     <SectionHeader
-                      title="Tags"
-                      subtitle="Tags help you find builds quickly. Add multiple tags; changes save automatically."
+                      title={t("build.tags.title", "Tags")}
+                      subtitle={t(
+                        "build.tags.subtitle",
+                        "Tags help you find builds quickly. Add multiple tags; changes save automatically."
+                      )}
                     />
                     <button
                       type="button"
@@ -479,7 +506,7 @@ const BuildDetailPage = ({
                         }
                       }}
                     >
-                      Make preview
+                      {t("build.tags.makePreview", "Make preview")}
                     </button>
                   </div>
                     <TagInput
@@ -489,15 +516,15 @@ const BuildDetailPage = ({
                         setTagDraft(next);
                         try {
                         await onChangeTags?.(next);
-                        setTagAlert("Tags saved");
+                        setTagAlert(t("build.tags.saved", "Tags saved"));
                         setTimeout(() => setTagAlert(null), 2000);
                       } catch {
-                        setTagAlert("Could not save tags");
+                        setTagAlert(t("build.tags.error", "Could not save tags"));
                         setTimeout(() => setTagAlert(null), 2000);
                       }
                     }}
                     suggestions={availableTags.map((tag) => tag.name)}
-                    placeholder="Add a tag (e.g. release, beta, hotfix)"
+                    placeholder={t("build.tags.placeholder", "Add a tag (e.g. release, beta, hotfix)")}
                   />
                   <details
                     open={isTagPaletteOpen}
@@ -509,7 +536,7 @@ const BuildDetailPage = ({
                     className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm dark:border-slate-700 dark:bg-slate-800/60"
                   >
                     <summary className="cursor-pointer text-sm font-semibold text-slate-700 dark:text-slate-200">
-                      Tag palette
+                      {t("build.tags.palette", "Tag palette")}
                     </summary>
                     <div className="mt-3 flex flex-wrap gap-2">
                       {tagPaletteOrder.map((name) => (
@@ -523,7 +550,7 @@ const BuildDetailPage = ({
                             onChangeTags?.(next);
                           }}
                         >
-                          {name}
+                          {tagLabel(name)}
                         </button>
                       ))}
                     </div>
@@ -543,7 +570,10 @@ const BuildDetailPage = ({
               <div className="col-span-12 space-y-6 md:col-span-6">
                 <Panel className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <SectionHeader title="Download history" subtitle="Newest first" />
+                    <SectionHeader
+                      title={t("build.downloads.title", "Download history")}
+                      subtitle={t("build.downloads.subtitle", "Newest first")}
+                    />
                     <button
                       type="button"
                       className="text-xs font-semibold text-indigo-600 transition-colors hover:text-indigo-500 dark:text-indigo-300"
@@ -555,14 +585,14 @@ const BuildDetailPage = ({
                         });
                       }}
                     >
-                      {isDownloadsOpen ? "Collapse" : "Expand"}
+                      {isDownloadsOpen ? t("common.collapse", "Collapse") : t("common.expand", "Expand")}
                     </button>
                   </div>
                   {isDownloadsOpen ? (
                     <>
                       {!downloads.length ? (
                         <p className="text-sm text-slate-500 dark:text-slate-400">
-                          No downloads recorded for this build yet.
+                          {t("build.downloads.empty", "No downloads recorded for this build yet.")}
                         </p>
                       ) : (
                         <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
@@ -572,10 +602,12 @@ const BuildDetailPage = ({
                               event.user?.fullName ||
                               event.user?.username ||
                               event.user?.email ||
-                              "Unknown user";
-                            const deviceLabel = resolveDeviceLabel(event.userAgent);
+                              t("activity.unknownUser", "Unknown user");
+                            const deviceLabel = resolveDeviceLabel(event.userAgent, t);
                             const actionLabel =
-                              event.kind === "install" ? "Install" : "Download";
+                              event.kind === "install"
+                                ? t("build.action.install", "Install")
+                                : t("build.action.download", "Download");
                             return (
                               <div
                                 key={event.id}
@@ -611,7 +643,7 @@ const BuildDetailPage = ({
 
                 <Panel className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <SectionHeader title="Targets" />
+                    <SectionHeader title={t("build.targets.title", "Targets")} />
                     <button
                       type="button"
                       className="text-xs font-semibold text-indigo-600 transition-colors hover:text-indigo-500 dark:text-indigo-300"
@@ -623,12 +655,14 @@ const BuildDetailPage = ({
                         });
                       }}
                     >
-                      {isTargetsOpen ? "Collapse" : "Expand"}
+                      {isTargetsOpen ? t("common.collapse", "Collapse") : t("common.expand", "Expand")}
                     </button>
                   </div>
                   {isTargetsOpen ? (
                     !build.targets?.length ? (
-                      <p className="text-sm text-slate-500">No targets found for this build.</p>
+                      <p className="text-sm text-slate-500">
+                        {t("build.targets.empty", "No targets found for this build.")}
+                      </p>
                     ) : (
                       <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
                         {build.targets.map((target, index) => {
@@ -647,14 +681,16 @@ const BuildDetailPage = ({
                                   </p>
                                   <p className="text-xs text-slate-500">
                                     {target.platform} • {target.role}
-                                    {target.minOsVersion ? ` • Min OS ${target.minOsVersion}` : ""}
+                                    {target.minOsVersion
+                                      ? ` • ${t("build.targets.minOs", "Min OS")} ${target.minOsVersion}`
+                                      : ""}
                                   </p>
                                 </div>
                                 <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-700 dark:bg-slate-700 dark:text-slate-200">
-                                  Target
+                                  {t("build.targets.badge", "Target")}
                                 </span>
                               </div>
-                              {renderMetadataRows(target.metadata)}
+                              {renderMetadataRows(target.metadata, t)}
                             </div>
                           );
                         })}
@@ -665,7 +701,7 @@ const BuildDetailPage = ({
 
                 <Panel className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <SectionHeader title="Artifacts & entitlements" />
+                    <SectionHeader title={t("build.artifacts.title", "Artifacts & entitlements")} />
                     <button
                       type="button"
                       className="text-xs font-semibold text-indigo-600 transition-colors hover:text-indigo-500 dark:text-indigo-300"
@@ -677,12 +713,14 @@ const BuildDetailPage = ({
                         });
                       }}
                     >
-                      {isArtifactsOpen ? "Collapse" : "Expand"}
+                      {isArtifactsOpen ? t("common.collapse", "Collapse") : t("common.expand", "Expand")}
                     </button>
                   </div>
                   {isArtifactsOpen ? (
                     !artifactGroups.length ? (
-                      <p className="text-sm text-slate-500">No artifacts available.</p>
+                      <p className="text-sm text-slate-500">
+                        {t("build.artifacts.empty", "No artifacts available.")}
+                      </p>
                     ) : (
                       <div className="space-y-4">
                         {artifactGroups.map(([kind, items]) => {
@@ -710,14 +748,14 @@ const BuildDetailPage = ({
                                             {item.label || formatKind(item.kind)}
                                           </p>
                                           <p className="text-xs text-slate-500">
-                                            {item.storageKind?.toUpperCase?.() ?? "—"} • {item.storagePath}
+                                            {item.storageKind?.toUpperCase?.() ?? t("common.emptyDash", "—")} • {item.storagePath}
                                           </p>
                                         </div>
                                         <p className="text-xs text-slate-500">
-                                          {item.createdAt ? formatDateTime(item.createdAt) : "—"}
+                                          {item.createdAt ? formatDateTime(item.createdAt) : t("common.emptyDash", "—")}
                                         </p>
                                       </div>
-                                      {renderMetadataRows(item.metadata)}
+                                      {renderMetadataRows(item.metadata, t)}
                                     </div>
                                   );
                                 })}
@@ -742,17 +780,20 @@ const BuildDetailPage = ({
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                  Edit build details
+                  {t("build.edit.title", "Edit build details")}
                 </h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400">
-                  Link this build back to source control and release notes. Empty fields will be cleared.
+                  {t(
+                    "build.edit.subtitle",
+                    "Link this build back to source control and release notes. Empty fields will be cleared."
+                  )}
                 </p>
               </div>
               <button
                 type="button"
                 className="text-slate-500 transition-colors hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
                 onClick={() => setIsEditOpen(false)}
-                aria-label="Close"
+                aria-label={t("common.close", "Close")}
               >
                 ✕
               </button>
@@ -761,7 +802,7 @@ const BuildDetailPage = ({
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <label className="flex flex-col gap-2 text-sm text-slate-700 dark:text-slate-200">
                 <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Git commit
+                  {t("build.release.gitCommit", "Git commit")}
                 </span>
                 <input
                   type="text"
@@ -770,12 +811,12 @@ const BuildDetailPage = ({
                     setEditForm((current) => ({ ...current, gitCommit: event.target.value }))
                   }
                   className="h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-                  placeholder="e.g. 9fceb02"
+                  placeholder={t("build.edit.gitCommit.placeholder", "e.g. 9fceb02")}
                 />
               </label>
               <label className="flex flex-col gap-2 text-sm text-slate-700 dark:text-slate-200">
                 <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  PR link
+                  {t("build.release.prLink", "PR link")}
                 </span>
                 <input
                   type="url"
@@ -784,7 +825,7 @@ const BuildDetailPage = ({
                     setEditForm((current) => ({ ...current, prUrl: event.target.value }))
                   }
                   className="h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-                  placeholder="https://github.com/org/repo/pull/123"
+                  placeholder={t("build.edit.prLink.placeholder", "https://github.com/org/repo/pull/123")}
                 />
               </label>
             </div>
@@ -792,7 +833,7 @@ const BuildDetailPage = ({
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <label className="flex flex-col gap-2 text-sm text-slate-700 dark:text-slate-200">
                 <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Change log
+                  {t("build.release.changeLog", "Change log")}
                 </span>
                 <textarea
                   value={editForm.changeLog}
@@ -800,12 +841,12 @@ const BuildDetailPage = ({
                     setEditForm((current) => ({ ...current, changeLog: event.target.value }))
                   }
                   className="min-h-[140px] rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-                  placeholder="What changed in this build?"
+                  placeholder={t("build.edit.changeLog.placeholder", "What changed in this build?")}
                 />
               </label>
               <label className="flex flex-col gap-2 text-sm text-slate-700 dark:text-slate-200">
                 <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Notes
+                  {t("build.release.notes", "Notes")}
                 </span>
                 <textarea
                   value={editForm.notes}
@@ -813,14 +854,14 @@ const BuildDetailPage = ({
                     setEditForm((current) => ({ ...current, notes: event.target.value }))
                   }
                   className="min-h-[140px] rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-                  placeholder="Tester notes, install instructions, etc."
+                  placeholder={t("build.edit.notes.placeholder", "Tester notes, install instructions, etc.")}
                 />
               </label>
             </div>
 
             <label className="flex flex-col gap-2 text-sm text-slate-700 dark:text-slate-200">
               <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Info (JSON)
+                {t("build.edit.info.label", "Info (JSON)")}
               </span>
               <textarea
                 value={editForm.infoText}
@@ -828,10 +869,13 @@ const BuildDetailPage = ({
                   setEditForm((current) => ({ ...current, infoText: event.target.value }))
                 }
                 className="min-h-[140px] rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-                placeholder='{"qaOwner":"Alex","jira":"MOBILE-123"}'
+                placeholder={t("build.edit.info.placeholder", '{"qaOwner":"Alex","jira":"MOBILE-123"}')}
               />
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Provide a JSON object for any extra metadata (e.g., QA owner, links, environment flags).
+                {t(
+                  "build.edit.info.help",
+                  "Provide a JSON object for any extra metadata (e.g., QA owner, links, environment flags)."
+                )}
               </p>
             </label>
 
@@ -850,7 +894,7 @@ const BuildDetailPage = ({
                   setEditError("");
                 }}
               >
-                Cancel
+                {t("common.cancel", "Cancel")}
               </button>
               <button
                 type="button"
@@ -866,7 +910,7 @@ const BuildDetailPage = ({
                     if (infoText) {
                       const parsed = JSON.parse(infoText);
                       if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-                        throw new Error("Info must be a JSON object.");
+                        throw new Error(t("build.edit.info.error", "Info must be a JSON object."));
                       }
                       parsedInfo = parsed as Record<string, unknown>;
                     } else {
@@ -882,13 +926,15 @@ const BuildDetailPage = ({
                     await onUpdateMetadata(payload);
                     setIsEditOpen(false);
                   } catch (err) {
-                    setEditError(err instanceof Error ? err.message : "Unable to save changes.");
+                    setEditError(
+                      err instanceof Error ? err.message : t("build.edit.error.save", "Unable to save changes.")
+                    );
                   } finally {
                     setIsSavingEdit(false);
                   }
                 }}
               >
-                Save changes
+                {t("common.saveChanges", "Save changes")}
               </button>
             </div>
           </Panel>

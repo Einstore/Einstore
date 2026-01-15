@@ -1,3 +1,5 @@
+import { translate } from "./i18n";
+
 const resolveApiBaseUrl = () => {
   if (import.meta.env.VITE_API_BASE_URL) {
     return import.meta.env.VITE_API_BASE_URL;
@@ -119,12 +121,18 @@ export async function apiFetch<T>(
       if (shouldRetryAuth(retryPayload, retry.response.status)) {
         forceLogout();
       }
-      throw new Error(retryPayload.error || retryPayload.message || "Request failed");
+      throw new Error(
+        retryPayload.error ||
+          retryPayload.message ||
+          translate("api.error.requestFailed", "Request failed")
+      );
     }
     forceLogout();
   }
 
-  throw new Error(payload.error || payload.message || "Request failed");
+  throw new Error(
+    payload.error || payload.message || translate("api.error.requestFailed", "Request failed")
+  );
 }
 
 export async function apiUpload<T>(path: string, formData: FormData): Promise<T> {
@@ -164,10 +172,16 @@ export async function apiUpload<T>(path: string, formData: FormData): Promise<T>
       if (shouldRetryAuth(retryPayload, retry.response.status)) {
         forceLogout();
       }
-      throw new Error(retryPayload.error || retryPayload.message || "Upload failed");
+      throw new Error(
+        retryPayload.error ||
+          retryPayload.message ||
+          translate("api.error.uploadFailed", "Upload failed")
+      );
     }
     forceLogout();
   }
 
-  throw new Error(payload.error || payload.message || "Upload failed");
+  throw new Error(
+    payload.error || payload.message || translate("api.error.uploadFailed", "Upload failed")
+  );
 }

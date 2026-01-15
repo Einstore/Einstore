@@ -1,3 +1,5 @@
+import { getLocale } from "./i18n";
+
 export type ApiApp = {
   id: string;
   name: string;
@@ -64,38 +66,39 @@ export type ApiTag = {
   usageCount?: number;
 };
 
-export const formatDate = (value?: string | null) => {
+const formatNumber = (value: number, digits: number, locale: string) => {
+  return new Intl.NumberFormat(locale, {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  }).format(value);
+};
+
+export const formatDate = (value?: string | null, locale: string = getLocale()) => {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+  return new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(date);
 };
 
-export const formatDateTime = (value?: string | null) => {
+export const formatDateTime = (value?: string | null, locale: string = getLocale()) => {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
-  return date.toLocaleString("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
 };
 
-export const formatBytes = (bytes?: number | null) => {
+export const formatBytes = (bytes?: number | null, locale: string = getLocale()) => {
   if (!bytes && bytes !== 0) return "—";
   if (bytes < 1024) return `${bytes} B`;
   const kb = bytes / 1024;
-  if (kb < 1024) return `${kb.toFixed(1)} KB`;
+  if (kb < 1024) return `${formatNumber(kb, 1, locale)} KB`;
   const mb = kb / 1024;
-  if (mb < 1024) return `${mb.toFixed(1)} MB`;
+  if (mb < 1024) return `${formatNumber(mb, 1, locale)} MB`;
   const gb = mb / 1024;
-  return `${gb.toFixed(2)} GB`;
+  return `${formatNumber(gb, 2, locale)} GB`;
 };
 
 export type ApiBuildIcon = {

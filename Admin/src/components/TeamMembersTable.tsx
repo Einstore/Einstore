@@ -1,22 +1,24 @@
 import type { TeamMember } from "../lib/teams";
-
-const roleLabel = (role: TeamMember["role"]) => {
-  if (role === "owner") {
-    return "Owner";
-  }
-  if (role === "admin") {
-    return "Admin";
-  }
-  return "User";
-};
+import { useI18n } from "../lib/i18n";
 
 const TeamMembersTable = ({ members }: { members: TeamMember[] }) => {
+  const { t } = useI18n();
+  const roleLabel = (role: TeamMember["role"]) => {
+    if (role === "owner") {
+      return t("team.role.owner", "Owner");
+    }
+    if (role === "admin") {
+      return t("team.role.admin", "Admin");
+    }
+    return t("team.role.user", "User");
+  };
+
   return (
     <div className="rounded-xl bg-white p-5 shadow-sm dark:bg-slate-800">
       <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,2fr)_minmax(0,1fr)] gap-4 border-b border-slate-200 pb-3 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:border-slate-700 dark:text-slate-400">
-        <span>Name</span>
-        <span>Email</span>
-        <span>Role</span>
+        <span>{t("team.members.name", "Name")}</span>
+        <span>{t("team.members.email", "Email")}</span>
+        <span>{t("team.members.role", "Role")}</span>
       </div>
       <div>
         {members.map((member) => (

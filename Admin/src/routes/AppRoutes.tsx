@@ -46,7 +46,8 @@ import { enableAnalytics, trackPageView } from "../lib/analytics";
 import { useSessionState } from "../lib/session";
 import type { PaginatedResponse, PaginationMeta } from "../lib/pagination";
 import RequireAuth from "./RequireAuth";
-import { navItems, pageConfig, type RouteConfig } from "./config";
+import { createNavItems, createPageConfig, type RouteConfig } from "./config";
+import { useI18n } from "../lib/i18n";
 import { adminFeatureFlagDefinitions } from "../data/featureFlagDefinitions";
 import type { StorageUsageResponse, StorageUsageUser } from "../types/usage";
 import type { AnalyticsSettings } from "../types/settings";
@@ -101,6 +102,7 @@ const putToSpacesXHR = ({
   });
 
 const AppRoutes = () => {
+  const { t, locale } = useI18n();
   const location = useLocation();
   const navigate = useNavigate();
   const [featureFlags, setFeatureFlags] = useState(getDefaultFeatureFlags());
@@ -229,35 +231,52 @@ const AppRoutes = () => {
 
   const mapEventToActivity = useCallback((event: ApiBuildEvent): ActivityItem => {
     const actor =
-      event.user?.fullName || event.user?.username || event.user?.email || "Unknown user";
+      event.user?.fullName ||
+      event.user?.username ||
+      event.user?.email ||
+      t("activity.unknownUser", "Unknown user");
     const buildName =
-      event.build?.version?.app?.name || event.build?.displayName || "Build";
+      event.build?.version?.app?.name || event.build?.displayName || t("build.fallback", "Build");
     const versionLabel = event.build?.version?.version;
     const buildNumber = event.build?.buildNumber;
+    const buildSuffix = buildNumber
+      ? t("activity.buildSuffix", "(build {number})", { number: buildNumber })
+      : "";
     const titleParts = [
       buildName,
       versionLabel,
-      buildNumber ? `(build ${buildNumber})` : null,
+      buildNumber ? buildSuffix : null,
     ].filter(Boolean);
-    const verb = event.kind === "install" ? "installed" : "downloaded";
-    const detail = `${actor} ${verb} ${buildName}${
-      buildNumber ? ` (build ${buildNumber})` : ""
-    }`;
+    const verb =
+      event.kind === "install"
+        ? t("activity.verb.installed", "installed")
+        : t("activity.verb.downloaded", "downloaded");
+    const detail = t("activity.detail", "{actor} {verb} {build}{suffix}", {
+      actor,
+      verb,
+      build: buildName,
+      suffix: buildSuffix ? ` ${buildSuffix}` : "",
+    });
     const time = Number.isNaN(Date.parse(event.createdAt))
       ? event.createdAt
-      : new Date(event.createdAt).toLocaleString();
+      : new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(
+          new Date(event.createdAt)
+        );
     return {
       id: event.id,
       title: titleParts.join(" "),
       detail,
       time,
-      tag: event.kind === "install" ? "Install" : "Download",
+      tag:
+        event.kind === "install"
+          ? t("build.action.install", "Install")
+          : t("build.action.download", "Download"),
       buildId: event.buildId,
       appId: event.build?.version?.app?.id ?? undefined,
       appName: buildName,
       actor,
     };
-  }, []);
+  }, [locale, t]);
 
   const loadRecentBuildEvents = useCallback(async () => {
     if (!activeTeamId) {
@@ -507,10 +526,10 @@ const AppRoutes = () => {
       };
       const maxBytes = 8 * 1024 * 1024 * 1024; // match API default limit
       if (file.size <= 0) {
-        throw toError("INGEST-EMPTY", "File is empty");
+        throw toError("INGEST-EMPTY", t("upload.error.empty", "File is empty"));
       }
       if (file.size > maxBytes) {
-        throw toError("INGEST-TOO-LARGE", "File exceeds 8GB limit");
+        throw toError("INGEST-TOO-LARGE", t("upload.error.tooLarge", "File exceeds 8GB limit"));
       }
 
       let primaryError: Error | null = null;
@@ -527,7 +546,10 @@ const AppRoutes = () => {
             }),
           }
         ).catch((err) => {
-          throw toError("INGEST-PRESIGN", err instanceof Error ? err.message : "Could not create upload link");
+          throw toError(
+            "INGEST-PRESIGN",
+            err instanceof Error ? err.message : t("upload.error.presign", "Could not create upload link")
+          );
         });
 
         try {
@@ -539,22 +561,32 @@ const AppRoutes = () => {
           });
         } catch (err) {
           if (err && (err as { isNetwork?: boolean }).isNetwork) {
-            throw toError("INGEST-PUT-NET", "Upload network error (PUT)");
+            throw toError("INGEST-PUT-NET", t("upload.error.network", "Upload network error (PUT)"));
           }
           const status = err && typeof (err as { status?: number }).status === "number" ? (err as { status?: number }).status : null;
           const code = status === 403 ? "INGEST-CORS" : "INGEST-PUT";
-          const msg = status === 403 ? "Upload blocked by storage CORS/ACL" : "Upload failed";
-          throw toError(code, `${msg} (status ${status ?? "unknown"})`);
+          const msg =
+            status === 403
+              ? t("upload.error.cors", "Upload blocked by storage CORS/ACL")
+              : t("upload.error.failed", "Upload failed");
+          throw toError(code, t("upload.error.status", "{message} (status {status})", {
+            message: msg,
+            status: status ?? t("upload.error.status.unknown", "unknown"),
+          }));
         }
 
         await apiFetch("/ingest/complete-upload", {
           method: "POST",
           body: JSON.stringify({ key: presign.key, filename: file.name, sizeBytes: file.size }),
         }).catch((err) => {
-          throw toError("INGEST-COMPLETE", err instanceof Error ? err.message : "Finalize failed");
+          throw toError(
+            "INGEST-COMPLETE",
+            err instanceof Error ? err.message : t("upload.error.finalize", "Finalize failed")
+          );
         });
       } catch (err) {
-        primaryError = err instanceof Error ? err : toError("INGEST-UNKNOWN", "Upload failed");
+        primaryError =
+          err instanceof Error ? err : toError("INGEST-UNKNOWN", t("upload.error.failed", "Upload failed"));
         // Fallback to legacy multipart upload
         const fallbackForm = new FormData();
         fallbackForm.append("file", file);
@@ -566,7 +598,9 @@ const AppRoutes = () => {
               ? (fallbackErr as any).code
               : "INGEST-FALLBACK";
           const message =
-            fallbackErr instanceof Error ? fallbackErr.message : "Fallback upload failed";
+            fallbackErr instanceof Error
+              ? fallbackErr.message
+              : t("upload.error.fallback", "Fallback upload failed");
           throw toError(
             fallbackCode,
             `${message}; primary=${primaryError.message}`
@@ -577,7 +611,7 @@ const AppRoutes = () => {
       await loadApps();
       setIngestNonce((current) => current + 1);
     },
-    [loadApps]
+    [loadApps, t]
   );
 
   const handleInstallBuild = useCallback(
@@ -786,6 +820,8 @@ const AppRoutes = () => {
   ];
 
   const routes: RouteConfig[] = [...coreRoutes, ...privateRoutes];
+  const navItems = useMemo(() => createNavItems(t), [t]);
+  const pageConfig = useMemo(() => createPageConfig(t), [t]);
 
   const visibleNavItems = useMemo(() => {
     const normalizedPrivate = privateNavItems.map((item) =>
@@ -821,7 +857,7 @@ const AppRoutes = () => {
       }
       return true;
     });
-  }, [featureFlags, isAdmin, isSuperUser, badges.apps, badges.builds]);
+  }, [featureFlags, isAdmin, isSuperUser, badges.apps, badges.builds, navItems]);
 
   const activeRoute = useMemo(() => {
     const match = routes.find((route) =>
@@ -1010,7 +1046,9 @@ const BuildDetailRoute = ({
         });
         setComments((current) => [...current, payload]);
       } catch (err) {
-        setCommentsError(err instanceof Error ? err.message : "Unable to post comment.");
+      setCommentsError(
+        err instanceof Error ? err.message : t("comments.error.submit", "Unable to post comment.")
+      );
         throw err;
       } finally {
         setIsPostingComment(false);
@@ -1029,7 +1067,7 @@ const BuildDetailRoute = ({
     setError(null);
     if (!buildId) {
       setIsLoading(false);
-      setError("Build not found.");
+      setError(t("build.error.notFound", "Build not found."));
       return () => {
         isMounted = false;
       };
@@ -1057,7 +1095,7 @@ const BuildDetailRoute = ({
           .catch(() => {
             if (!isMounted) return;
             setComments([]);
-            setCommentsError("Unable to load comments.");
+            setCommentsError(t("comments.error.load", "Unable to load comments."));
           })
           .finally(() => {
             if (isMounted) {
@@ -1080,7 +1118,7 @@ const BuildDetailRoute = ({
       })
       .catch(() => {
         if (!isMounted) return;
-        setError("Unable to load build details.");
+        setError(t("build.error.load", "Unable to load build details."));
       })
       .finally(() => {
         if (isMounted) {

@@ -82,6 +82,7 @@ export async function featureFlagRoutes(app: FastifyInstance) {
     const items = await listFeatureFlags(prisma, {
       offset: parsed.data.offset,
       limit: parsed.data.limit,
+      definitions: [],
     });
     return reply.send(items);
   });
@@ -205,12 +206,13 @@ export async function featureFlagRoutes(app: FastifyInstance) {
       return reply.status(400).send({ error: "Invalid query" });
     }
 
-    const defaults = resolveFeatureFlagDefaults(key);
+    const defaults = resolveFeatureFlagDefaults(key, []);
     const enabled = await isFeatureFlagEnabled(prisma, key, {
       scope: parsed.data.scope ?? "platform",
       targetKey: parsed.data.targetKey ?? null,
       description: defaults?.description ?? null,
       defaultEnabled: defaults?.defaultEnabled ?? false,
+      autoCreate: false,
     });
 
     return reply.send({ key, enabled });

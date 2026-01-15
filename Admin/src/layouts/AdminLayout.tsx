@@ -13,6 +13,7 @@ import type { TeamSummary } from "../lib/teams";
 import type { SessionUser } from "../lib/session";
 import SidebarUploadDropzone from "../components/SidebarUploadDropzone";
 import AcceptInviteDialog from "../components/AcceptInviteDialog";
+import { useI18n } from "../lib/i18n";
 
 type AdminLayoutProps = {
   navItems: readonly NavItem[];
@@ -47,6 +48,7 @@ const AdminLayout = ({
   user,
   appIcons,
 }: AdminLayoutProps) => {
+  const { t } = useI18n();
   const [isAddAppOpen, setIsAddAppOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAcceptInviteOpen, setIsAcceptInviteOpen] = useState(false);
@@ -126,14 +128,14 @@ const AdminLayout = ({
         <div className="flex min-h-full flex-col">
           <Outlet />
           <p className="mt-10 text-center text-xs text-slate-500 dark:text-slate-400">
-            Made with love in Scotland. © {currentYear}{" "}
+            {t("footer.message", "Made with love in Scotland.")} © {currentYear}{" "}
             <a
               href="https://www.unlikeotherai.com"
               className="font-semibold text-slate-500 transition-colors hover:underline dark:text-slate-400"
               target="_blank"
               rel="noreferrer"
             >
-              Unlike Other AI
+              {t("footer.company", "Unlike Other AI")}
             </a>
           </p>
         </div>
@@ -151,12 +153,12 @@ const AdminLayout = ({
       {showUploadDebug ? (
         <button
           type="button"
-          className="fixed bottom-6 right-6 z-40 rounded-full bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-lg transition-colors hover:bg-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
-          onClick={() => setIsAddAppOpen(true)}
-        >
-          Upload debug
-        </button>
-      ) : null}
+        className="fixed bottom-6 right-6 z-40 rounded-full bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-lg transition-colors hover:bg-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
+        onClick={() => setIsAddAppOpen(true)}
+      >
+        {t("upload.debug", "Upload debug")}
+      </button>
+    ) : null}
     </AppShell>
   );
 };

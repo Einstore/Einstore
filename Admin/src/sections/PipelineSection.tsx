@@ -2,18 +2,20 @@ import ActionButton from "../components/ActionButton";
 import PipelineStageCard from "../components/PipelineStageCard";
 import SectionHeader from "../components/SectionHeader";
 import type { PipelineStage } from "../data/mock";
+import { useI18n } from "../lib/i18n";
 
 type PipelineSectionProps = {
   stages: PipelineStage[];
 };
 
 const PipelineSection = ({ stages }: PipelineSectionProps) => {
+  const { t } = useI18n();
   return (
     <section className="space-y-6">
       <SectionHeader
-        title="Pipeline health"
-        description="Track the stages that feed approvals and distribution."
-        actions={<ActionButton label="Review incidents" variant="primary" />}
+        title={t("pipeline.health.title", "Pipeline health")}
+        description={t("pipeline.health.subtitle", "Track the stages that feed approvals and distribution.")}
+        actions={<ActionButton label={t("pipeline.health.cta", "Review incidents")} variant="primary" />}
       />
       <div className="grid grid-cols-12 gap-6">
         {stages.map((stage) => (

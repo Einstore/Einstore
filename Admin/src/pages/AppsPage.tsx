@@ -7,6 +7,7 @@ import Panel from "../components/Panel";
 import Pagination from "../components/Pagination";
 import type { ApiApp } from "../lib/apps";
 import type { PaginationMeta } from "../lib/pagination";
+import { useI18n } from "../lib/i18n";
 
 const VIEW_MODE_COOKIE = "apps_view_mode";
 const PLATFORM_COOKIE = "apps_platform";
@@ -57,6 +58,7 @@ const AppsPage = ({
   onPerPageChange,
   onUpload,
 }: AppsPageProps) => {
+  const { t } = useI18n();
   const [viewMode, setViewMode] = useState<"list" | "grid">(() => readViewModeCookie());
   const [platformValue, setPlatformValue] = useState<string>(platform);
 
@@ -84,13 +86,13 @@ const AppsPage = ({
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-              Filters
+              {t("apps.filters", "Filters")}
             </p>
             <div className="flex flex-wrap items-center gap-2">
               {[
-                { id: "all", label: "All" },
-                { id: "ios", label: "iOS", icon: "ios" },
-                { id: "android", label: "Android", icon: "android" },
+                { id: "all", label: t("apps.filter.all", "All") },
+                { id: "ios", label: t("apps.filter.ios", "iOS"), icon: "ios" },
+                { id: "android", label: t("apps.filter.android", "Android"), icon: "android" },
               ].map((option) => {
                 const isActive = platformValue === option.id;
                 return (
@@ -121,7 +123,7 @@ const AppsPage = ({
                   ? "border-indigo-500 bg-indigo-50 text-indigo-600 dark:border-indigo-400/60 dark:bg-indigo-500/20 dark:text-indigo-300"
                   : "border-slate-200 bg-white text-slate-500 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
               }`}
-              aria-label="Grid view"
+              aria-label={t("apps.view.grid", "Grid view")}
               aria-pressed={viewMode === "grid"}
             >
               <svg
@@ -141,7 +143,7 @@ const AppsPage = ({
                   ? "border-indigo-500 bg-indigo-50 text-indigo-600 dark:border-indigo-400/60 dark:bg-indigo-500/20 dark:text-indigo-300"
                   : "border-slate-200 bg-white text-slate-500 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
               }`}
-              aria-label="List view"
+              aria-label={t("apps.view.list", "List view")}
               aria-pressed={viewMode === "list"}
             >
               <Icon name="list" className="h-4 w-4" />

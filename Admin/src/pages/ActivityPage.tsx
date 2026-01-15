@@ -11,6 +11,7 @@ import type { ApiApp, ApiBuildEvent } from "../lib/apps";
 import { formatDateTime } from "../lib/apps";
 import type { PaginatedResponse } from "../lib/pagination";
 import type { TeamMember } from "../lib/teams";
+import { useI18n } from "../lib/i18n";
 
 type ActivityPageProps = {
   apps: ApiApp[];
@@ -20,6 +21,7 @@ type ActivityPageProps = {
 };
 
 const ActivityPage = ({ apps, appIcons, teamMembers, activeTeamId }: ActivityPageProps) => {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
@@ -37,29 +39,34 @@ const ActivityPage = ({ apps, appIcons, teamMembers, activeTeamId }: ActivityPag
   const appOptions = useMemo(
     () =>
       [
-        { value: "", label: "All apps" },
+        { value: "", label: t("activity.filter.apps.all", "All apps") },
         ...[...apps]
           .sort((a, b) => (a.name || a.identifier || "").localeCompare(b.name || b.identifier || ""))
           .map((app) => ({
             value: app.id,
-            label: app.name || app.identifier || "App",
+            label: app.name || app.identifier || t("app.fallback", "App"),
           })),
       ],
-    [apps]
+    [apps, t]
   );
 
   const userOptions = useMemo(
     () =>
       [
-        { value: "", label: "All users" },
+        { value: "", label: t("activity.filter.users.all", "All users") },
         ...[...teamMembers]
           .sort((a, b) => (a.name || "").localeCompare(b.name || ""))
           .map((member) => ({
             value: member.id,
-            label: member.name || member.fullName || member.username || member.email || "User",
+            label:
+              member.name ||
+              member.fullName ||
+              member.username ||
+              member.email ||
+              t("common.user", "User"),
           })),
       ],
-    [teamMembers]
+    [teamMembers, t]
   );
 
   useEffect(() => {
@@ -117,13 +124,15 @@ const ActivityPage = ({ apps, appIcons, teamMembers, activeTeamId }: ActivityPag
     <div className="space-y-6">
       <Panel className="space-y-4">
         <div className="space-y-1">
-          <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Activity</p>
+          <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+            {t("activity.title", "Activity")}
+          </p>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Review all install and download events for your team.
+            {t("activity.subtitle", "Review all install and download events for your team.")}
           </p>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
-          <FormField label="Filter by app" htmlFor="activity-app">
+          <FormField label={t("activity.filter.apps.label", "Filter by app")} htmlFor="activity-app">
             <select
               id="activity-app"
               value={selectedAppId}
@@ -137,7 +146,7 @@ const ActivityPage = ({ apps, appIcons, teamMembers, activeTeamId }: ActivityPag
               ))}
             </select>
           </FormField>
-          <FormField label="Filter by user" htmlFor="activity-user">
+          <FormField label={t("activity.filter.users.label", "Filter by user")} htmlFor="activity-user">
             <select
               id="activity-user"
               value={selectedUserId}
@@ -156,16 +165,16 @@ const ActivityPage = ({ apps, appIcons, teamMembers, activeTeamId }: ActivityPag
       <Panel className="overflow-hidden p-0">
         <div className="grid grid-cols-[auto_minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,0.6fr)_auto] items-center gap-3 border-b border-slate-200 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500 dark:border-slate-700 dark:text-slate-400">
           <span className="text-left"> </span>
-          <span>What</span>
-          <span>Who</span>
-          <span>When</span>
+          <span>{t("activity.header.what", "What")}</span>
+          <span>{t("activity.header.who", "Who")}</span>
+          <span>{t("activity.header.when", "When")}</span>
           <span className="text-right"> </span>
         </div>
         {events.items.length ? (
           <div className="divide-y divide-slate-200 dark:divide-slate-700">
             {events.items.map((event) => {
               const app = event.build?.version?.app;
-              const buildName = app?.name || event.build?.displayName || "Build";
+              const buildName = app?.name || event.build?.displayName || t("build.fallback", "Build");
               const versionLabel = event.build?.version?.version;
               const buildNumber = event.build?.buildNumber;
               const title = [buildName, versionLabel, buildNumber ? `(${buildNumber})` : null]
@@ -175,7 +184,7 @@ const ActivityPage = ({ apps, appIcons, teamMembers, activeTeamId }: ActivityPag
                 event.user?.fullName ||
                 event.user?.username ||
                 event.user?.email ||
-                "Unknown user";
+                t("activity.unknownUser", "Unknown user");
               const iconUrl = app?.id ? appIcons[app.id] : null;
               return (
                 <button
@@ -192,7 +201,9 @@ const ActivityPage = ({ apps, appIcons, teamMembers, activeTeamId }: ActivityPag
                         {title}
                       </span>
                       <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:bg-slate-700 dark:text-slate-300">
-                        {event.kind === "install" ? "Install" : "Download"}
+                        {event.kind === "install"
+                          ? t("build.action.install", "Install")
+                          : t("build.action.download", "Download")}
                       </span>
                     </div>
                   </div>
@@ -209,7 +220,9 @@ const ActivityPage = ({ apps, appIcons, teamMembers, activeTeamId }: ActivityPag
           </div>
         ) : (
           <div className="px-4 py-8 text-sm text-slate-500 dark:text-slate-400">
-            {isLoading ? "Loading events..." : "No install or download events yet."}
+            {isLoading
+              ? t("activity.loading", "Loading events...")
+              : t("activity.empty", "No install or download events yet.")}
           </div>
         )}
         <div className="px-4 pb-4">

@@ -4,6 +4,7 @@ import ActionButton from "./ActionButton";
 import Panel from "./Panel";
 import { apiFetch } from "../lib/api";
 import { buildInviteAcceptPath } from "../lib/invites";
+import { useI18n } from "../lib/i18n";
 
 type InviteUserDialogProps = {
   isOpen: boolean;
@@ -12,6 +13,7 @@ type InviteUserDialogProps = {
 };
 
 const InviteUserDialog = ({ isOpen, teamId, onClose }: InviteUserDialogProps) => {
+  const { t } = useI18n();
   const [maxUses, setMaxUses] = useState<number>(1);
   const [domain, setDomain] = useState("");
   const [link, setLink] = useState("");
@@ -66,9 +68,9 @@ const InviteUserDialog = ({ isOpen, teamId, onClose }: InviteUserDialogProps) =>
       const invitePath = payload?.invite?.path || buildInviteAcceptPath(payload?.invite?.token ?? "");
       const fullLink = buildLink(invitePath, payload?.invite?.token);
       setLink(fullLink);
-      setMessage("Invite link generated.");
+      setMessage(t("invite.generate.success", "Invite link generated."));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to create invite.");
+      setError(err instanceof Error ? err.message : t("invite.generate.error", "Unable to create invite."));
       setLink("");
     } finally {
       setBusy(false);
@@ -82,11 +84,13 @@ const InviteUserDialog = ({ isOpen, teamId, onClose }: InviteUserDialogProps) =>
       <Panel className="w-full max-w-xl space-y-6 p-6">
         <div>
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-            Invite user
+            {t("invite.generate.title", "Invite user")}
           </h3>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-            Generate a shareable link. Set max uses (0 = unlimited) or restrict to an email
-            domain.
+            {t(
+              "invite.generate.subtitle",
+              "Generate a shareable link. Set max uses (0 = unlimited) or restrict to an email domain."
+            )}
           </p>
         </div>
 
@@ -95,7 +99,7 @@ const InviteUserDialog = ({ isOpen, teamId, onClose }: InviteUserDialogProps) =>
             htmlFor="invite-max-uses"
             className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400"
           >
-            Max uses
+            {t("invite.generate.maxUses.label", "Max uses")}
           </label>
           <input
             id="invite-max-uses"
@@ -106,7 +110,10 @@ const InviteUserDialog = ({ isOpen, teamId, onClose }: InviteUserDialogProps) =>
             className="h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           />
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Use 0 for unlimited. The link can also be restricted to a domain below.
+            {t(
+              "invite.generate.maxUses.help",
+              "Use 0 for unlimited. The link can also be restricted to a domain below."
+            )}
           </p>
         </div>
 
@@ -115,25 +122,28 @@ const InviteUserDialog = ({ isOpen, teamId, onClose }: InviteUserDialogProps) =>
             htmlFor="invite-domain"
             className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400"
           >
-            Restrict to email domain
+            {t("invite.generate.domain.label", "Restrict to email domain")}
           </label>
           <input
             id="invite-domain"
             type="text"
-            placeholder="example.com"
+            placeholder={t("invite.generate.domain.placeholder", "example.com")}
             value={domain}
             onChange={(event) => setDomain(event.target.value)}
             className="h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           />
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Optional. Only users with matching email domains can accept.
+            {t(
+              "invite.generate.domain.help",
+              "Optional. Only users with matching email domains can accept."
+            )}
           </p>
         </div>
 
         {link ? (
           <div className="space-y-2">
             <label className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-              Invite link
+              {t("invite.generate.link.label", "Invite link")}
             </label>
             <div className="flex items-center gap-2">
               <input
@@ -147,11 +157,11 @@ const InviteUserDialog = ({ isOpen, teamId, onClose }: InviteUserDialogProps) =>
                 onClick={async () => {
                   if (!canCopy) return;
                   await navigator.clipboard.writeText(link);
-                  setMessage("Copied to clipboard.");
+                  setMessage(t("invite.generate.copied", "Copied to clipboard."));
                 }}
                 className="h-11 rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-700"
               >
-                Copy
+                {t("common.copy", "Copy")}
               </button>
             </div>
           </div>
@@ -169,9 +179,9 @@ const InviteUserDialog = ({ isOpen, teamId, onClose }: InviteUserDialogProps) =>
         ) : null}
 
         <div className="flex flex-wrap justify-end gap-3">
-          <ActionButton label="Close" variant="outline" onClick={onClose} />
+          <ActionButton label={t("common.close", "Close")} variant="outline" onClick={onClose} />
           <ActionButton
-            label={link ? "Regenerate" : "Generate link"}
+            label={link ? t("invite.generate.regenerate", "Regenerate") : t("invite.generate.cta", "Generate link")}
             variant="primary"
             disabled={busy}
             onClick={generate}

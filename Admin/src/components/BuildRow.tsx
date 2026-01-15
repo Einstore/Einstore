@@ -1,5 +1,6 @@
 import AppAvatar from "./AppAvatar";
 import { getClientPlatform, shouldShowInstall } from "../lib/device";
+import { useI18n } from "../lib/i18n";
 
 export type BuildRowProps = {
   name: string;
@@ -28,6 +29,7 @@ const BuildRow = ({
   showDownload = true,
   onSelect,
 }: BuildRowProps) => {
+  const { t } = useI18n();
   const clientPlatform = getClientPlatform();
   const showInstall = shouldShowInstall(platform);
   const showDownloadButton = !showInstall && (showDownload || clientPlatform === "web");
@@ -42,12 +44,14 @@ const BuildRow = ({
         <AppAvatar name={name} size="sm" iconUrl={iconUrl} platform={platform} />
         <div>
           <p className="font-semibold text-slate-900 dark:text-slate-100">{name}</p>
-          <p className="text-slate-500 dark:text-slate-400">Build #{buildNumber}</p>
+          <p className="text-slate-500 dark:text-slate-400">
+            {t("build.row.number", "Build #{number}", { number: buildNumber })}
+          </p>
         </div>
       </div>
       <div className="flex items-center gap-4">
         <p className="text-slate-500 dark:text-slate-400">
-          {storageKind ? storageKind.toUpperCase() : "—"}
+          {storageKind ? storageKind.toUpperCase() : t("common.emptyDash", "—")}
         </p>
         <p className="text-slate-500 dark:text-slate-400">{size}</p>
         <p className="text-slate-400 dark:text-slate-500">{createdAt}</p>
@@ -61,7 +65,7 @@ const BuildRow = ({
                 onInstall?.();
               }}
             >
-              Install
+              {t("build.action.install", "Install")}
             </button>
           ) : null}
           {showDownloadButton ? (
@@ -73,7 +77,7 @@ const BuildRow = ({
                 onDownload?.();
               }}
             >
-              Download
+              {t("build.action.download", "Download")}
             </button>
           ) : null}
         </div>

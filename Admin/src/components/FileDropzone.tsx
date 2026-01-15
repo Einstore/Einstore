@@ -1,15 +1,17 @@
 import { useRef, useState } from "react";
 
 import ActionButton from "./ActionButton";
+import { useI18n } from "../lib/i18n";
 
 const allowedExtensions = [".ipa", ".apk"];
 
-const formatFile = (file: File | null) => {
+const formatFile = (file: File | null, emptyLabel: string, locale: string) => {
   if (!file) {
-    return "No file selected";
+    return emptyLabel;
   }
-  const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
-  return `${file.name} (${sizeMb} MB)`;
+  const sizeMb = file.size / (1024 * 1024);
+  const formatted = new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(sizeMb);
+  return `${file.name} (${formatted} MB)`;
 };
 
 type FileDropzoneProps = {
@@ -27,6 +29,7 @@ const FileDropzone = ({
   disabled,
   statusMessage,
 }: FileDropzoneProps) => {
+  const { t, locale } = useI18n();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -41,7 +44,7 @@ const FileDropzone = ({
       const lower = selected.name.toLowerCase();
       const isAllowed = allowedExtensions.some((ext) => lower.endsWith(ext));
       if (!isAllowed) {
-        setError("Only .ipa or .apk files are supported.");
+        setError(t("upload.error.fileType", "Only .ipa or .apk files are supported."));
         setFile(null);
         onFileSelect(null);
         return;
@@ -83,15 +86,17 @@ const FileDropzone = ({
           handleFiles(event.dataTransfer.files);
         }}
       >
-        <p className="text-slate-600 dark:text-slate-300">Drop IPA or APK here</p>
+        <p className="text-slate-600 dark:text-slate-300">
+          {t("upload.dropzone.prompt", "Drop IPA or APK here")}
+        </p>
         <ActionButton
-          label="Browse file"
+          label={t("upload.dropzone.browse", "Browse file")}
           variant="outline"
           onClick={() => inputRef.current?.click()}
           disabled={disabled}
         />
         <p className="text-xs text-slate-400 dark:text-slate-500">
-          {formatFile(file)}
+          {formatFile(file, t("upload.dropzone.empty", "No file selected"), locale)}
         </p>
         {error ? <p className="text-xs text-red-500">{error}</p> : null}
         {statusMessage ? (

@@ -1,5 +1,6 @@
 import { FormEvent, useMemo, useState } from "react";
 import type { ApiComment } from "../lib/comments";
+import { useI18n } from "../lib/i18n";
 import Panel from "./Panel";
 
 export type CommentsPanelProps = {
@@ -20,14 +21,18 @@ const CommentAvatar = ({ label }: { label: string }) => {
   );
 };
 
-const formatDate = (value?: string) => {
+const formatDate = (value: string | undefined, locale: string) => {
   if (!value) return "";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString();
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
 };
 
 const CommentsPanel = ({ comments, currentUserId, onSubmit, isSubmitting, isLoading, error }: CommentsPanelProps) => {
+  const { t, locale } = useI18n();
   const [draft, setDraft] = useState("");
   const [localError, setLocalError] = useState("");
 
@@ -36,7 +41,7 @@ const CommentsPanel = ({ comments, currentUserId, onSubmit, isSubmitting, isLoad
     if (!onSubmit) return;
     const text = draft.trim();
     if (!text) {
-      setLocalError("Comment cannot be empty.");
+      setLocalError(t("comments.error.empty", "Comment cannot be empty."));
       return;
     }
     setLocalError("");
@@ -44,7 +49,9 @@ const CommentsPanel = ({ comments, currentUserId, onSubmit, isSubmitting, isLoad
       await onSubmit(text);
       setDraft("");
     } catch (err) {
-      setLocalError(err instanceof Error ? err.message : "Unable to post comment.");
+      setLocalError(
+        err instanceof Error ? err.message : t("comments.error.submit", "Unable to post comment.")
+      );
     }
   };
 
@@ -53,8 +60,12 @@ const CommentsPanel = ({ comments, currentUserId, onSubmit, isSubmitting, isLoad
   return (
     <Panel className="space-y-4">
       <div className="space-y-1">
-        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Comments</p>
-        <p className="text-xs text-slate-500 dark:text-slate-400">Share release notes, test results, or quick context.</p>
+        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+          {t("comments.title", "Comments")}
+        </p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          {t("comments.subtitle", "Share release notes, test results, or quick context.")}
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-2">
@@ -62,7 +73,7 @@ const CommentsPanel = ({ comments, currentUserId, onSubmit, isSubmitting, isLoad
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
           className="min-h-[96px] w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-          placeholder="Add a comment"
+          placeholder={t("comments.placeholder", "Add a comment")}
           disabled={isSubmitting}
         />
         {localError || error ? (
@@ -74,18 +85,23 @@ const CommentsPanel = ({ comments, currentUserId, onSubmit, isSubmitting, isLoad
             className="h-10 rounded-lg bg-indigo-600 px-4 text-sm font-semibold text-white transition-colors hover:bg-indigo-500 disabled:opacity-60"
             disabled={isSubmitting}
           >
-            Post comment
+            {t("comments.submit", "Post comment")}
           </button>
         </div>
       </form>
 
       <div className="space-y-3">
-        {isLoading ? <p className="text-sm text-slate-500">Loading comments…</p> : null}
+        {isLoading ? (
+          <p className="text-sm text-slate-500">{t("comments.loading", "Loading comments…")}</p>
+        ) : null}
         {!isLoading && !sortedComments.length ? (
-          <p className="text-sm text-slate-500 dark:text-slate-400">No comments yet.</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            {t("comments.empty", "No comments yet.")}
+          </p>
         ) : null}
         {sortedComments.map((comment) => {
-          const authorName = comment.user?.fullName || comment.user?.username || comment.user?.email || "Unknown";
+          const authorName =
+            comment.user?.fullName || comment.user?.username || comment.user?.email || t("common.unknown", "Unknown");
           const isMine = comment.userId && currentUserId && comment.userId === currentUserId;
           const bubbleClasses = isMine
             ? "bg-indigo-50 text-slate-800 dark:bg-indigo-900/30 dark:text-slate-100"
@@ -98,7 +114,9 @@ const CommentsPanel = ({ comments, currentUserId, onSubmit, isSubmitting, isLoad
               <div className="max-w-[80%] space-y-1">
                 <div className={`flex items-center justify-between gap-3 ${textAlign}`}>
                   <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{authorName}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{formatDate(comment.createdAt)}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {formatDate(comment.createdAt, locale)}
+                  </p>
                 </div>
                 <div className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${bubbleClasses}`}>
                   {comment.text}

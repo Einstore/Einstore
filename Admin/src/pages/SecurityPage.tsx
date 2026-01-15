@@ -3,6 +3,7 @@ import Panel from "../components/Panel";
 import SectionHeader from "../components/SectionHeader";
 import SecurityPolicyCard from "../components/SecurityPolicyCard";
 import type { SecurityAudit, SecurityPolicy } from "../data/mock";
+import { useI18n } from "../lib/i18n";
 
 type SecurityPageProps = {
   policies: SecurityPolicy[];
@@ -10,11 +11,12 @@ type SecurityPageProps = {
 };
 
 const SecurityPage = ({ policies, audits }: SecurityPageProps) => {
+  const { t } = useI18n();
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Security posture"
-        description="Track compliance controls and scheduled access reviews."
+        title={t("security.posture.title", "Security posture")}
+        description={t("security.posture.subtitle", "Track compliance controls and scheduled access reviews.")}
       />
       <div className="grid grid-cols-12 gap-6">
         {policies.map((policy) => (
@@ -24,8 +26,8 @@ const SecurityPage = ({ policies, audits }: SecurityPageProps) => {
         ))}
       </div>
       <SectionHeader
-        title="Access reviews"
-        description="Upcoming audits across distribution teams."
+        title={t("security.reviews.title", "Access reviews")}
+        description={t("security.reviews.subtitle", "Upcoming audits across distribution teams.")}
       />
       <Panel>
         {audits.map((audit) => (

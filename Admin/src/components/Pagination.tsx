@@ -1,3 +1,5 @@
+import { useI18n } from "../lib/i18n";
+
 type PaginationProps = {
   page: number;
   totalPages: number;
@@ -30,17 +32,20 @@ const Pagination = ({
   onPageChange,
   onPerPageChange,
 }: PaginationProps) => {
+  const { t } = useI18n();
   const pages = buildPageList(page, totalPages);
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-4 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
       <div className="flex items-center gap-3">
-        <span className="text-xs font-semibold uppercase tracking-wide">Rows</span>
+        <span className="text-xs font-semibold uppercase tracking-wide">
+          {t("pagination.rows", "Rows")}
+        </span>
         <select
           value={perPage}
           onChange={(event) => onPerPageChange(Number(event.target.value))}
           className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-          aria-label="Rows per page"
+          aria-label={t("pagination.rowsPerPage", "Rows per page")}
         >
           {perPageOptions.map((option) => (
             <option key={option} value={option}>
@@ -49,12 +54,14 @@ const Pagination = ({
           ))}
         </select>
         <span className="text-xs text-slate-400 dark:text-slate-500">
-          {typeof total === "number" ? `${total} total` : null}
+          {typeof total === "number"
+            ? t("pagination.total", "{count} total", { count: total })
+            : null}
         </span>
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <span className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
-          Page {page}/{totalPages}
+          {t("pagination.page", "Page {page}/{total}", { page, total: totalPages })}
         </span>
         <div className="flex items-center gap-2">
           <button
@@ -62,7 +69,7 @@ const Pagination = ({
             className="flex h-11 w-11 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             onClick={() => onPageChange(page - 1)}
             disabled={page <= 1}
-            aria-label="Previous page"
+            aria-label={t("pagination.previous", "Previous page")}
           >
             ‹
           </button>
@@ -82,7 +89,7 @@ const Pagination = ({
                       : "border-slate-200 text-slate-500 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
                   }`}
                   onClick={() => onPageChange(pageNumber)}
-                  aria-label={`Page ${pageNumber}`}
+                  aria-label={t("pagination.pageLabel", "Page {page}", { page: pageNumber })}
                   aria-current={pageNumber === page ? "page" : undefined}
                 >
                   {pageNumber}
@@ -95,7 +102,7 @@ const Pagination = ({
             className="flex h-11 w-11 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             onClick={() => onPageChange(page + 1)}
             disabled={page >= totalPages}
-            aria-label="Next page"
+            aria-label={t("pagination.next", "Next page")}
           >
             ›
           </button>

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import ActionButton from "./ActionButton";
 import FileDropzone from "./FileDropzone";
 import Panel from "./Panel";
+import { useI18n } from "../lib/i18n";
 
 const AddAppDialog = ({
   isOpen,
@@ -15,6 +16,7 @@ const AddAppDialog = ({
   onUpload: (file: File, onProgress?: (progress: number) => void) => Promise<void>;
   debugInfo?: string;
 }) => {
+  const { t } = useI18n();
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
@@ -57,15 +59,18 @@ const AddAppDialog = ({
       >
         <div>
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-            Upload build
+            {t("upload.dialog.title", "Upload build")}
           </h3>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-            Upload an IPA or APK to start ingestion. App details will be read from the manifest.
+            {t(
+              "upload.dialog.subtitle",
+              "Upload an IPA or APK to start ingestion. App details will be read from the manifest."
+            )}
           </p>
         </div>
         <FileDropzone
-          label="App binary"
-          helper="Drop a file or browse from your machine."
+          label={t("upload.dialog.label", "App binary")}
+          helper={t("upload.dialog.helper", "Drop a file or browse from your machine.")}
           onFileSelect={setFile}
           disabled={busy}
           statusMessage={status || undefined}
@@ -77,14 +82,14 @@ const AddAppDialog = ({
         ) : null}
         {debugInfo ? (
           <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-3 text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
-            <p className="font-semibold">Debug info</p>
+            <p className="font-semibold">{t("upload.dialog.debug", "Debug info")}</p>
             <p className="mt-1 break-all font-mono">{debugInfo}</p>
           </div>
         ) : null}
         <div className="flex flex-wrap justify-end gap-3">
-          <ActionButton label="Cancel" variant="outline" onClick={handleClose} />
+          <ActionButton label={t("common.cancel", "Cancel")} variant="outline" onClick={handleClose} />
           <ActionButton
-            label="Upload build"
+            label={t("upload.dialog.cta", "Upload build")}
             variant="primary"
             disabled={!file || busy}
             onClick={async () => {
@@ -93,14 +98,14 @@ const AddAppDialog = ({
               }
               setBusy(true);
               setError("");
-              setStatus("Uploading build...");
+              setStatus(t("upload.status.uploading", "Uploading build..."));
               try {
                 await onUpload(file);
-                setStatus("Build ingested.");
+                setStatus(t("upload.status.ingested", "Build ingested."));
                 setFile(null);
                 onClose();
               } catch (err) {
-                setError(err instanceof Error ? err.message : "Upload failed.");
+                setError(err instanceof Error ? err.message : t("upload.error.failed", "Upload failed."));
                 setStatus("");
               } finally {
                 setBusy(false);

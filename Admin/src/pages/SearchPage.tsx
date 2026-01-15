@@ -10,6 +10,7 @@ import type { ApiApp } from "../lib/apps";
 import { formatDateTime } from "../lib/apps";
 import type { PaginatedResponse } from "../lib/pagination";
 import type { SearchBuildResult, SearchResponse } from "../lib/search";
+import { useI18n } from "../lib/i18n";
 
 type SearchPageProps = {
   apps: ApiApp[];
@@ -20,6 +21,7 @@ type SearchPageProps = {
 const MIN_QUERY_LENGTH = 2;
 
 const SearchPage = ({ apps, appIcons, activeTeamId }: SearchPageProps) => {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
@@ -129,8 +131,11 @@ const SearchPage = ({ apps, appIcons, activeTeamId }: SearchPageProps) => {
             <Icon name="search" className="h-4 w-4 text-slate-400" />
             <input
               type="search"
-              placeholder="Search builds by name, version, build number, or tag"
-              aria-label="Search builds"
+              placeholder={t(
+                "search.placeholder",
+                "Search builds by name, version, build number, or tag"
+              )}
+              aria-label={t("search.label", "Search builds")}
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               className="h-full w-full bg-transparent text-base text-slate-700 outline-none placeholder:text-slate-400 dark:text-slate-100"
@@ -158,7 +163,7 @@ const SearchPage = ({ apps, appIcons, activeTeamId }: SearchPageProps) => {
                   </span>
                 )}
                 <span className="font-medium">
-                  {selectedApp ? selectedApp.name : "All apps"}
+                  {selectedApp ? selectedApp.name : t("search.apps.all", "All apps")}
                 </span>
               </span>
               <Icon name="chevronDown" className="h-3 w-3 text-slate-400" />
@@ -183,7 +188,7 @@ const SearchPage = ({ apps, appIcons, activeTeamId }: SearchPageProps) => {
                     <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-200">
                       <Icon name="apps" className="h-4 w-4" />
                     </span>
-                    All apps
+                    {t("search.apps.all", "All apps")}
                   </button>
                   {sortedApps.map((app) => {
                     const isActive = app.id === selectedAppId;
@@ -222,10 +227,12 @@ const SearchPage = ({ apps, appIcons, activeTeamId }: SearchPageProps) => {
       <Panel className="space-y-3">
         <div className="flex items-center justify-between">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Results
+            {t("search.results", "Results")}
           </p>
           {isLoading ? (
-            <span className="text-xs text-slate-400 dark:text-slate-500">Searching...</span>
+            <span className="text-xs text-slate-400 dark:text-slate-500">
+              {t("search.loading", "Searching...")}
+            </span>
           ) : null}
         </div>
         {results.items.length ? (
@@ -254,7 +261,7 @@ const SearchPage = ({ apps, appIcons, activeTeamId }: SearchPageProps) => {
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Build #{build.buildNumber}
+                    {t("build.row.number", "Build #{number}", { number: build.buildNumber })}
                   </p>
                   <p className="text-xs text-slate-400 dark:text-slate-500">
                     v{build.version} • {formatDateTime(build.createdAt)}
@@ -266,8 +273,8 @@ const SearchPage = ({ apps, appIcons, activeTeamId }: SearchPageProps) => {
         ) : (
           <p className="text-sm text-slate-500 dark:text-slate-400">
             {query.trim().length < MIN_QUERY_LENGTH
-              ? "Start typing to search builds."
-              : "No builds found."}
+              ? t("search.prompt", "Start typing to search builds.")
+              : t("search.empty", "No builds found.")}
           </p>
         )}
         <Pagination

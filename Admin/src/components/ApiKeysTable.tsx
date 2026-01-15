@@ -1,3 +1,5 @@
+import { useI18n } from "../lib/i18n";
+
 type ApiKeyRecord = {
   id: string;
   name: string;
@@ -15,22 +17,24 @@ type ApiKeysTableProps = {
   onRevoke: (key: ApiKeyRecord) => void;
 };
 
-const formatDateTime = (value?: string | null) => {
-  if (!value) return "-";
+const formatDateTime = (value: string | null | undefined, locale: string, fallback: string) => {
+  if (!value) return fallback;
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "-";
-  return date.toLocaleString();
+  if (Number.isNaN(date.getTime())) return fallback;
+  return new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(date);
 };
 
 const ApiKeysTable = ({ apiKeys, selectedId, onSelect, onRevoke }: ApiKeysTableProps) => {
+  const { t, locale } = useI18n();
+  const dash = t("common.emptyDash", "—");
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-800">
       <div className="-mx-5 border-b border-slate-200 pb-3 dark:border-slate-700">
         <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.4fr)_minmax(0,1.4fr)_minmax(0,0.8fr)] gap-4 px-5 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-          <span>Name</span>
-          <span>Created</span>
-          <span>Last used</span>
-          <span className="text-right">Actions</span>
+          <span>{t("apiKeys.header.name", "Name")}</span>
+          <span>{t("apiKeys.header.created", "Created")}</span>
+          <span>{t("apiKeys.header.lastUsed", "Last used")}</span>
+          <span className="text-right">{t("common.actions", "Actions")}</span>
         </div>
       </div>
       <div className="-mx-5">
@@ -62,14 +66,16 @@ const ApiKeysTable = ({ apiKeys, selectedId, onSelect, onRevoke }: ApiKeysTableP
                 </div>
               </div>
               <div className="text-slate-500 dark:text-slate-400">
-                {formatDateTime(key.createdAt)}
+                {formatDateTime(key.createdAt, locale, dash)}
               </div>
               <div className="text-slate-500 dark:text-slate-400">
-                {formatDateTime(key.lastUsedAt)}
+                {formatDateTime(key.lastUsedAt, locale, dash)}
               </div>
                 <div className="flex justify-end">
                   {key.revokedAt ? (
-                    <span className="text-xs text-slate-400 dark:text-slate-500">Revoked</span>
+                    <span className="text-xs text-slate-400 dark:text-slate-500">
+                      {t("apiKeys.status.revoked", "Revoked")}
+                    </span>
                   ) : (
                     <button
                       type="button"
@@ -79,13 +85,13 @@ const ApiKeysTable = ({ apiKeys, selectedId, onSelect, onRevoke }: ApiKeysTableP
                       onRevoke(key);
                     }}
                     >
-                      Revoke
+                      {t("apiKeys.action.revoke", "Revoke")}
                     </button>
                   )}
                 </div>
               </div>
               <div className="pointer-events-none absolute left-1/2 top-2 z-20 hidden -translate-x-1/2 -translate-y-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 shadow-sm group-hover:block dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
-                Key prefix: <span className="font-mono">{key.prefix}...</span>
+                {t("apiKeys.prefix", "Key prefix:")} <span className="font-mono">{key.prefix}...</span>
               </div>
             </div>
           );

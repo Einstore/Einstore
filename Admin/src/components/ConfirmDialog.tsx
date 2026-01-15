@@ -1,5 +1,6 @@
 import ActionButton from "./ActionButton";
 import Panel from "./Panel";
+import { useI18n } from "../lib/i18n";
 
 type ConfirmDialogProps = {
   isOpen: boolean;
@@ -15,11 +16,14 @@ const ConfirmDialog = ({
   isOpen,
   title,
   description,
-  confirmLabel = "Confirm",
-  cancelLabel = "Cancel",
+  confirmLabel,
+  cancelLabel,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) => {
+  const { t } = useI18n();
+  const resolvedConfirm = confirmLabel ?? t("common.confirm", "Confirm");
+  const resolvedCancel = cancelLabel ?? t("common.cancel", "Cancel");
   if (!isOpen) {
     return null;
   }
@@ -36,8 +40,8 @@ const ConfirmDialog = ({
           </p>
         </div>
         <div className="flex flex-wrap justify-end gap-3">
-          <ActionButton label={cancelLabel} variant="outline" onClick={onCancel} />
-          <ActionButton label={confirmLabel} variant="danger" onClick={onConfirm} />
+          <ActionButton label={resolvedCancel} variant="outline" onClick={onCancel} />
+          <ActionButton label={resolvedConfirm} variant="danger" onClick={onConfirm} />
         </div>
       </Panel>
     </div>

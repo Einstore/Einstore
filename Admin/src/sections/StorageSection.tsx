@@ -2,6 +2,7 @@ import Panel from "../components/Panel";
 import StorageCard from "../components/StorageCard";
 import { formatBytes } from "../lib/apps";
 import type { StorageUsageUser } from "../types/usage";
+import { useI18n } from "../lib/i18n";
 
 type StorageSectionProps = {
   users: StorageUsageUser[];
@@ -10,6 +11,7 @@ type StorageSectionProps = {
 };
 
 const StorageSection = ({ users, totalBytes, isLoading = false }: StorageSectionProps) => {
+  const { t } = useI18n();
   const sortedUsers = [...users].sort((a, b) => b.totalBytes - a.totalBytes);
   const topUsers = sortedUsers.slice(0, 3);
   const aggregateTotal =
@@ -17,8 +19,8 @@ const StorageSection = ({ users, totalBytes, isLoading = false }: StorageSection
       ? totalBytes
       : topUsers.reduce((sum, user) => sum + user.totalBytes, 0);
   const emptyStateText = isLoading
-    ? "Loading storage usage…"
-    : "No storage usage yet.";
+    ? t("storage.loading", "Loading storage usage…")
+    : t("storage.empty", "No storage usage yet.");
 
   return (
     <section className="space-y-6">
@@ -41,7 +43,9 @@ const StorageSection = ({ users, totalBytes, isLoading = false }: StorageSection
             </p>
             {!isLoading && (
               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                Usage will appear after builds are uploaded ({formatBytes(0)} used).
+                {t("storage.empty.note", "Usage will appear after builds are uploaded ({bytes} used).", {
+                  bytes: formatBytes(0),
+                })}
               </p>
             )}
           </Panel>
