@@ -4,6 +4,9 @@
   "private": true,
   "main": "index.js",
   "type": "commonjs",
+  "scripts": {
+    "test": "node tests/normalize-ios-icon.test.js"
+  },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.758.0",
     "@devicefarmer/adbkit-apkreader": "^3.2.4",

@@ -356,3 +356,9 @@ exports.main = async (args) => {
 
   return { ok: false, error: `Unsupported kind ${kind}` };
 };
+
+exports.__test = {
+  normalizeIosIconPng,
+  parsePngChunks,
+  readPngDimensions,
+};
