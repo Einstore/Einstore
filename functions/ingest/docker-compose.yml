@@ -1,0 +1,11 @@
+services:
+  ingest-function:
+    build: ./packages/einstore/ingest
+    ports:
+      - "7071:8080"
+    environment:
+      SPACES_ENDPOINT: ${SPACES_ENDPOINT}
+      SPACES_REGION: ${SPACES_REGION}
+      SPACES_BUCKET: ${SPACES_BUCKET}
+      SPACES_KEY: ${SPACES_KEY}
+      SPACES_SECRET: ${SPACES_SECRET}
