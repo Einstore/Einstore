@@ -4,4 +4,7 @@ packages:
       - name: ingest
         runtime: nodejs:18
         web: true
-        main: index.js
+        main: main
+        limits:
+          memory: 1024
+          timeout: 300000
