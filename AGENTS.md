@@ -16,6 +16,7 @@ postgresql://postgres@localhost:8102/einstore?schema=public
 - Always debug DigitalOcean/App Platform issues with `doctl` first.
 - Deployment debugging: use `doctl` (e.g., `doctl apps logs/get/list`) before changing configs or code.
 - When DigitalOcean Functions change, always deploy the functions (`doctl serverless deploy .`).
+- DigitalOcean Functions namespace for this repo is `einstore` (connect with `doctl serverless connect einstore`).
 - Binary handling policy: the API must never handle binary uploads or extract files. Uploads go directly to Spaces via presigned URLs (or to local MinIO). Extraction/processing of icons/files must be done by the Function (or local docker job) and return JSON only, while assets are uploaded back to S3-style storage. Local dev must start MinIO via Docker with persistent storage (no reset between launches).
 
 ## Before You Start
