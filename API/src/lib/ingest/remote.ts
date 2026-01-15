@@ -39,7 +39,7 @@ type FunctionIosResult = {
   version: string;
   buildNumber: string;
   targets: FunctionTarget[];
-  entitlements: FunctionEntitlements;
+  entitlements?: FunctionEntitlements;
   iconBase64?: string | null;
   iconWidth?: number | null;
   iconHeight?: number | null;

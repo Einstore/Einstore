@@ -41,6 +41,26 @@ const completeUploadSchema = z.object({
   filename: z.string().min(1).optional(),
   sizeBytes: z.coerce.number().int().positive().optional(),
 });
+const ingestFunctionBaseSchema = z.object({
+  ok: z.boolean(),
+  error: z.string().optional(),
+}).passthrough();
+const ingestFunctionAndroidSchema = z.object({
+  ok: z.literal(true),
+  packageName: z.string().min(1),
+  versionName: z.string().min(1),
+  versionCode: z.string().min(1),
+  permissions: z.array(z.string()),
+}).passthrough();
+const ingestFunctionIosSchema = z.object({
+  ok: z.literal(true),
+  appName: z.string().min(1),
+  identifier: z.string().min(1),
+  version: z.string().min(1),
+  buildNumber: z.string().min(1),
+  targets: z.array(z.any()),
+  entitlements: z.any().optional(),
+}).passthrough();
 
 const parseContentLength = (value: unknown) => {
   const raw = Array.isArray(value) ? value[0] : value;
@@ -323,17 +343,31 @@ export async function pipelineRoutes(app: FastifyInstance) {
           kind: extension === ".apk" ? "apk" : "ipa",
           storagePath,
         });
-        if (!functionResult?.ok) {
+        const baseParsed = ingestFunctionBaseSchema.safeParse(functionResult);
+        if (!baseParsed.success) {
           return reply.status(502).send({
             error: "ingest_function_failed",
-            message: functionResult?.error || "Ingest function failed.",
+            message: "Ingest function returned an invalid payload.",
+          });
+        }
+        if (!baseParsed.data.ok) {
+          return reply.status(502).send({
+            error: "ingest_function_failed",
+            message: baseParsed.data.error || "Ingest function failed.",
           });
         }
         const userId = request.auth?.user.id;
         const sizeBytes = Number(expectedSize);
         if (extension === ".apk") {
+          const parsedPayload = ingestFunctionAndroidSchema.safeParse(functionResult);
+          if (!parsedPayload.success) {
+            return reply.status(502).send({
+              error: "ingest_function_failed",
+              message: "Ingest function returned an invalid Android payload.",
+            });
+          }
           const result = await ingestAndroidFromFunction(
-            functionResult,
+            parsedPayload.data,
             parsed.data.key,
             sizeBytes,
             teamId,
@@ -343,8 +377,15 @@ export async function pipelineRoutes(app: FastifyInstance) {
           await broadcastBadgesUpdate(teamId).catch(() => undefined);
           return reply.status(201).send({ status: "ingested", result });
         }
+        const parsedPayload = ingestFunctionIosSchema.safeParse(functionResult);
+        if (!parsedPayload.success) {
+          return reply.status(502).send({
+            error: "ingest_function_failed",
+            message: "Ingest function returned an invalid iOS payload.",
+          });
+        }
         const result = await ingestIosFromFunction(
-          functionResult,
+          parsedPayload.data,
           parsed.data.key,
           sizeBytes,
           teamId,
