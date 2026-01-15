@@ -151,8 +151,25 @@ const Topbar = ({
 
   const localeOptions = useMemo(
     () => [
-      { id: "en" as const, label: t("topbar.locale.en", "English"), flag: "🇺🇸" },
+      { id: "en-US" as const, label: t("topbar.locale.enUS", "English (US)"), flag: "🇺🇸" },
+      { id: "en-GB" as const, label: t("topbar.locale.enGB", "English (UK)"), flag: "🇬🇧" },
       { id: "cs" as const, label: t("topbar.locale.cs", "Czech"), flag: "🇨🇿" },
+      { id: "de" as const, label: t("topbar.locale.de", "German"), flag: "🇩🇪" },
+      { id: "es" as const, label: t("topbar.locale.es", "Spanish"), flag: "🇪🇸" },
+      { id: "fr" as const, label: t("topbar.locale.fr", "French"), flag: "🇫🇷" },
+      { id: "it" as const, label: t("topbar.locale.it", "Italian"), flag: "🇮🇹" },
+      { id: "ja" as const, label: t("topbar.locale.ja", "Japanese"), flag: "🇯🇵" },
+      { id: "ko" as const, label: t("topbar.locale.ko", "Korean"), flag: "🇰🇷" },
+      { id: "nl" as const, label: t("topbar.locale.nl", "Dutch"), flag: "🇳🇱" },
+      { id: "pl" as const, label: t("topbar.locale.pl", "Polish"), flag: "🇵🇱" },
+      { id: "pt" as const, label: t("topbar.locale.pt", "Portuguese"), flag: "🇵🇹" },
+      { id: "ru" as const, label: t("topbar.locale.ru", "Russian"), flag: "🇷🇺" },
+      { id: "zh-CN" as const, label: t("topbar.locale.zhCN", "Chinese (Simplified)"), flag: "🇨🇳" },
+      {
+        id: "pirate" as const,
+        label: t("topbar.locale.pirate", "Pirate English"),
+        flag: "\u{1F3F4}\u{E0067}\u{E0062}\u{E0073}\u{E0063}\u{E0074}\u{E007F}",
+      },
     ],
     [t],
   );

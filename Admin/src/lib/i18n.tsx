@@ -1,27 +1,98 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { csMessages } from "../locales/cs";
+import { deMessages } from "../locales/de";
 import { enMessages } from "../locales/en";
+import { enGBMessages } from "../locales/en-GB";
+import { esMessages } from "../locales/es";
+import { frMessages } from "../locales/fr";
+import { itMessages } from "../locales/it";
+import { jaMessages } from "../locales/ja";
+import { koMessages } from "../locales/ko";
+import { nlMessages } from "../locales/nl";
+import { pirateMessages } from "../locales/pirate";
+import { poMessages } from "../locales/po";
+import { ptMessages } from "../locales/pt";
+import { ruMessages } from "../locales/ru";
+import { zhMessages } from "../locales/zh-CN";
 
-export type Locale = "en" | "cs";
+export type Locale =
+  | "en-US"
+  | "en-GB"
+  | "cs"
+  | "de"
+  | "es"
+  | "fr"
+  | "it"
+  | "ja"
+  | "ko"
+  | "nl"
+  | "pl"
+  | "pt"
+  | "ru"
+  | "zh-CN"
+  | "pirate";
 export type MessageValue = string | { [key: string]: string };
 export type MessageParams = Record<string, string | number>;
 
-const SUPPORTED_LOCALES: Locale[] = ["en", "cs"];
-const DEFAULT_LOCALE: Locale = "en";
-const STORAGE_KEY = "einstore.locale";
+const SUPPORTED_LOCALES: Locale[] = [
+  "en-US",
+  "en-GB",
+  "cs",
+  "de",
+  "es",
+  "fr",
+  "it",
+  "ja",
+  "ko",
+  "nl",
+  "pl",
+  "pt",
+  "ru",
+  "zh-CN",
+  "pirate",
+];
+const DEFAULT_LOCALE: Locale = "en-US";
+const LOCALE_COOKIE = "einstore.locale";
 
 const messagesByLocale: Record<Locale, Record<string, MessageValue>> = {
-  en: enMessages,
+  "en-US": enMessages,
+  "en-GB": enGBMessages,
   cs: csMessages,
+  de: deMessages,
+  es: esMessages,
+  fr: frMessages,
+  it: itMessages,
+  ja: jaMessages,
+  ko: koMessages,
+  nl: nlMessages,
+  pl: poMessages,
+  pt: ptMessages,
+  ru: ruMessages,
+  "zh-CN": zhMessages,
+  pirate: pirateMessages,
 };
 
 let activeLocale: Locale = DEFAULT_LOCALE;
 
 const resolveLocale = (candidate?: string | null): Locale => {
   if (!candidate) return DEFAULT_LOCALE;
-  const normalized = candidate.toLowerCase();
+  const normalized = candidate.toLowerCase().replace("_", "-");
   if (normalized.startsWith("cs")) return "cs";
-  return "en";
+  if (normalized.startsWith("de")) return "de";
+  if (normalized.startsWith("es")) return "es";
+  if (normalized.startsWith("fr")) return "fr";
+  if (normalized.startsWith("it")) return "it";
+  if (normalized.startsWith("ja")) return "ja";
+  if (normalized.startsWith("ko")) return "ko";
+  if (normalized.startsWith("nl")) return "nl";
+  if (normalized.startsWith("pt")) return "pt";
+  if (normalized.startsWith("ru")) return "ru";
+  if (normalized.startsWith("pl") || normalized.startsWith("po")) return "pl";
+  if (normalized.startsWith("zh-cn") || normalized.startsWith("zh-hans")) return "zh-CN";
+  if (normalized.startsWith("pirate") || normalized.includes("pirate")) return "pirate";
+  if (normalized.startsWith("en-gb")) return "en-GB";
+  if (normalized.startsWith("en")) return "en-US";
+  return DEFAULT_LOCALE;
 };
 
 const detectLocale = (): Locale => {
@@ -30,8 +101,15 @@ const detectLocale = (): Locale => {
   const fromQuery = resolveLocale(params.get("lang"));
   if (SUPPORTED_LOCALES.includes(fromQuery)) return fromQuery;
 
-  const stored = resolveLocale(window.localStorage.getItem(STORAGE_KEY));
-  if (SUPPORTED_LOCALES.includes(stored)) return stored;
+  const cookieMatch = window.document.cookie
+    .split(";")
+    .map((entry) => entry.trim())
+    .find((entry) => entry.startsWith(`${LOCALE_COOKIE}=`));
+  if (cookieMatch) {
+    const value = cookieMatch.split("=")[1];
+    const stored = resolveLocale(decodeURIComponent(value || ""));
+    if (SUPPORTED_LOCALES.includes(stored)) return stored;
+  }
 
   return resolveLocale(window.navigator.language);
 };
@@ -69,7 +147,7 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     activeLocale = locale;
     if (typeof window !== "undefined") {
-      window.localStorage.setItem(STORAGE_KEY, locale);
+      window.document.cookie = `${LOCALE_COOKIE}=${encodeURIComponent(locale)}; path=/; max-age=31536000; samesite=lax`;
     }
   }, [locale]);
 
