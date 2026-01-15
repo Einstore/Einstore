@@ -276,22 +276,6 @@ const Topbar = ({
               >
                 <Icon name="globe" className="h-4 w-4" />
               </button>
-              <button
-                type="button"
-                className="flex h-11 w-11 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100"
-                aria-label={t("topbar.theme", "Theme")}
-                aria-pressed={theme === "dark"}
-                onClick={toggleTheme}
-              >
-                <Icon name={theme === "dark" ? "sun" : "moon"} className="h-4 w-4" />
-              </button>
-              <button
-                type="button"
-                className="flex h-11 w-11 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100"
-                aria-label={t("topbar.notifications", "Notifications")}
-              >
-                <Icon name="bell" className="h-4 w-4" />
-              </button>
             </div>
             <div ref={userMenuRef} className="relative">
               <button
@@ -315,14 +299,6 @@ const Topbar = ({
               {isUserMenuOpen ? (
                 <div className="absolute right-0 mt-2 w-56 rounded-lg border border-slate-200 bg-white p-2 shadow-sm dark:border-slate-700 dark:bg-slate-800">
                   <div className="md:hidden">
-                    <button
-                      type="button"
-                      className="flex h-11 w-full items-center gap-3 rounded-md px-3 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"
-                      onClick={() => setIsUserMenuOpen(false)}
-                    >
-                      <Icon name="bell" className="h-4 w-4" />
-                      {t("topbar.notifications", "Notifications")}
-                    </button>
                     <button
                       type="button"
                       className="flex h-11 w-full items-center gap-3 rounded-md px-3 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"
