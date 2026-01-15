@@ -71,14 +71,14 @@ const resolveRole = (extensionPoint) => {
 const resolveTargetRoots = (entryNames) => {
   const roots = new Set();
   for (const entry of entryNames) {
-    if (/^Payload\\/[^/]+\\.app\\/Info\\.plist$/.test(entry)) {
-      roots.add(entry.replace(/Info\\.plist$/, ""));
+    if (/^Payload\/[^/]+\.app\/Info\.plist$/.test(entry)) {
+      roots.add(entry.replace(/Info\.plist$/, ""));
     }
-    if (/^Payload\\/[^/]+\\.app\\/PlugIns\\/[^/]+\\.appex\\/Info\\.plist$/.test(entry)) {
-      roots.add(entry.replace(/Info\\.plist$/, ""));
+    if (/^Payload\/[^/]+\.app\/PlugIns\/[^/]+\.appex\/Info\.plist$/.test(entry)) {
+      roots.add(entry.replace(/Info\.plist$/, ""));
     }
-    if (/^Payload\\/[^/]+\\.app\\/Watch\\/[^/]+\\.app\\/Info\\.plist$/.test(entry)) {
-      roots.add(entry.replace(/Info\\.plist$/, ""));
+    if (/^Payload\/[^/]+\.app\/Watch\/[^/]+\.app\/Info\.plist$/.test(entry)) {
+      roots.add(entry.replace(/Info\.plist$/, ""));
     }
   }
   return Array.from(roots);
