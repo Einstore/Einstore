@@ -98,8 +98,11 @@ const resolveLocale = (candidate?: string | null): Locale => {
 const detectLocale = (): Locale => {
   if (typeof window === "undefined") return DEFAULT_LOCALE;
   const params = new URLSearchParams(window.location.search);
-  const fromQuery = resolveLocale(params.get("lang"));
-  if (SUPPORTED_LOCALES.includes(fromQuery)) return fromQuery;
+  const queryParam = params.get("lang");
+  if (queryParam) {
+    const fromQuery = resolveLocale(queryParam);
+    if (SUPPORTED_LOCALES.includes(fromQuery)) return fromQuery;
+  }
 
   const cookieMatch = window.document.cookie
     .split(";")
