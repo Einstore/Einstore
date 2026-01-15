@@ -9,6 +9,11 @@ BILLING_REPO="${BILLING_REPO:-git@github.com:Einstore/Billing.git}"
 BILLING_REF="${BILLING_REF:-}"
 BILLING_DIR="${BILLING_DIR:-../Billing}"
 
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+if [[ "$(basename "$ROOT_DIR")" != "Einstore" && ! -e "$ROOT_DIR/Einstore" ]]; then
+  ln -s "$ROOT_DIR" "$ROOT_DIR/Einstore"
+fi
+
 mkdir -p ~/.ssh
 echo "$BILLING_DEPLOY_KEY" > ~/.ssh/id_rsa
 chmod 600 ~/.ssh/id_rsa
