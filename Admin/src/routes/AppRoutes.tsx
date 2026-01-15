@@ -825,7 +825,9 @@ const AppRoutes = () => {
 
   const visibleNavItems = useMemo(() => {
     const normalizedPrivate = privateNavItems.map((item) =>
-      item.id === "billing" ? { ...item, icon: "dollar" as const } : item
+      item.id === "billing"
+        ? { ...item, icon: "dollar" as const, label: t("nav.billing", "Billing") }
+        : item
     );
     const sortedPrivate = [...normalizedPrivate].sort((a, b) => a.label.localeCompare(b.label));
     const settingsIndex = navItems.findIndex((item) => item.id === "settings");
@@ -866,9 +868,21 @@ const AppRoutes = () => {
     return match ?? routes[0];
   }, [routes, location.pathname]);
 
+  const translatedPrivatePageConfig = useMemo(
+    () => ({
+      ...privatePageConfig,
+      billing: {
+        title: t("page.billing.title", "Billing"),
+        breadcrumbs: [{ label: t("breadcrumb.billing", "Billing") }],
+        actions: [],
+      },
+    }),
+    [t]
+  );
+
   const page =
     pageConfig[activeRoute.id as keyof typeof pageConfig] ??
-    privatePageConfig[activeRoute.id] ??
+    translatedPrivatePageConfig[activeRoute.id] ??
     pageConfig.overview;
 
   return (
