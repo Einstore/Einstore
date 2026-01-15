@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { apiFetch } from "./api";
+import { API_BASE_URL, apiFetch } from "./api";
 import { isTeamAdmin, type TeamMember, type TeamSummary } from "./teams";
 import { translate } from "./i18n";
 
@@ -68,7 +68,7 @@ export const useSessionState = (refreshKey?: string) => {
         const list = Array.isArray(payload?.teams)
           ? payload.teams.map((team) => ({
               ...team,
-              logoUrl: `/teams/${team.id}/logo?v=${version}`,
+              logoUrl: `${API_BASE_URL}/teams/${team.id}/logo?v=${version}`,
             }))
           : [];
         setTeams(list);
