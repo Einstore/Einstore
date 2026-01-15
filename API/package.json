@@ -9,7 +9,7 @@
     "do:build": "bash ../scripts/clone-billing.sh && npm --prefix ../Libraries/rafiki-auth install && npm --prefix ../Libraries/rafiki-auth run build && rm -rf node_modules/@unlikeother/auth/dist && mkdir -p node_modules/@unlikeother/auth/dist && cp -R ../Libraries/rafiki-auth/dist/* node_modules/@unlikeother/auth/dist/ && npm --prefix ../Libraries/teams install && npm --prefix ../Libraries/teams run build && rm -rf node_modules/@rafiki270/teams/dist && mkdir -p node_modules/@rafiki270/teams/dist && cp -R ../Libraries/teams/dist/* node_modules/@rafiki270/teams/dist/ && npm run prisma:generate && npm run build",
     "start": "node dist/index.js",
     "test:unit": "node scripts/run-unit-tests.mjs",
-    "test:integration": "newman run ../postman_collection.json -e ../tests/newman/local.postman_environment.json --folder \"Upload Ingest (APK)\" --folder \"iOS Ingest\" --folder \"Store Upload (token query)\"",
+    "test:integration": "newman run ../postman_collection.json -e ../tests/newman/local.postman_environment.json --folder \"Ingest Upload (APK)\" --folder \"Ingest Upload (IPA)\"",
     "postinstall": "npm run prisma:generate",
     "private:prepare": "node ./scripts/prepare-private.mjs",
     "prisma:generate": "npm run private:prepare && prisma generate --schema prisma/generated/schema.prisma",

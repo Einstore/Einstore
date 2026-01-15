@@ -1,16 +1,13 @@
 import { FastifyInstance, FastifyReply } from "fastify";
 import { z } from "zod";
-import { pipeline } from "node:stream/promises";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { HeadObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { ingestAndroidApk } from "../lib/ingest/android.js";
-import { ingestIosIpa } from "../lib/ingest/ios.js";
 import { ingestAndroidFromFunction, ingestIosFromFunction } from "../lib/ingest/remote.js";
-import { ensureZipReadable, isInvalidArchiveError } from "../lib/zip.js";
+import { isInvalidArchiveError } from "../lib/zip.js";
 import { requireTeamOrApiKey } from "../auth/guard.js";
 import { broadcastBadgesUpdate } from "../lib/realtime.js";
 import { prisma } from "../lib/prisma.js";
@@ -22,13 +19,6 @@ type BillingGuard = {
   assertCanCreateBuild?: (payload: { teamId: string; appId: string }) => Promise<void>;
 };
 
-const ingestSchema = z.object({
-  buildId: z.string().uuid().optional(),
-  filePath: z.string().min(1),
-  kind: z.enum(["ipa", "apk", "aab"]),
-});
-
-type IngestRequest = z.infer<typeof ingestSchema>;
 const allowedUploadExtensions = new Set([".apk", ".ipa"]);
 const STORAGE_LIMIT_SETTING_KEY = "storage.defaultLimitGb";
 const ONE_GB_BYTES = 1024n * 1024n * 1024n;
@@ -65,13 +55,6 @@ const ingestFunctionIosSchema = z.object({
   targets: z.array(z.any()),
   entitlements: z.any().optional(),
 }).passthrough();
-
-const parseContentLength = (value: unknown) => {
-  const raw = Array.isArray(value) ? value[0] : value;
-  if (typeof raw !== "string") return null;
-  const numeric = Number(raw);
-  return Number.isFinite(numeric) && numeric > 0 ? BigInt(Math.ceil(numeric)) : null;
-};
 
 const isMacSafariUserAgent = (value: unknown) => {
   const raw = Array.isArray(value) ? value[0] : value;
@@ -189,14 +172,20 @@ const sendBillingError = (reply: FastifyReply, error: unknown) => {
 
 const resolveSpacesConfig = () => {
   const client = resolveS3Client();
-  const bucket = process.env.SPACES_BUCKET;
+  const bucket = process.env.SPACES_BUCKET || (process.env.NODE_ENV === "production" ? undefined : "einstore-local");
   if (!client || !bucket) return null;
   return { client, bucket };
 };
 
 const resolveIngestFunctionUrl = () => {
   const raw = process.env.INGEST_FUNCTION_URL;
-  return typeof raw === "string" && raw.trim().length > 0 ? raw.trim() : null;
+  if (typeof raw === "string" && raw.trim().length > 0) {
+    return raw.trim();
+  }
+  if (process.env.NODE_ENV !== "production") {
+    return "http://localhost:7071";
+  }
+  return null;
 };
 
 const resolveLocalIngestWorkers = () => {
@@ -466,235 +455,4 @@ export async function pipelineRoutes(app: FastifyInstance) {
     }
   });
 
-  app.post("/ingest", { preHandler: requireTeamOrApiKey }, async (request, reply) => {
-    const parsed = ingestSchema.safeParse(request.body);
-    if (!parsed.success) {
-      return reply.status(400).send({ error: "Invalid payload" });
-    }
-    const payload: IngestRequest = parsed.data;
-    const teamId = request.team?.id;
-    if (!teamId) {
-      return reply.status(403).send({ error: "team_required", message: "Team context required" });
-    }
-
-    const userId = request.auth?.user.id;
-    if (payload.kind === "apk") {
-      try {
-        await ensureZipReadable(payload.filePath);
-      } catch (error) {
-        if (isInvalidArchiveError(error)) {
-          return reply.status(400).send({ error: "invalid_archive" });
-        }
-        throw error;
-      }
-      const result = await ingestAndroidApk(payload.filePath, teamId, userId, { billingGuard });
-      await broadcastBadgesUpdate(teamId).catch(() => undefined);
-      return reply.status(201).send({ status: "ingested", result });
-    }
-
-    if (payload.kind === "ipa") {
-      try {
-        await ensureZipReadable(payload.filePath);
-      } catch (error) {
-        if (isInvalidArchiveError(error)) {
-          return reply.status(400).send({ error: "invalid_archive" });
-        }
-        throw error;
-      }
-      const result = await ingestIosIpa(payload.filePath, teamId, userId, { billingGuard });
-      await broadcastBadgesUpdate(teamId).catch(() => undefined);
-      return reply.status(201).send({ status: "ingested", result });
-    }
-
-    return reply.status(501).send({
-      status: "not-implemented",
-      payload,
-    });
-  });
-
-  app.post("/ingest/upload", { preHandler: requireTeamOrApiKey }, async (request, reply) => {
-    if (!request.isMultipart()) {
-      return reply.status(400).send({ error: "multipart_required" });
-    }
-    const contentLength = parseContentLength(request.headers["content-length"]);
-    const part = await request.file();
-    if (!part) {
-      return reply.status(400).send({ error: "missing_file" });
-    }
-    const teamId = request.team?.id;
-    if (!teamId) {
-      return reply.status(403).send({ error: "team_required", message: "Team context required" });
-    }
-    try {
-      if (contentLength) {
-        if (billingGuard?.assertCanUploadBytes) {
-          await billingGuard.assertCanUploadBytes({ teamId, requiredBytes: contentLength });
-        }
-        await ensureStorageCapacity(teamId, contentLength);
-      }
-    } catch (error) {
-      if ((error as { code?: string }).code && (error as { code?: string }).code !== "storage_limit_exceeded") {
-        return sendBillingError(reply, error);
-      }
-      if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
-        return reply
-          .status((error as { statusCode?: number }).statusCode ?? 413)
-          .send({ error: "storage_limit_exceeded", message: (error as { message?: string }).message });
-      }
-      throw error;
-    }
-
-    const extension = path.extname(part.filename ?? "").toLowerCase();
-    if (!allowedUploadExtensions.has(extension)) {
-      return reply.status(400).send({ error: "unsupported_file_type" });
-    }
-
-    const uploadDir = path.resolve(process.cwd(), "storage", "uploads");
-    await fs.promises.mkdir(uploadDir, { recursive: true });
-    const uploadName = `${crypto.randomUUID()}${extension}`;
-    const filePath = path.join(uploadDir, uploadName);
-    let uploadedBytes: bigint | null = null;
-
-    try {
-      await pipeline(part.file, fs.createWriteStream(filePath));
-      const stats = await fs.promises.stat(filePath);
-      uploadedBytes = BigInt(stats.size);
-    } catch (error) {
-      await fs.promises.rm(filePath, { force: true });
-      throw error;
-    }
-
-    if (part.file.truncated) {
-      await fs.promises.rm(filePath, { force: true });
-      return reply.status(413).send({ error: "file_too_large" });
-    }
-
-    try {
-      const requiredBytes = uploadedBytes ?? contentLength ?? 0n;
-      if (billingGuard?.assertCanUploadBytes) {
-        await billingGuard.assertCanUploadBytes({ teamId, requiredBytes });
-      }
-      await ensureStorageCapacity(teamId, requiredBytes);
-    } catch (error) {
-      await fs.promises.rm(filePath, { force: true });
-      if ((error as { code?: string }).code && (error as { code?: string }).code !== "storage_limit_exceeded") {
-        return sendBillingError(reply, error);
-      }
-      if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
-        return reply
-          .status((error as { statusCode?: number }).statusCode ?? 413)
-          .send({ error: "storage_limit_exceeded", message: (error as { message?: string }).message });
-      }
-      throw error;
-    }
-
-    const userId = request.auth?.user.id;
-    try {
-      await ensureZipReadable(filePath);
-    } catch (error) {
-      if (isInvalidArchiveError(error)) {
-        await fs.promises.rm(filePath, { force: true });
-        return reply.status(400).send({ error: "invalid_archive" });
-      }
-      throw error;
-    }
-    try {
-      if (extension === ".apk") {
-        const result = await ingestAndroidApk(filePath, teamId, userId, { billingGuard });
-        await broadcastBadgesUpdate(teamId).catch(() => undefined);
-        return reply.status(201).send({ status: "ingested", result });
-      }
-
-      const result = await ingestIosIpa(filePath, teamId, userId, { billingGuard });
-      await broadcastBadgesUpdate(teamId).catch(() => undefined);
-      return reply.status(201).send({ status: "ingested", result });
-    } catch (error) {
-      if (isInvalidArchiveError(error)) {
-        return reply.status(400).send({ error: "invalid_archive" });
-      }
-      throw error;
-    }
-  });
-
-  app.post("/store/upload", { preHandler: requireTeamOrApiKey }, async (request, reply) => {
-    if (!request.isMultipart()) {
-      return reply.status(400).send({ error: "multipart_required" });
-    }
-    const contentLength = parseContentLength(request.headers["content-length"]);
-    const part = await request.file();
-    if (!part) {
-      return reply.status(400).send({ error: "missing_file" });
-    }
-    const teamId = request.team?.id;
-    if (!teamId) {
-      return reply.status(403).send({ error: "team_required", message: "Team context required" });
-    }
-    try {
-      if (contentLength) {
-        if (billingGuard?.assertCanUploadBytes) {
-          await billingGuard.assertCanUploadBytes({ teamId, requiredBytes: contentLength });
-        }
-        await ensureStorageCapacity(teamId, contentLength);
-      }
-    } catch (error) {
-      if ((error as { code?: string }).code && (error as { code?: string }).code !== "storage_limit_exceeded") {
-        return sendBillingError(reply, error);
-      }
-      if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
-        return reply
-          .status((error as { statusCode?: number }).statusCode ?? 413)
-          .send({ error: "storage_limit_exceeded", message: (error as { message?: string }).message });
-      }
-      throw error;
-    }
-
-    const extension = path.extname(part.filename ?? "").toLowerCase();
-    const uploadDir = path.resolve(process.cwd(), "storage", "uploads");
-    await fs.promises.mkdir(uploadDir, { recursive: true });
-    const uploadName = `${crypto.randomUUID()}${extension}`;
-    const filePath = path.join(uploadDir, uploadName);
-    let uploadedBytes: bigint | null = null;
-
-    try {
-      await pipeline(part.file, fs.createWriteStream(filePath));
-      const stats = await fs.promises.stat(filePath);
-      uploadedBytes = BigInt(stats.size);
-    } catch (error) {
-      await fs.promises.rm(filePath, { force: true });
-      throw error;
-    }
-
-    if (part.file.truncated) {
-      await fs.promises.rm(filePath, { force: true });
-      return reply.status(413).send({ error: "file_too_large" });
-    }
-
-    try {
-      const requiredBytes = uploadedBytes ?? contentLength ?? 0n;
-      if (billingGuard?.assertCanUploadBytes) {
-        await billingGuard.assertCanUploadBytes({ teamId, requiredBytes });
-      }
-      await ensureStorageCapacity(teamId, requiredBytes);
-    } catch (error) {
-      await fs.promises.rm(filePath, { force: true });
-      if ((error as { code?: string }).code && (error as { code?: string }).code !== "storage_limit_exceeded") {
-        return sendBillingError(reply, error);
-      }
-      if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
-        return reply
-          .status((error as { statusCode?: number }).statusCode ?? 413)
-          .send({ error: "storage_limit_exceeded", message: (error as { message?: string }).message });
-      }
-      throw error;
-    }
-
-    const stats = await fs.promises.stat(filePath);
-    return reply.status(201).send({
-      status: "stored",
-      filePath,
-      filename: part.filename ?? uploadName,
-      sizeBytes: stats.size,
-      teamId,
-    });
-  });
 }

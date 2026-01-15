@@ -2443,186 +2443,237 @@
       }
     },
     {
-      "name": "Android Ingest",
-      "event": [
+      "name": "Ingest Upload (APK)",
+      "item": [
         {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Android ingest ok', function () {",
-              "  pm.expect(pm.response.code).to.equal(201);",
-              "  const body = pm.response.json();",
-              "  pm.expect(body.result.manifest).to.be.an('object');",
-              "  pm.expect(body.result.manifest.packageName).to.be.a('string').and.not.empty;",
-              "  pm.expect(body.result.appName).to.equal('GPTeen');",
-              "  pm.expect(body.result.icons).to.be.an('array').and.not.empty;",
-              "  pm.expect(body.result.manifest.icon).to.be.a('string').and.not.empty;",
-              "  pm.expect(body.result.iconBitmap).to.be.an('object');",
-              "  pm.expect(body.result.iconBitmap.width).to.be.a('number').above(0);",
-              "  pm.expect(body.result.iconBitmap.height).to.be.a('number').above(0);",
-              "  pm.expect(body.result.iconBitmap.sizeBytes).to.be.a('number').above(0);",
-              "  pm.expect(body.result.iconBitmap.path).to.be.a('string').and.not.empty;",
-              "});"
-            ]
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
+          "name": "Ingest Upload URL (APK)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"filename\": \"{{apkFilename}}\",\n  \"sizeBytes\": \"{{apkSizeBytes}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ingest/upload-url?token={{apiKeyToken}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ingest",
+                "upload-url"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{apiKeyToken}}"
+                }
+              ]
+            }
           },
-          {
-            "key": "Authorization",
-            "value": "Bearer {{accessToken}}"
-          },
-          {
-            "key": "x-team-id",
-            "value": "{{teamId}}"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"filePath\": \"{{apkPath}}\",\n  \"kind\": \"apk\"\n}"
-        },
-        "url": "{{baseUrl}}/ingest"
-      }
-    },
-    {
-      "name": "Upload Ingest (APK)",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{accessToken}}"
-          },
-          {
-            "key": "x-team-id",
-            "value": "{{teamId}}"
-          }
-        ],
-        "body": {
-          "mode": "formdata",
-          "formdata": [
+          "event": [
             {
-              "key": "file",
-              "type": "file",
-              "src": "{{apkPath}}"
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Presigned upload URL returned', function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "if (json && json.uploadUrl) { pm.environment.set('ingestUploadUrl', json.uploadUrl); }",
+                  "if (json && json.key) { pm.environment.set('ingestKey', json.key); }",
+                  "if (json && json.headers && json.headers['Content-Type']) {",
+                  "  pm.environment.set('ingestUploadContentType', json.headers['Content-Type']);",
+                  "} else {",
+                  "  pm.environment.unset('ingestUploadContentType');",
+                  "}"
+                ]
+              }
             }
           ]
         },
-        "url": "{{baseUrl}}/ingest/upload"
-      }
-    },
-    {
-      "name": "Store Upload (token query)",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "multipart/form-data"
-          }
-        ],
-        "body": {
-          "mode": "formdata",
-          "formdata": [
-            {
-              "key": "file",
-              "type": "file",
-              "src": "{{uploadFilePath}}"
-            }
-          ]
-        },
-        "url": {
-          "raw": "{{baseUrl}}/store/upload?token={{apiKeyToken}}",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "store",
-            "upload"
-          ],
-          "query": [
-            {
-              "key": "token",
-              "value": "{{apiKeyToken}}"
-            }
-          ]
-        }
-      },
-      "event": [
         {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Store upload accepted', function () {",
-              "  pm.expect(pm.response.code).to.equal(201);",
-              "});"
-            ]
+          "name": "Ingest Upload Binary (APK)",
+          "request": {
+            "method": "PUT",
+            "body": {
+              "mode": "file",
+              "file": {
+                "src": "{{apkPath}}"
+              }
+            },
+            "url": "{{ingestUploadUrl}}"
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const contentType = pm.environment.get('ingestUploadContentType');",
+                  "pm.request.headers.remove('Content-Type');",
+                  "if (contentType) {",
+                  "  pm.request.headers.add({ key: 'Content-Type', value: contentType });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ingest Complete Upload (APK)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"{{ingestKey}}\",\n  \"filename\": \"{{apkFilename}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ingest/complete-upload?token={{apiKeyToken}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ingest",
+                "complete-upload"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{apiKeyToken}}"
+                }
+              ]
+            }
           }
         }
       ]
     },
     {
-      "name": "iOS Ingest",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "Authorization",
-            "value": "Bearer {{accessToken}}"
-          },
-          {
-            "key": "x-team-id",
-            "value": "{{teamId}}"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"filePath\": \"{{ipaPath}}\",\n  \"kind\": \"ipa\"\n}"
-        },
-        "url": {
-          "raw": "{{baseUrl}}/ingest",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "ingest"
-          ]
-        }
-      },
-      "event": [
+      "name": "Ingest Upload (IPA)",
+      "item": [
         {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('iOS ingest ok', function () {",
-              "  pm.expect(pm.response.code).to.equal(201);",
-              "  const body = pm.response.json();",
-              "  pm.expect(body.result.appName).to.equal('GPTeen');",
-              "  pm.expect(body.result.identifier).to.equal('ai.pocketpal');",
-              "  pm.expect(body.result.version).to.equal('1.11.12');",
-              "  pm.expect(body.result.buildNumber).to.equal('121');",
-              "  pm.expect(body.result.targets).to.be.an('array').and.not.empty;",
-              "  const main = body.result.targets[0];",
-              "  pm.expect(main.supportedDevices).to.include('iphone');",
-              "  pm.expect(main.supportedDevices).to.include('ipad');",
-              "  pm.expect(main.orientations).to.be.an('array').and.not.empty;",
-              "  pm.expect(main.iconBitmap).to.be.an('object');",
-              "  pm.expect(main.iconBitmap.path).to.be.a('string').and.not.empty;",
-              "});"
-            ]
+          "name": "Ingest Upload URL (IPA)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"filename\": \"{{ipaFilename}}\",\n  \"sizeBytes\": \"{{ipaSizeBytes}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ingest/upload-url?token={{apiKeyToken}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ingest",
+                "upload-url"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{apiKeyToken}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Presigned upload URL returned', function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "if (json && json.uploadUrl) { pm.environment.set('ingestUploadUrl', json.uploadUrl); }",
+                  "if (json && json.key) { pm.environment.set('ingestKey', json.key); }",
+                  "if (json && json.headers && json.headers['Content-Type']) {",
+                  "  pm.environment.set('ingestUploadContentType', json.headers['Content-Type']);",
+                  "} else {",
+                  "  pm.environment.unset('ingestUploadContentType');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ingest Upload Binary (IPA)",
+          "request": {
+            "method": "PUT",
+            "body": {
+              "mode": "file",
+              "file": {
+                "src": "{{ipaPath}}"
+              }
+            },
+            "url": "{{ingestUploadUrl}}"
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const contentType = pm.environment.get('ingestUploadContentType');",
+                  "pm.request.headers.remove('Content-Type');",
+                  "if (contentType) {",
+                  "  pm.request.headers.add({ key: 'Content-Type', value: contentType });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ingest Complete Upload (IPA)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"{{ingestKey}}\",\n  \"filename\": \"{{ipaFilename}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ingest/complete-upload?token={{apiKeyToken}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ingest",
+                "complete-upload"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{apiKeyToken}}"
+                }
+              ]
+            }
           }
         }
       ]

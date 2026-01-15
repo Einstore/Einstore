@@ -2037,7 +2037,7 @@
     },
     "/builds/{id}/icons": {
       "get": {
-        "description": "Lists extracted icon images for build targets and includes inline data URLs.",
+        "description": "Lists extracted icon images for build targets and returns URLs or proxy paths.",
         "parameters": [
           {
             "in": "path",
@@ -2066,7 +2066,7 @@
     },
     "/builds/{id}/icons/{targetId}": {
       "get": {
-        "description": "Returns the extracted icon image for a target.",
+        "description": "Redirects to the extracted icon image for a target.",
         "parameters": [
           {
             "in": "path",
@@ -2089,8 +2089,8 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Icon image"
+          "302": {
+            "description": "Redirect to icon image"
           }
         },
         "security": [
@@ -2808,286 +2808,6 @@
         "summary": "Service info"
       }
     },
-    "/ingest": {
-      "post": {
-        "description": "iOS: extracts entitlements/provisioning profile and stores an entitlements artifact with distribution = adhoc | appstore | enterprise | none | broken. Returns 400 invalid_archive when the IPA/APK is not a valid zip archive.",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "filePath": {
-                    "type": "string"
-                  },
-                  "kind": {
-                    "enum": [
-                      "ipa",
-                      "apk",
-                      "aab"
-                    ],
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "filePath",
-                  "kind"
-                ],
-                "type": "object"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "result": {
-                      "properties": {
-                        "appId": {
-                          "type": "string"
-                        },
-                        "appName": {
-                          "type": "string"
-                        },
-                        "buildId": {
-                          "type": "string"
-                        },
-                        "buildNumber": {
-                          "type": "string"
-                        },
-                        "iconBitmap": {
-                          "properties": {
-                            "height": {
-                              "type": "number"
-                            },
-                            "path": {
-                              "type": "string"
-                            },
-                            "sizeBytes": {
-                              "type": "number"
-                            },
-                            "width": {
-                              "type": "number"
-                            }
-                          },
-                          "type": "object"
-                        },
-                        "icons": {
-                          "items": {
-                            "properties": {
-                              "density": {
-                                "type": "string"
-                              },
-                              "path": {
-                                "type": "string"
-                              }
-                            },
-                            "type": "object"
-                          },
-                          "type": "array"
-                        },
-                        "identifier": {
-                          "type": "string"
-                        },
-                        "manifest": {
-                          "properties": {
-                            "icon": {
-                              "type": "string"
-                            },
-                            "minSdk": {
-                              "type": "string"
-                            },
-                            "packageName": {
-                              "type": "string"
-                            },
-                            "permissions": {
-                              "items": {
-                                "type": "string"
-                              },
-                              "type": "array"
-                            },
-                            "targetSdk": {
-                              "type": "string"
-                            },
-                            "versionCode": {
-                              "type": "string"
-                            },
-                            "versionName": {
-                              "type": "string"
-                            }
-                          },
-                          "type": "object"
-                        },
-                        "minSdk": {
-                          "type": "string"
-                        },
-                        "packageName": {
-                          "type": "string"
-                        },
-                        "permissions": {
-                          "items": {
-                            "type": "string"
-                          },
-                          "type": "array"
-                        },
-                        "targetId": {
-                          "type": "string"
-                        },
-                        "targetSdk": {
-                          "type": "string"
-                        },
-                        "targets": {
-                          "items": {
-                            "properties": {
-                              "build": {
-                                "type": "string"
-                              },
-                              "bundleId": {
-                                "type": "string"
-                              },
-                              "iconBitmap": {
-                                "properties": {
-                                  "height": {
-                                    "type": "number"
-                                  },
-                                  "path": {
-                                    "type": "string"
-                                  },
-                                  "sizeBytes": {
-                                    "type": "number"
-                                  },
-                                  "width": {
-                                    "type": "number"
-                                  }
-                                },
-                                "type": "object"
-                              },
-                              "info": {
-                                "type": "object"
-                              },
-                              "minOsVersion": {
-                                "type": "string"
-                              },
-                              "name": {
-                                "type": "string"
-                              },
-                              "orientations": {
-                                "items": {
-                                  "type": "string"
-                                },
-                                "type": "array"
-                              },
-                              "platform": {
-                                "type": "string"
-                              },
-                              "role": {
-                                "type": "string"
-                              },
-                              "supportedDevices": {
-                                "items": {
-                                  "type": "string"
-                                },
-                                "type": "array"
-                              },
-                              "version": {
-                                "type": "string"
-                              }
-                            },
-                            "type": "object"
-                          },
-                          "type": "array"
-                        },
-                        "version": {
-                          "type": "string"
-                        },
-                        "versionCode": {
-                          "type": "string"
-                        },
-                        "versionId": {
-                          "type": "string"
-                        },
-                        "versionName": {
-                          "type": "string"
-                        }
-                      },
-                      "type": "object"
-                    },
-                    "status": {
-                      "type": "string"
-                    }
-                  },
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Ingested"
-          },
-          "501": {
-            "description": "Not implemented"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          },
-          {
-            "apiKeyAuth": []
-          }
-        ],
-        "summary": "Queue ingestion"
-      }
-    },
-    "/ingest/upload": {
-      "post": {
-        "description": "Returns 400 invalid_archive when the IPA/APK is not a valid zip archive.",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "properties": {
-                  "file": {
-                    "format": "binary",
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "file"
-                ],
-                "type": "object"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Ingested"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          },
-          {
-            "apiKeyAuth": []
-          }
-        ],
-        "summary": "Upload and ingest build"
-      }
-    },
     "/modules": {
       "get": {
         "parameters": [
@@ -3328,63 +3048,6 @@
           }
         },
         "summary": "Set storage config"
-      }
-    },
-    "/store/upload": {
-      "post": {
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/TeamIdHeader"
-          },
-          {
-            "description": "API key token (query alternative to x-api-key header)",
-            "in": "query",
-            "name": "token",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "properties": {
-                  "file": {
-                    "format": "binary",
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "file"
-                ],
-                "type": "object"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Stored file"
-          },
-          "400": {
-            "description": "Invalid payload"
-          },
-          "413": {
-            "description": "File too large"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          },
-          {
-            "apiKeyAuth": []
-          }
-        ],
-        "summary": "Upload binary to storage"
       }
     },
     "/tags": {
@@ -4121,6 +3784,130 @@
           }
         ],
         "summary": "Realtime websocket"
+      }
+    },
+    "/ingest/upload-url": {
+      "post": {
+        "summary": "Create ingest upload URL",
+        "description": "Returns a pre-signed URL for IPA/APK upload. The client must upload to storage and then call /ingest/complete-upload.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "filename": {
+                    "type": "string"
+                  },
+                  "sizeBytes": {
+                    "type": "number"
+                  },
+                  "contentType": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "filename",
+                  "sizeBytes"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Pre-signed upload details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "uploadUrl": {
+                      "type": "string"
+                    },
+                    "key": {
+                      "type": "string"
+                    },
+                    "expiresIn": {
+                      "type": "number"
+                    },
+                    "headers": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "uploadUrl",
+                    "key"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ingest/complete-upload": {
+      "post": {
+        "summary": "Finalize ingest upload",
+        "description": "Finalizes a pre-signed upload and triggers ingest processing via the ingest function.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "filename": {
+                    "type": "string"
+                  },
+                  "sizeBytes": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "key"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ingested build metadata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "result": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   },

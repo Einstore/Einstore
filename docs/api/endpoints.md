@@ -18,7 +18,7 @@ Team-scoped endpoints:
 - `/artifacts`
 - `/storage`
 - `/resolve-install`
-- `/ingest`, `/ingest/upload`
+- `/ingest/upload-url`, `/ingest/complete-upload`
 - `/badges`
 - `/api-keys`, `/api-keys/:id`
 - `/ws`
@@ -32,7 +32,6 @@ Team-scoped endpoints:
 - `/builds/events`
 - `/builds/:id/tags`
 - `/tags`
-- `/store/upload`
 
 ## GET /health
 - Purpose: Health check
@@ -101,14 +100,6 @@ Team-scoped endpoints:
   - `perPage` (number, optional, default 25, max 100): page size
   - `limit` and `offset` (legacy, optional)
 - Response schema: `{ "items": [{ "id": "tag", "name": "release", "usageCount": 3 }], "page": 1, "perPage": 25, "total": 1, "totalPages": 1 }`
-
-## POST /store/upload
-- Purpose: Upload a binary directly to Einstore storage (any file type)
-- Auth scope: Team or API key (supports `token` query param as API key)
-- Request schema: multipart/form-data with a single `file` field; `token` can be passed as a query string instead of `x-api-key`.
-- Response schema: `{ "status": "stored", "filePath": "storage/uploads/<generated>", "filename": "original.ext", "sizeBytes": 123, "teamId": "team" }`
-- Side effects: none
-- Platform relevance: all
 
 ## GET /badges
 - Purpose: Fetch navigation badge counts for the active team
@@ -566,7 +557,7 @@ Optional tracking metadata shared by download/install endpoints.
 - Purpose: List extracted icon images for build targets
 - Auth scope: Bearer (rafiki270/auth)
 - Request schema: path `{ id: string }`
-- Response schema: `{ buildId: string, items: { targetId: string, bundleId: string, platform: string, role: string, iconBitmap: { width?: number, height?: number, sizeBytes?: number, sourcePath?: string }, url: string, contentType: string, dataUrl: string }[] }`
+- Response schema: `{ buildId: string, items: { targetId: string, bundleId: string, platform: string, role: string, iconBitmap: { width?: number, height?: number, sizeBytes?: number, sourcePath?: string }, url: string, contentType: string }[] }`
 - Side effects: none
 - Platform relevance: ios, android
 
@@ -574,7 +565,7 @@ Optional tracking metadata shared by download/install endpoints.
 - Purpose: Fetch the extracted icon image for a target
 - Auth scope: Bearer (rafiki270/auth)
 - Request schema: path `{ id: string, targetId: string }`
-- Response schema: `image/png`
+- Response schema: `302` redirect to storage URL (image/png)
 - Side effects: none
 - Platform relevance: ios, android
 
@@ -689,27 +680,6 @@ Optional tracking metadata shared by download/install endpoints.
 - Side effects: Updates storage settings
 - Platform relevance: ios, android
 
-## POST /ingest
-- Purpose: Ingest build metadata from IPA/APK
-- Auth scope: Bearer (rafiki270/auth) or `x-api-key` (CI uploads)
-- Request schema: `{ filePath: string, kind: "ipa"|"apk"|"aab" }`
-- Response schema: `{ status: string, result: object }`
-- Side effects: Parses file, creates/updates App/Version/Build/Target/Artifacts
-- Platform relevance: ios, android
-- Notes:
-  - iOS: extracts entitlements/provisioning profile and stores an `entitlements` artifact with `distribution` = adhoc | appstore | enterprise | none | broken.
-  - Errors: `400 invalid_archive` when the IPA/APK is not a valid zip archive.
-
-## POST /ingest/upload
-- Purpose: Upload and ingest an IPA/APK in one step
-- Auth scope: Bearer (rafiki270/auth) or `x-api-key` (CI uploads)
-- Request schema: multipart form with `file`
-- Response schema: `{ status: string, result: object }`
-- Side effects: Stores upload on the server, then ingests metadata
-- Platform relevance: ios, android
-- Notes:
-  - Errors: `400 invalid_archive` when the IPA/APK is not a valid zip archive.
-
 ## POST /ingest/upload-url
 - Purpose: Get a pre-signed Spaces URL for large IPA/APK uploads
 - Auth scope: Bearer (rafiki270/auth) or `x-api-key` (CI uploads)
@@ -723,18 +693,10 @@ Optional tracking metadata shared by download/install endpoints.
 - Auth scope: Bearer (rafiki270/auth) or `x-api-key` (CI uploads)
 - Request schema: `{ key: string, filename?: string, sizeBytes?: number }`
 - Response schema: `{ status: string, result: object }`
-- Side effects: Downloads the uploaded file from Spaces, validates it, ingests metadata, and cleans up the temporary object.
+- Side effects: Calls the ingest function to extract metadata and icons, then persists build records.
 - Platform relevance: ios, android
 - Notes:
   - Errors: `400 invalid_archive` when the IPA/APK is not a valid zip archive.
-
-## POST /store/upload
-- Purpose: Upload a binary directly to Einstore storage (any file type)
-- Auth scope: Team or API key (`x-api-key` header or `token` query param)
-- Request schema: multipart form with `file`; `token` query param supported as an alternative to header auth
-- Response schema: `{ "status": "stored", "filePath": "storage/uploads/<generated>", "filename": "original.ext", "sizeBytes": 123, "teamId": "team" }`
-- Side effects: Stores the file locally (subject to storage quota and purge rules)
-- Notes: `Content-Length` is preferred for quota checks; oldest builds are purged automatically to free space (never deletes the last build of an app).
 
 ## POST /feature-flags
 - Purpose: Create/ensure feature flag
