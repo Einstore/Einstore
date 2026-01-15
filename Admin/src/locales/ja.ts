@@ -457,9 +457,6 @@ export const jaMessages: Record<string, MessageValue> = {
   "brand.admin": "Admin",
   "brand.einstore": "Einstore",
   "brand.initials": "E",
-  "one": "{count} 件のビルドを保存",
-  "few": "{count} 件のビルドを保存",
-  "other": "{count} 件のビルドを保存"
   "nav.billing": "請求",
   "page.billing.title": "請求",
   "breadcrumb.billing": "請求",

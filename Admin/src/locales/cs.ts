@@ -428,7 +428,7 @@ export const csMessages: Record<string, MessageValue> = {
   "upload.title.default": "Nahrajte zde svůj první build",
   "brand.admin": "Admin",
   "brand.einstore": "Einstore",
-  "brand.initials": "E"
+  "brand.initials": "E",
   "nav.billing": "Fakturace",
   "page.billing.title": "Fakturace",
   "breadcrumb.billing": "Fakturace",

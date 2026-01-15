@@ -457,9 +457,6 @@ export const koMessages: Record<string, MessageValue> = {
   "brand.admin": "Admin",
   "brand.einstore": "Einstore",
   "brand.initials": "E",
-  "one": "저장된 빌드 {count}개",
-  "few": "저장된 빌드 {count}개",
-  "other": "저장된 빌드 {count}개"
   "nav.billing": "청구",
   "page.billing.title": "청구",
   "breadcrumb.billing": "청구",

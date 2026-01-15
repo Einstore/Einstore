@@ -457,9 +457,6 @@ export const frMessages: Record<string, MessageValue> = {
   "brand.admin": "Admin",
   "brand.einstore": "Einstore",
   "brand.initials": "E",
-  "one": "{count} build stocké",
-  "few": "{count} builds stockés",
-  "other": "{count} builds stockés"
   "nav.billing": "Facturation",
   "page.billing.title": "Facturation",
   "breadcrumb.billing": "Facturation",

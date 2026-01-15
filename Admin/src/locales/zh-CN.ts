@@ -326,9 +326,11 @@ export const zhMessages: Record<string, MessageValue> = {
   "brand.admin": "Admin",
   "brand.einstore": "Einstore",
   "brand.initials": "E",
-  "few": "",
-  "one": "",
-  "other": "",
+  "storage.buildsStored": {
+    "one": "已存储 {count} 个构建",
+    "few": "已存储 {count} 个构建",
+    "other": "已存储 {count} 个构建"
+  },
   "overview.activity.empty": "暂无下载记录。构建被下载或安装后，最近五条事件将显示在这里。",
   "overview.activity.title": "最新下载与安装",
   "overview.apps.all": "所有应用",
@@ -398,11 +400,6 @@ export const zhMessages: Record<string, MessageValue> = {
   "status.critical": "严重",
   "status.healthy": "正常",
   "status.warning": "警告",
-  "storage.buildsStored": {
-    "one": "{count} 个构建已存储",
-    "few": "{count} 个构建已存储",
-    "other": "{count} 个构建已存储"
-  },
   "storage.empty": "暂无存储使用。",
   "storage.empty.note": "上传构建后将显示使用情况（已用 {bytes}）。",
   "storage.loading": "正在加载存储使用情况...",

@@ -457,9 +457,6 @@ export const poMessages: Record<string, MessageValue> = {
   "brand.admin": "Admin",
   "brand.einstore": "Einstore",
   "brand.initials": "E",
-  "one": "{count} build zapisany",
-  "few": "{count} buildy zapisane",
-  "other": "{count} buildow zapisanych"
   "nav.billing": "Rozliczenia",
   "page.billing.title": "Rozliczenia",
   "breadcrumb.billing": "Rozliczenia",

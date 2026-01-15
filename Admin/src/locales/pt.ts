@@ -457,9 +457,6 @@ export const ptMessages: Record<string, MessageValue> = {
   "brand.admin": "Admin",
   "brand.einstore": "Einstore",
   "brand.initials": "E",
-  "one": "{count} build guardado",
-  "few": "{count} builds guardados",
-  "other": "{count} builds guardados"
   "nav.billing": "Faturação",
   "page.billing.title": "Faturação",
   "breadcrumb.billing": "Faturação",

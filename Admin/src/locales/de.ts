@@ -457,9 +457,6 @@ export const deMessages: Record<string, MessageValue> = {
   "brand.admin": "Admin",
   "brand.einstore": "Einstore",
   "brand.initials": "E",
-  "one": "{count} Build gespeichert",
-  "few": "{count} Builds gespeichert",
-  "other": "{count} Builds gespeichert"
   "nav.billing": "Abrechnung",
   "page.billing.title": "Abrechnung",
   "breadcrumb.billing": "Abrechnung",

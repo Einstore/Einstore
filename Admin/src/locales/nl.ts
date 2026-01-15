@@ -153,7 +153,7 @@ export const nlMessages: Record<string, MessageValue> = {
   "footer.message": "Met liefde gemaakt in Schotland.",
   "brand.admin": "Admin",
   "brand.einstore": "Einstore",
-  "brand.initials": "E"
+  "brand.initials": "E",
   "nav.billing": "Facturatie",
   "page.billing.title": "Facturatie",
   "breadcrumb.billing": "Facturatie",

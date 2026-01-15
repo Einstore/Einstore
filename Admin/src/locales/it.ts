@@ -118,7 +118,7 @@ export const itMessages: Record<string, MessageValue> = {
   "footer.message": "Realizzato con amore in Scozia.",
   "brand.admin": "Admin",
   "brand.einstore": "Einstore",
-  "brand.initials": "E"
+  "brand.initials": "E",
   "nav.billing": "Fatturazione",
   "page.billing.title": "Fatturazione",
   "breadcrumb.billing": "Fatturazione",
