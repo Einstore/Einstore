@@ -239,13 +239,6 @@ const ensureLocalIngestRunning = async (url: string) => {
   if (localIngestBoot) return localIngestBoot;
 
   localIngestBoot = (async () => {
-    try {
-      const health = await fetchWithTimeout(buildHealthUrl(url), 1500);
-      if (health.ok) return true;
-    } catch {
-      // ignore and attempt to start
-    }
-
     const composePath = path.resolve(process.cwd(), "..", "functions", "ingest", "docker-compose.yml");
     const workers = resolveLocalIngestWorkers();
     await execFileAsync(
