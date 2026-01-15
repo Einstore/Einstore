@@ -4,7 +4,7 @@ import { pipeline } from "node:stream/promises";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import { GetObjectCommand, HeadObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { HeadObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { ingestAndroidApk } from "../lib/ingest/android.js";
 import { ingestIosIpa } from "../lib/ingest/ios.js";
 import { ingestAndroidFromFunction, ingestIosFromFunction } from "../lib/ingest/remote.js";
@@ -218,23 +218,6 @@ const headSpacesObject = async (bucket: string, key: string) => {
   };
 };
 
-const downloadSpacesObject = async (bucket: string, key: string, extension: string) => {
-  const spaces = resolveSpacesConfig();
-  if (!spaces) {
-    throw new Error("Spaces not configured");
-  }
-  const uploadDir = path.resolve(process.cwd(), "storage", "uploads");
-  await fs.promises.mkdir(uploadDir, { recursive: true });
-  const filePath = path.join(uploadDir, `${crypto.randomUUID()}${extension}`);
-  const object = await spaces.client.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
-  if (!object.Body) {
-    throw new Error("Empty object");
-  }
-  await pipeline(object.Body as NodeJS.ReadableStream, fs.createWriteStream(filePath));
-  const stats = await fs.promises.stat(filePath);
-  return { filePath, sizeBytes: BigInt(stats.size) };
-};
-
 const deleteSpacesObject = async (bucket: string, key: string) => {
   const spaces = resolveSpacesConfig();
   if (!spaces) return;
@@ -336,55 +319,42 @@ export async function pipelineRoutes(app: FastifyInstance) {
     }
 
     const ingestFunctionUrl = resolveIngestFunctionUrl();
-    if (ingestFunctionUrl) {
-      try {
-        const storagePath = `spaces://${spaces.bucket}/${parsed.data.key}`;
-        const functionResult = await callIngestFunction(ingestFunctionUrl, {
-          kind: extension === ".apk" ? "apk" : "ipa",
-          storagePath,
+    if (!ingestFunctionUrl) {
+      return reply.status(500).send({
+        error: "ingest_function_missing",
+        message: "Ingest function URL is not configured.",
+      });
+    }
+    try {
+      const storagePath = `spaces://${spaces.bucket}/${parsed.data.key}`;
+      const functionResult = await callIngestFunction(ingestFunctionUrl, {
+        kind: extension === ".apk" ? "apk" : "ipa",
+        storagePath,
+      });
+      const baseParsed = ingestFunctionBaseSchema.safeParse(functionResult);
+      if (!baseParsed.success) {
+        return reply.status(502).send({
+          error: "ingest_function_failed",
+          message: "Ingest function returned an invalid payload.",
         });
-        const baseParsed = ingestFunctionBaseSchema.safeParse(functionResult);
-        if (!baseParsed.success) {
-          return reply.status(502).send({
-            error: "ingest_function_failed",
-            message: "Ingest function returned an invalid payload.",
-          });
-        }
-        if (!baseParsed.data.ok) {
-          return reply.status(502).send({
-            error: "ingest_function_failed",
-            message: baseParsed.data.error || "Ingest function failed.",
-          });
-        }
-        const userId = request.auth?.user.id;
-        const sizeBytes = Number(expectedSize);
-        if (extension === ".apk") {
-          const parsedPayload = ingestFunctionAndroidSchema.safeParse(functionResult);
-          if (!parsedPayload.success) {
-            return reply.status(502).send({
-              error: "ingest_function_failed",
-              message: "Ingest function returned an invalid Android payload.",
-            });
-          }
-          const result = await ingestAndroidFromFunction(
-            parsedPayload.data,
-            parsed.data.key,
-            sizeBytes,
-            teamId,
-            userId,
-            { billingGuard },
-          );
-          await broadcastBadgesUpdate(teamId).catch(() => undefined);
-          return reply.status(201).send({ status: "ingested", result });
-        }
-        const parsedPayload = ingestFunctionIosSchema.safeParse(functionResult);
+      }
+      if (!baseParsed.data.ok) {
+        return reply.status(502).send({
+          error: "ingest_function_failed",
+          message: baseParsed.data.error || "Ingest function failed.",
+        });
+      }
+      const userId = request.auth?.user.id;
+      const sizeBytes = Number(expectedSize);
+      if (extension === ".apk") {
+        const parsedPayload = ingestFunctionAndroidSchema.safeParse(functionResult);
         if (!parsedPayload.success) {
           return reply.status(502).send({
             error: "ingest_function_failed",
-            message: "Ingest function returned an invalid iOS payload.",
+            message: "Ingest function returned an invalid Android payload.",
           });
         }
-        const result = await ingestIosFromFunction(
+        const result = await ingestAndroidFromFunction(
           parsedPayload.data,
           parsed.data.key,
           sizeBytes,
@@ -394,59 +364,25 @@ export async function pipelineRoutes(app: FastifyInstance) {
         );
         await broadcastBadgesUpdate(teamId).catch(() => undefined);
         return reply.status(201).send({ status: "ingested", result });
-      } catch (error) {
+      }
+      const parsedPayload = ingestFunctionIosSchema.safeParse(functionResult);
+      if (!parsedPayload.success) {
         return reply.status(502).send({
           error: "ingest_function_failed",
-          message: (error as Error).message || "Ingest function failed.",
+          message: "Ingest function returned an invalid iOS payload.",
         });
       }
-    }
-
-    let filePath: string | null = null;
-    try {
-      const download = await downloadSpacesObject(spaces.bucket, parsed.data.key, extension);
-      filePath = download.filePath;
-      try {
-        if (billingGuard?.assertCanUploadBytes) {
-          await billingGuard.assertCanUploadBytes({ teamId, requiredBytes: download.sizeBytes });
-        }
-        await ensureStorageCapacity(teamId, download.sizeBytes);
-      } catch (error) {
-        await fs.promises.rm(filePath, { force: true }).catch(() => undefined);
-        if ((error as { code?: string }).code && (error as { code?: string }).code !== "storage_limit_exceeded") {
-          return sendBillingError(reply, error);
-        }
-        if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
-          return reply
-            .status((error as { statusCode?: number }).statusCode ?? 413)
-            .send({ error: "storage_limit_exceeded", message: (error as { message?: string }).message });
-        }
-        throw error;
-      }
-      const userId = request.auth?.user.id;
-      try {
-        await ensureZipReadable(filePath);
-      } catch (error) {
-        if (isInvalidArchiveError(error)) {
-          await fs.promises.rm(filePath, { force: true });
-          return reply.status(400).send({ error: "invalid_archive" });
-        }
-        throw error;
-      }
-      if (extension === ".apk") {
-        const result = await ingestAndroidApk(filePath, teamId, userId, { billingGuard });
-        await deleteSpacesObject(spaces.bucket, parsed.data.key);
-        await broadcastBadgesUpdate(teamId).catch(() => undefined);
-        return reply.status(201).send({ status: "ingested", result });
-      }
-      const result = await ingestIosIpa(filePath, teamId, userId, { billingGuard });
-      await deleteSpacesObject(spaces.bucket, parsed.data.key);
+      const result = await ingestIosFromFunction(
+        parsedPayload.data,
+        parsed.data.key,
+        sizeBytes,
+        teamId,
+        userId,
+        { billingGuard },
+      );
       await broadcastBadgesUpdate(teamId).catch(() => undefined);
       return reply.status(201).send({ status: "ingested", result });
     } catch (error) {
-      if (filePath) {
-        await fs.promises.rm(filePath, { force: true }).catch(() => undefined);
-      }
       if (isInvalidArchiveError(error)) {
         return reply.status(400).send({ error: "invalid_archive" });
       }
