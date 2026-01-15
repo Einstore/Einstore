@@ -1,6 +1,5 @@
 import fs from "node:fs";
 import path from "node:path";
-import { spawnSync } from "node:child_process";
 import { Prisma, PlatformKind, TargetRole } from "@prisma/client";
 import { prisma } from "../prisma.js";
 import { listZipEntries, readZipEntries, scanZipEntries } from "../zip.js";
@@ -9,16 +8,8 @@ import {
   IosDistributionInfo,
   IosEntitlementsInfo,
 } from "./ios-entitlements.js";
-import {
-  mapDeviceFamily,
-  normalizeJson,
-  parsePlist,
-  resolveIconCandidates,
-  resolveRole,
-  resolveTargetRoots,
-  sanitizePathSegment,
-} from "./ios-helpers.js";
-import { convertCgbiPng, isCgbiPng, readPngDimensions } from "./png-utils.js";
+import plist from "plist";
+import bplistParser from "bplist-parser";
 
 type IconBitmap = {
   sourcePath: string;

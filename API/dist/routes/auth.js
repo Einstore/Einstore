@@ -39,21 +39,7 @@ const getContext = (request) => ({
     ip: request.ip,
     userAgent: typeof request.headers["user-agent"] === "string" ? request.headers["user-agent"] : undefined,
 });
-const resolvePersonalTeamName = (user) => {
-    const fullName = user.fullName?.trim();
-    if (fullName) {
-        return `${fullName}'s team`;
-    }
-    const username = user.username.trim();
-    if (username) {
-        return `${username}'s team`;
-    }
-    const emailLocal = user.email?.split("@")[0]?.trim();
-    if (emailLocal) {
-        return `${emailLocal}'s team`;
-    }
-    return "Personal team";
-};
+const resolveDefaultTeamName = () => "Workspace";
 const ensureUniqueSlug = async (base) => {
     const root = base || "team";
     let candidate = root;
@@ -76,7 +62,7 @@ const ensurePersonalTeam = async (userId) => {
     if (!user) {
         return;
     }
-    const teamName = resolvePersonalTeamName(user);
+    const teamName = resolveDefaultTeamName();
     const slugBase = normalizeTeamSlug(slugify(teamName));
     const slug = await ensureUniqueSlug(slugBase);
     const inboxBase = deriveInboxBaseForUser({
@@ -173,6 +159,7 @@ export async function authRoutes(app) {
         const token = header.replace("Bearer ", "").trim();
         try {
             const session = await authService.getSession(token);
+            await ensurePersonalTeam(session.userId).catch(() => undefined);
             const user = await prisma.user.findUnique({
                 where: { id: session.userId },
                 select: { isSuperUser: true },

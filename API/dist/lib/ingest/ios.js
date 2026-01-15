@@ -1,24 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
-import plist from "plist";
-import bplistParser from "bplist-parser";
 import { prisma } from "../prisma.js";
 import { listZipEntries, readZipEntries, scanZipEntries } from "../zip.js";
 import { extractIosEntitlements, } from "./ios-entitlements.js";
-const readPngDimensions = (buffer) => {
-    if (buffer.length < 24)
-        return null;
-    const signature = buffer.subarray(0, 8);
-    const pngSignature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
-    if (!signature.equals(pngSignature))
-        return null;
-    const width = buffer.readUInt32BE(16);
-    const height = buffer.readUInt32BE(20);
-    if (!width || !height)
-        return null;
-    return { width, height };
-};
+import { mapDeviceFamily, normalizeJson, parsePlist, resolveIconCandidates, resolveRole, resolveTargetRoots, sanitizePathSegment, } from "./ios-helpers.js";
+import { convertCgbiPng, isCgbiPng, readPngDimensions } from "./png-utils.js";
 const commandAvailability = new Map();
 const hasCommand = (command) => {
     const cached = commandAvailability.get(command);
@@ -50,6 +37,8 @@ const normalizeIosPng = (rawPath, finalPath) => {
     const revertedPath = `${baseName}.reverted.png`;
     const normalizedPath = `${baseName}.normalized.png`;
     let workingPath = rawPath;
+    const rawBuffer = fs.readFileSync(rawPath);
+    const hasCgbi = isCgbiPng(rawBuffer);
     if (hasCommand("pngcrush")) {
         try {
             runCommand("pngcrush", ["-revert-iphone-optimizations", rawPath, revertedPath]);
@@ -57,6 +46,16 @@ const normalizeIosPng = (rawPath, finalPath) => {
         }
         catch (error) {
             console.warn("pngcrush failed, using raw icon PNG.", error);
+        }
+    }
+    if (workingPath === rawPath && hasCgbi) {
+        const converted = convertCgbiPng(rawBuffer);
+        if (converted) {
+            fs.writeFileSync(revertedPath, converted);
+            workingPath = revertedPath;
+        }
+        else {
+            console.warn("Failed to normalize CgBI icon PNG, using raw icon PNG.");
         }
     }
     const magickCommand = hasCommand("magick")
@@ -99,46 +98,6 @@ const normalizeIosPng = (rawPath, finalPath) => {
     safeUnlink(revertedPath, finalPath);
     safeUnlink(normalizedPath, finalPath);
     return finalPath;
-};
-const mapDeviceFamily = (family) => {
-    if (!Array.isArray(family))
-        return [];
-    return family.map((value) => {
-        switch (value) {
-            case 1:
-                return "iphone";
-            case 2:
-                return "ipad";
-            case 3:
-                return "appletv";
-            case 4:
-                return "watch";
-            case 6:
-                return "carplay";
-            default:
-                return `unknown-${value}`;
-        }
-    });
-};
-const sanitizePathSegment = (value) => value.replace(/[^a-zA-Z0-9._-]+/g, "_");
-const resolveIconCandidates = (info) => {
-    const icons = info.CFBundleIcons;
-    const primary = icons?.CFBundlePrimaryIcon;
-    const iconFiles = primary?.CFBundleIconFiles || [];
-    const iconName = primary?.CFBundleIconName;
-    const plistIcons = info.CFBundleIconFiles || [];
-    const candidates = new Set();
-    for (const entry of [...iconFiles, ...plistIcons]) {
-        if (!entry)
-            continue;
-        candidates.add(entry);
-        candidates.add(`${entry}.png`);
-    }
-    if (iconName) {
-        candidates.add(iconName);
-        candidates.add(`${iconName}.png`);
-    }
-    return Array.from(candidates);
 };
 const extractBestIcon = async (filePath, targetRoot, entries, outputDir, info) => {
     const targetEntries = entries.filter((entry) => !entry.endsWith("/") && entry.startsWith(targetRoot));
@@ -205,43 +164,6 @@ const extractBestIcon = async (filePath, targetRoot, entries, outputDir, info) =
         height: resolved.height,
         sizeBytes: normalizedStats.size,
     };
-};
-const parsePlist = (buffer) => {
-    const header = buffer.subarray(0, 6).toString("utf8");
-    if (header === "bplist") {
-        const parsed = bplistParser.parseBuffer(buffer);
-        return (parsed[0] ?? {});
-    }
-    const text = buffer.toString("utf8").trim();
-    if (!text)
-        return {};
-    return plist.parse(text);
-};
-const normalizeJson = (value) => JSON.parse(JSON.stringify(value ?? null));
-const resolveRole = (extensionPoint) => {
-    if (!extensionPoint)
-        return "app";
-    const lower = extensionPoint.toLowerCase();
-    if (lower.includes("widget"))
-        return "widget";
-    if (lower.includes("clip"))
-        return "clip";
-    return "extension";
-};
-const resolveTargetRoots = (entries) => {
-    const roots = new Set();
-    for (const entry of entries) {
-        if (entry.match(/^Payload\/[^/]+\.app\/Info\.plist$/)) {
-            roots.add(entry.replace(/Info\.plist$/, ""));
-        }
-        if (entry.match(/^Payload\/[^/]+\.app\/PlugIns\/[^/]+\.appex\/Info\.plist$/)) {
-            roots.add(entry.replace(/Info\.plist$/, ""));
-        }
-        if (entry.match(/^Payload\/[^/]+\.app\/Watch\/[^/]+\.app\/Info\.plist$/)) {
-            roots.add(entry.replace(/Info\.plist$/, ""));
-        }
-    }
-    return Array.from(roots);
 };
 export async function ingestIosIpa(filePath, teamId, createdByUserId, options) {
     if (!fs.existsSync(filePath)) {
