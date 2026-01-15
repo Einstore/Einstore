@@ -52,6 +52,71 @@ const parsePlist = (buffer) => {
   return plist.parse(text);
 };
 
+const normalizeIconName = (value) => {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  return trimmed.toLowerCase().endsWith(".png") ? trimmed.slice(0, -4) : trimmed;
+};
+
+const normalizeIconNames = (value) => {
+  if (Array.isArray(value)) {
+    return value.map(normalizeIconName).filter(Boolean);
+  }
+  if (typeof value === "string") {
+    const name = normalizeIconName(value);
+    return name ? [name] : [];
+  }
+  return [];
+};
+
+const collectIosIconNames = (info) => {
+  const names = new Set();
+  const pushNames = (value) => {
+    for (const name of normalizeIconNames(value)) {
+      names.add(name);
+    }
+  };
+  const collectFrom = (icons) => {
+    if (!icons || typeof icons !== "object") return;
+    pushNames(icons.CFBundleIconName);
+    pushNames(icons.CFBundleIconFiles);
+    const primary = icons.CFBundlePrimaryIcon;
+    if (primary && typeof primary === "object") {
+      pushNames(primary.CFBundleIconName);
+      pushNames(primary.CFBundleIconFiles);
+    }
+  };
+  collectFrom(info?.CFBundleIcons);
+  collectFrom(info?.["CFBundleIcons~ipad"]);
+  collectFrom(info?.["CFBundleIcons~watch"]);
+  collectFrom(info?.["CFBundleIcons~iphone"]);
+  collectFrom(info?.["CFBundleIcons~tv"]);
+  pushNames(info?.CFBundleIconName);
+  pushNames(info?.CFBundleIconFiles);
+  return Array.from(names);
+};
+
+const parseAndroidIconName = (iconValue) => {
+  if (typeof iconValue !== "string") return null;
+  const match = iconValue.match(/^@(?:mipmap|drawable)\/(.+)$/);
+  if (!match) return null;
+  return normalizeIconName(match[1]);
+};
+
+const matchesIconName = (filename, iconName) => {
+  if (!iconName) return false;
+  const lowerFile = filename.toLowerCase();
+  const base = lowerFile.endsWith(".png") ? lowerFile.slice(0, -4) : lowerFile;
+  const lowerName = iconName.toLowerCase();
+  return (
+    base === lowerName ||
+    base.startsWith(`${lowerName}@`) ||
+    base.startsWith(`${lowerName}-`) ||
+    base.startsWith(`${lowerName}~`)
+  );
+};
+
 const mapDeviceFamily = (family) => {
   if (!Array.isArray(family)) return [];
   return family.map((value) => {
@@ -297,23 +362,47 @@ const readEntryBuffers = async (zipfile, entryNames) => {
   });
 };
 
-const extractBestIcon = async (zipfile, entryNames, rootPrefix) => {
-  const candidates = entryNames
-    .filter((name) => name.startsWith(rootPrefix) && name.endsWith(".png"))
-    .map((name) => {
-      const lower = name.toLowerCase();
-      const filename = lower.split("/").pop() || "";
-      const score =
-        (lower.includes("appicon") ? 10 : 0) +
-        (filename.includes("ic_launcher") || filename.includes("app_icon") ? 8 : 0) +
-        (filename.includes("launcher") ? 4 : 0) +
-        (filename.includes("icon") ? 2 : 0);
-      return { name, score };
-    });
+const scoreIconCandidate = (name) => {
+  const lower = name.toLowerCase();
+  const filename = lower.split("/").pop() || "";
+  return (
+    (lower.includes("appicon") ? 10 : 0) +
+    (filename.includes("ic_launcher") || filename.includes("app_icon") ? 8 : 0) +
+    (filename.includes("launcher") ? 4 : 0) +
+    (filename.includes("icon") ? 2 : 0)
+  );
+};
 
+const buildIconCandidates = (entryNames, rootPrefix, preferredNames) => {
+  const preferred = Array.isArray(preferredNames) && preferredNames.length ? preferredNames : null;
+  const candidates = [];
+  for (const name of entryNames) {
+    if (!name.startsWith(rootPrefix) || !name.toLowerCase().endsWith(".png")) continue;
+    if (preferred) {
+      const filename = name.split("/").pop() || "";
+      if (!preferred.some((iconName) => matchesIconName(filename, iconName))) {
+        continue;
+      }
+    }
+    candidates.push({ name, score: scoreIconCandidate(name) });
+  }
+  return candidates;
+};
+
+const extractBestIcon = async (zipfile, entryNames, rootPrefix, preferredNames) => {
+  let candidates = buildIconCandidates(entryNames, rootPrefix, preferredNames);
+  if (!candidates.length && preferredNames) {
+    candidates = buildIconCandidates(entryNames, rootPrefix, null);
+  }
+  if (!candidates.length) return null;
+  candidates.sort((a, b) => b.score - a.score);
+  const limited = candidates.slice(0, 120);
+  const buffers = await readEntryBuffers(
+    zipfile,
+    limited.map((c) => c.name),
+  );
   let best = null;
-  const buffers = await readEntryBuffers(zipfile, candidates.map((c) => c.name));
-  for (const candidate of candidates) {
+  for (const candidate of limited) {
     const buffer = buffers.get(candidate.name);
     if (!buffer) continue;
     const dimensions = readPngDimensions(buffer);
@@ -332,9 +421,9 @@ const extractBestIcon = async (zipfile, entryNames, rootPrefix) => {
       };
     }
   }
-
   return best;
 };
+
 
 const parseIosTargets = async (zipfile, entryNames) => {
   const targets = [];
@@ -583,8 +672,9 @@ exports.main = async (args) => {
     const entitlements = await withZipfile(client, objectBucket, key, (zip) =>
       extractIosEntitlements(zip, entryNames, mainTarget.root),
     );
+    const iconNames = collectIosIconNames(mainTarget.info);
     const icon = await withZipfile(client, objectBucket, key, (zip) =>
-      extractBestIcon(zip, entryNames, mainTarget.root),
+      extractBestIcon(zip, entryNames, mainTarget.root, iconNames),
     );
     let iconPath = null;
     let iconBase64 = null;
@@ -630,8 +720,9 @@ exports.main = async (args) => {
       readEntryBuffer(zip, manifestEntry),
     );
     const manifest = parseAndroidManifest(manifestBuffer);
+    const iconName = parseAndroidIconName(manifest.application?.icon);
     const icon = await withZipfile(client, objectBucket, key, (zip) =>
-      extractBestIcon(zip, entryNames, "res/"),
+      extractBestIcon(zip, entryNames, "res/", iconName ? [iconName] : null),
     );
     let iconPath = null;
     let iconBase64 = null;
