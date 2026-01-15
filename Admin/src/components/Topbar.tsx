@@ -320,7 +320,7 @@ const Topbar = ({
                 </button>
                 {isLocaleMenuOpen ? (
                   <div
-                    className="absolute right-0 mt-2 w-44 rounded-lg border border-slate-200 bg-white p-2 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+                    className="absolute right-0 mt-2 max-h-[70vh] w-44 overflow-y-auto rounded-lg border border-slate-200 bg-white p-2 shadow-sm dark:border-slate-700 dark:bg-slate-800"
                     role="menu"
                   >
                     {localeOptions.map((option) => (
