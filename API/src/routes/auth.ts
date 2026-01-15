@@ -191,6 +191,7 @@ export async function authRoutes(app: FastifyInstance) {
     const token = header.replace("Bearer ", "").trim();
     try {
       const session = await authService.getSession(token);
+      await ensurePersonalTeam(session.userId).catch(() => undefined);
       const user = await prisma.user.findUnique({
         where: { id: session.userId },
         select: { isSuperUser: true },
