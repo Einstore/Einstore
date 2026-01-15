@@ -1,6 +1,8 @@
 import { FastifyInstance, FastifyReply } from "fastify";
 import { z } from "zod";
 import { pipeline } from "node:stream/promises";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -41,6 +43,8 @@ const completeUploadSchema = z.object({
   filename: z.string().min(1).optional(),
   sizeBytes: z.coerce.number().int().positive().optional(),
 });
+
+const execFileAsync = promisify(execFile);
 const ingestFunctionBaseSchema = z.object({
   ok: z.boolean(),
   error: z.string().optional(),
@@ -195,6 +199,78 @@ const resolveIngestFunctionUrl = () => {
   return typeof raw === "string" && raw.trim().length > 0 ? raw.trim() : null;
 };
 
+const resolveLocalIngestWorkers = () => {
+  const raw = process.env.LOCAL_INGEST_WORKERS;
+  const parsed = raw ? Number.parseInt(raw, 10) : NaN;
+  if (Number.isFinite(parsed)) {
+    return Math.min(Math.max(parsed, 1), 20);
+  }
+  return 10;
+};
+
+const isLocalIngestUrl = (url: string) => {
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1";
+  } catch {
+    return false;
+  }
+};
+
+const buildHealthUrl = (url: string) => `${url.replace(/\/+$/, "")}/health`;
+
+const fetchWithTimeout = async (url: string, timeoutMs: number) => {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+};
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+let localIngestBoot: Promise<boolean> | null = null;
+
+const ensureLocalIngestRunning = async (url: string) => {
+  if (process.env.NODE_ENV === "production") return true;
+  if (!isLocalIngestUrl(url)) return true;
+  if (localIngestBoot) return localIngestBoot;
+
+  localIngestBoot = (async () => {
+    try {
+      const health = await fetchWithTimeout(buildHealthUrl(url), 1500);
+      if (health.ok) return true;
+    } catch {
+      // ignore and attempt to start
+    }
+
+    const composePath = path.resolve(process.cwd(), "..", "functions", "ingest", "docker-compose.yml");
+    const workers = resolveLocalIngestWorkers();
+    await execFileAsync(
+      "docker",
+      ["compose", "-f", composePath, "up", "--build", "-d", "--scale", `ingest-function=${workers}`],
+      { cwd: path.dirname(composePath) },
+    );
+
+    for (let attempt = 0; attempt < 20; attempt += 1) {
+      try {
+        const health = await fetchWithTimeout(buildHealthUrl(url), 1500);
+        if (health.ok) return true;
+      } catch {
+        // ignore
+      }
+      await sleep(1000);
+    }
+    return false;
+  })().finally(() => {
+    localIngestBoot = null;
+  });
+
+  return localIngestBoot;
+};
+
 const callIngestFunction = async (url: string, payload: Record<string, unknown>) => {
   const response = await fetch(url, {
     method: "POST",
@@ -323,6 +399,13 @@ export async function pipelineRoutes(app: FastifyInstance) {
       return reply.status(500).send({
         error: "ingest_function_missing",
         message: "Ingest function URL is not configured.",
+      });
+    }
+    const localReady = await ensureLocalIngestRunning(ingestFunctionUrl);
+    if (!localReady) {
+      return reply.status(503).send({
+        error: "ingest_function_unavailable",
+        message: "Local ingest function is unavailable.",
       });
     }
     try {
