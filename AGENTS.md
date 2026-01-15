@@ -15,6 +15,7 @@ postgresql://postgres@localhost:8102/einstore?schema=public
 - Build failures: reproduce and fix locally first; only deploy after the local build passes.
 - Always debug DigitalOcean/App Platform issues with `doctl` first.
 - Deployment debugging: use `doctl` (e.g., `doctl apps logs/get/list`) before changing configs or code.
+- When DigitalOcean Functions change, always deploy the functions (`doctl serverless deploy .`).
 
 ## Before You Start
 
