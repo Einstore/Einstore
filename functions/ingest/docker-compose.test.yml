@@ -20,6 +20,7 @@ services:
       SPACES_SECRET: minio123
       SPACES_BUCKET: ingest-test
       SPACES_FORCE_PATH_STYLE: "true"
+      INGEST_DEBUG_TRANSFER: "true"
       PORT: 8080
     ports:
       - "8080:8080"

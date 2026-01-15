@@ -164,7 +164,22 @@ const uploadFixture = async (client, kind) => {
       ContentType: "application/octet-stream",
     }),
   );
-  return `spaces://${BUCKET}/${key}`;
+  return { storagePath: `spaces://${BUCKET}/${key}`, sizeBytes: buffer.length };
+};
+
+const verifyTransferStats = (response, sizeBytes, label) => {
+  const bytesRead = response.transferBytesRead;
+  const bytesRequested = response.transferBytesRequested;
+  assert(Number.isFinite(bytesRead), `${label} transferBytesRead missing`);
+  assert(Number.isFinite(bytesRequested), `${label} transferBytesRequested missing`);
+  assert(Number.isInteger(response.transferRequests), `${label} transferRequests missing`);
+  assert(bytesRead > 0, `${label} transferBytesRead should be > 0`);
+  assert(bytesRequested > 0, `${label} transferBytesRequested should be > 0`);
+  const ratio = bytesRead / sizeBytes;
+  assert(
+    ratio < 0.25,
+    `${label} transferred too much data: ${bytesRead} / ${sizeBytes} (${(ratio * 100).toFixed(2)}%)`,
+  );
 };
 
 const verifyIconOutput = async (client, response) => {
@@ -186,7 +201,7 @@ const verifyIconOutput = async (client, response) => {
   assert(storedBuffer.equals(iconBuffer), "Stored icon does not match response");
 };
 
-const verifyIpaResponse = async (client, response) => {
+const verifyIpaResponse = async (client, response, sizeBytes) => {
   assert(response.ok === true, `IPA response not ok: ${JSON.stringify(response)}`);
   assert(response.kind === "ipa", "IPA kind mismatch");
   assert(typeof response.appName === "string" && response.appName, "IPA appName missing");
@@ -204,9 +219,10 @@ const verifyIpaResponse = async (client, response) => {
   });
   assert("entitlements" in response, "IPA entitlements field missing");
   await verifyIconOutput(client, response);
+  verifyTransferStats(response, sizeBytes, "IPA");
 };
 
-const verifyApkResponse = async (client, response) => {
+const verifyApkResponse = async (client, response, sizeBytes) => {
   assert(response.ok === true, `APK response not ok: ${JSON.stringify(response)}`);
   assert(response.kind === "apk", "APK kind mismatch");
   assert(typeof response.packageName === "string" && response.packageName, "APK packageName missing");
@@ -223,6 +239,7 @@ const verifyApkResponse = async (client, response) => {
   );
   assert(Array.isArray(response.permissions), "APK permissions missing");
   await verifyIconOutput(client, response);
+  verifyTransferStats(response, sizeBytes, "APK");
 };
 
 const main = async () => {
@@ -236,22 +253,22 @@ const main = async () => {
     await ensureBucketReady(s3Client);
 
     console.log("container-ingest.test.js: uploading fixtures");
-    const ipaStoragePath = await uploadFixture(s3Client, "ipa");
-    const apkStoragePath = await uploadFixture(s3Client, "apk");
+    const ipaFixture = await uploadFixture(s3Client, "ipa");
+    const apkFixture = await uploadFixture(s3Client, "apk");
 
     console.log("container-ingest.test.js: ingesting IPA");
     const ipaResponse = await httpRequest("POST", FUNCTION_URL, {
       kind: "ipa",
-      storagePath: ipaStoragePath,
+      storagePath: ipaFixture.storagePath,
     });
-    await verifyIpaResponse(s3Client, ipaResponse);
+    await verifyIpaResponse(s3Client, ipaResponse, ipaFixture.sizeBytes);
 
     console.log("container-ingest.test.js: ingesting APK");
     const apkResponse = await httpRequest("POST", FUNCTION_URL, {
       kind: "apk",
-      storagePath: apkStoragePath,
+      storagePath: apkFixture.storagePath,
     });
-    await verifyApkResponse(s3Client, apkResponse);
+    await verifyApkResponse(s3Client, apkResponse, apkFixture.sizeBytes);
 
     console.log("container-ingest.test.js: ok");
   } finally {

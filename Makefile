@@ -30,6 +30,12 @@ launch:
 			echo "Stopping running einstore containers..."; \
 			docker stop $$CONTAINERS; \
 		fi; \
+		COMPOSE_PATH="functions/ingest/docker-compose.yml"; \
+		if [ -f "$$COMPOSE_PATH" ]; then \
+			WORKERS="$${LOCAL_INGEST_WORKERS:-10}"; \
+			echo "Starting local MinIO + ingest function ($$WORKERS workers)..."; \
+			docker compose -f "$$COMPOSE_PATH" up --build -d --scale ingest-function=$$WORKERS; \
+		fi; \
 	fi; \
 	API_PID=""; ADMIN_PID=""; \
 	cleanup() { \

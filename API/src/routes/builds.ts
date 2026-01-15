@@ -1,12 +1,11 @@
 import { FastifyInstance, FastifyReply } from "fastify";
-import fs from "node:fs";
-import path from "node:path";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { requireTeam } from "../auth/guard.js";
 import { requireAppForTeam } from "../lib/team-access.js";
 import { broadcastBadgesUpdate } from "../lib/realtime.js";
 import { buildPaginationMeta, resolvePagination } from "../lib/pagination.js";
+import { presignStorageObject } from "../lib/storage-presign.js";
 
 const groupArtifactsByKind = <T extends { kind: string; createdAt: Date }>(items: T[]) => {
   const grouped: Record<string, T[]> = {};
@@ -35,8 +34,6 @@ type IconBitmap = {
   sourcePath?: string;
 };
 
-const storageRoot = path.resolve(process.cwd(), "storage", "ingest");
-
 const resolveBaseUrl = (request: { headers: Record<string, string | string[] | undefined> }) => {
   const protoHeader = request.headers["x-forwarded-proto"];
   const hostHeader = request.headers["x-forwarded-host"] ?? request.headers["host"];
@@ -48,19 +45,21 @@ const resolveBaseUrl = (request: { headers: Record<string, string | string[] | u
   return `${proto || "http"}://${host}`;
 };
 
-const resolveIconPath = (iconPath: string) => {
-  const candidate = path.isAbsolute(iconPath) ? iconPath : path.join(storageRoot, iconPath);
-  const resolved = path.resolve(candidate);
-  const relative = path.relative(storageRoot, resolved);
-  if (relative.startsWith("..") || path.isAbsolute(relative)) {
-    return null;
-  }
-  return resolved;
+const parseSpacesPath = (value: string) => {
+  if (!value.startsWith("spaces://")) return null;
+  const stripped = value.replace("spaces://", "");
+  const [bucket, ...rest] = stripped.split("/");
+  if (!bucket || !rest.length) return null;
+  return { bucket, key: rest.join("/") };
 };
 
-const readIconDataUrl = async (filePath: string) => {
-  const buffer = await fs.promises.readFile(filePath);
-  return `data:image/png;base64,${buffer.toString("base64")}`;
+const resolveIconSource = (iconPath: string) => {
+  const remote = parseSpacesPath(iconPath);
+  if (remote) return { kind: "remote" as const, ...remote };
+  if (iconPath.startsWith("http://") || iconPath.startsWith("https://")) {
+    return { kind: "url" as const, url: iconPath };
+  }
+  return null;
 };
 
 const extractIconBitmap = (metadata: unknown): IconBitmap | null => {
@@ -390,8 +389,8 @@ export async function buildRoutes(app: FastifyInstance) {
         record.targets.map(async (target) => {
           const iconBitmap = extractIconBitmap(target.metadata);
           if (!iconBitmap) return null;
-          const resolved = resolveIconPath(iconBitmap.path);
-          if (!resolved || !fs.existsSync(resolved)) return null;
+          const source = resolveIconSource(iconBitmap.path);
+          if (!source) return null;
           return {
             targetId: target.id,
             bundleId: target.bundleId,
@@ -403,9 +402,8 @@ export async function buildRoutes(app: FastifyInstance) {
               sizeBytes: iconBitmap.sizeBytes,
               sourcePath: iconBitmap.sourcePath,
             },
-            url: `${baseUrl}/builds/${record.id}/icons/${target.id}`,
+            url: source.kind === "url" ? source.url : `${baseUrl}/builds/${record.id}/icons/${target.id}`,
             contentType: "image/png",
-            dataUrl: await readIconDataUrl(resolved),
           };
         }),
       )
@@ -433,11 +431,18 @@ export async function buildRoutes(app: FastifyInstance) {
     if (!iconBitmap) {
       return reply.status(404).send({ error: "icon_not_found" });
     }
-    const resolved = resolveIconPath(iconBitmap.path);
-    if (!resolved || !fs.existsSync(resolved)) {
+    const source = resolveIconSource(iconBitmap.path);
+    if (!source) {
       return reply.status(404).send({ error: "icon_not_found" });
     }
-    reply.type("image/png");
-    return reply.send(fs.createReadStream(resolved));
+    if (source.kind === "url") {
+      return reply.redirect(source.url);
+    }
+    const signedUrl = await presignStorageObject({
+      bucket: source.bucket,
+      key: source.key,
+      expiresIn: 900,
+    });
+    return reply.redirect(signedUrl);
   });
 }

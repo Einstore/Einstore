@@ -29,7 +29,7 @@ import {
   securityAudits,
   securityPolicies,
 } from "../data/mock";
-import { API_BASE_URL, apiFetch, apiUpload } from "../lib/api";
+import { API_BASE_URL, apiFetch } from "../lib/api";
 import { buildFeatureFlagMap, getDefaultFeatureFlags } from "../lib/featureFlags";
 import {
   pickPrimaryIcon,
@@ -532,8 +532,6 @@ const AppRoutes = () => {
         throw toError("INGEST-TOO-LARGE", t("upload.error.tooLarge", "File exceeds 8GB limit"));
       }
 
-      let primaryError: Error | null = null;
-
       try {
         const presign = await apiFetch<{ uploadUrl: string; key: string; headers?: Record<string, string> }>(
           "/ingest/upload-url",
@@ -585,27 +583,7 @@ const AppRoutes = () => {
           );
         });
       } catch (err) {
-        primaryError =
-          err instanceof Error ? err : toError("INGEST-UNKNOWN", t("upload.error.failed", "Upload failed"));
-        // Fallback to legacy multipart upload
-        const fallbackForm = new FormData();
-        fallbackForm.append("file", file);
-        try {
-          await apiUpload("/ingest/upload", fallbackForm);
-        } catch (fallbackErr) {
-          const fallbackCode =
-            fallbackErr instanceof Error && (fallbackErr as any).code
-              ? (fallbackErr as any).code
-              : "INGEST-FALLBACK";
-          const message =
-            fallbackErr instanceof Error
-              ? fallbackErr.message
-              : t("upload.error.fallback", "Fallback upload failed");
-          throw toError(
-            fallbackCode,
-            `${message}; primary=${primaryError.message}`
-          );
-        }
+        throw err instanceof Error ? err : toError("INGEST-UNKNOWN", t("upload.error.failed", "Upload failed"));
       }
 
       await loadApps();

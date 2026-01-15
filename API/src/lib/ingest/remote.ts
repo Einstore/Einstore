@@ -1,5 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
 import { PlatformKind, Prisma, TargetRole } from "@prisma/client";
 import { prisma } from "../prisma.js";
 
@@ -40,6 +38,7 @@ type FunctionIosResult = {
   buildNumber: string;
   targets: FunctionTarget[];
   entitlements?: FunctionEntitlements;
+  iconPath?: string | null;
   iconBase64?: string | null;
   iconWidth?: number | null;
   iconHeight?: number | null;
@@ -64,37 +63,12 @@ type FunctionAndroidResult = {
     permissions: string[];
     icon?: string;
   };
+  iconPath?: string | null;
   iconBase64?: string | null;
   iconWidth?: number | null;
   iconHeight?: number | null;
   iconBytes?: number | null;
   iconSourcePath?: string | null;
-};
-
-const sanitizePathSegment = (value: string) =>
-  value.replace(/[^a-zA-Z0-9._-]+/g, "_");
-
-const writeIconBitmap = (
-  slug: string,
-  iconBase64: string,
-  width: number,
-  height: number,
-  bytes?: number | null,
-  sourcePath?: string | null,
-) => {
-  const buffer = Buffer.from(iconBase64, "base64");
-  const outputDir = path.resolve(process.cwd(), "storage", "ingest", sanitizePathSegment(slug));
-  fs.mkdirSync(outputDir, { recursive: true });
-  const filename = `icon-${width}x${height}.png`;
-  const filePath = path.join(outputDir, filename);
-  fs.writeFileSync(filePath, buffer);
-  return {
-    sourcePath: sourcePath ?? filename,
-    path: filePath,
-    width,
-    height,
-    sizeBytes: bytes ?? buffer.length,
-  };
 };
 
 const deriveAppName = (identifier: string) => {
@@ -164,15 +138,14 @@ export async function ingestIosFromFunction(
   let mainIconBitmap:
     | { sourcePath: string; path: string; width: number; height: number; sizeBytes: number }
     | undefined;
-  if (payload.iconBase64 && payload.iconWidth && payload.iconHeight) {
-    mainIconBitmap = writeIconBitmap(
-      payload.identifier,
-      payload.iconBase64,
-      payload.iconWidth,
-      payload.iconHeight,
-      payload.iconBytes,
-      payload.iconSourcePath,
-    );
+  if (payload.iconPath && payload.iconWidth && payload.iconHeight) {
+    mainIconBitmap = {
+      sourcePath: payload.iconSourcePath ?? payload.iconPath,
+      path: payload.iconPath,
+      width: payload.iconWidth,
+      height: payload.iconHeight,
+      sizeBytes: payload.iconBytes ?? undefined,
+    };
   }
 
   for (const target of payload.targets) {
@@ -296,15 +269,14 @@ export async function ingestAndroidFromFunction(
   let iconBitmap:
     | { sourcePath: string; path: string; width: number; height: number; sizeBytes: number }
     | undefined;
-  if (payload.iconBase64 && payload.iconWidth && payload.iconHeight) {
-    iconBitmap = writeIconBitmap(
-      payload.packageName,
-      payload.iconBase64,
-      payload.iconWidth,
-      payload.iconHeight,
-      payload.iconBytes,
-      payload.iconSourcePath,
-    );
+  if (payload.iconPath && payload.iconWidth && payload.iconHeight) {
+    iconBitmap = {
+      sourcePath: payload.iconSourcePath ?? payload.iconPath,
+      path: payload.iconPath,
+      width: payload.iconWidth,
+      height: payload.iconHeight,
+      sizeBytes: payload.iconBytes ?? undefined,
+    };
   }
 
   const target = await prisma.target.create({

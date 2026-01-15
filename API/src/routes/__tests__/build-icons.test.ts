@@ -1,6 +1,4 @@
-import fs from "node:fs";
-import path from "node:path";
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import Fastify from "fastify";
 const prismaMock = vi.hoisted(() => ({
   build: { findFirst: vi.fn() },
@@ -68,16 +66,16 @@ vi.mock("../../auth/service.js", () => ({
   },
 }));
 
+const presignStorageObjectMock = vi.fn();
+
+vi.mock("../../lib/storage-presign.js", () => ({
+  presignStorageObject: presignStorageObjectMock,
+}));
+
 const { registerRoutes } = await import("../index.js");
-
-const PNG_BASE64 =
-  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAOaX2zQAAAAASUVORK5CYII=";
-
-const storageRoot = path.resolve(process.cwd(), "storage", "ingest");
 
 describe("GET /builds/:id/icons", () => {
   const app = Fastify();
-  let iconDir = "";
   let iconPath = "";
 
   beforeAll(async () => {
@@ -90,10 +88,8 @@ describe("GET /builds/:id/icons", () => {
   });
 
   beforeEach(() => {
-    fs.mkdirSync(storageRoot, { recursive: true });
-    iconDir = fs.mkdtempSync(path.join(storageRoot, "test-icon-"));
-    iconPath = path.join(iconDir, "icon-1x1.png");
-    fs.writeFileSync(iconPath, Buffer.from(PNG_BASE64, "base64"));
+    iconPath = "spaces://einstore-local/icons/icon-1x1.png";
+    presignStorageObjectMock.mockResolvedValue("https://storage.local/icon-1x1.png");
 
     prismaMock.build.findFirst.mockResolvedValue({
       id: "build-1",
@@ -118,12 +114,6 @@ describe("GET /builds/:id/icons", () => {
     });
   });
 
-  afterEach(() => {
-    if (iconDir) {
-      fs.rmSync(iconDir, { recursive: true, force: true });
-    }
-  });
-
   it("returns icon metadata with URLs", async () => {
     const response = await app.inject({
       method: "GET",
@@ -134,16 +124,16 @@ describe("GET /builds/:id/icons", () => {
     const payload = JSON.parse(response.body);
     expect(payload.items).toHaveLength(1);
     expect(payload.items[0].url).toContain("/builds/build-1/icons/target-1");
-    expect(payload.items[0].dataUrl).toMatch(/^data:image\/png;base64,/);
+    expect(payload.items[0].dataUrl).toBeUndefined();
   });
 
-  it("streams the icon image", async () => {
+  it("redirects to the stored icon", async () => {
     const response = await app.inject({
       method: "GET",
       url: "/builds/build-1/icons/target-1",
       headers: { "x-team-id": "team-1" },
     });
-    expect(response.statusCode).toBe(200);
-    expect(response.headers["content-type"]).toContain("image/png");
+    expect(response.statusCode).toBe(302);
+    expect(response.headers.location).toBe("https://storage.local/icon-1x1.png");
   });
 });

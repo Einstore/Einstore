@@ -1,11 +1,14 @@
 import { z } from "zod";
 import { pipeline } from "node:stream/promises";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import { GetObjectCommand, HeadObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { HeadObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { ingestAndroidApk } from "../lib/ingest/android.js";
 import { ingestIosIpa } from "../lib/ingest/ios.js";
+import { ingestAndroidFromFunction, ingestIosFromFunction } from "../lib/ingest/remote.js";
 import { ensureZipReadable, isInvalidArchiveError } from "../lib/zip.js";
 import { requireTeamOrApiKey } from "../auth/guard.js";
 import { broadcastBadgesUpdate } from "../lib/realtime.js";
@@ -30,6 +33,27 @@ const completeUploadSchema = z.object({
     filename: z.string().min(1).optional(),
     sizeBytes: z.coerce.number().int().positive().optional(),
 });
+const execFileAsync = promisify(execFile);
+const ingestFunctionBaseSchema = z.object({
+    ok: z.boolean(),
+    error: z.string().optional(),
+}).passthrough();
+const ingestFunctionAndroidSchema = z.object({
+    ok: z.literal(true),
+    packageName: z.string().min(1),
+    versionName: z.string().min(1),
+    versionCode: z.string().min(1),
+    permissions: z.array(z.string()),
+}).passthrough();
+const ingestFunctionIosSchema = z.object({
+    ok: z.literal(true),
+    appName: z.string().min(1),
+    identifier: z.string().min(1),
+    version: z.string().min(1),
+    buildNumber: z.string().min(1),
+    targets: z.array(z.any()),
+    entitlements: z.any().optional(),
+}).passthrough();
 const parseContentLength = (value) => {
     const raw = Array.isArray(value) ? value[0] : value;
     if (typeof raw !== "string")
@@ -144,6 +168,80 @@ const resolveSpacesConfig = () => {
         return null;
     return { client, bucket };
 };
+const resolveIngestFunctionUrl = () => {
+    const raw = process.env.INGEST_FUNCTION_URL;
+    return typeof raw === "string" && raw.trim().length > 0 ? raw.trim() : null;
+};
+const resolveLocalIngestWorkers = () => {
+    const raw = process.env.LOCAL_INGEST_WORKERS;
+    const parsed = raw ? Number.parseInt(raw, 10) : NaN;
+    if (Number.isFinite(parsed)) {
+        return Math.min(Math.max(parsed, 1), 20);
+    }
+    return 10;
+};
+const isLocalIngestUrl = (url) => {
+    try {
+        const parsed = new URL(url);
+        return parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1";
+    }
+    catch {
+        return false;
+    }
+};
+const buildHealthUrl = (url) => `${url.replace(/\/+$/, "")}/health`;
+const fetchWithTimeout = async (url, timeoutMs) => {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+        return await fetch(url, { signal: controller.signal });
+    }
+    finally {
+        clearTimeout(timeout);
+    }
+};
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+let localIngestBoot = null;
+const ensureLocalIngestRunning = async (url) => {
+    if (process.env.NODE_ENV === "production")
+        return true;
+    if (!isLocalIngestUrl(url))
+        return true;
+    if (localIngestBoot)
+        return localIngestBoot;
+    localIngestBoot = (async () => {
+        const composePath = path.resolve(process.cwd(), "..", "functions", "ingest", "docker-compose.yml");
+        const workers = resolveLocalIngestWorkers();
+        await execFileAsync("docker", ["compose", "-f", composePath, "up", "--build", "-d", "--scale", `ingest-function=${workers}`], { cwd: path.dirname(composePath) });
+        for (let attempt = 0; attempt < 20; attempt += 1) {
+            try {
+                const health = await fetchWithTimeout(buildHealthUrl(url), 1500);
+                if (health.ok)
+                    return true;
+            }
+            catch {
+                // ignore
+            }
+            await sleep(1000);
+        }
+        return false;
+    })().finally(() => {
+        localIngestBoot = null;
+    });
+    return localIngestBoot;
+};
+const callIngestFunction = async (url, payload) => {
+    const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+        const message = await response.text();
+        throw new Error(`ingest_function_failed: ${response.status} ${message}`);
+    }
+    return response.json();
+};
 const headSpacesObject = async (bucket, key) => {
     const spaces = resolveSpacesConfig();
     if (!spaces)
@@ -153,22 +251,6 @@ const headSpacesObject = async (bucket, key) => {
         size: typeof response.ContentLength === "number" ? BigInt(response.ContentLength) : null,
         contentType: response.ContentType ?? null,
     };
-};
-const downloadSpacesObject = async (bucket, key, extension) => {
-    const spaces = resolveSpacesConfig();
-    if (!spaces) {
-        throw new Error("Spaces not configured");
-    }
-    const uploadDir = path.resolve(process.cwd(), "storage", "uploads");
-    await fs.promises.mkdir(uploadDir, { recursive: true });
-    const filePath = path.join(uploadDir, `${crypto.randomUUID()}${extension}`);
-    const object = await spaces.client.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
-    if (!object.Body) {
-        throw new Error("Empty object");
-    }
-    await pipeline(object.Body, fs.createWriteStream(filePath));
-    const stats = await fs.promises.stat(filePath);
-    return { filePath, sizeBytes: BigInt(stats.size) };
 };
 const deleteSpacesObject = async (bucket, key) => {
     const spaces = resolveSpacesConfig();
@@ -267,54 +349,65 @@ export async function pipelineRoutes(app) {
             }
             throw error;
         }
-        let filePath = null;
+        const ingestFunctionUrl = resolveIngestFunctionUrl();
+        if (!ingestFunctionUrl) {
+            return reply.status(500).send({
+                error: "ingest_function_missing",
+                message: "Ingest function URL is not configured.",
+            });
+        }
+        const localReady = await ensureLocalIngestRunning(ingestFunctionUrl);
+        if (!localReady) {
+            return reply.status(503).send({
+                error: "ingest_function_unavailable",
+                message: "Local ingest function is unavailable.",
+            });
+        }
         try {
-            const download = await downloadSpacesObject(spaces.bucket, parsed.data.key, extension);
-            filePath = download.filePath;
-            try {
-                if (billingGuard?.assertCanUploadBytes) {
-                    await billingGuard.assertCanUploadBytes({ teamId, requiredBytes: download.sizeBytes });
-                }
-                await ensureStorageCapacity(teamId, download.sizeBytes);
+            const storagePath = `spaces://${spaces.bucket}/${parsed.data.key}`;
+            const functionResult = await callIngestFunction(ingestFunctionUrl, {
+                kind: extension === ".apk" ? "apk" : "ipa",
+                storagePath,
+            });
+            const baseParsed = ingestFunctionBaseSchema.safeParse(functionResult);
+            if (!baseParsed.success) {
+                return reply.status(502).send({
+                    error: "ingest_function_failed",
+                    message: "Ingest function returned an invalid payload.",
+                });
             }
-            catch (error) {
-                await fs.promises.rm(filePath, { force: true }).catch(() => undefined);
-                if (error.code && error.code !== "storage_limit_exceeded") {
-                    return sendBillingError(reply, error);
-                }
-                if (error.code === "storage_limit_exceeded") {
-                    return reply
-                        .status(error.statusCode ?? 413)
-                        .send({ error: "storage_limit_exceeded", message: error.message });
-                }
-                throw error;
+            if (!baseParsed.data.ok) {
+                return reply.status(502).send({
+                    error: "ingest_function_failed",
+                    message: baseParsed.data.error || "Ingest function failed.",
+                });
             }
             const userId = request.auth?.user.id;
-            try {
-                await ensureZipReadable(filePath);
-            }
-            catch (error) {
-                if (isInvalidArchiveError(error)) {
-                    await fs.promises.rm(filePath, { force: true });
-                    return reply.status(400).send({ error: "invalid_archive" });
-                }
-                throw error;
-            }
+            const sizeBytes = Number(expectedSize);
             if (extension === ".apk") {
-                const result = await ingestAndroidApk(filePath, teamId, userId, { billingGuard });
-                await deleteSpacesObject(spaces.bucket, parsed.data.key);
+                const parsedPayload = ingestFunctionAndroidSchema.safeParse(functionResult);
+                if (!parsedPayload.success) {
+                    return reply.status(502).send({
+                        error: "ingest_function_failed",
+                        message: "Ingest function returned an invalid Android payload.",
+                    });
+                }
+                const result = await ingestAndroidFromFunction(parsedPayload.data, parsed.data.key, sizeBytes, teamId, userId, { billingGuard });
                 await broadcastBadgesUpdate(teamId).catch(() => undefined);
                 return reply.status(201).send({ status: "ingested", result });
             }
-            const result = await ingestIosIpa(filePath, teamId, userId, { billingGuard });
-            await deleteSpacesObject(spaces.bucket, parsed.data.key);
+            const parsedPayload = ingestFunctionIosSchema.safeParse(functionResult);
+            if (!parsedPayload.success) {
+                return reply.status(502).send({
+                    error: "ingest_function_failed",
+                    message: "Ingest function returned an invalid iOS payload.",
+                });
+            }
+            const result = await ingestIosFromFunction(parsedPayload.data, parsed.data.key, sizeBytes, teamId, userId, { billingGuard });
             await broadcastBadgesUpdate(teamId).catch(() => undefined);
             return reply.status(201).send({ status: "ingested", result });
         }
         catch (error) {
-            if (filePath) {
-                await fs.promises.rm(filePath, { force: true }).catch(() => undefined);
-            }
             if (isInvalidArchiveError(error)) {
                 return reply.status(400).send({ error: "invalid_archive" });
             }

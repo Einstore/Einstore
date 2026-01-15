@@ -163,19 +163,7 @@ vi.mock("../../auth/service.js", () => ({
   authService: authServiceMock,
 }));
 
-const ingestAndroidMock = vi.fn();
-const ingestIosMock = vi.fn();
-
-vi.mock("../../lib/ingest/android.js", () => ({
-  ingestAndroidApk: ingestAndroidMock,
-}));
-
-vi.mock("../../lib/ingest/ios.js", () => ({
-  ingestIosIpa: ingestIosMock,
-}));
-
 vi.mock("../../lib/zip.js", () => ({
-  ensureZipReadable: vi.fn().mockResolvedValue(undefined),
   isInvalidArchiveError: vi.fn(() => false),
 }));
 
@@ -347,8 +335,6 @@ describe("routes", () => {
       { userId: "user-1", buildId: ids.buildId, _count: { _all: 1 } },
     ]);
 
-    ingestAndroidMock.mockResolvedValue({ buildId: "build-android" });
-    ingestIosMock.mockResolvedValue({ buildId: "build-ios" });
     resolveAndroidMock.mockResolvedValue({ status: "resolved" });
 
     prismaMock.featureFlag.create.mockResolvedValue({ id: "flag-1", key: "beta.feature" });
@@ -822,30 +808,4 @@ describe("routes", () => {
     );
   });
 
-  it("POST /ingest (apk + ipa)", async () => {
-    const apkResponse = await postJson(
-      "/ingest",
-      { filePath: "/tmp/app.apk", kind: "apk" },
-      { authorization: "Bearer token" }
-    );
-    expect(apkResponse.statusCode).toBe(201);
-    expect(ingestAndroidMock).toHaveBeenCalledWith(
-      "/tmp/app.apk",
-      "team-1",
-      "user-1",
-      { billingGuard: undefined },
-    );
-    const ipaResponse = await postJson(
-      "/ingest",
-      { filePath: "/tmp/app.ipa", kind: "ipa" },
-      { authorization: "Bearer token" }
-    );
-    expect(ipaResponse.statusCode).toBe(201);
-    expect(ingestIosMock).toHaveBeenCalledWith(
-      "/tmp/app.ipa",
-      "team-1",
-      "user-1",
-      { billingGuard: undefined },
-    );
-  });
 });

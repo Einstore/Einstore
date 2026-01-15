@@ -202,9 +202,7 @@ $799 / month
 - [ ] **App creation** — `POST /apps`: gate with `canCreateApp` using team app count + plan max (Free:1, Starter:3, Team/Enterprise: unlimited); include upgrade suggestion on rejection.
 - [ ] **Build record creation** — `POST /builds`: gate with `canUploadBuild` using per-app build cap (Starter:10/app) and storage forecast (`sizeBytes`); if denied, return `storage_limit_exceeded` or `build_limit_exceeded` with `upgrade_suggestion`.
 - [ ] **Upload URLs (presigned)** — `POST /ingest/upload-url`: call `canUploadBuild` with declared `sizeBytes`; deny before issuing signed URL.
-- [ ] **Finalize remote upload** — `POST /ingest/complete-upload`: re-check `canUploadBuild` with detected `expectedSize`; abort before downloading from Spaces.
-- [ ] **Direct multipart ingest** — `POST /ingest/upload` and `POST /store/upload`: gate with `canUploadBuild` before writing to disk; reuse cached decision for the session.
-- [ ] **Ingest processing** — `POST /ingest`: ensure Billing check was done earlier; enforce again when linking build to app/version (to prevent bypass).
+- [ ] **Finalize remote upload** — `POST /ingest/complete-upload`: re-check `canUploadBuild` with detected `expectedSize`; abort before calling ingest processing.
 - [ ] **Download token issuance (iOS)** — `POST /builds/:id/ios/install-link`: call `canDownloadBuild`; refuse to mint manifest/download tokens when over transfer cap.
 - [ ] **Manifest generation (iOS)** — `GET /builds/:id/ios/manifest`: before presigning S3 URL or returning local path, call `canDownloadBuild`; on deny, send structured error (no manifest/URL).
 - [ ] **File delivery (iOS)** — `GET /builds/:id/ios/download`: re-check `canDownloadBuild` right before redirect/stream to avoid cached tokens bypassing updated quota.

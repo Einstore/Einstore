@@ -212,16 +212,21 @@ const normalizeIosIconPng = async (buffer) => {
 };
 
 class S3RandomAccessReader extends yauzl.RandomAccessReader {
-  constructor(client, bucket, key) {
+  constructor(client, bucket, key, stats) {
     super();
     this.client = client;
     this.bucket = bucket;
     this.key = key;
+    this.stats = stats || null;
   }
 
   _readStreamForRange(start, end) {
     const pass = new PassThrough();
     const range = `bytes=${start}-${end - 1}`;
+    if (this.stats) {
+      this.stats.requests += 1;
+      this.stats.bytesRequested += Math.max(0, end - start);
+    }
     this.client
       .send(
         new GetObjectCommand({
@@ -235,6 +240,11 @@ class S3RandomAccessReader extends yauzl.RandomAccessReader {
           pass.emit("error", new Error("Missing S3 body"));
           return;
         }
+        if (this.stats) {
+          response.Body.on("data", (chunk) => {
+            this.stats.bytesRead += chunk.length;
+          });
+        }
         response.Body.on("error", (err) => pass.emit("error", err));
         response.Body.pipe(pass);
       })
@@ -243,13 +253,19 @@ class S3RandomAccessReader extends yauzl.RandomAccessReader {
   }
 }
 
-const openZipFromSpaces = async (client, bucket, key) => {
+const createTransferStats = () => ({
+  bytesRequested: 0,
+  bytesRead: 0,
+  requests: 0,
+});
+
+const openZipFromSpaces = async (client, bucket, key, stats) => {
   const head = await client.send(new HeadObjectCommand({ Bucket: bucket, Key: key }));
   const size = Number(head.ContentLength || 0);
   if (!size) {
     throw new Error("Unable to determine object size");
   }
-  const reader = new S3RandomAccessReader(client, bucket, key);
+  const reader = new S3RandomAccessReader(client, bucket, key, stats);
   return new Promise((resolve, reject) => {
     yauzl.fromRandomAccessReader(reader, size, { lazyEntries: true }, (err, zipfile) => {
       if (err || !zipfile) {
@@ -261,8 +277,8 @@ const openZipFromSpaces = async (client, bucket, key) => {
   });
 };
 
-const withZipfile = async (client, bucket, key, handler) => {
-  const zipfile = await openZipFromSpaces(client, bucket, key);
+const withZipfile = async (client, bucket, key, handler, stats) => {
+  const zipfile = await openZipFromSpaces(client, bucket, key, stats);
   try {
     return await handler(zipfile);
   } finally {
@@ -658,23 +674,39 @@ exports.main = async (args) => {
   const bucket = process.env.SPACES_BUCKET;
   const { bucket: inputBucket, key } = resolveBucketKey(storagePath);
   const objectBucket = inputBucket || bucket;
+  const debugTransfer = ["true", "1", "yes"].includes(
+    String(process.env.INGEST_DEBUG_TRANSFER || "").toLowerCase(),
+  );
+  const transferStats = debugTransfer ? createTransferStats() : null;
 
-  const entryNames = await withZipfile(client, objectBucket, key, listZipEntries);
+  const entryNames = await withZipfile(client, objectBucket, key, listZipEntries, transferStats);
 
   if (kind === "ipa") {
-    const targets = await withZipfile(client, objectBucket, key, (zip) =>
-      parseIosTargets(zip, entryNames),
+    const targets = await withZipfile(
+      client,
+      objectBucket,
+      key,
+      (zip) => parseIosTargets(zip, entryNames),
+      transferStats,
     );
     if (!targets.length) {
       return { ok: false, error: "No targets found" };
     }
     const mainTarget = targets[0];
-    const entitlements = await withZipfile(client, objectBucket, key, (zip) =>
-      extractIosEntitlements(zip, entryNames, mainTarget.root),
+    const entitlements = await withZipfile(
+      client,
+      objectBucket,
+      key,
+      (zip) => extractIosEntitlements(zip, entryNames, mainTarget.root),
+      transferStats,
     );
     const iconNames = collectIosIconNames(mainTarget.info);
-    const icon = await withZipfile(client, objectBucket, key, (zip) =>
-      extractBestIcon(zip, entryNames, mainTarget.root, iconNames),
+    const icon = await withZipfile(
+      client,
+      objectBucket,
+      key,
+      (zip) => extractBestIcon(zip, entryNames, mainTarget.root, iconNames),
+      transferStats,
     );
     let iconPath = null;
     let iconBase64 = null;
@@ -693,7 +725,7 @@ exports.main = async (args) => {
       iconSourcePath = icon.name;
       iconPath = await uploadToSpaces(client, bucket, iconKey, normalized, "image/png");
     }
-    return {
+    const response = {
       ok: true,
       kind,
       appName: mainTarget.name,
@@ -709,6 +741,12 @@ exports.main = async (args) => {
       iconBytes,
       iconSourcePath,
     };
+    if (transferStats) {
+      response.transferBytesRequested = transferStats.bytesRequested;
+      response.transferBytesRead = transferStats.bytesRead;
+      response.transferRequests = transferStats.requests;
+    }
+    return response;
   }
 
   if (kind === "apk") {
@@ -716,13 +754,21 @@ exports.main = async (args) => {
     if (!manifestEntry) {
       return { ok: false, error: "Missing AndroidManifest.xml" };
     }
-    const manifestBuffer = await withZipfile(client, objectBucket, key, (zip) =>
-      readEntryBuffer(zip, manifestEntry),
+    const manifestBuffer = await withZipfile(
+      client,
+      objectBucket,
+      key,
+      (zip) => readEntryBuffer(zip, manifestEntry),
+      transferStats,
     );
     const manifest = parseAndroidManifest(manifestBuffer);
     const iconName = parseAndroidIconName(manifest.application?.icon);
-    const icon = await withZipfile(client, objectBucket, key, (zip) =>
-      extractBestIcon(zip, entryNames, "res/", iconName ? [iconName] : null),
+    const icon = await withZipfile(
+      client,
+      objectBucket,
+      key,
+      (zip) => extractBestIcon(zip, entryNames, "res/", iconName ? [iconName] : null),
+      transferStats,
     );
     let iconPath = null;
     let iconBase64 = null;
@@ -739,7 +785,7 @@ exports.main = async (args) => {
       iconSourcePath = icon.name;
       iconPath = await uploadToSpaces(client, bucket, iconKey, icon.buffer, "image/png");
     }
-    return {
+    const response = {
       ok: true,
       kind,
       packageName: manifest.package,
@@ -765,6 +811,12 @@ exports.main = async (args) => {
       iconSourcePath,
       permissions: manifest.usesPermissions || [],
     };
+    if (transferStats) {
+      response.transferBytesRequested = transferStats.bytesRequested;
+      response.transferBytesRead = transferStats.bytesRead;
+      response.transferRequests = transferStats.requests;
+    }
+    return response;
   }
 
   return { ok: false, error: `Unsupported kind ${kind}` };
