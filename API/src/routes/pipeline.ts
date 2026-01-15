@@ -7,6 +7,7 @@ import path from "node:path";
 import { GetObjectCommand, HeadObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { ingestAndroidApk } from "../lib/ingest/android.js";
 import { ingestIosIpa } from "../lib/ingest/ios.js";
+import { ingestAndroidFromFunction, ingestIosFromFunction } from "../lib/ingest/remote.js";
 import { ensureZipReadable, isInvalidArchiveError } from "../lib/zip.js";
 import { requireTeamOrApiKey } from "../auth/guard.js";
 import { broadcastBadgesUpdate } from "../lib/realtime.js";
@@ -169,6 +170,24 @@ const resolveSpacesConfig = () => {
   return { client, bucket };
 };
 
+const resolveIngestFunctionUrl = () => {
+  const raw = process.env.INGEST_FUNCTION_URL;
+  return typeof raw === "string" && raw.trim().length > 0 ? raw.trim() : null;
+};
+
+const callIngestFunction = async (url: string, payload: Record<string, unknown>) => {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(`ingest_function_failed: ${response.status} ${message}`);
+  }
+  return response.json();
+};
+
 const headSpacesObject = async (bucket: string, key: string) => {
   const spaces = resolveSpacesConfig();
   if (!spaces) return null;
@@ -294,6 +313,52 @@ export async function pipelineRoutes(app: FastifyInstance) {
           .send({ error: "storage_limit_exceeded", message: (error as { message?: string }).message });
       }
       throw error;
+    }
+
+    const ingestFunctionUrl = resolveIngestFunctionUrl();
+    if (ingestFunctionUrl) {
+      try {
+        const storagePath = `spaces://${spaces.bucket}/${parsed.data.key}`;
+        const functionResult = await callIngestFunction(ingestFunctionUrl, {
+          kind: extension === ".apk" ? "apk" : "ipa",
+          storagePath,
+        });
+        if (!functionResult?.ok) {
+          return reply.status(502).send({
+            error: "ingest_function_failed",
+            message: functionResult?.error || "Ingest function failed.",
+          });
+        }
+        const userId = request.auth?.user.id;
+        const sizeBytes = Number(expectedSize);
+        if (extension === ".apk") {
+          const result = await ingestAndroidFromFunction(
+            functionResult,
+            parsed.data.key,
+            sizeBytes,
+            teamId,
+            userId,
+            { billingGuard },
+          );
+          await broadcastBadgesUpdate(teamId).catch(() => undefined);
+          return reply.status(201).send({ status: "ingested", result });
+        }
+        const result = await ingestIosFromFunction(
+          functionResult,
+          parsed.data.key,
+          sizeBytes,
+          teamId,
+          userId,
+          { billingGuard },
+        );
+        await broadcastBadgesUpdate(teamId).catch(() => undefined);
+        return reply.status(201).send({ status: "ingested", result });
+      } catch (error) {
+        return reply.status(502).send({
+          error: "ingest_function_failed",
+          message: (error as Error).message || "Ingest function failed.",
+        });
+      }
     }
 
     let filePath: string | null = null;

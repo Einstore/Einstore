@@ -40,6 +40,50 @@ const readPngDimensions = (buffer) => {
   return { width, height };
 };
 
+const mapDeviceFamily = (family) => {
+  if (!Array.isArray(family)) return [];
+  return family.map((value) => {
+    switch (value) {
+      case 1:
+        return "iphone";
+      case 2:
+        return "ipad";
+      case 3:
+        return "appletv";
+      case 4:
+        return "watch";
+      case 6:
+        return "carplay";
+      default:
+        return `unknown-${value}`;
+    }
+  });
+};
+
+const resolveRole = (extensionPoint) => {
+  if (!extensionPoint) return "app";
+  const lower = extensionPoint.toLowerCase();
+  if (lower.includes("widget")) return "widget";
+  if (lower.includes("clip")) return "clip";
+  return "extension";
+};
+
+const resolveTargetRoots = (entryNames) => {
+  const roots = new Set();
+  for (const entry of entryNames) {
+    if (/^Payload\\/[^/]+\\.app\\/Info\\.plist$/.test(entry)) {
+      roots.add(entry.replace(/Info\\.plist$/, ""));
+    }
+    if (/^Payload\\/[^/]+\\.app\\/PlugIns\\/[^/]+\\.appex\\/Info\\.plist$/.test(entry)) {
+      roots.add(entry.replace(/Info\\.plist$/, ""));
+    }
+    if (/^Payload\\/[^/]+\\.app\\/Watch\\/[^/]+\\.app\\/Info\\.plist$/.test(entry)) {
+      roots.add(entry.replace(/Info\\.plist$/, ""));
+    }
+  }
+  return Array.from(roots);
+};
+
 let pngValidatorPromise = null;
 
 const getPngValidator = async () => {
@@ -233,10 +277,11 @@ const extractBestIcon = async (zipfile, entryNames, rootPrefix) => {
 
 const parseIosTargets = async (zipfile, entryNames) => {
   const targets = [];
-  const plistEntries = entryNames.filter((name) => name.endsWith("Info.plist"));
+  const targetRoots = resolveTargetRoots(entryNames);
+  const plistEntries = targetRoots.map((root) => `${root}Info.plist`);
   const buffers = await readEntryBuffers(zipfile, plistEntries);
-  for (const entryName of plistEntries) {
-    if (!entryName.includes("Payload/") || !entryName.includes(".app/")) continue;
+  for (const root of targetRoots) {
+    const entryName = `${root}Info.plist`;
     const buffer = buffers.get(entryName);
     if (!buffer) continue;
     const info = plist.parse(buffer.toString("utf8"));
@@ -245,10 +290,167 @@ const parseIosTargets = async (zipfile, entryNames) => {
     const name = String(info.CFBundleDisplayName || info.CFBundleName || info.CFBundleExecutable || bundleId);
     const version = String(info.CFBundleShortVersionString || info.CFBundleVersion || "");
     const build = String(info.CFBundleVersion || "");
-    const root = entryName.replace(/Info\.plist$/, "");
-    targets.push({ entryName, root, bundleId, name, version, build, info });
+    const deviceFamily = Array.isArray(info.UIDeviceFamily) ? info.UIDeviceFamily : undefined;
+    const supportedDevices = mapDeviceFamily(deviceFamily);
+    const orientations = [
+      ...(Array.isArray(info.UISupportedInterfaceOrientations) ? info.UISupportedInterfaceOrientations : []),
+      ...(Array.isArray(info["UISupportedInterfaceOrientations~ipad"])
+        ? info["UISupportedInterfaceOrientations~ipad"]
+        : []),
+    ];
+    const minOsVersion = info.MinimumOSVersion ? String(info.MinimumOSVersion) : undefined;
+    const extension = info.NSExtension || undefined;
+    const extensionPoint =
+      extension && typeof extension === "object" && extension.NSExtensionPointIdentifier
+        ? String(extension.NSExtensionPointIdentifier)
+        : undefined;
+    const platform = supportedDevices.includes("watch") || info.WKWatchKitApp ? "watchos" : "ios";
+    const role = resolveRole(extensionPoint);
+    targets.push({
+      entryName,
+      root,
+      bundleId,
+      name,
+      version,
+      build,
+      supportedDevices,
+      orientations,
+      minOsVersion,
+      platform,
+      role,
+      info,
+    });
   }
   return targets;
+};
+
+const tryParsePlist = (buffer) => {
+  try {
+    return plist.parse(buffer.toString("utf8"));
+  } catch (error) {
+    return null;
+  }
+};
+
+const extractXmlPlist = (buffer) => {
+  const xmlStart = buffer.indexOf("<?xml");
+  const plistStart = buffer.indexOf("<plist");
+  const start = xmlStart !== -1 ? xmlStart : plistStart;
+  const end = buffer.indexOf("</plist>");
+  if (start === -1 || end === -1 || end <= start) return null;
+  return buffer.subarray(start, end + "</plist>".length).toString("utf8");
+};
+
+const parseEmbeddedMobileProvision = (buffer) => {
+  const xml = extractXmlPlist(buffer);
+  if (!xml) return null;
+  try {
+    return plist.parse(xml);
+  } catch (error) {
+    return null;
+  }
+};
+
+const summarizeProvisioningProfile = (profile) => {
+  const provisionedDevices = Array.isArray(profile.ProvisionedDevices)
+    ? profile.ProvisionedDevices.filter((item) => typeof item === "string")
+    : [];
+  const teamIdentifier = Array.isArray(profile.TeamIdentifier)
+    ? profile.TeamIdentifier.filter((item) => typeof item === "string")
+    : undefined;
+  return {
+    name: typeof profile.Name === "string" ? profile.Name : undefined,
+    uuid: typeof profile.UUID === "string" ? profile.UUID : undefined,
+    teamIdentifier,
+    teamName: typeof profile.TeamName === "string" ? profile.TeamName : undefined,
+    appIdName: typeof profile.AppIDName === "string" ? profile.AppIDName : undefined,
+    creationDate:
+      profile.CreationDate instanceof Date || typeof profile.CreationDate === "string"
+        ? profile.CreationDate
+        : undefined,
+    expirationDate:
+      profile.ExpirationDate instanceof Date || typeof profile.ExpirationDate === "string"
+        ? profile.ExpirationDate
+        : undefined,
+    provisionsAllDevices: profile.ProvisionsAllDevices === true,
+    provisionedDevicesCount: provisionedDevices.length || undefined,
+  };
+};
+
+const resolveDistributionFromProfile = (profile) => {
+  if (!profile) {
+    return { kind: "broken", reason: "provisioning_profile_unreadable" };
+  }
+  if (profile.ProvisionsAllDevices === true) {
+    return { kind: "enterprise", reason: "provisions_all_devices" };
+  }
+  const provisionedDevices = Array.isArray(profile.ProvisionedDevices)
+    ? profile.ProvisionedDevices
+    : [];
+  if (provisionedDevices.length) {
+    return { kind: "adhoc", reason: "provisioned_devices_present" };
+  }
+  return { kind: "appstore", reason: "no_provisioned_devices" };
+};
+
+const extractIosEntitlements = async (zipfile, entryNames, targetRoot) => {
+  const provisioningProfileEntry = entryNames.find(
+    (entry) => entry === `${targetRoot}embedded.mobileprovision`,
+  );
+  const explicitXcentEntry =
+    entryNames.find((entry) => entry === `${targetRoot}archived-expanded-entitlements.xcent`) ??
+    entryNames.find(
+      (entry) => entry.startsWith(targetRoot) && entry.toLowerCase().endsWith(".xcent"),
+    );
+  const wantedEntries = [];
+  if (provisioningProfileEntry) {
+    wantedEntries.push(provisioningProfileEntry);
+  }
+  if (explicitXcentEntry) {
+    wantedEntries.push(explicitXcentEntry);
+  }
+  const buffers = wantedEntries.length > 0 ? await readEntryBuffers(zipfile, wantedEntries) : new Map();
+
+  let entitlements = null;
+  let entitlementsSource;
+  if (explicitXcentEntry) {
+    const entitlementsBuffer = buffers.get(explicitXcentEntry);
+    if (entitlementsBuffer) {
+      entitlements = tryParsePlist(entitlementsBuffer);
+      entitlementsSource = entitlements ? explicitXcentEntry : `${explicitXcentEntry} (unreadable)`;
+    }
+  }
+
+  let provisioningProfile = null;
+  let provisioningProfileSource;
+  let distribution = {
+    kind: "none",
+    reason: "provisioning_profile_missing",
+  };
+
+  if (provisioningProfileEntry) {
+    const profileBuffer = buffers.get(provisioningProfileEntry);
+    provisioningProfileSource = provisioningProfileEntry;
+    if (!profileBuffer) {
+      distribution = { kind: "broken", reason: "provisioning_profile_unreadable" };
+    } else {
+      provisioningProfile = parseEmbeddedMobileProvision(profileBuffer);
+      distribution = resolveDistributionFromProfile(provisioningProfile);
+    }
+  }
+
+  if (!entitlements && provisioningProfile && provisioningProfile.Entitlements) {
+    entitlements = provisioningProfile.Entitlements;
+    entitlementsSource = `${provisioningProfileEntry}:Entitlements`;
+  }
+
+  return {
+    distribution,
+    entitlements,
+    entitlementsSource,
+    provisioningProfile: provisioningProfile ? summarizeProvisioningProfile(provisioningProfile) : null,
+    provisioningProfileSource,
+  };
 };
 
 const parseAndroidManifest = (buffer) => {
@@ -312,12 +514,23 @@ exports.main = async (args) => {
       return { ok: false, error: "No targets found" };
     }
     const mainTarget = targets[0];
+    const entitlements = await extractIosEntitlements(zipfile, entryNames, mainTarget.root);
     const icon = await extractBestIcon(zipfile, entryNames, mainTarget.root);
     let iconPath = null;
+    let iconBase64 = null;
+    let iconWidth = null;
+    let iconHeight = null;
+    let iconBytes = null;
+    let iconSourcePath = null;
     if (icon) {
       const normalized = await normalizeIosIconPng(icon.buffer);
       const dimensions = readPngDimensions(normalized) || { width: icon.width, height: icon.height };
       const iconKey = `extracted/${key}/icon-${dimensions.width}x${dimensions.height}.png`;
+      iconBase64 = normalized.toString("base64");
+      iconWidth = dimensions.width;
+      iconHeight = dimensions.height;
+      iconBytes = normalized.length;
+      iconSourcePath = icon.name;
       iconPath = await uploadToSpaces(client, bucket, iconKey, normalized, "image/png");
     }
     return {
@@ -327,7 +540,14 @@ exports.main = async (args) => {
       identifier: mainTarget.bundleId,
       version: mainTarget.version,
       buildNumber: mainTarget.build,
+      targets,
+      entitlements,
       iconPath,
+      iconBase64,
+      iconWidth,
+      iconHeight,
+      iconBytes,
+      iconSourcePath,
     };
   }
 
@@ -340,8 +560,18 @@ exports.main = async (args) => {
     const manifest = parseAndroidManifest(manifestBuffer);
     const icon = await extractBestIcon(zipfile, entryNames, "res/");
     let iconPath = null;
+    let iconBase64 = null;
+    let iconWidth = null;
+    let iconHeight = null;
+    let iconBytes = null;
+    let iconSourcePath = null;
     if (icon) {
       const iconKey = `extracted/${key}/icon-${icon.width}x${icon.height}.png`;
+      iconBase64 = icon.buffer.toString("base64");
+      iconWidth = icon.width;
+      iconHeight = icon.height;
+      iconBytes = icon.buffer.length;
+      iconSourcePath = icon.name;
       iconPath = await uploadToSpaces(client, bucket, iconKey, icon.buffer, "image/png");
     }
     return {
@@ -350,7 +580,24 @@ exports.main = async (args) => {
       packageName: manifest.package,
       versionName: manifest.versionName,
       versionCode: manifest.versionCode,
+      appName: manifest.application?.label || "",
+      minSdk: manifest.usesSdk?.minSdkVersion ? String(manifest.usesSdk.minSdkVersion) : undefined,
+      targetSdk: manifest.usesSdk?.targetSdkVersion ? String(manifest.usesSdk.targetSdkVersion) : undefined,
+      manifest: {
+        packageName: manifest.package,
+        versionName: manifest.versionName,
+        versionCode: manifest.versionCode,
+        minSdk: manifest.usesSdk?.minSdkVersion ? String(manifest.usesSdk.minSdkVersion) : undefined,
+        targetSdk: manifest.usesSdk?.targetSdkVersion ? String(manifest.usesSdk.targetSdkVersion) : undefined,
+        permissions: manifest.usesPermissions || [],
+        icon: manifest.application?.icon || "",
+      },
       iconPath,
+      iconBase64,
+      iconWidth,
+      iconHeight,
+      iconBytes,
+      iconSourcePath,
       permissions: manifest.usesPermissions || [],
     };
   }
