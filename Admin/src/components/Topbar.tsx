@@ -42,6 +42,7 @@ const Topbar = ({
   const [searchValue, setSearchValue] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [isLocaleMenuOpen, setIsLocaleMenuOpen] = useState(false);
   const emptyResults = useMemo(() => {
     const emptyPage = <T,>(): PaginatedResponse<T> => ({
       items: [],
@@ -55,6 +56,7 @@ const Topbar = ({
   const [searchResults, setSearchResults] = useState<SearchResponse>(emptyResults);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
   const searchRef = useRef<HTMLDivElement | null>(null);
+  const localeMenuRef = useRef<HTMLDivElement | null>(null);
   const avatarUrl = user?.avatarUrl ?? null;
   const userLabel = user?.name || user?.email || user?.username || t("common.user", "User");
   const trimmedQuery = searchValue.trim();
@@ -96,6 +98,18 @@ const Topbar = ({
   }, [isSearchOpen]);
 
   useEffect(() => {
+    if (!isLocaleMenuOpen) return;
+    const handleClick = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (localeMenuRef.current && !localeMenuRef.current.contains(target)) {
+        setIsLocaleMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [isLocaleMenuOpen]);
+
+  useEffect(() => {
     setAvatarFailed(false);
   }, [avatarUrl]);
 
@@ -135,9 +149,14 @@ const Topbar = ({
     setTheme(next);
   };
 
-  const toggleLocale = () => {
-    setLocale(locale === "cs" ? "en" : "cs");
-  };
+  const localeOptions = useMemo(
+    () => [
+      { id: "en" as const, label: t("topbar.locale.en", "English"), flag: "🇺🇸" },
+      { id: "cs" as const, label: t("topbar.locale.cs", "Czech"), flag: "🇨🇿" },
+    ],
+    [t],
+  );
+  const activeLocale = localeOptions.find((option) => option.id === locale) ?? localeOptions[0];
 
   return (
     <header className="z-20 border-b border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-900">
@@ -268,14 +287,50 @@ const Topbar = ({
           </div>
           <div className="flex items-center gap-2">
             <div className="hidden items-center gap-2 md:flex">
-              <button
-                type="button"
-                className="flex h-11 w-11 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100"
-                aria-label={t("topbar.language", "Language")}
-                onClick={toggleLocale}
-              >
-                <Icon name="globe" className="h-4 w-4" />
-              </button>
+              <div ref={localeMenuRef} className="relative">
+                <button
+                  type="button"
+                  className="flex h-11 items-center gap-2 rounded-full px-3 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100"
+                  aria-label={t("topbar.language", "Language")}
+                  aria-expanded={isLocaleMenuOpen}
+                  aria-haspopup="menu"
+                  onClick={() => setIsLocaleMenuOpen((current) => !current)}
+                >
+                  <span className="text-lg leading-none" aria-hidden="true">
+                    {activeLocale.flag}
+                  </span>
+                  <Icon name="chevronDown" className="h-3 w-3" />
+                </button>
+                {isLocaleMenuOpen ? (
+                  <div
+                    className="absolute right-0 mt-2 w-44 rounded-lg border border-slate-200 bg-white p-2 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+                    role="menu"
+                  >
+                    {localeOptions.map((option) => (
+                      <button
+                        key={option.id}
+                        type="button"
+                        className={[
+                          "flex h-10 w-full items-center gap-3 rounded-md px-3 text-left text-sm transition-colors",
+                          option.id === locale
+                            ? "bg-slate-100 text-slate-900 dark:bg-slate-700 dark:text-slate-100"
+                            : "text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700",
+                        ].join(" ")}
+                        onClick={() => {
+                          setLocale(option.id);
+                          setIsLocaleMenuOpen(false);
+                        }}
+                        role="menuitem"
+                      >
+                        <span className="text-lg leading-none" aria-hidden="true">
+                          {option.flag}
+                        </span>
+                        <span>{option.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
             </div>
             <div ref={userMenuRef} className="relative">
               <button
@@ -299,17 +354,22 @@ const Topbar = ({
               {isUserMenuOpen ? (
                 <div className="absolute right-0 mt-2 w-56 rounded-lg border border-slate-200 bg-white p-2 shadow-sm dark:border-slate-700 dark:bg-slate-800">
                   <div className="md:hidden">
-                    <button
-                      type="button"
-                      className="flex h-11 w-full items-center gap-3 rounded-md px-3 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"
-                      onClick={() => {
-                        toggleLocale();
-                        setIsUserMenuOpen(false);
-                      }}
-                    >
-                      <Icon name="globe" className="h-4 w-4" />
-                      {t("topbar.language", "Language")}
-                    </button>
+                    {localeOptions.map((option) => (
+                      <button
+                        key={option.id}
+                        type="button"
+                        className="flex h-11 w-full items-center gap-3 rounded-md px-3 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"
+                        onClick={() => {
+                          setLocale(option.id);
+                          setIsUserMenuOpen(false);
+                        }}
+                      >
+                        <span className="text-lg leading-none" aria-hidden="true">
+                          {option.flag}
+                        </span>
+                        {option.label}
+                      </button>
+                    ))}
                   </div>
                   <div>
                     <button
