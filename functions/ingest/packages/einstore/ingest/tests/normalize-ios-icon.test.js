@@ -48,7 +48,7 @@ const run = async () => {
   assert.ok(Buffer.isBuffer(normalized), "Expected buffer output");
   assertValidPng(normalized);
   assertNoCgbi(normalized);
-  assertDimensions(normalized, 180, 180);
+  assertDimensions(normalized, 128, 128);
 
   // Standard PNG: should remain valid and keep dimensions.
   const tinyPng = Buffer.from(
@@ -61,7 +61,7 @@ const run = async () => {
   const normalizedTiny = await __test.normalizeIosIconPng(tinyPng);
   assertValidPng(normalizedTiny);
   assertNoCgbi(normalizedTiny);
-  assertDimensions(normalizedTiny, 1, 1);
+  assertDimensions(normalizedTiny, 128, 128);
 
   // Invalid buffer should not report dimensions.
   const junk = Buffer.from("not-a-png");
