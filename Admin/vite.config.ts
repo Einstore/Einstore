@@ -7,6 +7,7 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const privateDir = path.resolve(__dirname, "..", "Private");
 const billingDir = path.resolve(__dirname, "..", "..", "Billing");
+const adminI18nPath = path.resolve(__dirname, "src", "lib", "i18n.tsx");
 const devHost = process.env.ADMIN_DEV_HOST || "0.0.0.0";
 const devPort = Number(process.env.ADMIN_DEV_PORT || 8101);
 const publicHost = process.env.ADMIN_PUBLIC_HOST || "";
@@ -36,6 +37,20 @@ export default defineConfig({
     },
   },
   plugins: [
+    {
+      name: "billing-admin-i18n-alias",
+      resolveId(source, importer) {
+        if (!importer || !source.startsWith(".")) {
+          return null;
+        }
+        const resolved = path.resolve(path.dirname(importer), source);
+        const expectedSuffix = path.join("Einstore", "Admin", "src", "lib", "i18n");
+        if (path.normalize(resolved).endsWith(expectedSuffix)) {
+          return adminI18nPath;
+        }
+        return null;
+      },
+    },
     {
       name: "feature-flags-jsx",
       enforce: "pre",
