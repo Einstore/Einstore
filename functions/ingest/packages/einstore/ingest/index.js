@@ -1,5 +1,6 @@
 const { S3Client, HeadObjectCommand, GetObjectCommand, PutObjectCommand } = require("@aws-sdk/client-s3");
 const yauzl = require("yauzl");
+const bplistParser = require("bplist-parser");
 const plist = require("plist");
 const ManifestParser = require("@devicefarmer/adbkit-apkreader/lib/apkreader/parser/manifest");
 const { PassThrough } = require("stream");
@@ -38,6 +39,17 @@ const readPngDimensions = (buffer) => {
   const height = ihdr.data.readUInt32BE(4);
   if (!width || !height) return null;
   return { width, height };
+};
+
+const parsePlist = (buffer) => {
+  const header = buffer.subarray(0, 6).toString("utf8");
+  if (header === "bplist") {
+    const parsed = bplistParser.parseBuffer(buffer);
+    return parsed[0] || {};
+  }
+  const text = buffer.toString("utf8").trim();
+  if (!text) return {};
+  return plist.parse(text);
 };
 
 const mapDeviceFamily = (family) => {
@@ -184,6 +196,19 @@ const openZipFromSpaces = async (client, bucket, key) => {
   });
 };
 
+const withZipfile = async (client, bucket, key, handler) => {
+  const zipfile = await openZipFromSpaces(client, bucket, key);
+  try {
+    return await handler(zipfile);
+  } finally {
+    try {
+      zipfile.close();
+    } catch {
+      // Ignore close errors
+    }
+  }
+};
+
 const listZipEntries = (zipfile) =>
   new Promise((resolve, reject) => {
     const entries = [];
@@ -224,16 +249,52 @@ const readEntryBuffer = (zipfile, entryName) =>
   });
 
 const readEntryBuffers = async (zipfile, entryNames) => {
-  const buffers = new Map();
-  for (const entryName of entryNames) {
-    try {
-      const buffer = await readEntryBuffer(zipfile, entryName);
-      buffers.set(entryName, buffer);
-    } catch {
-      // Ignore missing entry
+  return new Promise((resolve, reject) => {
+    const buffers = new Map();
+    const wanted = new Set(entryNames);
+    if (!wanted.size) {
+      resolve(buffers);
+      return;
     }
-  }
-  return buffers;
+    let done = false;
+    const finish = (err) => {
+      if (done) return;
+      done = true;
+      if (err) {
+        reject(err);
+      } else {
+        resolve(buffers);
+      }
+    };
+    zipfile.readEntry();
+    zipfile.on("entry", (entry) => {
+      if (done) return;
+      if (!wanted.has(entry.fileName)) {
+        zipfile.readEntry();
+        return;
+      }
+      zipfile.openReadStream(entry, (err, stream) => {
+        if (err || !stream) {
+          finish(err || new Error("Unable to read entry"));
+          return;
+        }
+        const chunks = [];
+        stream.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
+        stream.on("end", () => {
+          buffers.set(entry.fileName, Buffer.concat(chunks));
+          wanted.delete(entry.fileName);
+          if (!wanted.size) {
+            finish();
+          } else {
+            zipfile.readEntry();
+          }
+        });
+        stream.on("error", finish);
+      });
+    });
+    zipfile.on("end", () => finish());
+    zipfile.on("error", finish);
+  });
 };
 
 const extractBestIcon = async (zipfile, entryNames, rootPrefix) => {
@@ -284,7 +345,7 @@ const parseIosTargets = async (zipfile, entryNames) => {
     const entryName = `${root}Info.plist`;
     const buffer = buffers.get(entryName);
     if (!buffer) continue;
-    const info = plist.parse(buffer.toString("utf8"));
+    const info = parsePlist(buffer);
     const bundleId = String(info.CFBundleIdentifier || "");
     if (!bundleId) continue;
     const name = String(info.CFBundleDisplayName || info.CFBundleName || info.CFBundleExecutable || bundleId);
@@ -491,6 +552,9 @@ exports.main = async (args) => {
     return { ok: false, error: "Missing kind/storagePath" };
   }
 
+  const forcePathStyle = ["true", "1", "yes"].includes(
+    String(process.env.SPACES_FORCE_PATH_STYLE || "").toLowerCase(),
+  );
   const spacesConfig = {
     region: process.env.SPACES_REGION,
     endpoint: process.env.SPACES_ENDPOINT,
@@ -498,6 +562,7 @@ exports.main = async (args) => {
       accessKeyId: process.env.SPACES_KEY,
       secretAccessKey: process.env.SPACES_SECRET,
     },
+    forcePathStyle,
   };
 
   const client = new S3Client(spacesConfig);
@@ -505,17 +570,22 @@ exports.main = async (args) => {
   const { bucket: inputBucket, key } = resolveBucketKey(storagePath);
   const objectBucket = inputBucket || bucket;
 
-  const zipfile = await openZipFromSpaces(client, objectBucket, key);
-  const entryNames = await listZipEntries(zipfile);
+  const entryNames = await withZipfile(client, objectBucket, key, listZipEntries);
 
   if (kind === "ipa") {
-    const targets = await parseIosTargets(zipfile, entryNames);
+    const targets = await withZipfile(client, objectBucket, key, (zip) =>
+      parseIosTargets(zip, entryNames),
+    );
     if (!targets.length) {
       return { ok: false, error: "No targets found" };
     }
     const mainTarget = targets[0];
-    const entitlements = await extractIosEntitlements(zipfile, entryNames, mainTarget.root);
-    const icon = await extractBestIcon(zipfile, entryNames, mainTarget.root);
+    const entitlements = await withZipfile(client, objectBucket, key, (zip) =>
+      extractIosEntitlements(zip, entryNames, mainTarget.root),
+    );
+    const icon = await withZipfile(client, objectBucket, key, (zip) =>
+      extractBestIcon(zip, entryNames, mainTarget.root),
+    );
     let iconPath = null;
     let iconBase64 = null;
     let iconWidth = null;
@@ -556,9 +626,13 @@ exports.main = async (args) => {
     if (!manifestEntry) {
       return { ok: false, error: "Missing AndroidManifest.xml" };
     }
-    const manifestBuffer = await readEntryBuffer(zipfile, manifestEntry);
+    const manifestBuffer = await withZipfile(client, objectBucket, key, (zip) =>
+      readEntryBuffer(zip, manifestEntry),
+    );
     const manifest = parseAndroidManifest(manifestBuffer);
-    const icon = await extractBestIcon(zipfile, entryNames, "res/");
+    const icon = await withZipfile(client, objectBucket, key, (zip) =>
+      extractBestIcon(zip, entryNames, "res/"),
+    );
     let iconPath = null;
     let iconBase64 = null;
     let iconWidth = null;

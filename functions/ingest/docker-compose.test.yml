@@ -1,0 +1,30 @@
+services:
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+
+  ingest-function:
+    build: ./packages/einstore/ingest
+    environment:
+      SPACES_ENDPOINT: http://minio:9000
+      SPACES_REGION: us-east-1
+      SPACES_KEY: minio
+      SPACES_SECRET: minio123
+      SPACES_BUCKET: ingest-test
+      SPACES_FORCE_PATH_STYLE: "true"
+      PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      - minio
+
+volumes:
+  minio-data:
