@@ -8,13 +8,34 @@ const { convert: convertCgbi, isCgbiPng } = require("cgbi");
 
 const REQUIRED_ENV = ["SPACES_ENDPOINT", "SPACES_REGION", "SPACES_KEY", "SPACES_SECRET", "SPACES_BUCKET"];
 
-const readPngDimensions = (buffer) => {
-  if (!buffer || buffer.length < 24) return null;
+const parsePngChunks = (buffer) => {
+  if (!buffer || buffer.length < 8) return null;
   const signature = buffer.subarray(0, 8);
   const pngSignature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
   if (!signature.equals(pngSignature)) return null;
-  const width = buffer.readUInt32BE(16);
-  const height = buffer.readUInt32BE(20);
+  const chunks = [];
+  let offset = 8;
+  while (offset + 8 <= buffer.length) {
+    const length = buffer.readUInt32BE(offset);
+    const type = buffer.toString("ascii", offset + 4, offset + 8);
+    const dataStart = offset + 8;
+    const dataEnd = dataStart + length;
+    const crcEnd = dataEnd + 4;
+    if (crcEnd > buffer.length) break;
+    chunks.push({ type, data: buffer.subarray(dataStart, dataEnd) });
+    offset = crcEnd;
+    if (type === "IEND") break;
+  }
+  return chunks;
+};
+
+const readPngDimensions = (buffer) => {
+  const chunks = parsePngChunks(buffer);
+  if (!chunks) return null;
+  const ihdr = chunks.find((chunk) => chunk.type === "IHDR");
+  if (!ihdr || ihdr.data.length < 8) return null;
+  const width = ihdr.data.readUInt32BE(0);
+  const height = ihdr.data.readUInt32BE(4);
   if (!width || !height) return null;
   return { width, height };
 };
