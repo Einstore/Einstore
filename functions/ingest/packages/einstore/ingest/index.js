@@ -651,7 +651,28 @@ const resolveBucketKey = (storagePath) => {
 };
 
 exports.main = async (args) => {
-  const missing = REQUIRED_ENV.filter((key) => !process.env[key]);
+  const resolveSetting = (key) => {
+    const envValue = process.env[key];
+    if (typeof envValue === "string" && envValue.trim()) {
+      return envValue.trim();
+    }
+    const argValue = args && typeof args === "object" ? args[key] : undefined;
+    if (typeof argValue === "string" && argValue.trim()) {
+      return argValue.trim();
+    }
+    return undefined;
+  };
+
+  const resolved = {};
+  const missing = [];
+  for (const key of REQUIRED_ENV) {
+    const value = resolveSetting(key);
+    if (value) {
+      resolved[key] = value;
+    } else {
+      missing.push(key);
+    }
+  }
   if (missing.length) {
     return { ok: false, message: `Missing env: ${missing.join(", ")}` };
   }
@@ -662,20 +683,20 @@ exports.main = async (args) => {
   }
 
   const forcePathStyle = ["true", "1", "yes"].includes(
-    String(process.env.SPACES_FORCE_PATH_STYLE || "").toLowerCase(),
+    String(process.env.SPACES_FORCE_PATH_STYLE || (args && args.SPACES_FORCE_PATH_STYLE) || "").toLowerCase(),
   );
   const spacesConfig = {
-    region: process.env.SPACES_REGION,
-    endpoint: process.env.SPACES_ENDPOINT,
+    region: resolved.SPACES_REGION,
+    endpoint: resolved.SPACES_ENDPOINT,
     credentials: {
-      accessKeyId: process.env.SPACES_KEY,
-      secretAccessKey: process.env.SPACES_SECRET,
+      accessKeyId: resolved.SPACES_KEY,
+      secretAccessKey: resolved.SPACES_SECRET,
     },
     forcePathStyle,
   };
 
   const client = new S3Client(spacesConfig);
-  const bucket = process.env.SPACES_BUCKET;
+  const bucket = resolved.SPACES_BUCKET;
   const { bucket: inputBucket, key } = resolveBucketKey(storagePath);
   const objectBucket = inputBucket || bucket;
   const debugTransfer = ["true", "1", "yes"].includes(
