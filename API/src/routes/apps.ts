@@ -1,10 +1,12 @@
 import { FastifyInstance, FastifyReply } from "fastify";
 import fs from "node:fs";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { requireTeam } from "../auth/guard.js";
 import { broadcastBadgesUpdate } from "../lib/realtime.js";
 import { buildPaginationMeta, resolvePagination } from "../lib/pagination.js";
+import { resolveS3Client } from "../lib/storage-presign.js";
 import { PlatformKind } from "@prisma/client";
 
 type BillingGuard = {
@@ -34,6 +36,39 @@ const sendBillingError = (reply: FastifyReply, error: unknown) => {
     error: (error as { code: string }).code,
     message: (error as { message?: string }).message ?? "Plan limit reached.",
   });
+};
+
+const resolveStorageBucket = () => {
+  if (process.env.SPACES_BUCKET) {
+    return process.env.SPACES_BUCKET;
+  }
+  return process.env.NODE_ENV !== "production" ? "einstore-local" : null;
+};
+
+const parseSpacesPath = (value: string) => {
+  if (!value.startsWith("spaces://")) return null;
+  const stripped = value.replace("spaces://", "");
+  const [bucket, ...rest] = stripped.split("/");
+  if (!bucket || !rest.length) return null;
+  return { bucket, key: rest.join("/") };
+};
+
+const resolveRemoteObject = (storagePath: string, fallbackBucket: string | null) => {
+  const parsed = parseSpacesPath(storagePath);
+  if (parsed) return parsed;
+  if (!fallbackBucket) return null;
+  if (storagePath.includes("://")) return null;
+  const key = storagePath.replace(/^\/+/, "");
+  if (!key) return null;
+  return { bucket: fallbackBucket, key };
+};
+
+const extractIconPath = (metadata: unknown) => {
+  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) return null;
+  const iconBitmap = (metadata as Record<string, unknown>).iconBitmap;
+  if (!iconBitmap || typeof iconBitmap !== "object" || Array.isArray(iconBitmap)) return null;
+  const record = iconBitmap as Record<string, unknown>;
+  return typeof record.path === "string" ? record.path : null;
 };
 
 export async function appRoutes(app: FastifyInstance) {
@@ -182,6 +217,37 @@ export async function appRoutes(app: FastifyInstance) {
       select: { id: true },
     });
     const targetIdList = targetIds.map((target) => target.id);
+    const targets = await prisma.target.findMany({
+      where: { id: { in: targetIdList } },
+      select: { metadata: true },
+    });
+
+    const storageBucket = resolveStorageBucket();
+    const remoteObjects = new Map<string, { bucket: string; key: string }>();
+    const addRemoteObject = (storagePath: string) => {
+      const resolved = resolveRemoteObject(storagePath, storageBucket);
+      if (!resolved) return;
+      remoteObjects.set(`${resolved.bucket}/${resolved.key}`, resolved);
+    };
+
+    builds
+      .filter((build) => build.storageKind === "s3")
+      .forEach((build) => addRemoteObject(build.storagePath));
+    artifacts
+      .filter((artifact) => artifact.storageKind === "s3")
+      .forEach((artifact) => addRemoteObject(artifact.storagePath));
+    targets
+      .map((target) => extractIconPath(target.metadata))
+      .filter((iconPath): iconPath is string => Boolean(iconPath))
+      .forEach((iconPath) => addRemoteObject(iconPath));
+
+    const s3Client = remoteObjects.size ? resolveS3Client() : null;
+    if (remoteObjects.size && !s3Client) {
+      return reply.status(500).send({
+        error: "storage_not_configured",
+        message: "Storage credentials are not configured.",
+      });
+    }
 
     await prisma.$transaction([
       prisma.comment.deleteMany({
@@ -218,6 +284,21 @@ export async function appRoutes(app: FastifyInstance) {
         where: { id: { in: buildIds } },
       }),
     ]);
+
+    if (s3Client && remoteObjects.size) {
+      await Promise.all(
+        Array.from(remoteObjects.values()).map((item) =>
+          s3Client
+            .send(
+              new DeleteObjectCommand({
+                Bucket: item.bucket,
+                Key: item.key,
+              }),
+            )
+            .catch(() => undefined),
+        ),
+      );
+    }
 
     await Promise.all(
       [

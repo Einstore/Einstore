@@ -499,7 +499,7 @@ Optional tracking metadata shared by download/install endpoints.
 - Auth scope: Bearer (rafiki270/auth)
 - Request schema: path `{ id: string }`
 - Response schema: `{ deletedBuilds: number }`
-- Side effects: Deletes build dependencies (comments, build events, tracking, targets, variants, modules, artifacts, signing, tags) and removes local build files.
+- Side effects: Deletes build dependencies (comments, build events, tracking, targets, variants, modules, artifacts, signing, tags) and removes stored files (local + S3).
 - Platform relevance: ios, android
 
 ## POST /versions
