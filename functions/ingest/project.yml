@@ -1,5 +1,11 @@
 packages:
   - name: einstore
+    parameters:
+      SPACES_ENDPOINT: ${SPACES_ENDPOINT}
+      SPACES_REGION: ${SPACES_REGION}
+      SPACES_BUCKET: ${SPACES_BUCKET}
+      SPACES_KEY: ${SPACES_KEY}
+      SPACES_SECRET: ${SPACES_SECRET}
     functions:
       - name: ingest
         runtime: nodejs:18
