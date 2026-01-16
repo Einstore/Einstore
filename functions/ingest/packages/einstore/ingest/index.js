@@ -653,12 +653,12 @@ const resolveBucketKey = (storagePath) => {
 exports.main = async (args) => {
   const missing = REQUIRED_ENV.filter((key) => !process.env[key]);
   if (missing.length) {
-    return { ok: false, error: `Missing env: ${missing.join(", ")}` };
+    return { ok: false, message: `Missing env: ${missing.join(", ")}` };
   }
 
   const { kind, storagePath } = args || {};
   if (!kind || !storagePath) {
-    return { ok: false, error: "Missing kind/storagePath" };
+    return { ok: false, message: "Missing kind/storagePath" };
   }
 
   const forcePathStyle = ["true", "1", "yes"].includes(
@@ -694,7 +694,7 @@ exports.main = async (args) => {
       transferStats,
     );
     if (!targets.length) {
-      return { ok: false, error: "No targets found" };
+      return { ok: false, message: "No targets found" };
     }
     const mainTarget = targets[0];
     const entitlements = await withZipfile(
@@ -756,7 +756,7 @@ exports.main = async (args) => {
   if (kind === "apk") {
     const manifestEntry = entryNames.find((name) => name === "AndroidManifest.xml");
     if (!manifestEntry) {
-      return { ok: false, error: "Missing AndroidManifest.xml" };
+      return { ok: false, message: "Missing AndroidManifest.xml" };
     }
     const manifestBuffer = await withZipfile(
       client,
@@ -823,7 +823,7 @@ exports.main = async (args) => {
     return response;
   }
 
-  return { ok: false, error: `Unsupported kind ${kind}` };
+  return { ok: false, message: `Unsupported kind ${kind}` };
 };
 
 exports.__test = {

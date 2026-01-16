@@ -38,6 +38,7 @@ const execFileAsync = promisify(execFile);
 const ingestFunctionBaseSchema = z.object({
   ok: z.boolean(),
   error: z.string().optional(),
+  message: z.string().optional(),
 }).passthrough();
 const ingestFunctionAndroidSchema = z.object({
   ok: z.literal(true),
@@ -406,7 +407,7 @@ export async function pipelineRoutes(app: FastifyInstance) {
       if (!baseParsed.data.ok) {
         return reply.status(502).send({
           error: "ingest_function_failed",
-          message: baseParsed.data.error || "Ingest function failed.",
+          message: baseParsed.data.error || baseParsed.data.message || "Ingest function failed.",
         });
       }
       const userId = request.auth?.user.id;
