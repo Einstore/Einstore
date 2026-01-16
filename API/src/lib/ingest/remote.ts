@@ -136,7 +136,7 @@ export async function ingestIosFromFunction(
   });
 
   let mainIconBitmap:
-    | { sourcePath: string; path: string; width: number; height: number; sizeBytes: number }
+    | { sourcePath: string; path: string; width: number; height: number; sizeBytes?: number }
     | undefined;
   if (payload.iconPath && payload.iconWidth && payload.iconHeight) {
     mainIconBitmap = {
@@ -267,7 +267,7 @@ export async function ingestAndroidFromFunction(
   });
 
   let iconBitmap:
-    | { sourcePath: string; path: string; width: number; height: number; sizeBytes: number }
+    | { sourcePath: string; path: string; width: number; height: number; sizeBytes?: number }
     | undefined;
   if (payload.iconPath && payload.iconWidth && payload.iconHeight) {
     iconBitmap = {
