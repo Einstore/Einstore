@@ -33,6 +33,39 @@ Modern private app distribution platform for iOS + Android.
 4. Finalize the upload with `/ingest/complete-upload` (send `key` from step 2).
 5. Teams have a storage quota (default 1 GB). If an upload would exceed the quota, the API purges the oldest builds first (never deletes the last build of an app). If no space can be freed, the upload is rejected with a clear error.
 
+## Storage CORS (self-hosting)
+When self-hosting, browser uploads PUT directly to your S3-compatible bucket using presigned URLs. Browsers send a CORS preflight request; if your bucket does not allow the Admin origin, the PUT fails with a network/CORS error before the file ever reaches storage. You must configure bucket CORS for Admin (and any other upload origins).
+
+Example CORS (S3/Spaces/MinIO):
+```json
+{
+  "CORSRules": [
+    {
+      "AllowedOrigins": [
+        "https://admin.your-domain.com",
+        "https://api.your-domain.com",
+        "http://localhost:8101"
+      ],
+      "AllowedMethods": ["GET", "PUT", "POST", "HEAD", "DELETE"],
+      "AllowedHeaders": ["*"],
+      "ExposeHeaders": ["ETag", "x-amz-request-id", "x-amz-id-2", "x-amz-version-id"],
+      "MaxAgeSeconds": 3000
+    }
+  ]
+}
+```
+
+DigitalOcean Spaces (CLI example):
+```bash
+aws --endpoint-url https://lon1.digitaloceanspaces.com s3api put-bucket-cors \
+  --bucket your-bucket \
+  --cors-configuration file://cors.json
+```
+
+Notes:
+- The presigned URL is generated with `SignedHeaders=host` only. Do not add custom headers (including `Content-Type`) unless the API explicitly returns them, or the signature will be invalid.
+- If you change the Admin or API domain, update your bucket CORS to match the new origins.
+
 ## Integration tests (Newman)
 - Requirements: API running locally, valid `accessToken`, `teamId`, `apiKeyToken`, and sample APK/IPA paths.
 - Update `tests/newman/local.postman_environment.json` with your tokens and file paths.
