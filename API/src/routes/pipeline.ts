@@ -181,7 +181,11 @@ const resolveSpacesConfig = () => {
 const resolveIngestFunctionUrl = () => {
   const raw = process.env.INGEST_FUNCTION_URL;
   if (typeof raw === "string" && raw.trim().length > 0) {
-    return raw.trim();
+    const trimmed = raw.trim();
+    if (trimmed.endsWith(".json")) {
+      return trimmed;
+    }
+    return `${trimmed.replace(/\/+$/, "")}.json`;
   }
   if (process.env.NODE_ENV !== "production") {
     return "http://localhost:7071";
