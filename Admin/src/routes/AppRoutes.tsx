@@ -1101,7 +1101,7 @@ const BuildDetailRoute = ({
         setCommentsError(null);
         setIsLoadingComments(true);
         apiFetch<{ items: ApiComment[] }>(
-          `/comments?${new URLSearchParams({ parentId: buildId, category: "build", perPage: "200" }).toString()}`,
+          `/comments?${new URLSearchParams({ parentId: buildId, category: "build", perPage: "100" }).toString()}`,
           {
             headers: { "x-team-id": activeTeamId },
           }
