@@ -1446,26 +1446,6 @@ const LatestBuildsRoute = ({
     [activeTeamId]
   );
 
-  const deleteAllBuilds = useCallback(async () => {
-    if (!appId || !activeTeamId) {
-      return false;
-    }
-    setIsDeletingBuilds(true);
-    try {
-      await apiFetch<{ deletedBuilds: number }>(`/apps/${appId}/builds`, {
-        method: "DELETE",
-        headers: { "x-team-id": activeTeamId },
-      });
-      setIngestNonce((current) => current + 1);
-      setPage(1);
-      return true;
-    } catch {
-      return false;
-    } finally {
-      setIsDeletingBuilds(false);
-    }
-  }, [appId, activeTeamId]);
-
   return (
     <BuildsPage
       builds={builds}
