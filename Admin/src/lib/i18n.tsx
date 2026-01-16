@@ -1,4 +1,5 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { csMessages } from "../locales/cs";
 import { deMessages } from "../locales/de";
 import { enMessages } from "../locales/en";
@@ -145,7 +146,18 @@ type I18nContextValue = {
 const I18nContext = createContext<I18nContextValue | null>(null);
 
 export const I18nProvider = ({ children }: { children: ReactNode }) => {
+  const location = useLocation();
   const [locale, setLocale] = useState<Locale>(() => detectLocale());
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const queryParam = params.get("lang");
+    if (!queryParam) return;
+    const resolved = resolveLocale(queryParam);
+    if (resolved !== locale && SUPPORTED_LOCALES.includes(resolved)) {
+      setLocale(resolved);
+    }
+  }, [locale, location.search]);
 
   useEffect(() => {
     activeLocale = locale;
