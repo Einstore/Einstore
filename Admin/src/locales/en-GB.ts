@@ -17,12 +17,12 @@ export const enGBMessages: Record<string, MessageValue> = {
   "brand.admin": "Admin",
   "brand.einstore": "Einstore",
   "login.apple": "Continue with Apple",
-  "login.error.failed": "Login failed.",
-  "login.error.failedRetry": "Login failed. Try again.",
-  "login.error.start": "Unable to start login.",
+  "login.error.failed": "Log in failed.",
+  "login.error.failedRetry": "Log in failed. Please try again.",
+  "login.error.start": "Unable to start sign-in.",
   "login.google": "Continue with Google",
-  "login.status.redirecting": "Redirecting to provider...",
-  "login.status.signingIn": "Signing in...",
-  "login.subtitle": "Use Google or Apple. If you don't have an account yet, one will be created on login. We only request your email.",
-  "login.title": "Sign in"
+  "login.status.redirecting": "Redirecting to the provider...",
+  "login.status.signingIn": "Signing you in...",
+  "login.subtitle": "Use Google or Apple. If you don't have an account yet, one will be created on sign-in. We only request your email address.",
+  "login.title": "Log in"
 };
