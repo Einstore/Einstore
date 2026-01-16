@@ -1,11 +1,11 @@
-import fs from "node:fs";
-import path from "node:path";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { requireTeam } from "../auth/guard.js";
 import { requireAppForTeam } from "../lib/team-access.js";
 import { broadcastBadgesUpdate } from "../lib/realtime.js";
 import { buildPaginationMeta, resolvePagination } from "../lib/pagination.js";
+import { presignStorageObject } from "../lib/storage-presign.js";
+import { deleteBuildsWithDependencies } from "../lib/build-cleanup.js";
 const groupArtifactsByKind = (items) => {
     const grouped = {};
     for (const item of items) {
@@ -18,7 +18,6 @@ const groupArtifactsByKind = (items) => {
     }
     return grouped;
 };
-const storageRoot = path.resolve(process.cwd(), "storage", "ingest");
 const resolveBaseUrl = (request) => {
     const protoHeader = request.headers["x-forwarded-proto"];
     const hostHeader = request.headers["x-forwarded-host"] ?? request.headers["host"];
@@ -29,18 +28,23 @@ const resolveBaseUrl = (request) => {
     }
     return `${proto || "http"}://${host}`;
 };
-const resolveIconPath = (iconPath) => {
-    const candidate = path.isAbsolute(iconPath) ? iconPath : path.join(storageRoot, iconPath);
-    const resolved = path.resolve(candidate);
-    const relative = path.relative(storageRoot, resolved);
-    if (relative.startsWith("..") || path.isAbsolute(relative)) {
+const parseSpacesPath = (value) => {
+    if (!value.startsWith("spaces://"))
         return null;
-    }
-    return resolved;
+    const stripped = value.replace("spaces://", "");
+    const [bucket, ...rest] = stripped.split("/");
+    if (!bucket || !rest.length)
+        return null;
+    return { bucket, key: rest.join("/") };
 };
-const readIconDataUrl = async (filePath) => {
-    const buffer = await fs.promises.readFile(filePath);
-    return `data:image/png;base64,${buffer.toString("base64")}`;
+const resolveIconSource = (iconPath) => {
+    const remote = parseSpacesPath(iconPath);
+    if (remote)
+        return { kind: "remote", ...remote };
+    if (iconPath.startsWith("http://") || iconPath.startsWith("https://")) {
+        return { kind: "url", url: iconPath };
+    }
+    return null;
 };
 const extractIconBitmap = (metadata) => {
     if (!metadata || typeof metadata !== "object" || Array.isArray(metadata))
@@ -305,6 +309,34 @@ export async function buildRoutes(app) {
         const artifactsByKind = groupArtifactsByKind(updated.artifacts);
         return reply.send({ ...updated, artifactsByKind });
     });
+    app.delete("/builds/:id", { preHandler: requireTeam }, async (request, reply) => {
+        const teamId = request.team?.id;
+        if (!teamId) {
+            return reply.status(403).send({ error: "team_required", message: "Team context required" });
+        }
+        const id = request.params.id;
+        const record = await prisma.build.findFirst({
+            where: { id, version: { app: { teamId } } },
+            select: { id: true },
+        });
+        if (!record) {
+            return reply.status(404).send({ error: "Not found" });
+        }
+        try {
+            await deleteBuildsWithDependencies([record.id]);
+        }
+        catch (error) {
+            if (error.code === "storage_not_configured") {
+                return reply.status(500).send({
+                    error: "storage_not_configured",
+                    message: "Storage credentials are not configured.",
+                });
+            }
+            throw error;
+        }
+        await broadcastBadgesUpdate(teamId).catch(() => undefined);
+        return reply.send({ deletedBuilds: 1 });
+    });
     app.get("/builds/:id/metadata", { preHandler: requireTeam }, async (request, reply) => {
         const teamId = request.team?.id;
         if (!teamId) {
@@ -347,8 +379,8 @@ export async function buildRoutes(app) {
             const iconBitmap = extractIconBitmap(target.metadata);
             if (!iconBitmap)
                 return null;
-            const resolved = resolveIconPath(iconBitmap.path);
-            if (!resolved || !fs.existsSync(resolved))
+            const source = resolveIconSource(iconBitmap.path);
+            if (!source)
                 return null;
             return {
                 targetId: target.id,
@@ -361,9 +393,8 @@ export async function buildRoutes(app) {
                     sizeBytes: iconBitmap.sizeBytes,
                     sourcePath: iconBitmap.sourcePath,
                 },
-                url: `${baseUrl}/builds/${record.id}/icons/${target.id}`,
+                url: source.kind === "url" ? source.url : `${baseUrl}/builds/${record.id}/icons/${target.id}`,
                 contentType: "image/png",
-                dataUrl: await readIconDataUrl(resolved),
             };
         }))).filter((item) => Boolean(item));
         return reply.send({ buildId: record.id, items });
@@ -388,11 +419,18 @@ export async function buildRoutes(app) {
         if (!iconBitmap) {
             return reply.status(404).send({ error: "icon_not_found" });
         }
-        const resolved = resolveIconPath(iconBitmap.path);
-        if (!resolved || !fs.existsSync(resolved)) {
+        const source = resolveIconSource(iconBitmap.path);
+        if (!source) {
             return reply.status(404).send({ error: "icon_not_found" });
         }
-        reply.type("image/png");
-        return reply.send(fs.createReadStream(resolved));
+        if (source.kind === "url") {
+            return reply.redirect(source.url);
+        }
+        const signedUrl = await presignStorageObject({
+            bucket: source.bucket,
+            key: source.key,
+            expiresIn: 900,
+        });
+        return reply.redirect(signedUrl);
     });
 }
