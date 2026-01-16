@@ -377,7 +377,7 @@ export const enMessages: Record<string, MessageValue> = {
   "settings.team.logo.cta": "Upload logo",
   "settings.team.logo.error.size": "Maximum size is 2 MB.",
   "settings.team.logo.error.upload": "Unable to upload logo. Try again.",
-  "settings.team.logo.subtitle": "Upload a 180x180 logo (max 2 MB). Shown in the team switcher.",
+  "settings.team.logo.subtitle": "Max 2Mb",
   "settings.team.logo.success": "Logo updated. Refresh if it doesn't appear.",
   "settings.team.logo.title": "Team logo",
   "settings.team.name.label": "Team name",

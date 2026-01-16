@@ -133,7 +133,6 @@ const SettingsPage = ({
           <div className="space-y-2">
             <SectionHeader
               title={t("settings.team.logo.title", "Team logo")}
-              description={t("settings.team.logo.subtitle", "Upload a 180x180 logo (max 2MB). Shown in the team switcher.")}
             />
             <div className="flex items-center gap-4">
               <div className="h-14 w-14 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700">
@@ -189,6 +188,9 @@ const SettingsPage = ({
                 >
                   {t("settings.team.logo.cta", "Upload logo")}
                 </button>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {t("settings.team.logo.subtitle", "Max 2Mb")}
+                </p>
                 {logoMessage ? <p className="text-xs text-green-600">{logoMessage}</p> : null}
                 {logoError ? <p className="text-xs text-red-500">{logoError}</p> : null}
               </div>
