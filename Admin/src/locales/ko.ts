@@ -78,6 +78,8 @@ export const koMessages: Record<string, MessageValue> = {
   "build.empty": "빌드 상세를 찾을 수 없습니다.",
   "build.error.load": "빌드 상세를 불러올 수 없습니다.",
   "build.error.notFound": "빌드를 찾을 수 없습니다.",
+  "build.delete.title": "이 빌드를 삭제할까요?",
+  "build.delete.description": "이 빌드 {number} 및 댓글과 다운로드 추적이 삭제됩니다.",
   "build.fallback": "빌드",
   "build.info.buildId": "빌드 ID",
   "build.info.buildNumber": "빌드 번호",

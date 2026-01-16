@@ -6,6 +6,7 @@ import { requireAppForTeam } from "../lib/team-access.js";
 import { broadcastBadgesUpdate } from "../lib/realtime.js";
 import { buildPaginationMeta, resolvePagination } from "../lib/pagination.js";
 import { presignStorageObject } from "../lib/storage-presign.js";
+import { deleteBuildsWithDependencies } from "../lib/build-cleanup.js";
 
 const groupArtifactsByKind = <T extends { kind: string; createdAt: Date }>(items: T[]) => {
   const grouped: Record<string, T[]> = {};
@@ -343,6 +344,37 @@ export async function buildRoutes(app: FastifyInstance) {
     });
     const artifactsByKind = groupArtifactsByKind(updated.artifacts);
     return reply.send({ ...updated, artifactsByKind });
+  });
+
+  app.delete("/builds/:id", { preHandler: requireTeam }, async (request, reply) => {
+    const teamId = request.team?.id;
+    if (!teamId) {
+      return reply.status(403).send({ error: "team_required", message: "Team context required" });
+    }
+    const id = (request.params as { id: string }).id;
+    const record = await prisma.build.findFirst({
+      where: { id, version: { app: { teamId } } },
+      select: { id: true },
+    });
+    if (!record) {
+      return reply.status(404).send({ error: "Not found" });
+    }
+
+    try {
+      await deleteBuildsWithDependencies([record.id]);
+    } catch (error) {
+      if ((error as { code?: string }).code === "storage_not_configured") {
+        return reply.status(500).send({
+          error: "storage_not_configured",
+          message: "Storage credentials are not configured.",
+        });
+      }
+      throw error;
+    }
+
+    await broadcastBadgesUpdate(teamId).catch(() => undefined);
+
+    return reply.send({ deletedBuilds: 1 });
   });
 
   app.get("/builds/:id/metadata", { preHandler: requireTeam }, async (request, reply) => {

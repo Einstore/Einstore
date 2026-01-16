@@ -78,6 +78,8 @@ export const poMessages: Record<string, MessageValue> = {
   "build.empty": "Nie znaleziono szczegolow buildu.",
   "build.error.load": "Nie mozna zaladowac szczegolow buildu.",
   "build.error.notFound": "Nie znaleziono buildu.",
+  "build.delete.title": "Usunac ten build?",
+  "build.delete.description": "Spowoduje to usuniecie buildu {number} wraz z komentarzami i sledzeniem pobran.",
   "build.fallback": "Build",
   "build.info.buildId": "ID buildu",
   "build.info.buildNumber": "Numer buildu",

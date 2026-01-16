@@ -550,6 +550,14 @@ Optional tracking metadata shared by download/install endpoints.
 - Side effects: none
 - Platform relevance: ios, android
 
+## DELETE /builds/{id}
+- Purpose: Delete a build
+- Auth scope: Bearer (rafiki270/auth)
+- Request schema: path `{ id: string }`
+- Response schema: `{ deletedBuilds: number }`
+- Side effects: Deletes build dependencies (comments, build events, tracking, targets, variants, modules, artifacts, signing, tags) and removes stored files (local + S3).
+- Platform relevance: ios, android
+
 ## GET /builds/{id}/metadata
 - Purpose: Fetch build metadata with artifacts grouped by kind plus targets/app/version context
 - Auth scope: Bearer (rafiki270/auth)

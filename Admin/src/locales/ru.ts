@@ -78,6 +78,8 @@ export const ruMessages: Record<string, MessageValue> = {
   "build.empty": "Детали билда не найдены.",
   "build.error.load": "Не удалось загрузить детали билда.",
   "build.error.notFound": "Билд не найден.",
+  "build.delete.title": "Удалить этот билд?",
+  "build.delete.description": "Это удалит билд {number}, а также комментарии и отслеживание загрузок.",
   "build.fallback": "Билд",
   "build.info.buildId": "ID билда",
   "build.info.buildNumber": "Номер билда",

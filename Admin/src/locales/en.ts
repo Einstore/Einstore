@@ -78,6 +78,8 @@ export const enMessages: Record<string, MessageValue> = {
   "build.empty": "No build details found.",
   "build.error.load": "Unable to load build details.",
   "build.error.notFound": "Build not found.",
+  "build.delete.title": "Delete this build?",
+  "build.delete.description": "This will remove build {number}, along with comments and download tracking.",
   "build.fallback": "Build",
   "build.info.buildId": "Build ID",
   "build.info.buildNumber": "Build number",

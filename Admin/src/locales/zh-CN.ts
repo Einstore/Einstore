@@ -78,6 +78,8 @@ export const zhMessages: Record<string, MessageValue> = {
   "build.empty": "未找到构建详情。",
   "build.error.load": "无法加载构建详情。",
   "build.error.notFound": "未找到构建。",
+  "build.delete.title": "删除此构建？",
+  "build.delete.description": "这将删除构建 {number}，以及评论和下载跟踪。",
   "build.fallback": "构建",
   "build.info.buildId": "构建 ID",
   "build.info.buildNumber": "构建编号",

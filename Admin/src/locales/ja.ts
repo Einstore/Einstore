@@ -78,6 +78,8 @@ export const jaMessages: Record<string, MessageValue> = {
   "build.empty": "ビルドの詳細が見つかりません。",
   "build.error.load": "ビルド詳細を読み込めません。",
   "build.error.notFound": "ビルドが見つかりません。",
+  "build.delete.title": "このビルドを削除しますか？",
+  "build.delete.description": "このビルド {number} を削除し、コメントとダウンロード追跡も削除します。",
   "build.fallback": "ビルド",
   "build.info.buildId": "ビルドID",
   "build.info.buildNumber": "ビルド番号",

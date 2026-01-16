@@ -78,6 +78,8 @@ export const ptMessages: Record<string, MessageValue> = {
   "build.empty": "Nenhum detalhe do build encontrado.",
   "build.error.load": "Não foi possível carregar os detalhes do build.",
   "build.error.notFound": "Build não encontrado.",
+  "build.delete.title": "Excluir este build?",
+  "build.delete.description": "Isso removerá o build {number}, junto com comentários e o rastreamento de downloads.",
   "build.fallback": "Build",
   "build.info.buildId": "ID do build",
   "build.info.buildNumber": "Número do build",

@@ -78,6 +78,8 @@ export const nlMessages: Record<string, MessageValue> = {
   "build.empty": "Geen builddetails gevonden.",
   "build.error.load": "Kan builddetails niet laden.",
   "build.error.notFound": "Build niet gevonden.",
+  "build.delete.title": "Deze build verwijderen?",
+  "build.delete.description": "Dit verwijdert build {number}, samen met opmerkingen en downloadtracking.",
   "build.fallback": "Build",
   "build.info.buildId": "Build-ID",
   "build.info.buildNumber": "Buildnummer",

@@ -78,6 +78,8 @@ export const pirateMessages: Record<string, MessageValue> = {
   "build.empty": "No fish details found.",
   "build.error.load": "Can’t load the fish details.",
   "build.error.notFound": "That fish be lost at sea.",
+  "build.delete.title": "Scuttle this fish?",
+  "build.delete.description": "This be scuttlin’ fish {number}, plus scribbles an’ plunder trackin’.",
   "build.fallback": "Fish",
   "build.info.buildId": "Fish ID",
   "build.info.buildNumber": "Fish number",

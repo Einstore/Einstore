@@ -78,6 +78,8 @@ export const frMessages: Record<string, MessageValue> = {
   "build.empty": "Aucun détail de build trouvé.",
   "build.error.load": "Impossible de charger les détails du build.",
   "build.error.notFound": "Build introuvable.",
+  "build.delete.title": "Supprimer ce build ?",
+  "build.delete.description": "Cela supprimera le build {number}, ainsi que les commentaires et le suivi des téléchargements.",
   "build.fallback": "Build",
   "build.info.buildId": "ID du build",
   "build.info.buildNumber": "Numéro de build",

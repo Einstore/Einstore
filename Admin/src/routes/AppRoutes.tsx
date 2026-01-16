@@ -953,7 +953,9 @@ const BuildDetailRoute = ({
   activeTeamId: string;
   currentUserId?: string | null;
 }) => {
-  const { buildId } = useParams();
+  const { buildId, appId } = useParams();
+  const navigate = useNavigate();
+  const { t } = useI18n();
   const [build, setBuild] = useState<ApiBuildMetadata | null>(null);
   const [iconUrl, setIconUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -971,6 +973,7 @@ const BuildDetailRoute = ({
   const [isLoadingComments, setIsLoadingComments] = useState(false);
   const [isPostingComment, setIsPostingComment] = useState(false);
   const [commentsError, setCommentsError] = useState<string | null>(null);
+  const [isDeletingBuild, setIsDeletingBuild] = useState(false);
   const installBuild = useCallback(
     async (id: string) => {
       try {
@@ -1008,6 +1011,28 @@ const BuildDetailRoute = ({
       }
     },
     [activeTeamId]
+  );
+
+  const deleteBuild = useCallback(
+    async (id: string) => {
+      if (!activeTeamId) {
+        return false;
+      }
+      setIsDeletingBuild(true);
+      try {
+        await apiFetch<{ deletedBuilds: number }>(`/builds/${id}`, {
+          method: "DELETE",
+          headers: { "x-team-id": activeTeamId },
+        });
+        navigate(appId ? `/apps/${appId}/builds` : "/builds");
+        return true;
+      } catch {
+        return false;
+      } finally {
+        setIsDeletingBuild(false);
+      }
+    },
+    [activeTeamId, appId, navigate]
   );
 
   const updateBuildMetadata = useCallback(
@@ -1228,6 +1253,8 @@ const BuildDetailRoute = ({
       error={error}
       onInstall={installBuild}
       onDownload={downloadBuild}
+      onDeleteBuild={deleteBuild}
+      isDeletingBuild={isDeletingBuild}
       tags={tags}
       availableTags={availableTags}
       onChangeTags={async (nextTags) => {

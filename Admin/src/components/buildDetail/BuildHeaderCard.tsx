@@ -15,6 +15,8 @@ type BuildHeaderCardProps = {
   canInstall: boolean;
   onInstall?: (buildId: string) => void;
   onDownload?: (buildId: string) => void;
+  onDelete?: (buildId: string) => void;
+  isDeleting?: boolean;
   t: Translate;
 };
 
@@ -29,6 +31,8 @@ const BuildHeaderCard = ({
   canInstall,
   onInstall,
   onDownload,
+  onDelete,
+  isDeleting,
   t,
 }: BuildHeaderCardProps) => {
   return (
@@ -70,6 +74,16 @@ const BuildHeaderCard = ({
         >
           {t("build.action.download", "Download")}
         </button>
+        {onDelete ? (
+          <button
+            type="button"
+            className="h-10 rounded-lg bg-red-600 px-4 text-xs font-semibold text-white hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-60"
+            onClick={() => buildId && onDelete(buildId)}
+            disabled={!buildId || isDeleting}
+          >
+            {t("common.delete", "Delete")}
+          </button>
+        ) : null}
       </div>
     </Panel>
   );

@@ -78,6 +78,8 @@ export const deMessages: Record<string, MessageValue> = {
   "build.empty": "Keine Build-Details gefunden.",
   "build.error.load": "Build-Details können nicht geladen werden.",
   "build.error.notFound": "Build nicht gefunden.",
+  "build.delete.title": "Diesen Build löschen?",
+  "build.delete.description": "Dadurch wird Build {number} sowie Kommentare und Download-Tracking entfernt.",
   "build.fallback": "Build",
   "build.info.buildId": "Build-ID",
   "build.info.buildNumber": "Build-Nummer",

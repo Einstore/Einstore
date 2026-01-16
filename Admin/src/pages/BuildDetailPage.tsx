@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Panel from "../components/Panel";
+import ConfirmDialog from "../components/ConfirmDialog";
 import CommentsPanel from "../components/CommentsPanel";
 import BuildHeaderCard from "../components/buildDetail/BuildHeaderCard";
 import BuildInfoPanel from "../components/buildDetail/BuildInfoPanel";
@@ -32,6 +33,8 @@ type BuildDetailPageProps = {
   error?: string | null;
   onInstall?: (buildId: string) => void;
   onDownload?: (buildId: string) => void;
+  onDeleteBuild?: (buildId: string) => Promise<boolean> | boolean;
+  isDeletingBuild?: boolean;
   tags?: ApiTag[];
   availableTags?: ApiTag[];
   onChangeTags?: (tags: string[]) => Promise<void> | void;
@@ -54,6 +57,8 @@ const BuildDetailPage = ({
   error,
   onInstall,
   onDownload,
+  onDeleteBuild,
+  isDeletingBuild = false,
   tags = [],
   availableTags = [],
   onChangeTags,
@@ -114,6 +119,17 @@ const BuildDetailPage = ({
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [tagAlert, setTagAlert] = useState<string | null>(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+  const handleDeleteConfirm = async () => {
+    if (!build?.id || !onDeleteBuild || isDeletingBuild) {
+      return;
+    }
+    const ok = await onDeleteBuild(build.id);
+    if (ok) {
+      setIsDeleteOpen(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -140,6 +156,8 @@ const BuildDetailPage = ({
               canInstall={canInstall}
               onInstall={onInstall}
               onDownload={onDownload}
+              onDelete={onDeleteBuild ? () => setIsDeleteOpen(true) : undefined}
+              isDeleting={isDeletingBuild}
               t={t}
             />
             <BuildInfoPanel
@@ -204,6 +222,18 @@ const BuildDetailPage = ({
         onClose={() => setIsEditOpen(false)}
         onUpdateMetadata={onUpdateMetadata}
         t={t}
+      />
+      <ConfirmDialog
+        isOpen={isDeleteOpen}
+        title={t("build.delete.title", "Delete this build?")}
+        description={t(
+          "build.delete.description",
+          "This will remove build {number}, along with comments and download tracking.",
+          { number: buildNumber }
+        )}
+        confirmLabel={t("common.delete", "Delete")}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setIsDeleteOpen(false)}
       />
     </div>
   );

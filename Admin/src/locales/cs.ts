@@ -78,6 +78,8 @@ export const csMessages: Record<string, MessageValue> = {
   "build.empty": "Žádné detaily buildu nenalezeny.",
   "build.error.load": "Detaily buildu nelze načíst.",
   "build.error.notFound": "Build nebyl nalezen.",
+  "build.delete.title": "Smazat tento build?",
+  "build.delete.description": "Tímto odstraníte build {number} včetně komentářů a sledování stažení.",
   "build.fallback": "Build",
   "build.info.buildId": "ID buildu",
   "build.info.buildNumber": "Číslo buildu",
