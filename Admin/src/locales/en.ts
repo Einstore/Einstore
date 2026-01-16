@@ -161,6 +161,7 @@ export const enMessages: Record<string, MessageValue> = {
   "device.pc": "PC",
   "device.unknown": "Unknown device",
   "flags.definition.admin.upload_debug": "Show upload debug tools in Admin",
+  "flags.definition.billing.priority_support": "Show Priority Support add-on in Billing",
   "flags.form.create": "Create flag",
   "flags.form.createTitle": "Create flag",
   "flags.form.default.label": "Default",
