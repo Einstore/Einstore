@@ -40,6 +40,20 @@ const discoverSchema = z.object({
     .nonempty(),
 });
 
+const publicFlagSchema = z.object({
+  flags: z
+    .array(
+      z.object({
+        key: z.string().min(1).regex(/^web\\./),
+        description: z.string().optional(),
+        defaultEnabled: z.boolean().optional(),
+        metadata: z.any().optional(),
+      })
+    )
+    .nonempty(),
+  scope: z.string().min(1).optional(),
+});
+
 const createOverrideSchema = z.object({
   scope: z.string().min(1),
   targetKey: z.string().min(1).nullable().optional(),
@@ -234,5 +248,37 @@ export async function featureFlagRoutes(app: FastifyInstance) {
     );
     const created = results.filter((r) => r.status === "fulfilled").length;
     return reply.status(201).send({ created });
+  });
+
+  app.post("/feature-flags/public", async (request, reply) => {
+    const parsed = publicFlagSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return reply.status(400).send({ error: "Invalid payload" });
+    }
+    const scope = parsed.data.scope ?? "web";
+    await Promise.all(
+      parsed.data.flags.map((flag) =>
+        ensureFeatureFlag(prisma, flag.key, {
+          description: flag.description,
+          defaultEnabled: flag.defaultEnabled ?? false,
+          metadata: flag.metadata,
+        })
+      )
+    );
+
+    const flags = await Promise.all(
+      parsed.data.flags.map(async (flag) => {
+        const enabled = await isFeatureFlagEnabled(prisma, flag.key, {
+          scope,
+          targetKey: null,
+          description: flag.description ?? null,
+          defaultEnabled: flag.defaultEnabled ?? false,
+          autoCreate: false,
+        });
+        return { key: flag.key, enabled };
+      })
+    );
+
+    return reply.send({ flags });
   });
 }

@@ -2270,6 +2270,34 @@
       ]
     },
     {
+      "name": "Ensure Web Feature Flags",
+      "description": "Public web flags.",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/feature-flags/public",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "feature-flags",
+            "public"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"flags\":[{\"key\":\"web.hero\",\"description\":\"Show hero section\",\"defaultEnabled\":true}]}"
+        }
+      },
+      "event": []
+    },
+    {
       "name": "Info",
       "request": {
         "method": "GET",

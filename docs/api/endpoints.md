@@ -730,6 +730,14 @@ Optional tracking metadata shared by download/install endpoints.
 - Side effects: none
 - Platform relevance: all
 
+## POST /feature-flags/public
+- Purpose: Ensure and evaluate public web feature flags
+- Auth scope: none
+- Request schema: `{ flags: [{ key: string (web.*), description?: string, defaultEnabled?: boolean, metadata?: object }], scope?: string }`
+- Response schema: `{ flags: [{ key: string, enabled: boolean }] }`
+- Side effects: Ensures flags exist for provided keys
+- Platform relevance: web
+
 ## GET /feature-flags/{key}
 - Purpose: Fetch feature flag with overrides
 - Auth scope: Bearer (super user)
