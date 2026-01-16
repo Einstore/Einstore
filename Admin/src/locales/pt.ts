@@ -113,6 +113,8 @@ export const ptMessages: Record<string, MessageValue> = {
   "build.targets.title": "Alvos",
   "build.versionLabel": "Versão {version}",
   "builds.app.label": "Builds da aplicação",
+  "builds.deleteAll.title": "Excluir todos os builds?",
+  "builds.deleteAll.description": "Isso removerá {count} builds deste app, junto com comentários e o rastreamento de downloads.",
   "builds.total": "Total de builds",
   "checkbox.defaultEnabled": "Ativado por defeito",
   "comments.empty": "Ainda sem comentários.",

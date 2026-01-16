@@ -1,4 +1,5 @@
 import { FastifyInstance, FastifyReply } from "fastify";
+import fs from "node:fs";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { requireTeam } from "../auth/guard.js";
@@ -147,5 +148,90 @@ export async function appRoutes(app: FastifyInstance) {
       return reply.status(404).send({ error: "Not found" });
     }
     return reply.send(record);
+  });
+
+  app.delete("/apps/:id/builds", { preHandler: requireTeam }, async (request, reply) => {
+    const teamId = request.team?.id;
+    if (!teamId) {
+      return reply.status(403).send({ error: "team_required", message: "Team context required" });
+    }
+    const id = (request.params as { id: string }).id;
+    const record = await prisma.app.findFirst({
+      where: { id, teamId },
+      select: { id: true },
+    });
+    if (!record) {
+      return reply.status(404).send({ error: "Not found" });
+    }
+
+    const builds = await prisma.build.findMany({
+      where: { version: { appId: id } },
+      select: { id: true, storageKind: true, storagePath: true },
+    });
+    if (!builds.length) {
+      return reply.send({ deletedBuilds: 0 });
+    }
+
+    const buildIds = builds.map((build) => build.id);
+    const artifacts = await prisma.complianceArtifact.findMany({
+      where: { buildId: { in: buildIds } },
+      select: { storageKind: true, storagePath: true },
+    });
+    const targetIds = await prisma.target.findMany({
+      where: { buildId: { in: buildIds } },
+      select: { id: true },
+    });
+    const targetIdList = targetIds.map((target) => target.id);
+
+    await prisma.$transaction([
+      prisma.comment.deleteMany({
+        where: { parentId: { in: buildIds }, category: "build" },
+      }),
+      prisma.buildEvent.deleteMany({
+        where: { buildId: { in: buildIds } },
+      }),
+      prisma.trackingEvent.deleteMany({
+        where: { buildId: { in: buildIds } },
+      }),
+      prisma.buildTag.deleteMany({
+        where: { buildId: { in: buildIds } },
+      }),
+      prisma.capability.deleteMany({
+        where: { targetId: { in: targetIdList } },
+      }),
+      prisma.target.deleteMany({
+        where: { buildId: { in: buildIds } },
+      }),
+      prisma.variant.deleteMany({
+        where: { buildId: { in: buildIds } },
+      }),
+      prisma.module.deleteMany({
+        where: { buildId: { in: buildIds } },
+      }),
+      prisma.complianceArtifact.deleteMany({
+        where: { buildId: { in: buildIds } },
+      }),
+      prisma.signingIdentity.deleteMany({
+        where: { buildId: { in: buildIds } },
+      }),
+      prisma.build.deleteMany({
+        where: { id: { in: buildIds } },
+      }),
+    ]);
+
+    await Promise.all(
+      [
+        ...builds
+          .filter((build) => build.storageKind === "local")
+          .map((build) => build.storagePath),
+        ...artifacts
+          .filter((artifact) => artifact.storageKind === "local")
+          .map((artifact) => artifact.storagePath),
+      ].map((storagePath) => fs.promises.rm(storagePath, { force: true }).catch(() => undefined))
+    );
+
+    await broadcastBadgesUpdate(teamId).catch(() => undefined);
+
+    return reply.send({ deletedBuilds: buildIds.length });
   });
 }

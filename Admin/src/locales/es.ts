@@ -113,6 +113,8 @@ export const esMessages: Record<string, MessageValue> = {
   "build.targets.title": "Objetivos",
   "build.versionLabel": "Versión {version}",
   "builds.app.label": "Builds de la aplicación",
+  "builds.deleteAll.title": "¿Eliminar todos los builds?",
+  "builds.deleteAll.description": "Esto eliminará {count} builds de esta aplicación, junto con comentarios y el seguimiento de descargas.",
   "builds.total": "Total de builds",
   "checkbox.defaultEnabled": "Habilitado por defecto",
   "comments.empty": "Aún no hay comentarios.",

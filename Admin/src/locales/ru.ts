@@ -113,6 +113,8 @@ export const ruMessages: Record<string, MessageValue> = {
   "build.targets.title": "Цели",
   "build.versionLabel": "Версия {version}",
   "builds.app.label": "Билды приложения",
+  "builds.deleteAll.title": "Удалить все билды?",
+  "builds.deleteAll.description": "Это удалит {count} билдов для этого приложения, а также комментарии и отслеживание загрузок.",
   "builds.total": "Всего билдов",
   "checkbox.defaultEnabled": "Включено по умолчанию",
   "comments.empty": "Комментариев пока нет.",

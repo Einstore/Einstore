@@ -113,6 +113,8 @@ export const frMessages: Record<string, MessageValue> = {
   "build.targets.title": "Cibles",
   "build.versionLabel": "Version {version}",
   "builds.app.label": "Builds de l'application",
+  "builds.deleteAll.title": "Supprimer tous les builds ?",
+  "builds.deleteAll.description": "Cela supprimera {count} builds pour cette application, ainsi que les commentaires et le suivi des téléchargements.",
   "builds.total": "Total des builds",
   "checkbox.defaultEnabled": "Activé par défaut",
   "comments.empty": "Aucun commentaire pour le moment.",

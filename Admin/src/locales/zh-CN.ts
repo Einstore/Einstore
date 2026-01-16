@@ -113,6 +113,8 @@ export const zhMessages: Record<string, MessageValue> = {
   "build.targets.title": "目标",
   "build.versionLabel": "版本 {version}",
   "builds.app.label": "应用构建",
+  "builds.deleteAll.title": "删除所有构建？",
+  "builds.deleteAll.description": "这将删除此应用的 {count} 个构建，以及评论和下载跟踪。",
   "builds.total": "构建总数",
   "checkbox.defaultEnabled": "默认启用",
   "comments.empty": "暂无评论。",

@@ -113,6 +113,8 @@ export const koMessages: Record<string, MessageValue> = {
   "build.targets.title": "대상",
   "build.versionLabel": "버전 {version}",
   "builds.app.label": "앱 빌드",
+  "builds.deleteAll.title": "모든 빌드를 삭제할까요?",
+  "builds.deleteAll.description": "이 앱의 {count}개 빌드와 댓글, 다운로드 추적을 삭제합니다.",
   "builds.total": "빌드 총계",
   "checkbox.defaultEnabled": "기본값으로 활성화",
   "comments.empty": "아직 댓글이 없습니다.",

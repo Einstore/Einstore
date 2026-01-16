@@ -6,7 +6,7 @@ All endpoints return JSON. Authenticated endpoints require `Authorization: Beare
 Team-scoped endpoints require `x-team-id` (a Team ID you belong to). If omitted, the API falls back to your `lastActiveTeamId`. Responses are restricted to that team.
 
 Team-scoped endpoints:
-- `/apps`, `/apps/:id`
+- `/apps`, `/apps/:id`, `/apps/:id/builds`
 - `/versions`, `/versions/:id`
 - `/builds`, `/builds/:id`
 - `/builds/:id/downloads`
@@ -493,6 +493,14 @@ Optional tracking metadata shared by download/install endpoints.
 - Response schema: `App & { versions: Version[] }`
 - Side effects: none
 - Platform relevance: all
+
+## DELETE /apps/{id}/builds
+- Purpose: Delete all builds for an app
+- Auth scope: Bearer (rafiki270/auth)
+- Request schema: path `{ id: string }`
+- Response schema: `{ deletedBuilds: number }`
+- Side effects: Deletes build dependencies (comments, build events, tracking, targets, variants, modules, artifacts, signing, tags) and removes local build files.
+- Platform relevance: ios, android
 
 ## POST /versions
 - Purpose: Create version for app

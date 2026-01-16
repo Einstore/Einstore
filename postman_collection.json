@@ -1078,6 +1078,50 @@
       ]
     },
     {
+      "name": "Delete App Builds",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/apps/{{appId}}/builds",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "apps",
+            "{{appId}}",
+            "builds"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Delete app builds ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
       "name": "Get Versions",
       "request": {
         "method": "GET",

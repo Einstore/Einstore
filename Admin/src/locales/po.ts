@@ -113,6 +113,8 @@ export const poMessages: Record<string, MessageValue> = {
   "build.targets.title": "Cele",
   "build.versionLabel": "Wersja {version}",
   "builds.app.label": "Buildy aplikacji",
+  "builds.deleteAll.title": "Usunac wszystkie buildy?",
+  "builds.deleteAll.description": "Spowoduje to usuniecie {count} buildow tej aplikacji wraz z komentarzami i sledzeniem pobran.",
   "builds.total": "Liczba buildow",
   "checkbox.defaultEnabled": "Domyslnie wlaczone",
   "comments.empty": "Brak komentarzy.",

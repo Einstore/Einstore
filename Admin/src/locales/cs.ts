@@ -113,6 +113,8 @@ export const csMessages: Record<string, MessageValue> = {
   "build.targets.title": "Cíle",
   "build.versionLabel": "Verze {version}",
   "builds.app.label": "Buildy aplikace",
+  "builds.deleteAll.title": "Smazat všechny buildy?",
+  "builds.deleteAll.description": "Tímto odstraníte {count} buildů pro tuto aplikaci včetně komentářů a sledování stažení.",
   "builds.total": "Celkem buildů",
   "checkbox.defaultEnabled": "Defaultně povoleno",
   "comments.empty": "Zatím žádné komentáře.",

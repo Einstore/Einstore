@@ -113,6 +113,8 @@ export const nlMessages: Record<string, MessageValue> = {
   "build.targets.title": "Targets",
   "build.versionLabel": "Versie {version}",
   "builds.app.label": "Builds voor app",
+  "builds.deleteAll.title": "Alle builds verwijderen?",
+  "builds.deleteAll.description": "Dit verwijdert {count} builds voor deze app, samen met opmerkingen en downloadtracking.",
   "builds.total": "Totaal builds",
   "checkbox.defaultEnabled": "Standaard ingeschakeld",
   "comments.empty": "Nog geen opmerkingen.",

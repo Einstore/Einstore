@@ -113,6 +113,8 @@ export const pirateMessages: Record<string, MessageValue> = {
   "build.targets.title": "Targets",
   "build.versionLabel": "Version {version}",
   "builds.app.label": "Fish o’ the ship",
+  "builds.deleteAll.title": "Scuttle all fish?",
+  "builds.deleteAll.description": "This be scuttlin’ {count} fish fer this ship, plus scribbles an’ plunder trackin’.",
   "builds.total": "Total fish",
   "checkbox.defaultEnabled": "Enabled by default",
   "comments.empty": "No scribbles yet.",

@@ -166,4 +166,6 @@ export const itMessages: Record<string, MessageValue> = {
   "billing.addOn.action.add": "Aggiungi al piano",
   "billing.addOn.notice.billedMonthly": "Fatturato mensilmente. Si applica immediatamente all'attivazione.",
   "billing.notice.unavailable": "Servizio di fatturazione non rilevato. Questa UI resta per gli operatori; le build OSS/self-host continuano senza fatturazione.",
+  "builds.deleteAll.title": "Eliminare tutti i build?",
+  "builds.deleteAll.description": "Questo rimuoverà {count} build per questa app, insieme ai commenti e al tracciamento dei download.",
 };

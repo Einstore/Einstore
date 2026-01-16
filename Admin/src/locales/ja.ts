@@ -113,6 +113,8 @@ export const jaMessages: Record<string, MessageValue> = {
   "build.targets.title": "ターゲット",
   "build.versionLabel": "バージョン {version}",
   "builds.app.label": "アプリのビルド",
+  "builds.deleteAll.title": "すべてのビルドを削除しますか？",
+  "builds.deleteAll.description": "このアプリの{count}件のビルドとコメント、ダウンロード追跡を削除します。",
   "builds.total": "ビルド総数",
   "checkbox.defaultEnabled": "デフォルトで有効",
   "comments.empty": "コメントはまだありません。",

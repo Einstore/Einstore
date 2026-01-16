@@ -136,6 +136,7 @@ const AppRoutes = () => {
   const envAnalyticsKey = import.meta.env.VITE_ANALYTICS_KEY ?? "";
   const [previewBuilds, setPreviewBuilds] = useState<SearchBuildResult[]>([]);
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
+  const [isDeletingBuilds, setIsDeletingBuilds] = useState(false);
   const {
     hasToken,
     isSuperUser,
@@ -1418,6 +1419,26 @@ const LatestBuildsRoute = ({
     [activeTeamId]
   );
 
+  const deleteAllBuilds = useCallback(async () => {
+    if (!appId || !activeTeamId) {
+      return false;
+    }
+    setIsDeletingBuilds(true);
+    try {
+      await apiFetch<{ deletedBuilds: number }>(`/apps/${appId}/builds`, {
+        method: "DELETE",
+        headers: { "x-team-id": activeTeamId },
+      });
+      setIngestNonce((current) => current + 1);
+      setPage(1);
+      return true;
+    } catch {
+      return false;
+    } finally {
+      setIsDeletingBuilds(false);
+    }
+  }, [appId, activeTeamId]);
+
   return (
     <BuildsPage
       builds={builds}
@@ -1609,6 +1630,8 @@ const AppBuildsRoute = ({
       onSelectBuild={(id) => navigate(appId ? `/apps/${appId}/builds/${id}` : `/builds/${id}`)}
       onInstallBuild={installBuild}
       onDownloadBuild={downloadBuild}
+      onDeleteBuilds={deleteAllBuilds}
+      isDeletingBuilds={isDeletingBuilds}
       pagination={pagination}
       onPageChange={setPage}
       onPerPageChange={(nextPerPage) => {

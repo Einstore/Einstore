@@ -113,6 +113,8 @@ export const deMessages: Record<string, MessageValue> = {
   "build.targets.title": "Ziele",
   "build.versionLabel": "Version {version}",
   "builds.app.label": "Builds der App",
+  "builds.deleteAll.title": "Alle Builds löschen?",
+  "builds.deleteAll.description": "Damit werden {count} Builds dieser App sowie Kommentare und Download-Tracking entfernt.",
   "builds.total": "Builds gesamt",
   "checkbox.defaultEnabled": "Standardmäßig aktiviert",
   "comments.empty": "Noch keine Kommentare.",

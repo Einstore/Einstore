@@ -1229,6 +1229,34 @@
         "summary": "Get app"
       }
     },
+    "/apps/{id}/builds": {
+      "delete": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete app builds"
+      }
+    },
     "/artifacts": {
       "get": {
         "parameters": [

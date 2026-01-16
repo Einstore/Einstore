@@ -113,6 +113,8 @@ export const enMessages: Record<string, MessageValue> = {
   "build.targets.title": "Targets",
   "build.versionLabel": "Version {version}",
   "builds.app.label": "Builds for app",
+  "builds.deleteAll.title": "Delete all builds?",
+  "builds.deleteAll.description": "This will remove {count} builds for this app, along with comments and download tracking.",
   "builds.total": "Total builds",
   "checkbox.defaultEnabled": "Enabled by default",
   "comments.empty": "No comments yet.",

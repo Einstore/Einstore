@@ -1,5 +1,8 @@
+import { useState } from "react";
+import ActionButton from "../components/ActionButton";
 import AppAvatar from "../components/AppAvatar";
 import BuildQueueList from "../components/BuildQueueList";
+import ConfirmDialog from "../components/ConfirmDialog";
 import Panel from "../components/Panel";
 import Pagination from "../components/Pagination";
 import SectionHeader from "../components/SectionHeader";
@@ -18,6 +21,8 @@ type AppBuildsPageProps = {
   onSelectBuild?: (id: string) => void;
   onInstallBuild?: (id: string) => void;
   onDownloadBuild?: (id: string) => void;
+  onDeleteBuilds?: () => Promise<boolean>;
+  isDeletingBuilds?: boolean;
   pagination: PaginationMeta;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
@@ -32,13 +37,28 @@ const AppBuildsPage = ({
   onSelectBuild,
   onInstallBuild,
   onDownloadBuild,
+  onDeleteBuilds,
+  isDeletingBuilds,
   pagination,
   onPageChange,
   onPerPageChange,
 }: AppBuildsPageProps) => {
   const { t } = useI18n();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const latestBuild = builds[0] ?? null;
   const lastUploaded = latestBuild ? formatDateTime(latestBuild.createdAt) : t("common.emptyDash", "—");
+  const totalBuilds = pagination.total ?? builds.length;
+  const hasBuilds = totalBuilds > 0;
+
+  const handleDeleteConfirm = async () => {
+    if (!onDeleteBuilds || isDeletingBuilds) {
+      return;
+    }
+    const ok = await onDeleteBuilds();
+    if (ok) {
+      setIsDeleteDialogOpen(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -101,7 +121,17 @@ const AppBuildsPage = ({
         </div>
       </div>
 
-      <SectionHeader title={t("common.builds", "Builds")} />
+      <SectionHeader
+        title={t("common.builds", "Builds")}
+        actions={
+          <ActionButton
+            label={t("common.delete", "Delete")}
+            variant="danger"
+            onClick={() => setIsDeleteDialogOpen(true)}
+            disabled={!hasBuilds || !onDeleteBuilds || isDeletingBuilds}
+          />
+        }
+      />
       <BuildQueueList
         jobs={builds}
         icons={buildIcons}
@@ -117,6 +147,18 @@ const AppBuildsPage = ({
         total={pagination.total}
         onPageChange={onPageChange}
         onPerPageChange={onPerPageChange}
+      />
+      <ConfirmDialog
+        isOpen={isDeleteDialogOpen}
+        title={t("builds.deleteAll.title", "Delete all builds?")}
+        description={t(
+          "builds.deleteAll.description",
+          "This will remove {count} builds for this app, along with comments and download tracking.",
+          { count: totalBuilds }
+        )}
+        confirmLabel={t("common.delete", "Delete")}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setIsDeleteDialogOpen(false)}
       />
     </div>
   );
