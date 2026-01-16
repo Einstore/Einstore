@@ -35,17 +35,6 @@ type IconBitmap = {
   sourcePath?: string;
 };
 
-const resolveBaseUrl = (request: { headers: Record<string, string | string[] | undefined> }) => {
-  const protoHeader = request.headers["x-forwarded-proto"];
-  const hostHeader = request.headers["x-forwarded-host"] ?? request.headers["host"];
-  const proto = Array.isArray(protoHeader) ? protoHeader[0] : protoHeader;
-  const host = Array.isArray(hostHeader) ? hostHeader[0] : hostHeader;
-  if (!host) {
-    return "http://localhost:8100";
-  }
-  return `${proto || "http"}://${host}`;
-};
-
 const parseSpacesPath = (value: string) => {
   if (!value.startsWith("spaces://")) return null;
   const stripped = value.replace("spaces://", "");
@@ -415,7 +404,6 @@ export async function buildRoutes(app: FastifyInstance) {
     if (!record) {
       return reply.status(404).send({ error: "Not found" });
     }
-    const baseUrl = resolveBaseUrl(request);
     const items = (
       await Promise.all(
         record.targets.map(async (target) => {
@@ -423,6 +411,14 @@ export async function buildRoutes(app: FastifyInstance) {
           if (!iconBitmap) return null;
           const source = resolveIconSource(iconBitmap.path);
           if (!source) return null;
+          const url =
+            source.kind === "url"
+              ? source.url
+              : await presignStorageObject({
+                  bucket: source.bucket,
+                  key: source.key,
+                  expiresIn: 900,
+                });
           return {
             targetId: target.id,
             bundleId: target.bundleId,
@@ -434,7 +430,7 @@ export async function buildRoutes(app: FastifyInstance) {
               sizeBytes: iconBitmap.sizeBytes,
               sourcePath: iconBitmap.sourcePath,
             },
-            url: source.kind === "url" ? source.url : `${baseUrl}/builds/${record.id}/icons/${target.id}`,
+            url,
             contentType: "image/png",
           };
         }),

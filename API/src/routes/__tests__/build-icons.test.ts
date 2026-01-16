@@ -123,7 +123,7 @@ describe("GET /builds/:id/icons", () => {
     expect(response.statusCode).toBe(200);
     const payload = JSON.parse(response.body);
     expect(payload.items).toHaveLength(1);
-    expect(payload.items[0].url).toContain("/builds/build-1/icons/target-1");
+    expect(payload.items[0].url).toBe("https://storage.local/icon-1x1.png");
     expect(payload.items[0].dataUrl).toBeUndefined();
   });
 
