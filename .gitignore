@@ -10,6 +10,7 @@ functions/**/.deployed
 functions/**/__deployer__.zip
 functions/**/package-lock.json
 /Admin/dist
+/API/dist
 API/prisma/generated/
 API/src/private/registry.ts
 Admin/src/private/routes.generated.tsx

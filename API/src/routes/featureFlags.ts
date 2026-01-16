@@ -72,9 +72,20 @@ const evaluateQuerySchema = z.object({
   targetKey: z.string().min(1).optional(),
 });
 
+const parseJsonBody = (body: unknown) => {
+  if (typeof body !== "string") {
+    return body;
+  }
+  try {
+    return JSON.parse(body) as unknown;
+  } catch {
+    return body;
+  }
+};
+
 export async function featureFlagRoutes(app: FastifyInstance) {
   app.post("/feature-flags", { preHandler: requireSuperUser }, async (request, reply) => {
-    const parsed = createFlagSchema.safeParse(request.body);
+    const parsed = createFlagSchema.safeParse(parseJsonBody(request.body));
     if (!parsed.success) {
       return reply.status(400).send({ error: "Invalid payload" });
     }
@@ -115,7 +126,7 @@ export async function featureFlagRoutes(app: FastifyInstance) {
 
   app.patch("/feature-flags/:key", { preHandler: requireSuperUser }, async (request, reply) => {
     const key = (request.params as { key: string }).key;
-    const parsed = updateFlagSchema.safeParse(request.body);
+    const parsed = updateFlagSchema.safeParse(parseJsonBody(request.body));
     if (!parsed.success) {
       return reply.status(400).send({ error: "Invalid payload" });
     }
@@ -150,7 +161,7 @@ export async function featureFlagRoutes(app: FastifyInstance) {
     { preHandler: requireSuperUser },
     async (request, reply) => {
     const key = (request.params as { key: string }).key;
-    const parsed = createOverrideSchema.safeParse(request.body);
+    const parsed = createOverrideSchema.safeParse(parseJsonBody(request.body));
     if (!parsed.success) {
       return reply.status(400).send({ error: "Invalid payload" });
     }
@@ -233,7 +244,7 @@ export async function featureFlagRoutes(app: FastifyInstance) {
   });
 
   app.post("/feature-flags/discover", { preHandler: requireAuth }, async (request, reply) => {
-    const parsed = discoverSchema.safeParse(request.body);
+    const parsed = discoverSchema.safeParse(parseJsonBody(request.body));
     if (!parsed.success) {
       return reply.status(400).send({ error: "Invalid payload" });
     }
@@ -251,7 +262,7 @@ export async function featureFlagRoutes(app: FastifyInstance) {
   });
 
   app.post("/feature-flags/public", async (request, reply) => {
-    const parsed = publicFlagSchema.safeParse(request.body);
+    const parsed = publicFlagSchema.safeParse(parseJsonBody(request.body));
     if (!parsed.success) {
       return reply.status(400).send({ error: "Invalid payload" });
     }
