@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import StorageSection from "../sections/StorageSection";
 import ActionButton from "../components/ActionButton";
 import Panel from "../components/Panel";
+import ProgressBar from "../components/ProgressBar";
 import BuildQueueList from "../components/BuildQueueList";
 import AppAvatar from "../components/AppAvatar";
 import Icon from "../components/Icon";
@@ -17,6 +18,8 @@ type OverviewPageProps = {
   buildQueue: BuildJob[];
   storageUsage: StorageUsageUser[];
   storageTotalBytes: number;
+  storageLimitBytes: number | null;
+  trafficTotalBytes: number;
   isStorageLoading?: boolean;
   showStorage?: boolean;
   activity?: ActivityItem[];
@@ -34,6 +37,8 @@ const OverviewPage = ({
   buildQueue,
   storageUsage,
   storageTotalBytes,
+  storageLimitBytes,
+  trafficTotalBytes,
   isStorageLoading = false,
   showStorage = false,
   activity = [],
@@ -67,6 +72,42 @@ const OverviewPage = ({
 
   const selectedAppLabel =
     appOptions.find((option) => option.id === previewAppId)?.name ?? t("overview.apps.all", "All apps");
+
+  const renderUsageCard = ({
+    label,
+    usedBytes,
+    limitBytes,
+    subtitle,
+  }: {
+    label: string;
+    usedBytes: number;
+    limitBytes: number | null;
+    subtitle: string;
+  }) => {
+    const hasLimit = typeof limitBytes === "number" && limitBytes > 0;
+    const safeMax = hasLimit ? limitBytes : Math.max(usedBytes, 1);
+    const formattedUsed = formatBytes(usedBytes);
+    const formattedLimit = hasLimit
+      ? formatBytes(limitBytes)
+      : t("overview.usage.noLimit", "No limit set");
+    const percent = hasLimit ? Math.round((usedBytes / limitBytes) * 100) : null;
+
+    return (
+      <Panel className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+            {label}
+          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            {formattedUsed} / {formattedLimit}
+            {percent !== null ? ` (${percent}%)` : ""}
+          </p>
+        </div>
+        <ProgressBar value={usedBytes} max={safeMax} />
+        <p className="text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>
+      </Panel>
+    );
+  };
 
   const filteredAppOptions = useMemo(
     () =>
@@ -107,7 +148,7 @@ const OverviewPage = ({
 
   return (
     <div className="space-y-10">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <Panel className="flex flex-col gap-2">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
             {t("common.apps", "Apps")}
@@ -128,17 +169,18 @@ const OverviewPage = ({
             {t("overview.builds.recent", "Recent builds listed below")}
           </p>
         </Panel>
-        <Panel className="flex flex-col gap-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            {t("overview.storage.label", "Storage")}
-          </p>
-          <p className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
-            {formatBytes(storageTotalBytes)}
-          </p>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            {t("overview.storage.subtitle", "Storage used across this workspace")}
-          </p>
-        </Panel>
+        {renderUsageCard({
+          label: t("overview.storage.label", "Storage"),
+          usedBytes: storageTotalBytes,
+          limitBytes: storageLimitBytes,
+          subtitle: t("overview.storage.subtitle", "Storage used across this workspace"),
+        })}
+        {renderUsageCard({
+          label: t("overview.traffic.label", "Traffic"),
+          usedBytes: trafficTotalBytes,
+          limitBytes: null,
+          subtitle: t("overview.traffic.subtitle", "Downloads across this workspace"),
+        })}
       </div>
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <div className="space-y-3">

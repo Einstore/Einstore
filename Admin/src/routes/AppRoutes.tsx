@@ -131,6 +131,8 @@ const AppRoutes = () => {
   const [ingestNonce, setIngestNonce] = useState(0);
   const [storageUsage, setStorageUsage] = useState<StorageUsageUser[]>([]);
   const [storageUsageTotalBytes, setStorageUsageTotalBytes] = useState(0);
+  const [storageUsageDownloadBytes, setStorageUsageDownloadBytes] = useState(0);
+  const [storageLimitBytes, setStorageLimitBytes] = useState<number | null>(null);
   const [isLoadingStorageUsage, setIsLoadingStorageUsage] = useState(false);
   const [analyticsKey, setAnalyticsKey] = useState<string | null>(null);
   const envAnalyticsKey = import.meta.env.VITE_ANALYTICS_KEY ?? "";
@@ -366,6 +368,7 @@ const AppRoutes = () => {
     if (!hasToken || !activeTeamId) {
       setStorageUsage([]);
       setStorageUsageTotalBytes(0);
+      setStorageUsageDownloadBytes(0);
       setIsLoadingStorageUsage(false);
       return () => {
         isMounted = false;
@@ -384,11 +387,15 @@ const AppRoutes = () => {
         setStorageUsageTotalBytes(
           users.reduce((sum, user) => sum + (user.totalBytes ?? 0), 0)
         );
+        setStorageUsageDownloadBytes(
+          users.reduce((sum, user) => sum + (user.downloadBytes ?? 0), 0)
+        );
       })
       .catch(() => {
         if (isMounted) {
           setStorageUsage([]);
           setStorageUsageTotalBytes(0);
+          setStorageUsageDownloadBytes(0);
         }
       })
       .finally(() => {
@@ -400,6 +407,30 @@ const AppRoutes = () => {
       isMounted = false;
     };
   }, [activeTeamId, hasToken, ingestNonce]);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (!hasToken || !isSuperUser) {
+      setStorageLimitBytes(null);
+      return () => {
+        isMounted = false;
+      };
+    }
+    apiFetch<{ defaultLimitGb?: number }>("/settings/storage-limit")
+      .then((payload) => {
+        if (!isMounted) return;
+        const limitGb = typeof payload?.defaultLimitGb === "number" ? payload.defaultLimitGb : 0;
+        setStorageLimitBytes(limitGb > 0 ? limitGb * 1024 * 1024 * 1024 : null);
+      })
+      .catch(() => {
+        if (isMounted) {
+          setStorageLimitBytes(null);
+        }
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [hasToken, isSuperUser]);
 
   useEffect(() => {
     if (!hasToken || !activeTeamId) {
@@ -652,6 +683,8 @@ const AppRoutes = () => {
           activity={recentActivity}
           storageUsage={storageUsage}
           storageTotalBytes={storageUsageTotalBytes}
+          storageLimitBytes={storageLimitBytes}
+          trafficTotalBytes={storageUsageDownloadBytes}
           isStorageLoading={isLoadingStorageUsage}
           showActivity
           showStorage

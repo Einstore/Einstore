@@ -5,6 +5,8 @@ export type StorageUsageUser = {
   fullName: string | null;
   buildCount: number;
   totalBytes: number;
+  downloadCount?: number;
+  downloadBytes?: number;
 };
 
 export type StorageUsageResponse = {
