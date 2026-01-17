@@ -20,6 +20,7 @@ type OverviewPageProps = {
   storageTotalBytes: number;
   storageLimitBytes: number | null;
   trafficTotalBytes: number;
+  trafficLimitBytes: number | null;
   isStorageLoading?: boolean;
   showStorage?: boolean;
   activity?: ActivityItem[];
@@ -39,6 +40,7 @@ const OverviewPage = ({
   storageTotalBytes,
   storageLimitBytes,
   trafficTotalBytes,
+  trafficLimitBytes,
   isStorageLoading = false,
   showStorage = false,
   activity = [],
@@ -89,7 +91,7 @@ const OverviewPage = ({
     const formattedUsed = formatBytes(usedBytes);
     const formattedLimit = hasLimit
       ? formatBytes(limitBytes)
-      : t("overview.usage.noLimit", "No limit set");
+      : t("overview.usage.noLimit", "Unlimited");
     const percent = hasLimit ? Math.round((usedBytes / limitBytes) * 100) : null;
 
     return (
@@ -178,7 +180,7 @@ const OverviewPage = ({
         {renderUsageCard({
           label: t("overview.traffic.label", "Traffic"),
           usedBytes: trafficTotalBytes,
-          limitBytes: null,
+          limitBytes: trafficLimitBytes,
           subtitle: t("overview.traffic.subtitle", "Downloads across this workspace"),
         })}
       </div>
