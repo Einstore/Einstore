@@ -44,7 +44,7 @@ const publicFlagSchema = z.object({
   flags: z
     .array(
       z.object({
-        key: z.string().min(1).regex(/^web\\./),
+        key: z.string().min(1).regex(/^web\./),
         description: z.string().optional(),
         defaultEnabled: z.boolean().optional(),
         metadata: z.any().optional(),
