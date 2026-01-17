@@ -68,6 +68,19 @@ const isMacSafariUserAgent = (value: unknown) => {
 };
 
 const gbToBytes = (gb: number) => BigInt(Math.round(gb * 1024 * 1024 * 1024));
+const formatBytes = (value: bigint) => {
+  if (value > BigInt(Number.MAX_SAFE_INTEGER)) {
+    return `${value.toString()} B`;
+  }
+  let size = Number(value);
+  const units = ["B", "KB", "MB", "GB", "TB"];
+  let unitIndex = 0;
+  while (size >= 1024 && unitIndex < units.length - 1) {
+    size /= 1024;
+    unitIndex += 1;
+  }
+  return `${size % 1 === 0 ? size.toFixed(0) : size.toFixed(1)} ${units[unitIndex]}`;
+};
 
 const resolveStorageLimitBytes = async (teamId: string) => {
   const team = await prisma.team.findUnique({
@@ -143,9 +156,17 @@ const ensureStorageCapacity = async (teamId: string, requiredBytes: bigint) => {
     const message = singleBuildApps
       ? "Storage limit reached and each app only has one build. Increase storage or delete a build manually."
       : "Storage limit reached. Delete older builds or increase storage.";
+    const availableBytes = limitBytes > usedBytes ? limitBytes - usedBytes : 0n;
     const err: Error & { statusCode?: number; code?: string } = new Error(message);
     err.statusCode = 413;
     err.code = "storage_limit_exceeded";
+    (err as Error & { details?: Record<string, string> }).details = {
+      limitBytes: limitBytes.toString(),
+      usedBytes: usedBytes.toString(),
+      requiredBytes: requiredBytes.toString(),
+      availableBytes: availableBytes.toString(),
+    };
+    err.message = `${message} Used ${formatBytes(usedBytes)} of ${formatBytes(limitBytes)}; upload size ${formatBytes(requiredBytes)}.`;
     throw err;
   }
 
@@ -165,9 +186,11 @@ const sendBillingError = (reply: FastifyReply, error: unknown) => {
   }
   const candidate = (error as { statusCode?: number }).statusCode;
   const statusCode = typeof candidate === "number" ? candidate : 403;
+  const details = (error as { details?: unknown }).details;
   return reply.status(statusCode).send({
     error: (error as { code: string }).code,
     message: (error as { message?: string }).message ?? "Plan limit reached.",
+    ...(details && typeof details === "object" ? { details } : {}),
   });
 };
 
@@ -318,9 +341,14 @@ export async function pipelineRoutes(app: FastifyInstance) {
         return sendBillingError(reply, error);
       }
       if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
+        const details = (error as { details?: unknown }).details;
         return reply
           .status((error as { statusCode?: number }).statusCode ?? 413)
-          .send({ error: "storage_limit_exceeded", message: (error as { message?: string }).message });
+          .send({
+            error: "storage_limit_exceeded",
+            message: (error as { message?: string }).message,
+            ...(details && typeof details === "object" ? { details } : {}),
+          });
       }
       throw error;
     }
@@ -374,9 +402,14 @@ export async function pipelineRoutes(app: FastifyInstance) {
         return sendBillingError(reply, error);
       }
       if ((error as { code?: string; statusCode?: number; message?: string }).code === "storage_limit_exceeded") {
+        const details = (error as { details?: unknown }).details;
         return reply
           .status((error as { statusCode?: number }).statusCode ?? 413)
-          .send({ error: "storage_limit_exceeded", message: (error as { message?: string }).message });
+          .send({
+            error: "storage_limit_exceeded",
+            message: (error as { message?: string }).message,
+            ...(details && typeof details === "object" ? { details } : {}),
+          });
       }
       throw error;
     }
