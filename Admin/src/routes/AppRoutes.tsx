@@ -418,32 +418,44 @@ const AppRoutes = () => {
         isMounted = false;
       };
     }
-    apiFetch<{
-      limits?: { storageBytes?: number | null; transferBytes?: number | null };
-      stripeError?: boolean;
-    }>("/billing/status", {
-      headers: { "x-team-id": activeTeamId },
-    })
-      .then((payload) => {
-        if (!isMounted) return;
-        if (payload?.stripeError) {
-          setStorageLimitBytes(null);
-          setTransferLimitBytes(null);
+
+    const resolveLimits = async () => {
+      try {
+        const probe = await fetch(`${API_BASE_URL}/billing/status`, {
+          headers: { Accept: "application/json" },
+        });
+        if (probe.status === 404) {
+          if (isMounted) {
+            setStorageLimitBytes(null);
+            setTransferLimitBytes(null);
+          }
           return;
         }
+      } catch {
+        return;
+      }
+
+      try {
+        const payload = await apiFetch<{
+          limits?: { storageBytes?: number | null; transferBytes?: number | null };
+          stripeError?: boolean;
+        }>("/billing/status", {
+          headers: { "x-team-id": activeTeamId },
+        });
+        if (!isMounted) return;
         const storageBytes =
           typeof payload?.limits?.storageBytes === "number" ? payload.limits.storageBytes : null;
         const transferBytes =
           typeof payload?.limits?.transferBytes === "number" ? payload.limits.transferBytes : null;
         setStorageLimitBytes(storageBytes && storageBytes > 0 ? storageBytes : null);
         setTransferLimitBytes(transferBytes && transferBytes > 0 ? transferBytes : null);
-      })
-      .catch(() => {
-        if (isMounted) {
-          setStorageLimitBytes(null);
-          setTransferLimitBytes(null);
-        }
-      });
+      } catch {
+        // Keep existing limits if the module is present but the request failed.
+      }
+    };
+
+    resolveLimits();
+
     return () => {
       isMounted = false;
     };
