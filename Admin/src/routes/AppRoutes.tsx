@@ -421,8 +421,14 @@ const AppRoutes = () => {
 
     const resolveLimits = async () => {
       try {
+        const token = localStorage.getItem("accessToken");
+        const headers: HeadersInit = { Accept: "application/json" };
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+        headers["x-team-id"] = activeTeamId;
         const probe = await fetch(`${API_BASE_URL}/billing/status`, {
-          headers: { Accept: "application/json" },
+          headers,
         });
         if (probe.status === 404) {
           if (isMounted) {
