@@ -22,6 +22,7 @@ const AddAppDialog = ({
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [progress, setProgress] = useState<number | null>(null);
 
   useEffect(() => {
     if (!isOpen) {
@@ -30,6 +31,7 @@ const AddAppDialog = ({
       setError("");
       setBusy(false);
       setIsClosing(false);
+      setProgress(null);
     }
   }, [isOpen]);
 
@@ -75,6 +77,19 @@ const AddAppDialog = ({
           disabled={busy}
           statusMessage={status || undefined}
         />
+        {progress !== null ? (
+          <div className="space-y-2">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+              <div
+                className="h-full rounded-full bg-indigo-600 transition-[width] duration-150"
+                style={{ width: `${Math.round(progress * 100)}%` }}
+              />
+            </div>
+            <p className="text-right text-xs text-slate-500 dark:text-slate-400">
+              {Math.round(progress * 100)}%
+            </p>
+          </div>
+        ) : null}
         {error ? (
           <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-600">
             {error}
@@ -99,8 +114,17 @@ const AddAppDialog = ({
               setBusy(true);
               setError("");
               setStatus(t("upload.status.uploading", "Uploading build..."));
+              setProgress(0);
               try {
-                await onUpload(file);
+                await onUpload(file, (value) => {
+                  const nextValue = Math.min(Math.max(value, 0), 1);
+                  setProgress(nextValue);
+                  setStatus(
+                    t("upload.status.progress", "Uploading build... {percent}%", {
+                      percent: Math.round(nextValue * 100),
+                    })
+                  );
+                });
                 setStatus(t("upload.status.ingested", "Build ingested."));
                 setFile(null);
                 onClose();
@@ -109,6 +133,7 @@ const AddAppDialog = ({
                 setStatus("");
               } finally {
                 setBusy(false);
+                setProgress(null);
               }
             }}
           />
