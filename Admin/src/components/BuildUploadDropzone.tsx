@@ -136,9 +136,6 @@ const BuildUploadDropzone = ({
                     style={{ width: `${Math.round(progress * 100)}%` }}
                   />
                 </div>
-                <p className="text-right text-[11px] text-slate-500 dark:text-slate-400">
-                  {Math.round(progress * 100)}%
-                </p>
               </div>
             ) : null}
             {status ? <p className="mt-1 text-xs text-indigo-600">{status}</p> : null}
@@ -172,9 +169,6 @@ const BuildUploadDropzone = ({
                   style={{ width: `${Math.round(progress * 100)}%` }}
                 />
               </div>
-              <p className="text-right text-xs text-slate-500 dark:text-slate-400">
-                {Math.round(progress * 100)}%
-              </p>
             </div>
           ) : null}
           {status ? <p className="text-xs text-indigo-600">{status}</p> : null}
