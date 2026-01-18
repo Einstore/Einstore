@@ -61,7 +61,7 @@ import {
 
 const putToSpacesXHR = ({
   url,
-  headers,
+  headers: _headers,
   file,
   onProgress,
 }: {
@@ -73,10 +73,8 @@ const putToSpacesXHR = ({
   new Promise<void>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open("PUT", url, true);
-    const contentType = headers?.["Content-Type"] ?? headers?.["content-type"];
-    if (contentType) {
-      xhr.setRequestHeader("Content-Type", contentType);
-    }
+    // Avoid sending Content-Type since presigns only include host.
+    const uploadBlob = file.type ? file.slice(0, file.size, "") : file;
     if (xhr.upload && onProgress) {
       xhr.upload.onprogress = (event) => {
         if (event.lengthComputable) {
@@ -98,7 +96,7 @@ const putToSpacesXHR = ({
       (err as any).isNetwork = true;
       reject(err);
     };
-    xhr.send(file);
+    xhr.send(uploadBlob);
   });
 
 const AppRoutes = () => {
@@ -585,7 +583,6 @@ const AppRoutes = () => {
       if (!file) {
         return;
       }
-      const contentType = file.type || "application/octet-stream";
       const toError = (code: string, message: string) => {
         const err = new Error(`${message} [${code}]`);
         (err as any).code = code;
@@ -607,7 +604,6 @@ const AppRoutes = () => {
             body: JSON.stringify({
               filename: file.name,
               sizeBytes: file.size,
-              contentType,
             }),
           }
         ).catch((err) => {
