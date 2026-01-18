@@ -128,6 +128,19 @@ const BuildUploadDropzone = ({
             <p className="text-xs text-slate-500">
               {t("upload.compact.help", "Drop IPA/APK or click to browse. Uploads immediately.")}
             </p>
+            {progress !== null ? (
+              <div className="mt-2 space-y-1">
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+                  <div
+                    className="h-full rounded-full bg-indigo-600 transition-[width] duration-150"
+                    style={{ width: `${Math.round(progress * 100)}%` }}
+                  />
+                </div>
+                <p className="text-right text-[11px] text-slate-500 dark:text-slate-400">
+                  {Math.round(progress * 100)}%
+                </p>
+              </div>
+            ) : null}
             {status ? <p className="mt-1 text-xs text-indigo-600">{status}</p> : null}
             {error ? <p className="mt-1 text-xs text-rose-600">{error}</p> : null}
           </div>
@@ -151,6 +164,19 @@ const BuildUploadDropzone = ({
           >
             {t("common.browse", "Browse")}
           </button>
+          {progress !== null ? (
+            <div className="w-full max-w-sm space-y-2">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+                <div
+                  className="h-full rounded-full bg-indigo-600 transition-[width] duration-150"
+                  style={{ width: `${Math.round(progress * 100)}%` }}
+                />
+              </div>
+              <p className="text-right text-xs text-slate-500 dark:text-slate-400">
+                {Math.round(progress * 100)}%
+              </p>
+            </div>
+          ) : null}
           {status ? <p className="text-xs text-indigo-600">{status}</p> : null}
           {error ? <p className="text-xs text-rose-600">{error}</p> : null}
         </>
