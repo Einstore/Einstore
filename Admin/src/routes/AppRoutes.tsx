@@ -137,7 +137,6 @@ const AppRoutes = () => {
   const envAnalyticsKey = import.meta.env.VITE_ANALYTICS_KEY ?? "";
   const [previewBuilds, setPreviewBuilds] = useState<SearchBuildResult[]>([]);
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
-  const [isDeletingBuilds, setIsDeletingBuilds] = useState(false);
   const {
     hasToken,
     isSuperUser,
@@ -1371,6 +1370,8 @@ const LatestBuildsRoute = ({
   const [buildPlatforms, setBuildPlatforms] = useState<Record<string, string>>({});
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
+  const [deleteNonce, setDeleteNonce] = useState(0);
+  const [isDeletingBuilds, setIsDeletingBuilds] = useState(false);
   const [pagination, setPagination] = useState<PaginationMeta>({
     page: 1,
     perPage: 25,
@@ -1505,6 +1506,26 @@ const LatestBuildsRoute = ({
     [activeTeamId]
   );
 
+  const deleteAllBuilds = useCallback(async () => {
+    if (!activeTeamId || !appId || isDeletingBuilds) {
+      return false;
+    }
+    setIsDeletingBuilds(true);
+    try {
+      await apiFetch<{ deletedBuilds: number }>(`/apps/${appId}/builds`, {
+        method: "DELETE",
+        headers: { "x-team-id": activeTeamId },
+      });
+      setPage(1);
+      setDeleteNonce((current) => current + 1);
+      return true;
+    } catch {
+      return false;
+    } finally {
+      setIsDeletingBuilds(false);
+    }
+  }, [activeTeamId, appId, isDeletingBuilds]);
+
   return (
     <BuildsPage
       builds={builds}
@@ -1636,7 +1657,7 @@ const AppBuildsRoute = ({
     return () => {
       isMounted = false;
     };
-  }, [appId, ingestNonce, activeTeamId, page, perPage]);
+  }, [appId, ingestNonce, activeTeamId, page, perPage, deleteNonce]);
 
   useEffect(() => {
     let isMounted = true;
