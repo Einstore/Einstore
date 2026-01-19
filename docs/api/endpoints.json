@@ -3076,6 +3076,131 @@
         "summary": "Update default storage limit (GB)"
       }
     },
+    "/settings/tariff-overrides": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "perPage",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tariff overrides"
+          },
+          "400": {
+            "description": "Invalid query"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List tariff overrides"
+      }
+    },
+    "/settings/tariff-overrides/{teamId}": {
+      "put": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "maxUsers": {
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "maxApps": {
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "storageLimitBytes": {
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "transferLimitBytes": {
+                    "nullable": true,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "maxUsers",
+                  "maxApps",
+                  "storageLimitBytes",
+                  "transferLimitBytes"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Saved tariff overrides"
+          },
+          "400": {
+            "description": "Invalid limits"
+          },
+          "404": {
+            "description": "Team not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Update tariff overrides"
+      }
+    },
     "/storage": {
       "get": {
         "parameters": [

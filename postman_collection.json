@@ -582,6 +582,66 @@
       }
     },
     {
+      "name": "List Tariff Overrides",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('List tariff overrides ok', function () {",
+              "  pm.expect([200, 403]).to.include(pm.response.code);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/settings/tariff-overrides?page=1&perPage=25"
+      }
+    },
+    {
+      "name": "Update Tariff Overrides",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Update tariff overrides ok', function () {",
+              "  pm.expect([200, 400, 403, 404]).to.include(pm.response.code);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"maxUsers\": null,\n  \"maxApps\": null,\n  \"storageLimitBytes\": null,\n  \"transferLimitBytes\": null\n}"
+        },
+        "url": "{{baseUrl}}/settings/tariff-overrides/{{teamId}}"
+      }
+    },
+    {
       "name": "Auth Session",
       "request": {
         "method": "GET",

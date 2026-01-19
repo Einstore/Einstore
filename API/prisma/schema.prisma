@@ -437,6 +437,20 @@ model Team {
   tags            Tag[]
   trackingEvents  TrackingEvent[]
   invites         TeamInvite[]
+  limitOverride   TeamLimitOverride?
+}
+
+model TeamLimitOverride {
+  id                 String   @id @default(uuid())
+  teamId             String   @unique
+  maxUsers           Int?
+  maxApps            Int?
+  storageLimitBytes  BigInt?
+  transferLimitBytes BigInt?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 }
 
 model TeamMember {

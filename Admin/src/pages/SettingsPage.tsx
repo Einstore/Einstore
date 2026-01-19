@@ -7,6 +7,7 @@ import InviteUserDialog from "../components/InviteUserDialog";
 import Tabs from "../components/Tabs";
 import TeamMembersTable from "../components/TeamMembersTable";
 import TextInput from "../components/TextInput";
+import TariffOverridesPanel from "../components/TariffOverridesPanel";
 import { apiFetch } from "../lib/api";
 import type { TeamMember, TeamSummary } from "../lib/teams";
 import type { AnalyticsSettings } from "../types/settings";
@@ -236,6 +237,11 @@ const SettingsPage = ({
   ];
 
   if (isSuperUser) {
+    tabs.push({
+      id: "tariff-overrides",
+      label: t("settings.tabs.tariffOverrides", "Tariff overrides"),
+      content: <TariffOverridesPanel />,
+    });
     tabs.push({
       id: "analytics",
       label: t("settings.tabs.analytics", "Analytics"),

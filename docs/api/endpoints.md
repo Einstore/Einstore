@@ -781,6 +781,22 @@ Optional tracking metadata shared by download/install endpoints.
 - Request schema: `{ "defaultLimitGb": number }` (positive, max 10,000)
 - Response schema: `{ "defaultLimitGb": number }`
 
+## GET /settings/tariff-overrides
+- Purpose: List team tariff overrides
+- Auth scope: Superuser
+- Request schema: query `{ page?: number, perPage?: number, limit?: number, offset?: number, search?: string }`
+- Response schema: `{ items: [{ id, name, slug, limits: { maxUsers, maxApps, storageLimitBytes, transferLimitBytes } }], page, perPage, total, totalPages }`
+- Side effects: none
+- Platform relevance: all
+
+## PUT /settings/tariff-overrides/{teamId}
+- Purpose: Create/update team tariff overrides (all null clears overrides)
+- Auth scope: Superuser
+- Request schema: path `{ teamId }`, body `{ maxUsers: number|null, maxApps: number|null, storageLimitBytes: number|null, transferLimitBytes: number|null }`
+- Response schema: `{ id, name, slug, limits: { maxUsers, maxApps, storageLimitBytes, transferLimitBytes } }`
+- Side effects: Creates, updates, or clears team override record
+- Platform relevance: all
+
 ## GET /feature-flags/{key}/overrides
 - Purpose: List feature flag overrides
 - Auth scope: Bearer (super user)
