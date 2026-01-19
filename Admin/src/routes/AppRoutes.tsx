@@ -880,9 +880,6 @@ const AppRoutes = () => {
       if (item.id === "apps") {
         return { ...item, badge: badges.apps ? String(badges.apps) : undefined };
       }
-      if (item.id === "builds") {
-        return { ...item, badge: badges.builds ? String(badges.builds) : undefined };
-      }
       return item;
     });
     return withBadges.filter((item) => {
