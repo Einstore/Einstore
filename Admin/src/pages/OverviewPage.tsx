@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import StorageSection from "../sections/StorageSection";
 import ActionButton from "../components/ActionButton";
 import Panel from "../components/Panel";
 import ProgressBar from "../components/ProgressBar";
@@ -8,7 +7,6 @@ import BuildQueueList from "../components/BuildQueueList";
 import AppAvatar from "../components/AppAvatar";
 import Icon from "../components/Icon";
 import type { ActivityItem, AppSummary, BuildJob } from "../data/mock";
-import type { StorageUsageUser } from "../types/usage";
 import type { SearchBuildResult } from "../lib/search";
 import { useI18n } from "../lib/i18n";
 import { formatBytes } from "../lib/apps";
@@ -16,13 +14,10 @@ import { formatBytes } from "../lib/apps";
 type OverviewPageProps = {
   apps: AppSummary[];
   buildQueue: BuildJob[];
-  storageUsage: StorageUsageUser[];
   storageTotalBytes: number;
   storageLimitBytes: number | null;
   trafficTotalBytes: number;
   trafficLimitBytes: number | null;
-  isStorageLoading?: boolean;
-  showStorage?: boolean;
   activity?: ActivityItem[];
   showActivity?: boolean;
   appsTotal?: number;
@@ -36,13 +31,10 @@ type OverviewPageProps = {
 const OverviewPage = ({
   apps,
   buildQueue,
-  storageUsage,
   storageTotalBytes,
   storageLimitBytes,
   trafficTotalBytes,
   trafficLimitBytes,
-  isStorageLoading = false,
-  showStorage = false,
   activity = [],
   showActivity = false,
   appsTotal,
@@ -354,13 +346,6 @@ const OverviewPage = ({
           </div>
         ) : null}
       </div>
-      {showStorage ? (
-        <StorageSection
-          users={storageUsage}
-          totalBytes={storageTotalBytes}
-          isLoading={isStorageLoading}
-        />
-      ) : null}
     </div>
   );
 };

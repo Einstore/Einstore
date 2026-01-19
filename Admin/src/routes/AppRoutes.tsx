@@ -712,14 +712,11 @@ const AppRoutes = () => {
           appsTotal={appsPagination.total || badges.apps || apps.length}
           buildsTotal={badges.builds}
           activity={recentActivity}
-          storageUsage={storageUsage}
           storageTotalBytes={storageUsageTotalBytes}
           storageLimitBytes={storageLimitBytes}
           trafficTotalBytes={storageUsageDownloadBytes}
           trafficLimitBytes={transferLimitBytes}
-          isStorageLoading={isLoadingStorageUsage}
           showActivity
-          showStorage
         />
       ),
       navId: "overview",
