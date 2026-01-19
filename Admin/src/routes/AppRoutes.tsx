@@ -1506,26 +1506,6 @@ const LatestBuildsRoute = ({
     [activeTeamId]
   );
 
-  const deleteAllBuilds = useCallback(async () => {
-    if (!activeTeamId || !appId || isDeletingBuilds) {
-      return false;
-    }
-    setIsDeletingBuilds(true);
-    try {
-      await apiFetch<{ deletedBuilds: number }>(`/apps/${appId}/builds`, {
-        method: "DELETE",
-        headers: { "x-team-id": activeTeamId },
-      });
-      setPage(1);
-      setDeleteNonce((current) => current + 1);
-      return true;
-    } catch {
-      return false;
-    } finally {
-      setIsDeletingBuilds(false);
-    }
-  }, [activeTeamId, appId, isDeletingBuilds]);
-
   return (
     <BuildsPage
       builds={builds}
@@ -1563,6 +1543,8 @@ const AppBuildsRoute = ({
   const [buildPlatforms, setBuildPlatforms] = useState<Record<string, string>>({});
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
+  const [deleteNonce, setDeleteNonce] = useState(0);
+  const [isDeletingBuilds, setIsDeletingBuilds] = useState(false);
   const [pagination, setPagination] = useState<PaginationMeta>({
     page: 1,
     perPage: 25,
@@ -1614,6 +1596,26 @@ const AppBuildsRoute = ({
     },
     [activeTeamId]
   );
+
+  const deleteAllBuilds = useCallback(async () => {
+    if (!activeTeamId || !appId || isDeletingBuilds) {
+      return false;
+    }
+    setIsDeletingBuilds(true);
+    try {
+      await apiFetch<{ deletedBuilds: number }>(`/apps/${appId}/builds`, {
+        method: "DELETE",
+        headers: { "x-team-id": activeTeamId },
+      });
+      setPage(1);
+      setDeleteNonce((current) => current + 1);
+      return true;
+    } catch {
+      return false;
+    } finally {
+      setIsDeletingBuilds(false);
+    }
+  }, [activeTeamId, appId, isDeletingBuilds]);
 
   useEffect(() => {
     setPage(1);
