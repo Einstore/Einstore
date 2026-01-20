@@ -870,7 +870,22 @@ exports.main = async (args) => {
     return finalize({ ok: false, message: `Unsupported kind ${kind}` });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Ingest failed.";
-    return finalize({ ok: false, message });
+    const errorName = error instanceof Error ? error.name : null;
+    const errorCode = error && typeof error === "object" && "code" in error ? error.code : null;
+    const errorStatus =
+      error && typeof error === "object" && "$metadata" in error
+        ? error.$metadata?.httpStatusCode ?? null
+        : null;
+    const errorStack = error instanceof Error ? error.stack : null;
+    console.error("Ingest failed", error);
+    return finalize({
+      ok: false,
+      message,
+      errorName,
+      errorCode,
+      errorStatus,
+      errorStack,
+    });
   }
 };
 
