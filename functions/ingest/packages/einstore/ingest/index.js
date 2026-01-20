@@ -181,8 +181,8 @@ const normalizeIosIconPng = async (buffer) => {
   if (isCgbiPng(buffer)) {
     console.log("normalizeIosIconPng: detected CgBI PNG, converting.");
     try {
-      const converted = await convertCgbi(buffer);
-      working = Buffer.from(converted);
+          const converted = await convertCgbi(buffer);
+          working = Buffer.from(converted);
     } catch (error) {
       console.warn("CgBI conversion failed, using raw icon PNG.", error);
       working = buffer;
@@ -190,15 +190,15 @@ const normalizeIosIconPng = async (buffer) => {
   }
 
   try {
-    working = await sharp(working)
-      .ensureAlpha()
-      .resize(128, 128, {
-        fit: "contain",
-        background: { r: 0, g: 0, b: 0, alpha: 0 },
-      })
-      .toColorspace("srgb")
-      .png({ force: true })
-      .toBuffer();
+      working = await sharp(working)
+        .ensureAlpha()
+        .resize(128, 128, {
+          fit: "contain",
+          background: { r: 0, g: 0, b: 0, alpha: 0 },
+        })
+        .toColorspace("srgb")
+        .png({ force: true })
+        .toBuffer();
   } catch (error) {
     console.warn("PNG normalization failed, using existing icon PNG.", error);
   }
@@ -284,219 +284,219 @@ const openZipFromSpaces = async (client, bucket, key, stats) => {
 const withZipfile = async (client, bucket, key, handler, stats) => {
   const zipfile = await openZipFromSpaces(client, bucket, key, stats);
   try {
-    return await handler(zipfile);
-  } finally {
-    try {
-      zipfile.close();
-    } catch {
-      // Ignore close errors
+      return await handler(zipfile);
+    } finally {
+      try {
+        zipfile.close();
+      } catch {
+        // Ignore close errors
+      }
     }
-  }
-};
+  };
 
-const listZipEntries = (zipfile) =>
-  new Promise((resolve, reject) => {
-    const entries = [];
-    zipfile.readEntry();
-    zipfile.on("entry", (entry) => {
-      entries.push(entry.fileName);
+  const listZipEntries = (zipfile) =>
+    new Promise((resolve, reject) => {
+      const entries = [];
       zipfile.readEntry();
+      zipfile.on("entry", (entry) => {
+        entries.push(entry.fileName);
+        zipfile.readEntry();
+      });
+      zipfile.on("end", () => resolve(entries));
+      zipfile.on("error", reject);
     });
-    zipfile.on("end", () => resolve(entries));
-    zipfile.on("error", reject);
-  });
 
-const readEntryBuffer = (zipfile, entryName) =>
-  new Promise((resolve, reject) => {
-    let found = false;
-    zipfile.readEntry();
-    zipfile.on("entry", (entry) => {
-      if (entry.fileName === entryName) {
-        found = true;
+  const readEntryBuffer = (zipfile, entryName) =>
+    new Promise((resolve, reject) => {
+      let found = false;
+      zipfile.readEntry();
+      zipfile.on("entry", (entry) => {
+        if (entry.fileName === entryName) {
+          found = true;
+          zipfile.openReadStream(entry, (err, stream) => {
+            if (err || !stream) {
+              reject(err || new Error("Unable to read entry"));
+              return;
+            }
+            const chunks = [];
+            stream.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
+            stream.on("end", () => resolve(Buffer.concat(chunks)));
+            stream.on("error", reject);
+          });
+        } else {
+          zipfile.readEntry();
+        }
+      });
+      zipfile.on("end", () => {
+        if (!found) reject(new Error(`Missing entry ${entryName}`));
+      });
+      zipfile.on("error", reject);
+    });
+
+  const readEntryBuffers = async (zipfile, entryNames) => {
+    return new Promise((resolve, reject) => {
+      const buffers = new Map();
+      const wanted = new Set(entryNames);
+      if (!wanted.size) {
+        resolve(buffers);
+        return;
+      }
+      let done = false;
+      const finish = (err) => {
+        if (done) return;
+        done = true;
+        if (err) {
+          reject(err);
+        } else {
+          resolve(buffers);
+        }
+      };
+      zipfile.readEntry();
+      zipfile.on("entry", (entry) => {
+        if (done) return;
+        if (!wanted.has(entry.fileName)) {
+          zipfile.readEntry();
+          return;
+        }
         zipfile.openReadStream(entry, (err, stream) => {
           if (err || !stream) {
-            reject(err || new Error("Unable to read entry"));
+            finish(err || new Error("Unable to read entry"));
             return;
           }
           const chunks = [];
           stream.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
-          stream.on("end", () => resolve(Buffer.concat(chunks)));
-          stream.on("error", reject);
+          stream.on("end", () => {
+            buffers.set(entry.fileName, Buffer.concat(chunks));
+            wanted.delete(entry.fileName);
+            if (!wanted.size) {
+              finish();
+            } else {
+              zipfile.readEntry();
+            }
+          });
+          stream.on("error", finish);
         });
-      } else {
-        zipfile.readEntry();
-      }
-    });
-    zipfile.on("end", () => {
-      if (!found) reject(new Error(`Missing entry ${entryName}`));
-    });
-    zipfile.on("error", reject);
-  });
-
-const readEntryBuffers = async (zipfile, entryNames) => {
-  return new Promise((resolve, reject) => {
-    const buffers = new Map();
-    const wanted = new Set(entryNames);
-    if (!wanted.size) {
-      resolve(buffers);
-      return;
-    }
-    let done = false;
-    const finish = (err) => {
-      if (done) return;
-      done = true;
-      if (err) {
-        reject(err);
-      } else {
-        resolve(buffers);
-      }
-    };
-    zipfile.readEntry();
-    zipfile.on("entry", (entry) => {
-      if (done) return;
-      if (!wanted.has(entry.fileName)) {
-        zipfile.readEntry();
-        return;
-      }
-      zipfile.openReadStream(entry, (err, stream) => {
-        if (err || !stream) {
-          finish(err || new Error("Unable to read entry"));
-          return;
-        }
-        const chunks = [];
-        stream.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
-        stream.on("end", () => {
-          buffers.set(entry.fileName, Buffer.concat(chunks));
-          wanted.delete(entry.fileName);
-          if (!wanted.size) {
-            finish();
-          } else {
-            zipfile.readEntry();
-          }
-        });
-        stream.on("error", finish);
       });
+      zipfile.on("end", () => finish());
+      zipfile.on("error", finish);
     });
-    zipfile.on("end", () => finish());
-    zipfile.on("error", finish);
-  });
-};
+  };
 
-const scoreIconCandidate = (name) => {
-  const lower = name.toLowerCase();
-  const filename = lower.split("/").pop() || "";
-  return (
-    (lower.includes("appicon") ? 10 : 0) +
-    (filename.includes("ic_launcher") || filename.includes("app_icon") ? 8 : 0) +
-    (filename.includes("launcher") ? 4 : 0) +
-    (filename.includes("icon") ? 2 : 0)
-  );
-};
+  const scoreIconCandidate = (name) => {
+    const lower = name.toLowerCase();
+    const filename = lower.split("/").pop() || "";
+    return (
+      (lower.includes("appicon") ? 10 : 0) +
+      (filename.includes("ic_launcher") || filename.includes("app_icon") ? 8 : 0) +
+      (filename.includes("launcher") ? 4 : 0) +
+      (filename.includes("icon") ? 2 : 0)
+    );
+  };
 
-const buildIconCandidates = (entryNames, rootPrefix, preferredNames) => {
-  const preferred = Array.isArray(preferredNames) && preferredNames.length ? preferredNames : null;
-  const candidates = [];
-  for (const name of entryNames) {
-    if (!name.startsWith(rootPrefix) || !name.toLowerCase().endsWith(".png")) continue;
-    if (preferred) {
-      const filename = name.split("/").pop() || "";
-      if (!preferred.some((iconName) => matchesIconName(filename, iconName))) {
-        continue;
+  const buildIconCandidates = (entryNames, rootPrefix, preferredNames) => {
+    const preferred = Array.isArray(preferredNames) && preferredNames.length ? preferredNames : null;
+    const candidates = [];
+    for (const name of entryNames) {
+      if (!name.startsWith(rootPrefix) || !name.toLowerCase().endsWith(".png")) continue;
+      if (preferred) {
+        const filename = name.split("/").pop() || "";
+        if (!preferred.some((iconName) => matchesIconName(filename, iconName))) {
+          continue;
+        }
+      }
+      candidates.push({ name, score: scoreIconCandidate(name) });
+    }
+    return candidates;
+  };
+
+  const extractBestIcon = async (zipfile, entryNames, rootPrefix, preferredNames) => {
+    let candidates = buildIconCandidates(entryNames, rootPrefix, preferredNames);
+    if (!candidates.length && preferredNames) {
+      candidates = buildIconCandidates(entryNames, rootPrefix, null);
+    }
+    if (!candidates.length) return null;
+    candidates.sort((a, b) => b.score - a.score);
+    const limited = candidates.slice(0, 120);
+    const buffers = await readEntryBuffers(
+      zipfile,
+      limited.map((c) => c.name),
+    );
+    let best = null;
+    for (const candidate of limited) {
+      const buffer = buffers.get(candidate.name);
+      if (!buffer) continue;
+      const dimensions = readPngDimensions(buffer);
+      if (!dimensions) continue;
+      if (
+        !best ||
+        dimensions.width * dimensions.height > best.width * best.height ||
+        (dimensions.width * dimensions.height === best.width * best.height &&
+          candidate.score > best.score)
+      ) {
+        best = {
+          name: candidate.name,
+          buffer,
+          width: dimensions.width,
+          height: dimensions.height,
+        };
       }
     }
-    candidates.push({ name, score: scoreIconCandidate(name) });
-  }
-  return candidates;
-};
+    return best;
+  };
 
-const extractBestIcon = async (zipfile, entryNames, rootPrefix, preferredNames) => {
-  let candidates = buildIconCandidates(entryNames, rootPrefix, preferredNames);
-  if (!candidates.length && preferredNames) {
-    candidates = buildIconCandidates(entryNames, rootPrefix, null);
-  }
-  if (!candidates.length) return null;
-  candidates.sort((a, b) => b.score - a.score);
-  const limited = candidates.slice(0, 120);
-  const buffers = await readEntryBuffers(
-    zipfile,
-    limited.map((c) => c.name),
-  );
-  let best = null;
-  for (const candidate of limited) {
-    const buffer = buffers.get(candidate.name);
-    if (!buffer) continue;
-    const dimensions = readPngDimensions(buffer);
-    if (!dimensions) continue;
-    if (
-      !best ||
-      dimensions.width * dimensions.height > best.width * best.height ||
-      (dimensions.width * dimensions.height === best.width * best.height &&
-        candidate.score > best.score)
-    ) {
-      best = {
-        name: candidate.name,
-        buffer,
-        width: dimensions.width,
-        height: dimensions.height,
-      };
+
+  const parseIosTargets = async (zipfile, entryNames) => {
+    const targets = [];
+    const targetRoots = resolveTargetRoots(entryNames);
+    const plistEntries = targetRoots.map((root) => `${root}Info.plist`);
+    const buffers = await readEntryBuffers(zipfile, plistEntries);
+    for (const root of targetRoots) {
+      const entryName = `${root}Info.plist`;
+      const buffer = buffers.get(entryName);
+      if (!buffer) continue;
+      const info = parsePlist(buffer);
+      const bundleId = String(info.CFBundleIdentifier || "");
+      if (!bundleId) continue;
+      const name = String(info.CFBundleDisplayName || info.CFBundleName || info.CFBundleExecutable || bundleId);
+      const version = String(info.CFBundleShortVersionString || info.CFBundleVersion || "");
+      const build = String(info.CFBundleVersion || "");
+      const deviceFamily = Array.isArray(info.UIDeviceFamily) ? info.UIDeviceFamily : undefined;
+      const supportedDevices = mapDeviceFamily(deviceFamily);
+      const orientations = [
+        ...(Array.isArray(info.UISupportedInterfaceOrientations) ? info.UISupportedInterfaceOrientations : []),
+        ...(Array.isArray(info["UISupportedInterfaceOrientations~ipad"])
+          ? info["UISupportedInterfaceOrientations~ipad"]
+          : []),
+      ];
+      const minOsVersion = info.MinimumOSVersion ? String(info.MinimumOSVersion) : undefined;
+      const extension = info.NSExtension || undefined;
+      const extensionPoint =
+        extension && typeof extension === "object" && extension.NSExtensionPointIdentifier
+          ? String(extension.NSExtensionPointIdentifier)
+          : undefined;
+      const platform = supportedDevices.includes("watch") || info.WKWatchKitApp ? "watchos" : "ios";
+      const role = resolveRole(extensionPoint);
+      targets.push({
+        entryName,
+        root,
+        bundleId,
+        name,
+        version,
+        build,
+        supportedDevices,
+        orientations,
+        minOsVersion,
+        platform,
+        role,
+        info,
+      });
     }
-  }
-  return best;
-};
+    return targets;
+  };
 
-
-const parseIosTargets = async (zipfile, entryNames) => {
-  const targets = [];
-  const targetRoots = resolveTargetRoots(entryNames);
-  const plistEntries = targetRoots.map((root) => `${root}Info.plist`);
-  const buffers = await readEntryBuffers(zipfile, plistEntries);
-  for (const root of targetRoots) {
-    const entryName = `${root}Info.plist`;
-    const buffer = buffers.get(entryName);
-    if (!buffer) continue;
-    const info = parsePlist(buffer);
-    const bundleId = String(info.CFBundleIdentifier || "");
-    if (!bundleId) continue;
-    const name = String(info.CFBundleDisplayName || info.CFBundleName || info.CFBundleExecutable || bundleId);
-    const version = String(info.CFBundleShortVersionString || info.CFBundleVersion || "");
-    const build = String(info.CFBundleVersion || "");
-    const deviceFamily = Array.isArray(info.UIDeviceFamily) ? info.UIDeviceFamily : undefined;
-    const supportedDevices = mapDeviceFamily(deviceFamily);
-    const orientations = [
-      ...(Array.isArray(info.UISupportedInterfaceOrientations) ? info.UISupportedInterfaceOrientations : []),
-      ...(Array.isArray(info["UISupportedInterfaceOrientations~ipad"])
-        ? info["UISupportedInterfaceOrientations~ipad"]
-        : []),
-    ];
-    const minOsVersion = info.MinimumOSVersion ? String(info.MinimumOSVersion) : undefined;
-    const extension = info.NSExtension || undefined;
-    const extensionPoint =
-      extension && typeof extension === "object" && extension.NSExtensionPointIdentifier
-        ? String(extension.NSExtensionPointIdentifier)
-        : undefined;
-    const platform = supportedDevices.includes("watch") || info.WKWatchKitApp ? "watchos" : "ios";
-    const role = resolveRole(extensionPoint);
-    targets.push({
-      entryName,
-      root,
-      bundleId,
-      name,
-      version,
-      build,
-      supportedDevices,
-      orientations,
-      minOsVersion,
-      platform,
-      role,
-      info,
-    });
-  }
-  return targets;
-};
-
-const tryParsePlist = (buffer) => {
+  const tryParsePlist = (buffer) => {
   try {
-    return plist.parse(buffer.toString("utf8"));
+      return plist.parse(buffer.toString("utf8"));
   } catch (error) {
     return null;
   }
@@ -515,7 +515,7 @@ const parseEmbeddedMobileProvision = (buffer) => {
   const xml = extractXmlPlist(buffer);
   if (!xml) return null;
   try {
-    return plist.parse(xml);
+      return plist.parse(xml);
   } catch (error) {
     return null;
   }
@@ -663,188 +663,215 @@ exports.main = async (args) => {
     return undefined;
   };
 
-  const resolved = {};
-  const missing = [];
-  for (const key of REQUIRED_ENV) {
-    const value = resolveSetting(key);
-    if (value) {
-      resolved[key] = value;
-    } else {
-      missing.push(key);
+  const callbackUrl = typeof args?.callbackUrl === "string" ? args.callbackUrl.trim() : null;
+  const callbackToken = typeof args?.callbackToken === "string" ? args.callbackToken.trim() : null;
+  const callbackJobId = typeof args?.jobId === "string" ? args.jobId.trim() : null;
+
+  const sendCallback = async (payload) => {
+    if (!callbackUrl || !callbackToken) return;
+    try {
+      await fetch(callbackUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: callbackToken, jobId: callbackJobId, ...payload }),
+      });
+    } catch (error) {
+      console.warn("Ingest callback failed.", error);
     }
-  }
-  if (missing.length) {
-    return { ok: false, message: `Missing env: ${missing.join(", ")}` };
-  }
-
-  const { kind, storagePath } = args || {};
-  if (!kind || !storagePath) {
-    return { ok: false, message: "Missing kind/storagePath" };
-  }
-
-  const forcePathStyle = ["true", "1", "yes"].includes(
-    String(process.env.SPACES_FORCE_PATH_STYLE || (args && args.SPACES_FORCE_PATH_STYLE) || "").toLowerCase(),
-  );
-  const spacesConfig = {
-    region: resolved.SPACES_REGION,
-    endpoint: resolved.SPACES_ENDPOINT,
-    credentials: {
-      accessKeyId: resolved.SPACES_KEY,
-      secretAccessKey: resolved.SPACES_SECRET,
-    },
-    forcePathStyle,
   };
 
-  const client = new S3Client(spacesConfig);
-  const bucket = resolved.SPACES_BUCKET;
-  const { bucket: inputBucket, key } = resolveBucketKey(storagePath);
-  const objectBucket = inputBucket || bucket;
-  const debugTransfer = ["true", "1", "yes"].includes(
-    String(process.env.INGEST_DEBUG_TRANSFER || "").toLowerCase(),
-  );
-  const transferStats = debugTransfer ? createTransferStats() : null;
-
-  const entryNames = await withZipfile(client, objectBucket, key, listZipEntries, transferStats);
-
-  if (kind === "ipa") {
-    const targets = await withZipfile(
-      client,
-      objectBucket,
-      key,
-      (zip) => parseIosTargets(zip, entryNames),
-      transferStats,
-    );
-    if (!targets.length) {
-      return { ok: false, message: "No targets found" };
-    }
-    const mainTarget = targets[0];
-    const entitlements = await withZipfile(
-      client,
-      objectBucket,
-      key,
-      (zip) => extractIosEntitlements(zip, entryNames, mainTarget.root),
-      transferStats,
-    );
-    const iconNames = collectIosIconNames(mainTarget.info);
-    const icon = await withZipfile(
-      client,
-      objectBucket,
-      key,
-      (zip) => extractBestIcon(zip, entryNames, mainTarget.root, iconNames),
-      transferStats,
-    );
-    let iconPath = null;
-    let iconBase64 = null;
-    let iconWidth = null;
-    let iconHeight = null;
-    let iconBytes = null;
-    let iconSourcePath = null;
-    if (icon) {
-      const normalized = await normalizeIosIconPng(icon.buffer);
-      const dimensions = readPngDimensions(normalized) || { width: icon.width, height: icon.height };
-      const iconKey = `extracted/${key}/icon-${dimensions.width}x${dimensions.height}.png`;
-      iconBase64 = normalized.toString("base64");
-      iconWidth = dimensions.width;
-      iconHeight = dimensions.height;
-      iconBytes = normalized.length;
-      iconSourcePath = icon.name;
-      iconPath = await uploadToSpaces(client, bucket, iconKey, normalized, "image/png");
-    }
-    const response = {
-      ok: true,
-      kind,
-      appName: mainTarget.name,
-      identifier: mainTarget.bundleId,
-      version: mainTarget.version,
-      buildNumber: mainTarget.build,
-      targets,
-      entitlements,
-      iconPath,
-      iconBase64,
-      iconWidth,
-      iconHeight,
-      iconBytes,
-      iconSourcePath,
-    };
-    if (transferStats) {
-      response.transferBytesRequested = transferStats.bytesRequested;
-      response.transferBytesRead = transferStats.bytesRead;
-      response.transferRequests = transferStats.requests;
-    }
+  const finalize = async (response) => {
+    await sendCallback({ result: response });
     return response;
-  }
+  };
 
-  if (kind === "apk") {
-    const manifestEntry = entryNames.find((name) => name === "AndroidManifest.xml");
-    if (!manifestEntry) {
-      return { ok: false, message: "Missing AndroidManifest.xml" };
+  try {
+    const resolved = {};
+    const missing = [];
+    for (const key of REQUIRED_ENV) {
+      const value = resolveSetting(key);
+      if (value) {
+        resolved[key] = value;
+      } else {
+        missing.push(key);
+      }
     }
-    const manifestBuffer = await withZipfile(
-      client,
-      objectBucket,
-      key,
-      (zip) => readEntryBuffer(zip, manifestEntry),
-      transferStats,
-    );
-    const manifest = parseAndroidManifest(manifestBuffer);
-    const iconName = parseAndroidIconName(manifest.application?.icon);
-    const icon = await withZipfile(
-      client,
-      objectBucket,
-      key,
-      (zip) => extractBestIcon(zip, entryNames, "res/", iconName ? [iconName] : null),
-      transferStats,
-    );
-    let iconPath = null;
-    let iconBase64 = null;
-    let iconWidth = null;
-    let iconHeight = null;
-    let iconBytes = null;
-    let iconSourcePath = null;
-    if (icon) {
-      const iconKey = `extracted/${key}/icon-${icon.width}x${icon.height}.png`;
-      iconBase64 = icon.buffer.toString("base64");
-      iconWidth = icon.width;
-      iconHeight = icon.height;
-      iconBytes = icon.buffer.length;
-      iconSourcePath = icon.name;
-      iconPath = await uploadToSpaces(client, bucket, iconKey, icon.buffer, "image/png");
+    if (missing.length) {
+      return finalize({ ok: false, message: `Missing env: ${missing.join(", ")}` });
     }
-    const response = {
-      ok: true,
-      kind,
-      packageName: manifest.package,
-      versionName: manifest.versionName,
-      versionCode: manifest.versionCode,
-      appName: manifest.application?.label || "",
-      minSdk: manifest.usesSdk?.minSdkVersion ? String(manifest.usesSdk.minSdkVersion) : undefined,
-      targetSdk: manifest.usesSdk?.targetSdkVersion ? String(manifest.usesSdk.targetSdkVersion) : undefined,
-      manifest: {
+
+    const { kind, storagePath } = args || {};
+    if (!kind || !storagePath) {
+      return finalize({ ok: false, message: "Missing kind/storagePath" });
+    }
+
+    const forcePathStyle = ["true", "1", "yes"].includes(
+      String(process.env.SPACES_FORCE_PATH_STYLE || (args && args.SPACES_FORCE_PATH_STYLE) || "").toLowerCase(),
+    );
+    const spacesConfig = {
+      region: resolved.SPACES_REGION,
+      endpoint: resolved.SPACES_ENDPOINT,
+      credentials: {
+        accessKeyId: resolved.SPACES_KEY,
+        secretAccessKey: resolved.SPACES_SECRET,
+      },
+      forcePathStyle,
+    };
+
+    const client = new S3Client(spacesConfig);
+    const bucket = resolved.SPACES_BUCKET;
+    const { bucket: inputBucket, key } = resolveBucketKey(storagePath);
+    const objectBucket = inputBucket || bucket;
+    const debugTransfer = ["true", "1", "yes"].includes(
+      String(process.env.INGEST_DEBUG_TRANSFER || "").toLowerCase(),
+    );
+    const transferStats = debugTransfer ? createTransferStats() : null;
+
+    const entryNames = await withZipfile(client, objectBucket, key, listZipEntries, transferStats);
+
+    if (kind === "ipa") {
+      const targets = await withZipfile(
+        client,
+        objectBucket,
+        key,
+        (zip) => parseIosTargets(zip, entryNames),
+        transferStats,
+      );
+      if (!targets.length) {
+        return finalize({ ok: false, message: "No targets found" });
+      }
+      const mainTarget = targets[0];
+      const entitlements = await withZipfile(
+        client,
+        objectBucket,
+        key,
+        (zip) => extractIosEntitlements(zip, entryNames, mainTarget.root),
+        transferStats,
+      );
+      const iconNames = collectIosIconNames(mainTarget.info);
+      const icon = await withZipfile(
+        client,
+        objectBucket,
+        key,
+        (zip) => extractBestIcon(zip, entryNames, mainTarget.root, iconNames),
+        transferStats,
+      );
+      let iconPath = null;
+      let iconBase64 = null;
+      let iconWidth = null;
+      let iconHeight = null;
+      let iconBytes = null;
+      let iconSourcePath = null;
+      if (icon) {
+        const normalized = await normalizeIosIconPng(icon.buffer);
+        const dimensions = readPngDimensions(normalized) || { width: icon.width, height: icon.height };
+        const iconKey = `extracted/${key}/icon-${dimensions.width}x${dimensions.height}.png`;
+        iconBase64 = normalized.toString("base64");
+        iconWidth = dimensions.width;
+        iconHeight = dimensions.height;
+        iconBytes = normalized.length;
+        iconSourcePath = icon.name;
+        iconPath = await uploadToSpaces(client, bucket, iconKey, normalized, "image/png");
+      }
+      const response = {
+        ok: true,
+        kind,
+        appName: mainTarget.name,
+        identifier: mainTarget.bundleId,
+        version: mainTarget.version,
+        buildNumber: mainTarget.build,
+        targets,
+        entitlements,
+        iconPath,
+        iconBase64,
+        iconWidth,
+        iconHeight,
+        iconBytes,
+        iconSourcePath,
+      };
+      if (transferStats) {
+        response.transferBytesRequested = transferStats.bytesRequested;
+        response.transferBytesRead = transferStats.bytesRead;
+        response.transferRequests = transferStats.requests;
+      }
+      return finalize(response);
+    }
+
+    if (kind === "apk") {
+      const manifestEntry = entryNames.find((name) => name === "AndroidManifest.xml");
+      if (!manifestEntry) {
+        return finalize({ ok: false, message: "Missing AndroidManifest.xml" });
+      }
+      const manifestBuffer = await withZipfile(
+        client,
+        objectBucket,
+        key,
+        (zip) => readEntryBuffer(zip, manifestEntry),
+        transferStats,
+      );
+      const manifest = parseAndroidManifest(manifestBuffer);
+      const iconName = parseAndroidIconName(manifest.application?.icon);
+      const icon = await withZipfile(
+        client,
+        objectBucket,
+        key,
+        (zip) => extractBestIcon(zip, entryNames, "res/", iconName ? [iconName] : null),
+        transferStats,
+      );
+      let iconPath = null;
+      let iconBase64 = null;
+      let iconWidth = null;
+      let iconHeight = null;
+      let iconBytes = null;
+      let iconSourcePath = null;
+      if (icon) {
+        const iconKey = `extracted/${key}/icon-${icon.width}x${icon.height}.png`;
+        iconBase64 = icon.buffer.toString("base64");
+        iconWidth = icon.width;
+        iconHeight = icon.height;
+        iconBytes = icon.buffer.length;
+        iconSourcePath = icon.name;
+        iconPath = await uploadToSpaces(client, bucket, iconKey, icon.buffer, "image/png");
+      }
+      const response = {
+        ok: true,
+        kind,
         packageName: manifest.package,
         versionName: manifest.versionName,
         versionCode: manifest.versionCode,
+        appName: manifest.application?.label || "",
         minSdk: manifest.usesSdk?.minSdkVersion ? String(manifest.usesSdk.minSdkVersion) : undefined,
         targetSdk: manifest.usesSdk?.targetSdkVersion ? String(manifest.usesSdk.targetSdkVersion) : undefined,
+        manifest: {
+          packageName: manifest.package,
+          versionName: manifest.versionName,
+          versionCode: manifest.versionCode,
+          minSdk: manifest.usesSdk?.minSdkVersion ? String(manifest.usesSdk.minSdkVersion) : undefined,
+          targetSdk: manifest.usesSdk?.targetSdkVersion ? String(manifest.usesSdk.targetSdkVersion) : undefined,
+          permissions: manifest.usesPermissions || [],
+          icon: manifest.application?.icon || "",
+        },
+        iconPath,
+        iconBase64,
+        iconWidth,
+        iconHeight,
+        iconBytes,
+        iconSourcePath,
         permissions: manifest.usesPermissions || [],
-        icon: manifest.application?.icon || "",
-      },
-      iconPath,
-      iconBase64,
-      iconWidth,
-      iconHeight,
-      iconBytes,
-      iconSourcePath,
-      permissions: manifest.usesPermissions || [],
-    };
-    if (transferStats) {
-      response.transferBytesRequested = transferStats.bytesRequested;
-      response.transferBytesRead = transferStats.bytesRead;
-      response.transferRequests = transferStats.requests;
+      };
+      if (transferStats) {
+        response.transferBytesRequested = transferStats.bytesRequested;
+        response.transferBytesRead = transferStats.bytesRead;
+        response.transferRequests = transferStats.requests;
+      }
+      return finalize(response);
     }
-    return response;
-  }
 
-  return { ok: false, message: `Unsupported kind ${kind}` };
+    return finalize({ ok: false, message: `Unsupported kind ${kind}` });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Ingest failed.";
+    return finalize({ ok: false, message });
+  }
 };
 
 exports.__test = {

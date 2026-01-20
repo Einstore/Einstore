@@ -110,10 +110,10 @@ Team-scoped endpoints:
 - Platform relevance: all
 
 ## GET /ws
-- Purpose: WebSocket for real-time badge updates
+- Purpose: WebSocket for real-time badge + ingest updates
 - Auth scope: Bearer (rafiki270/auth) + Team membership
 - Request schema: none (uses `Authorization` header when available, otherwise `accessToken` query param; `x-team-id` header or `teamId` query param for team context)
-- Response schema: WebSocket messages like `{ type: "badges.updated", badges: { apps: number, builds: number } }`
+- Response schema: WebSocket messages like `{ type: "badges.updated", badges: { apps: number, builds: number } }` or `{ type: "ingest.completed" | "ingest.failed", jobId: string, result?: object, message?: string }`
 - Side effects: none
 - Platform relevance: all
 
@@ -705,14 +705,22 @@ Optional tracking metadata shared by download/install endpoints.
 - Platform relevance: ios, android
 
 ## POST /ingest/complete-upload
-- Purpose: Finalize a pre-signed upload and ingest the IPA/APK
+- Purpose: Finalize a pre-signed upload and queue IPA/APK ingest
 - Auth scope: Bearer (rafiki270/auth) or `x-api-key` (CI uploads)
 - Request schema: `{ key: string, filename?: string, sizeBytes?: number }`
-- Response schema: `{ status: string, result: object }`
-- Side effects: Calls the ingest function to extract metadata and icons, then persists build records.
+- Response schema: `{ status: "processing", jobId: string }`
+- Side effects: Queues the ingest function for async processing; the ingest callback persists build records when complete.
 - Platform relevance: ios, android
 - Notes:
-  - Errors: `400 invalid_archive` when the IPA/APK is not a valid zip archive.
+  - Use `/ws` events to detect completion (`ingest.completed` / `ingest.failed`).
+
+## POST /ingest/jobs/{jobId}/callback
+- Purpose: Ingest function callback (internal)
+- Auth scope: None (token-based callback)
+- Request schema: `{ token: string, result?: object, error?: string, message?: string }`
+- Response schema: `{ status: "completed"|"failed" }`
+- Side effects: Persists build metadata and broadcasts ingest completion events.
+- Platform relevance: ios, android
 
 ## POST /feature-flags
 - Purpose: Create/ensure feature flag

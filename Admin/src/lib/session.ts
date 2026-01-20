@@ -26,6 +26,7 @@ export const useSessionState = (refreshKey?: string) => {
   const [activeTeamId, setActiveTeamId] = useState("");
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [badges, setBadges] = useState<BadgeCounts>({ apps: 0, builds: 0 });
+  const [ingestEventsNonce, setIngestEventsNonce] = useState(0);
 
   useEffect(() => {
     setHasToken(Boolean(localStorage.getItem("accessToken")));
@@ -154,6 +155,9 @@ export const useSessionState = (refreshKey?: string) => {
         if (payload?.type === "badges.updated" && payload.badges) {
           setBadges(payload.badges);
         }
+        if (payload?.type === "ingest.completed" || payload?.type === "ingest.failed") {
+          setIngestEventsNonce((current) => current + 1);
+        }
       } catch {
         return;
       }
@@ -234,6 +238,7 @@ export const useSessionState = (refreshKey?: string) => {
     isAdmin,
     teamMembers,
     badges,
+    ingestEventsNonce,
     selectTeam,
     createTeam,
   };

@@ -98,6 +98,13 @@ enum OverviewStatsPeriod {
   calendar_month
 }
 
+enum IngestJobStatus {
+  queued
+  processing
+  completed
+  failed
+}
+
 model App {
   id        String   @id @default(uuid())
   teamId    String
@@ -321,6 +328,7 @@ model User {
   createdBuilds       Build[]             @relation("BuildCreatedBy")
   buildEvents         BuildEvent[]
   createdApiKeys      ApiKey[]            @relation("ApiKeyCreator")
+  createdIngestJobs   IngestJob[]         @relation("IngestJobCreatedBy")
   trackingEvents      TrackingEvent[]
 }
 
@@ -438,6 +446,7 @@ model Team {
   trackingEvents  TrackingEvent[]
   invites         TeamInvite[]
   limitOverride   TeamLimitOverride?
+  ingestJobs      IngestJob[]
 }
 
 model TeamLimitOverride {
@@ -451,6 +460,29 @@ model TeamLimitOverride {
   updatedAt          DateTime @updatedAt
 
   team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+}
+
+model IngestJob {
+  id                String          @id @default(uuid())
+  teamId            String
+  createdByUserId   String?
+  status            IngestJobStatus @default(queued)
+  kind              String
+  storageKey        String
+  filename          String?
+  sizeBytes         BigInt
+  callbackTokenHash String
+  errorMessage      String?         @db.Text
+  result            Json?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  team          Team  @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  createdByUser User? @relation("IngestJobCreatedBy", fields: [createdByUserId], references: [id], onDelete: SetNull)
+
+  @@index([teamId])
+  @@index([createdByUserId])
+  @@index([status])
 }
 
 model TeamMember {

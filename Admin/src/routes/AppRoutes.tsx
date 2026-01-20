@@ -126,7 +126,7 @@ const AppRoutes = () => {
 
   const [appsPlatform, setAppsPlatform] = useState(() => readAppsPlatformCookie());
   const [appIcons, setAppIcons] = useState<Record<string, string>>({});
-  const [ingestNonce, setIngestNonce] = useState(0);
+  const [localIngestNonce, setLocalIngestNonce] = useState(0);
   const [storageUsage, setStorageUsage] = useState<StorageUsageUser[]>([]);
   const [storageUsageTotalBytes, setStorageUsageTotalBytes] = useState(0);
   const [storageUsageDownloadBytes, setStorageUsageDownloadBytes] = useState(0);
@@ -147,8 +147,10 @@ const AppRoutes = () => {
     selectTeam,
     createTeam,
     badges,
+    ingestEventsNonce,
     me,
   } = useSessionState(location.pathname);
+  const ingestNonce = localIngestNonce + ingestEventsNonce;
   const isSaas = import.meta.env.VITE_SAAS === "true";
   const uploadDebugInfo = useMemo(() => {
     const accessToken = localStorage.getItem("accessToken");
@@ -635,21 +637,38 @@ const AppRoutes = () => {
           }));
         }
 
-        await apiFetch("/ingest/complete-upload", {
+        const accessToken = localStorage.getItem("accessToken");
+        const completeResponse = await fetch(`${API_BASE_URL}/ingest/complete-upload`, {
           method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+          },
           body: JSON.stringify({ key: presign.key, filename: file.name, sizeBytes: file.size }),
-        }).catch((err) => {
-          throw toError(
-            "INGEST-COMPLETE",
-            err instanceof Error ? err.message : t("upload.error.finalize", "Finalize failed")
-          );
         });
+        if (!completeResponse.ok) {
+          const completeText = await completeResponse.text();
+          let completePayload: { message?: string; error?: string } | null = null;
+          if (completeText) {
+            try {
+              completePayload = JSON.parse(completeText);
+            } catch {
+              completePayload = null;
+            }
+          }
+          const message =
+            completePayload?.message ||
+            completePayload?.error ||
+            t("upload.error.finalize", "Finalize failed");
+          throw toError("INGEST-COMPLETE", message);
+        }
       } catch (err) {
         throw err instanceof Error ? err : toError("INGEST-UNKNOWN", t("upload.error.failed", "Upload failed"));
       }
 
       await loadApps();
-      setIngestNonce((current) => current + 1);
+      setLocalIngestNonce((current) => current + 1);
     },
     [loadApps, t]
   );

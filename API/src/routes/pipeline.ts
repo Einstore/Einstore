@@ -9,7 +9,7 @@ import { HeadObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { ingestAndroidFromFunction, ingestIosFromFunction } from "../lib/ingest/remote.js";
 import { isInvalidArchiveError } from "../lib/zip.js";
 import { requireTeamOrApiKey } from "../auth/guard.js";
-import { broadcastBadgesUpdate } from "../lib/realtime.js";
+import { broadcastBadgesUpdate, broadcastTeamEvent } from "../lib/realtime.js";
 import { prisma } from "../lib/prisma.js";
 import { resolveS3Client, presignPutObject } from "../lib/storage-presign.js";
 
@@ -56,6 +56,12 @@ const ingestFunctionIosSchema = z.object({
   targets: z.array(z.any()),
   entitlements: z.any().optional(),
 }).passthrough();
+const ingestCallbackSchema = z.object({
+  token: z.string().min(1),
+  result: z.unknown().optional(),
+  error: z.string().optional(),
+  message: z.string().optional(),
+});
 
 const isMacSafariUserAgent = (value: unknown) => {
   const raw = Array.isArray(value) ? value[0] : value;
@@ -281,8 +287,11 @@ const ensureLocalIngestRunning = async (url: string) => {
   return localIngestBoot;
 };
 
-const callIngestFunction = async (url: string, payload: Record<string, unknown>) => {
-  const response = await fetch(url, {
+const callIngestFunctionAsync = async (url: string, payload: Record<string, unknown>) => {
+  const target = new URL(url);
+  target.searchParams.set("blocking", "false");
+  target.searchParams.set("result", "false");
+  const response = await fetch(target.toString(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -291,7 +300,28 @@ const callIngestFunction = async (url: string, payload: Record<string, unknown>)
     const message = await response.text();
     throw new Error(`ingest_function_failed: ${response.status} ${message}`);
   }
-  return response.json();
+};
+
+const hashIngestToken = (value: string) => crypto.createHash("sha256").update(value).digest("hex");
+
+const tokensMatch = (token: string, storedHash: string) => {
+  try {
+    const tokenHash = hashIngestToken(token);
+    return crypto.timingSafeEqual(Buffer.from(tokenHash), Buffer.from(storedHash));
+  } catch {
+    return false;
+  }
+};
+
+const resolveCallbackBaseUrl = (request: { headers: Record<string, string | string[] | undefined> }) => {
+  const forwardedHost = request.headers["x-forwarded-host"];
+  const host = Array.isArray(forwardedHost) ? forwardedHost[0] : forwardedHost ?? request.headers.host;
+  if (!host || typeof host !== "string") {
+    return null;
+  }
+  const forwardedProto = request.headers["x-forwarded-proto"];
+  const proto = Array.isArray(forwardedProto) ? forwardedProto[0] : forwardedProto ?? "http";
+  return `${proto}://${host}`;
 };
 
 const headSpacesObject = async (bucket: string, key: string) => {
@@ -428,68 +458,159 @@ export async function pipelineRoutes(app: FastifyInstance) {
         message: "Local ingest function is unavailable.",
       });
     }
-    try {
-      const storagePath = `spaces://${spaces.bucket}/${parsed.data.key}`;
-      const functionResult = await callIngestFunction(ingestFunctionUrl, {
-        kind: extension === ".apk" ? "apk" : "ipa",
-        storagePath,
+    const userId = request.auth?.user.id;
+    const sizeBytes = Number(expectedSize);
+    const kind = extension === ".apk" ? "apk" : "ipa";
+    const callbackBaseUrl = resolveCallbackBaseUrl(request);
+    if (!callbackBaseUrl) {
+      return reply.status(500).send({
+        error: "callback_url_missing",
+        message: "Unable to resolve public callback URL.",
       });
-      const baseParsed = ingestFunctionBaseSchema.safeParse(functionResult);
-      if (!baseParsed.success) {
-        return reply.status(502).send({
-          error: "ingest_function_failed",
-          message: "Ingest function returned an invalid payload.",
-        });
+    }
+    const callbackToken = crypto.randomBytes(32).toString("hex");
+    const ingestJob = await prisma.ingestJob.create({
+      data: {
+        teamId,
+        createdByUserId: userId,
+        status: "queued",
+        kind,
+        storageKey: parsed.data.key,
+        filename: parsed.data.filename,
+        sizeBytes: expectedSize,
+        callbackTokenHash: hashIngestToken(callbackToken),
+      },
+    });
+    const callbackUrl = new URL(`/ingest/jobs/${ingestJob.id}/callback`, callbackBaseUrl).toString();
+    const storagePath = `spaces://${spaces.bucket}/${parsed.data.key}`;
+
+    try {
+      await callIngestFunctionAsync(ingestFunctionUrl, {
+        kind,
+        storagePath,
+        callbackUrl,
+        callbackToken,
+        jobId: ingestJob.id,
+      });
+      await prisma.ingestJob.update({
+        where: { id: ingestJob.id },
+        data: { status: "processing" },
+      });
+      return reply.status(202).send({ status: "processing", jobId: ingestJob.id });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Ingest function failed.";
+      await prisma.ingestJob.update({
+        where: { id: ingestJob.id },
+        data: { status: "failed", errorMessage: message },
+      });
+      return reply.status(502).send({
+        error: "ingest_function_failed",
+        message,
+      });
+    }
+  });
+
+  app.post("/ingest/jobs/:jobId/callback", async (request, reply) => {
+    const parsed = ingestCallbackSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return reply.status(400).send({ error: "Invalid payload" });
+    }
+    const jobId = (request.params as { jobId?: string }).jobId;
+    if (!jobId) {
+      return reply.status(400).send({ error: "invalid_job" });
+    }
+    const job = await prisma.ingestJob.findUnique({ where: { id: jobId } });
+    if (!job) {
+      return reply.status(404).send({ error: "job_not_found" });
+    }
+    if (!tokensMatch(parsed.data.token, job.callbackTokenHash)) {
+      return reply.status(403).send({ error: "invalid_token" });
+    }
+    if (job.status === "completed" || job.status === "failed") {
+      return reply.send({ status: job.status });
+    }
+
+    const recordFailure = async (message: string, result?: unknown) => {
+      await prisma.ingestJob.update({
+        where: { id: job.id },
+        data: { status: "failed", errorMessage: message, result: result ?? null },
+      });
+      broadcastTeamEvent(job.teamId, { type: "ingest.failed", jobId: job.id, message });
+      return reply.send({ status: "failed" });
+    };
+
+    if (parsed.data.error || parsed.data.message) {
+      const message = parsed.data.error || parsed.data.message || "Ingest function failed.";
+      return recordFailure(message);
+    }
+
+    const functionResult = parsed.data.result;
+    if (!functionResult) {
+      return recordFailure("Ingest function returned no payload.");
+    }
+    const baseParsed = ingestFunctionBaseSchema.safeParse(functionResult);
+    if (!baseParsed.success) {
+      return recordFailure("Ingest function returned an invalid payload.", functionResult);
+    }
+    if (!baseParsed.data.ok) {
+      return recordFailure(
+        baseParsed.data.error || baseParsed.data.message || "Ingest function failed.",
+        functionResult,
+      );
+    }
+
+    try {
+      const sizeBytes = Number(job.sizeBytes);
+      if (job.kind !== "apk" && job.kind !== "ipa") {
+        return recordFailure(`Unsupported ingest kind ${job.kind}.`);
       }
-      if (!baseParsed.data.ok) {
-        return reply.status(502).send({
-          error: "ingest_function_failed",
-          message: baseParsed.data.error || baseParsed.data.message || "Ingest function failed.",
-        });
-      }
-      const userId = request.auth?.user.id;
-      const sizeBytes = Number(expectedSize);
-      if (extension === ".apk") {
+      if (job.kind === "apk") {
         const parsedPayload = ingestFunctionAndroidSchema.safeParse(functionResult);
         if (!parsedPayload.success) {
-          return reply.status(502).send({
-            error: "ingest_function_failed",
-            message: "Ingest function returned an invalid Android payload.",
-          });
+          return recordFailure("Ingest function returned an invalid Android payload.", functionResult);
         }
         const result = await ingestAndroidFromFunction(
           parsedPayload.data,
-          parsed.data.key,
+          job.storageKey,
           sizeBytes,
-          teamId,
-          userId,
+          job.teamId,
+          job.createdByUserId ?? undefined,
           { billingGuard },
         );
-        await broadcastBadgesUpdate(teamId).catch(() => undefined);
-        return reply.status(201).send({ status: "ingested", result });
+        await prisma.ingestJob.update({
+          where: { id: job.id },
+          data: { status: "completed", result },
+        });
+        await broadcastBadgesUpdate(job.teamId).catch(() => undefined);
+        broadcastTeamEvent(job.teamId, { type: "ingest.completed", jobId: job.id, result });
+        return reply.send({ status: "completed", result });
       }
+
       const parsedPayload = ingestFunctionIosSchema.safeParse(functionResult);
       if (!parsedPayload.success) {
-        return reply.status(502).send({
-          error: "ingest_function_failed",
-          message: "Ingest function returned an invalid iOS payload.",
-        });
+        return recordFailure("Ingest function returned an invalid iOS payload.", functionResult);
       }
       const result = await ingestIosFromFunction(
         parsedPayload.data,
-        parsed.data.key,
+        job.storageKey,
         sizeBytes,
-        teamId,
-        userId,
+        job.teamId,
+        job.createdByUserId ?? undefined,
         { billingGuard },
       );
-      await broadcastBadgesUpdate(teamId).catch(() => undefined);
-      return reply.status(201).send({ status: "ingested", result });
+      await prisma.ingestJob.update({
+        where: { id: job.id },
+        data: { status: "completed", result },
+      });
+      await broadcastBadgesUpdate(job.teamId).catch(() => undefined);
+      broadcastTeamEvent(job.teamId, { type: "ingest.completed", jobId: job.id, result });
+      return reply.send({ status: "completed", result });
     } catch (error) {
       if (isInvalidArchiveError(error)) {
-        return reply.status(400).send({ error: "invalid_archive" });
+        return recordFailure("invalid_archive");
       }
-      throw error;
+      const message = error instanceof Error ? error.message : "Ingest failed.";
+      return recordFailure(message);
     }
   });
 

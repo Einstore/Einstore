@@ -4037,7 +4037,7 @@
     "/ingest/complete-upload": {
       "post": {
         "summary": "Finalize ingest upload",
-        "description": "Finalizes a pre-signed upload and triggers ingest processing via the ingest function.",
+        "description": "Finalizes a pre-signed upload and queues ingest processing via the ingest function.",
         "parameters": [
           {
             "$ref": "#/components/parameters/TeamIdHeader"
@@ -4068,15 +4068,89 @@
           }
         },
         "responses": {
-          "201": {
-            "description": "Ingested build metadata",
+          "202": {
+            "description": "Ingest queued",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "status": {
+                      "type": "string",
+                      "enum": [
+                        "processing"
+                      ]
+                    },
+                    "jobId": {
                       "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "jobId"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ingest/jobs/{jobId}/callback": {
+      "post": {
+        "summary": "Ingest function callback",
+        "description": "Internal callback used by the ingest function to finalize ingestion.",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  },
+                  "result": {
+                    "type": "object"
+                  },
+                  "error": {
+                    "type": "string"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Callback processed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "completed",
+                        "failed"
+                      ]
                     },
                     "result": {
                       "type": "object"

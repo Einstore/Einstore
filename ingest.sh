@@ -127,8 +127,18 @@ curl -fsSL \
 
 complete_payload="$(json_payload "$filename" "$size_bytes" "$upload_key")"
 
-curl -fsSL \
-  -H "Content-Type: application/json" \
-  -H "x-api-key: $API_KEY" \
-  -d "$complete_payload" \
-  "$API_BASE_URL/ingest/complete-upload"
+complete_response="$(
+  curl -fsSL \
+    -H "Content-Type: application/json" \
+    -H "x-api-key: $API_KEY" \
+    -d "$complete_payload" \
+    "$API_BASE_URL/ingest/complete-upload"
+)"
+
+job_id="$(json_get "$complete_response" "jobId")"
+status="$(json_get "$complete_response" "status")"
+if [[ -n "$job_id" ]]; then
+  echo "Ingest queued ($status, job $job_id)."
+else
+  printf "%s\n" "$complete_response"
+fi
