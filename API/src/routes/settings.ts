@@ -1,4 +1,5 @@
 import { FastifyInstance } from "fastify";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 import { requireAuth, requireSuperUser } from "../auth/guard.js";
@@ -122,11 +123,11 @@ export async function settingsRoutes(app: FastifyInstance) {
     const resolvedPage = parsed.data.page ?? Math.floor(resolvedOffset / resolvedPerPage) + 1;
     const search = parsed.data.search;
 
-    const where = search
+    const where: Prisma.TeamWhereInput | undefined = search
       ? {
           OR: [
-            { name: { contains: search, mode: "insensitive" } },
-            { slug: { contains: search, mode: "insensitive" } },
+            { name: { contains: search, mode: Prisma.QueryMode.insensitive } },
+            { slug: { contains: search, mode: Prisma.QueryMode.insensitive } },
           ],
         }
       : undefined;

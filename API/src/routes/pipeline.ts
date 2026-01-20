@@ -6,6 +6,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { HeadObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { Prisma } from "@prisma/client";
 import { ingestAndroidFromFunction, ingestIosFromFunction } from "../lib/ingest/remote.js";
 import { isInvalidArchiveError } from "../lib/zip.js";
 import { requireTeamOrApiKey } from "../auth/guard.js";
@@ -533,7 +534,11 @@ export async function pipelineRoutes(app: FastifyInstance) {
     const recordFailure = async (message: string, result?: unknown) => {
       await prisma.ingestJob.update({
         where: { id: job.id },
-        data: { status: "failed", errorMessage: message, result: result ?? null },
+        data: {
+          status: "failed",
+          errorMessage: message,
+          result: result ? (result as Prisma.InputJsonValue) : Prisma.JsonNull,
+        },
       });
       broadcastTeamEvent(job.teamId, { type: "ingest.failed", jobId: job.id, message });
       return reply.send({ status: "failed" });
@@ -579,7 +584,7 @@ export async function pipelineRoutes(app: FastifyInstance) {
         );
         await prisma.ingestJob.update({
           where: { id: job.id },
-          data: { status: "completed", result },
+          data: { status: "completed", result: result as Prisma.InputJsonValue },
         });
         await broadcastBadgesUpdate(job.teamId).catch(() => undefined);
         broadcastTeamEvent(job.teamId, { type: "ingest.completed", jobId: job.id, result });
@@ -600,7 +605,7 @@ export async function pipelineRoutes(app: FastifyInstance) {
       );
       await prisma.ingestJob.update({
         where: { id: job.id },
-        data: { status: "completed", result },
+        data: { status: "completed", result: result as Prisma.InputJsonValue },
       });
       await broadcastBadgesUpdate(job.teamId).catch(() => undefined);
       broadcastTeamEvent(job.teamId, { type: "ingest.completed", jobId: job.id, result });
