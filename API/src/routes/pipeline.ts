@@ -492,16 +492,16 @@ export async function pipelineRoutes(app: FastifyInstance) {
     const storagePath = `spaces://${spaces.bucket}/${parsed.data.key}`;
 
     try {
+      await prisma.ingestJob.update({
+        where: { id: ingestJob.id },
+        data: { status: "processing" },
+      });
       await callIngestFunctionAsync(ingestFunctionUrl, {
         kind,
         storagePath,
         callbackUrl,
         callbackToken,
         jobId: ingestJob.id,
-      });
-      await prisma.ingestJob.update({
-        where: { id: ingestJob.id },
-        data: { status: "processing" },
       });
       return reply.status(202).send({ status: "processing", jobId: ingestJob.id });
     } catch (error) {
