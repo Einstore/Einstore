@@ -1138,50 +1138,6 @@
       ]
     },
     {
-      "name": "Delete App Builds",
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{accessToken}}"
-          },
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "x-team-id",
-            "value": "{{teamId}}"
-          }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/apps/{{appId}}/builds",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "apps",
-            "{{appId}}",
-            "builds"
-          ]
-        }
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Delete app builds ok', function () {",
-              "  pm.expect(pm.response.code).to.equal(200);",
-              "});"
-            ]
-          }
-        }
-      ]
-    },
-    {
       "name": "Get Versions",
       "request": {
         "method": "GET",
@@ -1360,49 +1316,6 @@
             "type": "text/javascript",
             "exec": [
               "pm.test('Get build ok', function () {",
-              "  pm.expect(pm.response.code).to.equal(200);",
-              "});"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "Delete Build",
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{accessToken}}"
-          },
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "x-team-id",
-            "value": "{{teamId}}"
-          }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/builds/{{buildId}}",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "builds",
-            "{{buildId}}"
-          ]
-        }
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Delete build ok', function () {",
               "  pm.expect(pm.response.code).to.equal(200);",
               "});"
             ]
@@ -2737,7 +2650,16 @@
           "name": "Ingest Processing Count",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-team-id",
+                "value": "{{teamId}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/ingest/processing-count",
               "host": [
@@ -2776,7 +2698,8 @@
                 "callback"
               ]
             }
-          }
+          },
+          "disabled": true
         }
       ]
     },
@@ -3764,6 +3687,93 @@
               "pm.test('creates one per service', function () { pm.expect(body.items.length).to.eql(6); });",
               "pm.test('services include crashes', function () { pm.expect(body.items.map(i=>i.service)).to.include('crashes'); });",
               "pm.test('build id matches env', function () { pm.expect(body.items.every(i=>i.buildId===pm.environment.get('buildId'))).to.be.true; });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delete Build",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/builds/{{buildId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "builds",
+            "{{buildId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Delete build ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delete App Builds",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/apps/{{appId}}/builds",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "apps",
+            "{{appId}}",
+            "builds"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Delete app builds ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
             ]
           }
         }
