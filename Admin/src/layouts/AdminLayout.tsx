@@ -30,6 +30,7 @@ type AdminLayoutProps = {
   uploadDebugInfo?: string;
   user?: SessionUser | null;
   appIcons?: Record<string, string>;
+  processingBuildsCount?: number;
 };
 
 const AdminLayout = ({
@@ -47,6 +48,7 @@ const AdminLayout = ({
   uploadDebugInfo,
   user,
   appIcons,
+  processingBuildsCount = 0,
 }: AdminLayoutProps) => {
   const { t } = useI18n();
   const [isAddAppOpen, setIsAddAppOpen] = useState(false);
@@ -110,6 +112,7 @@ const AdminLayout = ({
         user={user}
         activeTeamId={activeTeamId}
         appIcons={appIcons}
+        processingBuildsCount={processingBuildsCount}
         onAcceptInvite={() => setIsAcceptInviteOpen(true)}
         actions={
           <>

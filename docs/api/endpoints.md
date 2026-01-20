@@ -19,6 +19,7 @@ Team-scoped endpoints:
 - `/storage`
 - `/resolve-install`
 - `/ingest/upload-url`, `/ingest/complete-upload`
+- `/ingest/processing-count`
 - `/badges`
 - `/api-keys`, `/api-keys/:id`
 - `/ws`
@@ -713,6 +714,14 @@ Optional tracking metadata shared by download/install endpoints.
 - Platform relevance: ios, android
 - Notes:
   - Use `/ws` events to detect completion (`ingest.completed` / `ingest.failed`).
+
+## GET /ingest/processing-count
+- Purpose: Count queued + processing ingest jobs for the active team
+- Auth scope: Bearer (rafiki270/auth) + Team membership
+- Request schema: none
+- Response schema: `{ processingCount: number }`
+- Side effects: none
+- Platform relevance: ios, android
 
 ## POST /ingest/jobs/{jobId}/callback
 - Purpose: Ingest function callback (internal)

@@ -9,6 +9,9 @@ export type NavItem = {
   label: string;
   icon: IconName;
   badge?: string;
+  auxLabel?: string;
+  auxBadge?: string;
+  auxTone?: "info" | "muted";
   featureFlag?: FeatureFlagKey;
 };
 
@@ -57,26 +60,39 @@ const Sidebar = ({
         <nav className="flex flex-col gap-2">
           {items.map((item) => {
             const isActive = item.id === activeId;
+            const auxToneClass =
+              item.auxTone === "info"
+                ? "bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-200"
+                : "bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-300";
             return (
-              <button
-                key={item.id}
-                type="button"
-                className={`flex h-11 items-center gap-3 rounded-lg px-4 text-left text-sm font-medium transition-colors ${
-                  isActive
-                    ? "bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400"
-                    : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700"
-                }`}
-                aria-current={isActive ? "page" : undefined}
-                onClick={() => onSelect?.(item.id)}
-              >
-                <Icon name={item.icon} className="h-5 w-5" />
-                <span className="flex-1">{item.label}</span>
-                {item.badge ? (
-                  <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-600 dark:bg-slate-700 dark:text-slate-300">
-                    {item.badge}
-                  </span>
+              <div key={item.id} className="flex flex-col gap-1">
+                <button
+                  type="button"
+                  className={`flex h-11 items-center gap-3 rounded-lg px-4 text-left text-sm font-medium transition-colors ${
+                    isActive
+                      ? "bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400"
+                      : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700"
+                  }`}
+                  aria-current={isActive ? "page" : undefined}
+                  onClick={() => onSelect?.(item.id)}
+                >
+                  <Icon name={item.icon} className="h-5 w-5" />
+                  <span className="flex-1">{item.label}</span>
+                  {item.badge ? (
+                    <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                      {item.badge}
+                    </span>
+                  ) : null}
+                </button>
+                {item.auxLabel && item.auxBadge ? (
+                  <div className="flex items-center gap-2 px-6 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                    <span>{item.auxLabel}</span>
+                    <span className={`rounded-full px-2 py-0.5 ${auxToneClass}`}>
+                      {item.auxBadge}
+                    </span>
+                  </div>
                 ) : null}
-              </button>
+              </div>
             );
           })}
         </nav>

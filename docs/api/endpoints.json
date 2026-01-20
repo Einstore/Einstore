@@ -4096,6 +4096,37 @@
         }
       }
     },
+    "/ingest/processing-count": {
+      "get": {
+        "summary": "Get ingest processing count",
+        "description": "Returns the number of queued and processing ingest jobs for the active team.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TeamIdHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Processing count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "processingCount": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "processingCount"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/ingest/jobs/{jobId}/callback": {
       "post": {
         "summary": "Ingest function callback",

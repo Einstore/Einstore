@@ -9,7 +9,7 @@ import { HeadObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { Prisma } from "@prisma/client";
 import { ingestAndroidFromFunction, ingestIosFromFunction } from "../lib/ingest/remote.js";
 import { isInvalidArchiveError } from "../lib/zip.js";
-import { requireTeamOrApiKey } from "../auth/guard.js";
+import { requireTeam, requireTeamOrApiKey } from "../auth/guard.js";
 import { broadcastBadgesUpdate, broadcastTeamEvent } from "../lib/realtime.js";
 import { prisma } from "../lib/prisma.js";
 import { resolveS3Client, presignPutObject } from "../lib/storage-presign.js";
@@ -617,6 +617,17 @@ export async function pipelineRoutes(app: FastifyInstance) {
       const message = error instanceof Error ? error.message : "Ingest failed.";
       return recordFailure(message);
     }
+  });
+
+  app.get("/ingest/processing-count", { preHandler: requireTeam }, async (request, reply) => {
+    const teamId = request.team?.id;
+    if (!teamId) {
+      return reply.status(403).send({ error: "team_required", message: "Team context required" });
+    }
+    const processingCount = await prisma.ingestJob.count({
+      where: { teamId, status: { in: ["queued", "processing"] } },
+    });
+    return reply.send({ processingCount });
   });
 
 }

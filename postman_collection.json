@@ -2734,6 +2734,23 @@
           }
         },
         {
+          "name": "Ingest Processing Count",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ingest/processing-count",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ingest",
+                "processing-count"
+              ]
+            }
+          }
+        },
+        {
           "name": "Ingest Callback (internal)",
           "request": {
             "method": "POST",

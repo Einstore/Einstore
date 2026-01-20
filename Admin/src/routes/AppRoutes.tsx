@@ -148,6 +148,7 @@ const AppRoutes = () => {
     createTeam,
     badges,
     ingestEventsNonce,
+    processingBuildsCount,
     me,
   } = useSessionState(location.pathname);
   const ingestNonce = localIngestNonce + ingestEventsNonce;
@@ -898,6 +899,14 @@ const AppRoutes = () => {
       if (item.id === "apps") {
         return { ...item, badge: badges.apps ? String(badges.apps) : undefined };
       }
+      if (item.id === "settings" && processingBuildsCount > 0) {
+        return {
+          ...item,
+          auxLabel: t("nav.settings.processing", "Processing"),
+          auxBadge: String(processingBuildsCount),
+          auxTone: "info" as const,
+        };
+      }
       return item;
     });
     return withBadges.filter((item) => {
@@ -915,7 +924,16 @@ const AppRoutes = () => {
       }
       return true;
     });
-  }, [featureFlags, isAdmin, isSuperUser, badges.apps, badges.builds, navItems]);
+  }, [
+    featureFlags,
+    isAdmin,
+    isSuperUser,
+    badges.apps,
+    badges.builds,
+    navItems,
+    processingBuildsCount,
+    t,
+  ]);
 
   const activeRoute = useMemo(() => {
     const match = routes.find((route) =>
@@ -962,6 +980,7 @@ const AppRoutes = () => {
               uploadDebugInfo={uploadDebugInfo}
               user={me}
               appIcons={appIcons}
+              processingBuildsCount={processingBuildsCount}
             />
           </RequireAuth>
         }

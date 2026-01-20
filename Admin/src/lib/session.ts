@@ -19,6 +19,10 @@ export type BadgeCounts = {
   builds: number;
 };
 
+export type ProcessingCount = {
+  processingCount: number;
+};
+
 export const useSessionState = (refreshKey?: string) => {
   const [hasToken, setHasToken] = useState(Boolean(localStorage.getItem("accessToken")));
   const [me, setMe] = useState<SessionUser | null>(null);
@@ -27,6 +31,7 @@ export const useSessionState = (refreshKey?: string) => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [badges, setBadges] = useState<BadgeCounts>({ apps: 0, builds: 0 });
   const [ingestEventsNonce, setIngestEventsNonce] = useState(0);
+  const [processingBuildsCount, setProcessingBuildsCount] = useState(0);
 
   useEffect(() => {
     setHasToken(Boolean(localStorage.getItem("accessToken")));
@@ -110,6 +115,7 @@ export const useSessionState = (refreshKey?: string) => {
   useEffect(() => {
     if (!hasToken || !activeTeam?.id) {
       setBadges({ apps: 0, builds: 0 });
+      setProcessingBuildsCount(0);
       return;
     }
     let isMounted = true;
@@ -132,6 +138,32 @@ export const useSessionState = (refreshKey?: string) => {
       isMounted = false;
     };
   }, [hasToken, activeTeam?.id]);
+
+  useEffect(() => {
+    if (!hasToken || !activeTeam?.id) {
+      setProcessingBuildsCount(0);
+      return;
+    }
+    let isMounted = true;
+    apiFetch<ProcessingCount>("/ingest/processing-count", {
+      headers: {
+        "x-team-id": activeTeam.id,
+      },
+    })
+      .then((payload) => {
+        if (isMounted) {
+          setProcessingBuildsCount(payload?.processingCount ?? 0);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setProcessingBuildsCount(0);
+        }
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [hasToken, activeTeam?.id, ingestEventsNonce]);
 
   useEffect(() => {
     if (!hasToken || !activeTeam?.id) {
@@ -239,6 +271,7 @@ export const useSessionState = (refreshKey?: string) => {
     teamMembers,
     badges,
     ingestEventsNonce,
+    processingBuildsCount,
     selectTeam,
     createTeam,
   };

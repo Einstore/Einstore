@@ -21,6 +21,7 @@ type TopbarProps = {
   activeTeamId?: string;
   appIcons?: Record<string, string>;
   onAcceptInvite?: () => void;
+  processingBuildsCount?: number;
 };
 
 const Topbar = ({
@@ -33,6 +34,7 @@ const Topbar = ({
   activeTeamId,
   appIcons = {},
   onAcceptInvite,
+  processingBuildsCount = 0,
 }: TopbarProps) => {
   const { t, locale, setLocale } = useI18n();
   const navigate = useNavigate();
@@ -182,11 +184,16 @@ const Topbar = ({
           <div className="flex flex-1 items-center gap-3">
             <button
               type="button"
-              className="flex h-11 w-11 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 md:hidden dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100"
+              className="relative flex h-11 w-11 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 md:hidden dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100"
               aria-label={t("topbar.menu", "Open menu")}
               onClick={onToggleSidebar}
             >
               <Icon name="menu" className="h-4 w-4" />
+              {processingBuildsCount > 0 ? (
+                <span className="absolute -right-0.5 -top-0.5 min-w-[18px] rounded-full bg-sky-500 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                  {processingBuildsCount}
+                </span>
+              ) : null}
             </button>
             <div ref={searchRef} className="relative flex-1">
               <div className="flex h-11 min-w-[180px] items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-500 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
