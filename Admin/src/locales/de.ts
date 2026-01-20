@@ -233,6 +233,7 @@ export const deMessages: Record<string, MessageValue> = {
   "invite.accept.titleWithTeam": "Einladung zu {team} annehmen",
   "invite.accept.usage.remaining": "{count} verbleibend",
   "invite.accept.usage.unlimited": "Unbegrenzte Nutzung",
+  "invite.error.seatLimit": "Sitzplatzlimit erreicht.",
   "invite.generate.copied": "In die Zwischenablage kopiert.",
   "invite.generate.cta": "Link generieren",
   "invite.generate.domain.help": "Optional. Nur Nutzer mit passender Domain können die Einladung annehmen.",

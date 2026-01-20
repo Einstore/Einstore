@@ -233,6 +233,7 @@ export const ruMessages: Record<string, MessageValue> = {
   "invite.accept.titleWithTeam": "Принять приглашение в {team}",
   "invite.accept.usage.remaining": "Осталось {count}",
   "invite.accept.usage.unlimited": "Без ограничений",
+  "invite.error.seatLimit": "Достигнут лимит мест.",
   "invite.generate.copied": "Скопировано в буфер обмена.",
   "invite.generate.cta": "Создать ссылку",
   "invite.generate.domain.help": "Необязательно. Только пользователи с соответствующим доменом смогут принять приглашение.",

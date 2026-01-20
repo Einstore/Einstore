@@ -233,6 +233,7 @@ export const pirateMessages: Record<string, MessageValue> = {
   "invite.accept.titleWithTeam": "Accept summons to {team}",
   "invite.accept.usage.remaining": "{count} remaining",
   "invite.accept.usage.unlimited": "Unlimited usage",
+  "invite.error.seatLimit": "Bunks be full.",
   "invite.generate.copied": "Copied to clipboard.",
   "invite.generate.cta": "Generate link",
   "invite.generate.domain.label": "Restrict to email domain",

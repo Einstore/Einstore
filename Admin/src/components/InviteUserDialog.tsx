@@ -70,7 +70,11 @@ const InviteUserDialog = ({ isOpen, teamId, onClose }: InviteUserDialogProps) =>
       setLink(fullLink);
       setMessage(t("invite.generate.success", "Invite link generated."));
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("invite.generate.error", "Unable to create invite."));
+      if (err instanceof Error && err.message === "seat_limit_exceeded") {
+        setError(t("invite.error.seatLimit", "Seat limit reached."));
+      } else {
+        setError(err instanceof Error ? err.message : t("invite.generate.error", "Unable to create invite."));
+      }
       setLink("");
     } finally {
       setBusy(false);

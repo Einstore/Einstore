@@ -234,6 +234,7 @@ export const enMessages: Record<string, MessageValue> = {
   "invite.accept.titleWithTeam": "Accept invitation to {team}",
   "invite.accept.usage.remaining": "{count} remaining",
   "invite.accept.usage.unlimited": "Unlimited usage",
+  "invite.error.seatLimit": "Seat limit reached.",
   "invite.generate.copied": "Copied to clipboard.",
   "invite.generate.cta": "Generate link",
   "invite.generate.domain.label": "Restrict to email domain",

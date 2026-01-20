@@ -233,6 +233,7 @@ export const ptMessages: Record<string, MessageValue> = {
   "invite.accept.titleWithTeam": "Aceitar convite para {team}",
   "invite.accept.usage.remaining": "Restam {count}",
   "invite.accept.usage.unlimited": "Utilização ilimitada",
+  "invite.error.seatLimit": "Limite de lugares atingido.",
   "invite.generate.copied": "Copiado para a área de transferência.",
   "invite.generate.cta": "Gerar link",
   "invite.generate.domain.help": "Opcional. Apenas utilizadores com o domínio correspondente podem aceitar o convite.",

@@ -233,6 +233,7 @@ export const nlMessages: Record<string, MessageValue> = {
   "invite.accept.titleWithTeam": "Uitnodiging accepteren voor {team}",
   "invite.accept.usage.remaining": "{count} resterend",
   "invite.accept.usage.unlimited": "Onbeperkt",
+  "invite.error.seatLimit": "Stoelenlimiet bereikt.",
   "invite.generate.copied": "Gekopieerd naar klembord.",
   "invite.generate.cta": "Link genereren",
   "invite.generate.domain.label": "Beperk tot e-maildomein",

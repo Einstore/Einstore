@@ -233,6 +233,7 @@ export const poMessages: Record<string, MessageValue> = {
   "invite.accept.titleWithTeam": "Zaakceptuj zaproszenie do {team}",
   "invite.accept.usage.remaining": "Pozostalo {count}",
   "invite.accept.usage.unlimited": "Bez limitu",
+  "invite.error.seatLimit": "Osiągnięto limit miejsc.",
   "invite.generate.copied": "Skopiowano do schowka.",
   "invite.generate.cta": "Generuj link",
   "invite.generate.domain.help": "Opcjonalne. Tylko uzytkownicy z pasujaca domena moga zaakceptowac zaproszenie.",

@@ -233,6 +233,7 @@ export const jaMessages: Record<string, MessageValue> = {
   "invite.accept.titleWithTeam": "{team} への招待を承諾",
   "invite.accept.usage.remaining": "残り {count}",
   "invite.accept.usage.unlimited": "無制限",
+  "invite.error.seatLimit": "席数の上限に達しました。",
   "invite.generate.copied": "クリップボードにコピーしました。",
   "invite.generate.cta": "リンクを生成",
   "invite.generate.domain.help": "任意。該当ドメインのユーザーのみ招待を承諾できます。",

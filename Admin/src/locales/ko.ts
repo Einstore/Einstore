@@ -233,6 +233,7 @@ export const koMessages: Record<string, MessageValue> = {
   "invite.accept.titleWithTeam": "{team}에 대한 초대를 수락",
   "invite.accept.usage.remaining": "남음 {count}",
   "invite.accept.usage.unlimited": "무제한",
+  "invite.error.seatLimit": "좌석 한도에 도달했습니다.",
   "invite.generate.copied": "클립보드에 복사됨.",
   "invite.generate.cta": "링크 생성",
   "invite.generate.domain.help": "선택 사항입니다. 일치하는 도메인의 사용자만 초대를 수락할 수 있습니다.",

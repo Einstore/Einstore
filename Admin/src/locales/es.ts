@@ -233,6 +233,7 @@ export const esMessages: Record<string, MessageValue> = {
   "invite.accept.titleWithTeam": "Aceptar invitación a {team}",
   "invite.accept.usage.remaining": "{count} restantes",
   "invite.accept.usage.unlimited": "Uso ilimitado",
+  "invite.error.seatLimit": "Se alcanzó el límite de plazas.",
   "invite.generate.copied": "Copiado al portapapeles.",
   "invite.generate.cta": "Generar enlace",
   "invite.generate.domain.label": "Restringir al dominio de correo",

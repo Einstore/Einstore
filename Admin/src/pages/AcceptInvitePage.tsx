@@ -74,7 +74,11 @@ const AcceptInvitePage = () => {
       }
       navigate("/overview", { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("invite.accept.error.accept", "Unable to accept invitation."));
+      if (err instanceof Error && err.message === "seat_limit_exceeded") {
+        setError(t("invite.error.seatLimit", "Seat limit reached."));
+      } else {
+        setError(err instanceof Error ? err.message : t("invite.accept.error.accept", "Unable to accept invitation."));
+      }
     } finally {
       setBusy(false);
     }

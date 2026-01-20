@@ -233,6 +233,7 @@ export const zhMessages: Record<string, MessageValue> = {
   "invite.accept.titleWithTeam": "接受加入 {team} 的邀请",
   "invite.accept.usage.remaining": "剩余 {count}",
   "invite.accept.usage.unlimited": "不限次数",
+  "invite.error.seatLimit": "已达到席位上限。",
   "invite.generate.copied": "已复制到剪贴板。",
   "invite.generate.cta": "生成链接",
   "invite.generate.domain.label": "限制邮箱域名",

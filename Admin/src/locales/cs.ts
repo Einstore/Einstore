@@ -233,6 +233,7 @@ export const csMessages: Record<string, MessageValue> = {
   "invite.accept.titleWithTeam": "Přijmout pozvánku do {team}",
   "invite.accept.usage.remaining": "{count} zbývá",
   "invite.accept.usage.unlimited": "Neomezené použití",
+  "invite.error.seatLimit": "Byl dosažen limit míst.",
   "invite.generate.copied": "Zkopírováno do schránky.",
   "invite.generate.cta": "Vygenerovat odkaz",
   "invite.generate.domain.label": "Omezit na e-mailovou doménu",

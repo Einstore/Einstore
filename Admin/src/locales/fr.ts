@@ -233,6 +233,7 @@ export const frMessages: Record<string, MessageValue> = {
   "invite.accept.titleWithTeam": "Accepter l'invitation à {team}",
   "invite.accept.usage.remaining": "{count} restant",
   "invite.accept.usage.unlimited": "Utilisation illimitée",
+  "invite.error.seatLimit": "Limite de sièges atteint.",
   "invite.generate.copied": "Copié dans le presse-papiers.",
   "invite.generate.cta": "Générer un lien",
   "invite.generate.domain.help": "Optionnel. Seuls les utilisateurs avec le domaine correspondant pourront accepter l'invitation.",
