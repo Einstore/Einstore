@@ -4,7 +4,6 @@ const bplistParser = require("bplist-parser");
 const plist = require("plist");
 const ManifestParser = require("@devicefarmer/adbkit-apkreader/lib/apkreader/parser/manifest");
 const { PassThrough } = require("stream");
-const sharp = require("sharp");
 const { convert: convertCgbi, isCgbiPng } = require("cgbi");
 
 const REQUIRED_ENV = ["SPACES_ENDPOINT", "SPACES_REGION", "SPACES_KEY", "SPACES_SECRET", "SPACES_BUCKET"];
@@ -162,6 +161,7 @@ const resolveTargetRoots = (entryNames) => {
 };
 
 let pngValidatorPromise = null;
+let sharpPromise = null;
 
 const getPngValidator = async () => {
   if (!pngValidatorPromise) {
@@ -173,6 +173,18 @@ const getPngValidator = async () => {
       });
   }
   return pngValidatorPromise;
+};
+
+const getSharp = async () => {
+  if (!sharpPromise) {
+    sharpPromise = Promise.resolve()
+      .then(() => require("sharp"))
+      .catch((error) => {
+        console.warn("Sharp unavailable, skipping PNG normalization.", error);
+        return null;
+      });
+  }
+  return sharpPromise;
 };
 
 const normalizeIosIconPng = async (buffer) => {
@@ -189,8 +201,10 @@ const normalizeIosIconPng = async (buffer) => {
     }
   }
 
-  try {
-      working = await sharp(working)
+  const sharpLib = await getSharp();
+  if (sharpLib) {
+    try {
+      working = await sharpLib(working)
         .ensureAlpha()
         .resize(128, 128, {
           fit: "contain",
@@ -199,8 +213,9 @@ const normalizeIosIconPng = async (buffer) => {
         .toColorspace("srgb")
         .png({ force: true })
         .toBuffer();
-  } catch (error) {
-    console.warn("PNG normalization failed, using existing icon PNG.", error);
+    } catch (error) {
+      console.warn("PNG normalization failed, using existing icon PNG.", error);
+    }
   }
 
   const pngValidator = await getPngValidator();
