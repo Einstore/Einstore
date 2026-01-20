@@ -123,11 +123,25 @@ export async function settingsRoutes(app: FastifyInstance) {
     const resolvedPage = parsed.data.page ?? Math.floor(resolvedOffset / resolvedPerPage) + 1;
     const search = parsed.data.search;
 
+    const matchedUsers = search
+      ? await prisma.user.findMany({
+          where: { email: { contains: search, mode: Prisma.QueryMode.insensitive } },
+          select: { id: true },
+          take: 50,
+        })
+      : [];
+    const matchedUserIds = matchedUsers.map((user) => user.id);
     const where: Prisma.TeamWhereInput | undefined = search
       ? {
           OR: [
             { name: { contains: search, mode: Prisma.QueryMode.insensitive } },
             { slug: { contains: search, mode: Prisma.QueryMode.insensitive } },
+            ...(matchedUserIds.length > 0
+              ? [
+                  { createdByUserId: { in: matchedUserIds } },
+                  { members: { some: { userId: { in: matchedUserIds } } } },
+                ]
+              : []),
           ],
         }
       : undefined;
@@ -139,7 +153,10 @@ export async function settingsRoutes(app: FastifyInstance) {
         orderBy: { createdAt: "desc" },
         skip: resolvedOffset,
         take: resolvedPerPage,
-        include: { limitOverride: true },
+        include: {
+          limitOverride: true,
+          createdBy: { select: { email: true } },
+        },
       }),
     ]);
 
@@ -148,6 +165,7 @@ export async function settingsRoutes(app: FastifyInstance) {
       id: team.id,
       name: team.name,
       slug: team.slug,
+      ownerEmail: team.createdBy?.email ?? null,
       limits: {
         maxUsers: team.limitOverride?.maxUsers ?? null,
         maxApps: team.limitOverride?.maxApps ?? null,
@@ -180,7 +198,7 @@ export async function settingsRoutes(app: FastifyInstance) {
 
       const team = await prisma.team.findUnique({
         where: { id: teamId },
-        select: { id: true, name: true, slug: true },
+        select: { id: true, name: true, slug: true, createdBy: { select: { email: true } } },
       });
       if (!team) {
         return reply.status(404).send({ error: "team_not_found", message: "Team not found." });
@@ -199,6 +217,7 @@ export async function settingsRoutes(app: FastifyInstance) {
           id: team.id,
           name: team.name,
           slug: team.slug,
+          ownerEmail: team.createdBy?.email ?? null,
           limits: {
             maxUsers: null,
             maxApps: null,
@@ -229,6 +248,7 @@ export async function settingsRoutes(app: FastifyInstance) {
         id: team.id,
         name: team.name,
         slug: team.slug,
+        ownerEmail: team.createdBy?.email ?? null,
         limits: {
           maxUsers: saved.maxUsers ?? null,
           maxApps: saved.maxApps ?? null,

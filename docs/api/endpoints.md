@@ -801,8 +801,8 @@ Optional tracking metadata shared by download/install endpoints.
 ## GET /settings/tariff-overrides
 - Purpose: List team tariff overrides
 - Auth scope: Superuser
-- Request schema: query `{ page?: number, perPage?: number, limit?: number, offset?: number, search?: string }`
-- Response schema: `{ items: [{ id, name, slug, limits: { maxUsers, maxApps, storageLimitBytes, transferLimitBytes } }], page, perPage, total, totalPages }`
+- Request schema: query `{ page?: number, perPage?: number, limit?: number, offset?: number, search?: string }` (search supports team name, slug, or owner email)
+- Response schema: `{ items: [{ id, name, slug, ownerEmail, limits: { maxUsers, maxApps, storageLimitBytes, transferLimitBytes } }], page, perPage, total, totalPages }`
 - Side effects: none
 - Platform relevance: all
 

@@ -22,6 +22,7 @@ type TariffOverrideTeam = {
   id: string;
   name: string;
   slug: string;
+  ownerEmail?: string | null;
   limits: TariffOverrideLimits;
 };
 
@@ -323,6 +324,7 @@ const TariffOverridesPanel = () => {
   const headers = useMemo(
     () => [
       t("settings.tariffOverrides.table.team", "Team"),
+      t("settings.tariffOverrides.table.owner", "Owner email"),
       t("settings.tariffOverrides.table.users", "Users"),
       t("settings.tariffOverrides.table.apps", "Apps"),
       t("settings.tariffOverrides.table.storage", "Storage"),
@@ -345,7 +347,10 @@ const TariffOverridesPanel = () => {
         <TextInput
           id="tariff-search"
           label={t("settings.tariffOverrides.search.label", "Search teams")}
-          placeholder={t("settings.tariffOverrides.search.placeholder", "Search by team name or slug")}
+          placeholder={t(
+            "settings.tariffOverrides.search.placeholder",
+            "Search by team name, slug, or owner email"
+          )}
           value={search}
           onChange={setSearch}
         />
@@ -373,6 +378,9 @@ const TariffOverridesPanel = () => {
                     <td className="px-4 py-3">
                       <div className="font-semibold text-slate-900 dark:text-slate-100">{team.name}</div>
                       <div className="text-xs text-slate-500 dark:text-slate-400">{team.slug}</div>
+                    </td>
+                    <td className="px-4 py-3">
+                      {team.ownerEmail ?? t("settings.tariffOverrides.value.unknown", "Unknown")}
                     </td>
                     <td className="px-4 py-3">{users ?? t("settings.tariffOverrides.value.default", "Default")}</td>
                     <td className="px-4 py-3">{apps ?? t("settings.tariffOverrides.value.default", "Default")}</td>

@@ -3078,6 +3078,7 @@
     },
     "/settings/tariff-overrides": {
       "get": {
+        "description": "Search by team name, slug, or owner email.",
         "parameters": [
           {
             "in": "query",
