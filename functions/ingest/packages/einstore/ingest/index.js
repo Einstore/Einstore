@@ -656,6 +656,22 @@ const normalizeAndroidPermissions = (permissions) => {
     .filter(Boolean);
 };
 
+const resolveAndroidAppName = (label, packageName) => {
+  if (typeof label === "string") {
+    const trimmed = label.trim();
+    if (trimmed && !trimmed.startsWith("resourceId:")) {
+      return trimmed;
+    }
+  }
+  if (typeof packageName === "string") {
+    const trimmed = packageName.trim();
+    if (!trimmed) return "";
+    const segment = trimmed.split(".").filter(Boolean).pop();
+    return segment || trimmed;
+  }
+  return "";
+};
+
 const uploadToSpaces = async (client, bucket, key, buffer, contentType) => {
   await client.send(
     new PutObjectCommand({
@@ -864,13 +880,14 @@ exports.main = async (args) => {
       const versionName = manifest.versionName ? String(manifest.versionName) : "";
       const versionCode = manifest.versionCode ? String(manifest.versionCode) : "";
       const permissions = normalizeAndroidPermissions(manifest.usesPermissions);
+      const appName = resolveAndroidAppName(manifest.application?.label, manifest.package);
       const response = {
         ok: true,
         kind,
         packageName: manifest.package,
         versionName,
         versionCode,
-        appName: manifest.application?.label || "",
+        appName,
         minSdk: manifest.usesSdk?.minSdkVersion ? String(manifest.usesSdk.minSdkVersion) : undefined,
         targetSdk: manifest.usesSdk?.targetSdkVersion ? String(manifest.usesSdk.targetSdkVersion) : undefined,
         manifest: {
