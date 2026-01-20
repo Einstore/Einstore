@@ -50,7 +50,12 @@ const getContext = (request: { ip?: string; headers: { [key: string]: string | s
   userAgent: typeof request.headers["user-agent"] === "string" ? request.headers["user-agent"] : undefined,
 });
 
-const resolveDefaultTeamName = () => "Workspace";
+const resolveDefaultTeamName = (user: { fullName?: string | null; username: string }) => {
+  const rawName = user.fullName?.trim() || user.username.trim();
+  const name = rawName || "User";
+  const suffix = name.endsWith("s") || name.endsWith("S") ? "'" : "'s";
+  return `${name}${suffix} team`;
+};
 
 const ensureUniqueSlug = async (base: string) => {
   const root = base || "team";
@@ -76,7 +81,7 @@ const ensurePersonalTeam = async (userId: string) => {
     return;
   }
 
-  const teamName = resolveDefaultTeamName();
+  const teamName = resolveDefaultTeamName({ fullName: user.fullName, username: user.username });
   const slugBase = normalizeTeamSlug(slugify(teamName));
   const slug = await ensureUniqueSlug(slugBase);
   const inboxBase = deriveInboxBaseForUser({
