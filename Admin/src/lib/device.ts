@@ -21,16 +21,11 @@ export const getClientPlatform = (): ClientPlatform => {
 export const shouldShowInstall = (buildPlatform?: string | null) => {
   const client = getClientPlatform();
   const platform = (buildPlatform ?? "").toLowerCase();
-  if (client === "android") {
-    return platform.includes("android") || platform.includes("wearos");
-  }
-  if (client === "ios") {
-    return (
-      platform.includes("ios") ||
-      platform.includes("tvos") ||
-      platform.includes("watchos") ||
-      platform.includes("visionos")
-    );
-  }
-  return false;
+  if (client !== "ios") return false;
+  return (
+    platform.includes("ios") ||
+    platform.includes("tvos") ||
+    platform.includes("watchos") ||
+    platform.includes("visionos")
+  );
 };

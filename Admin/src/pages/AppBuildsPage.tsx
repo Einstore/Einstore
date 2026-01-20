@@ -10,6 +10,7 @@ import SectionHeader from "../components/SectionHeader";
 import StatusPill from "../components/StatusPill";
 import type { ApiApp, ApiBuild } from "../lib/apps";
 import { formatDateTime } from "../lib/apps";
+import { shouldShowInstall } from "../lib/device";
 import type { PaginationMeta } from "../lib/pagination";
 import { useI18n } from "../lib/i18n";
 
@@ -50,6 +51,8 @@ const AppBuildsPage = ({
   const lastUploaded = latestBuild ? formatDateTime(latestBuild.createdAt) : t("common.emptyDash", "—");
   const totalBuilds = pagination.total ?? builds.length;
   const hasBuilds = totalBuilds > 0;
+  const latestPlatform = latestBuild ? buildPlatforms?.[latestBuild.id] ?? app?.platform : app?.platform;
+  const canInstallLatest = shouldShowInstall(latestPlatform ?? null);
 
   const handleDeleteConfirm = async () => {
     if (!onDeleteBuilds || isDeletingBuilds) {
@@ -102,13 +105,15 @@ const AppBuildsPage = ({
               <StatusPill status="running" label={t("builds.app.label", "App builds")} />
               {latestBuild ? (
                 <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    className="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-500"
-                    onClick={() => onInstallBuild?.(latestBuild.id)}
-                  >
-                    {t("build.action.install", "Install")}
-                  </button>
+                  {canInstallLatest ? (
+                    <button
+                      type="button"
+                      className="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-500"
+                      onClick={() => onInstallBuild?.(latestBuild.id)}
+                    >
+                      {t("build.action.install", "Install")}
+                    </button>
+                  ) : null}
                   <button
                     type="button"
                     className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
