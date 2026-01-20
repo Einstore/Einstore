@@ -22,5 +22,6 @@ export const canInstallForPlatforms = (platforms: (string | null | undefined)[])
   const client = getClientPlatform();
   const allowsIos = client === "ios" || (client === "mac" && typeof navigator !== "undefined" && navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   if (normalized.has("ios") && allowsIos) return true;
+  if (normalized.has("android") && client === "android") return true;
   return false;
 };

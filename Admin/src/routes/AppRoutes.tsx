@@ -31,6 +31,7 @@ import {
 } from "../data/mock";
 import { API_BASE_URL, apiFetch } from "../lib/api";
 import { buildFeatureFlagMap, getDefaultFeatureFlags } from "../lib/featureFlags";
+import { getClientPlatform } from "../lib/device";
 import {
   pickPrimaryIcon,
   type ApiApp,
@@ -58,6 +59,24 @@ import {
   privatePageConfig,
   privateRoutes,
 } from "../private/routes.generated";
+
+const openInstallLink = (payload?: { itmsServicesUrl?: string; downloadUrl?: string }) => {
+  if (!payload) return;
+  const clientPlatform = getClientPlatform();
+  if (clientPlatform === "android") {
+    if (payload.downloadUrl) {
+      window.location.assign(payload.downloadUrl);
+    }
+    return;
+  }
+  if (payload.itmsServicesUrl) {
+    window.location.href = payload.itmsServicesUrl;
+    return;
+  }
+  if (payload.downloadUrl) {
+    window.location.assign(payload.downloadUrl);
+  }
+};
 
 const putToSpacesXHR = ({
   url,
@@ -685,11 +704,7 @@ const AppRoutes = () => {
             headers: { "x-team-id": activeTeamId },
           }
         );
-        if (payload?.itmsServicesUrl) {
-          window.location.href = payload.itmsServicesUrl;
-        } else if (payload?.downloadUrl) {
-          window.location.assign(payload.downloadUrl);
-        }
+        openInstallLink(payload);
       } catch {
         // ignore errors
       }
@@ -1091,11 +1106,7 @@ const BuildDetailRoute = ({
             headers: { "x-team-id": activeTeamId },
           }
         );
-        if (payload?.itmsServicesUrl) {
-          window.location.href = payload.itmsServicesUrl;
-        } else if (payload?.downloadUrl) {
-          window.location.assign(payload.downloadUrl);
-        }
+        openInstallLink(payload);
       } catch {
         // ignore install errors for now
       }
@@ -1523,11 +1534,7 @@ const LatestBuildsRoute = ({
             headers: { "x-team-id": activeTeamId },
           }
         );
-        if (payload?.itmsServicesUrl) {
-          window.location.href = payload.itmsServicesUrl;
-        } else if (payload?.downloadUrl) {
-          window.location.assign(payload.downloadUrl);
-        }
+        openInstallLink(payload);
       } catch {
         // ignore install errors for now
       }
@@ -1612,13 +1619,7 @@ const AppBuildsRoute = ({
             headers: { "x-team-id": activeTeamId },
           }
         );
-        if (payload?.itmsServicesUrl) {
-          window.location.href = payload.itmsServicesUrl;
-          return;
-        }
-        if (payload?.downloadUrl) {
-          window.location.assign(payload.downloadUrl);
-        }
+        openInstallLink(payload);
       } catch {
         // ignore install errors in this context
       }
