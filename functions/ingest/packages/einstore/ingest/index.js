@@ -643,6 +643,19 @@ const parseAndroidManifest = (buffer) => {
   return parser.parse();
 };
 
+const normalizeAndroidPermissions = (permissions) => {
+  if (!Array.isArray(permissions)) return [];
+  return permissions
+    .map((permission) => {
+      if (typeof permission === "string") return permission;
+      if (permission && typeof permission === "object" && typeof permission.name === "string") {
+        return permission.name;
+      }
+      return null;
+    })
+    .filter(Boolean);
+};
+
 const uploadToSpaces = async (client, bucket, key, buffer, contentType) => {
   await client.send(
     new PutObjectCommand({
@@ -848,22 +861,25 @@ exports.main = async (args) => {
         iconSourcePath = icon.name;
         iconPath = await uploadToSpaces(client, bucket, iconKey, icon.buffer, "image/png");
       }
+      const versionName = manifest.versionName ? String(manifest.versionName) : "";
+      const versionCode = manifest.versionCode ? String(manifest.versionCode) : "";
+      const permissions = normalizeAndroidPermissions(manifest.usesPermissions);
       const response = {
         ok: true,
         kind,
         packageName: manifest.package,
-        versionName: manifest.versionName,
-        versionCode: manifest.versionCode,
+        versionName,
+        versionCode,
         appName: manifest.application?.label || "",
         minSdk: manifest.usesSdk?.minSdkVersion ? String(manifest.usesSdk.minSdkVersion) : undefined,
         targetSdk: manifest.usesSdk?.targetSdkVersion ? String(manifest.usesSdk.targetSdkVersion) : undefined,
         manifest: {
           packageName: manifest.package,
-          versionName: manifest.versionName,
-          versionCode: manifest.versionCode,
+          versionName,
+          versionCode,
           minSdk: manifest.usesSdk?.minSdkVersion ? String(manifest.usesSdk.minSdkVersion) : undefined,
           targetSdk: manifest.usesSdk?.targetSdkVersion ? String(manifest.usesSdk.targetSdkVersion) : undefined,
-          permissions: manifest.usesPermissions || [],
+          permissions,
           icon: manifest.application?.icon || "",
         },
         iconPath,
@@ -872,7 +888,7 @@ exports.main = async (args) => {
         iconHeight,
         iconBytes,
         iconSourcePath,
-        permissions: manifest.usesPermissions || [],
+        permissions,
       };
       if (transferStats) {
         response.transferBytesRequested = transferStats.bytesRequested;
