@@ -496,12 +496,20 @@ export async function pipelineRoutes(app: FastifyInstance) {
         where: { id: ingestJob.id },
         data: { status: "processing" },
       });
-      await callIngestFunctionAsync(ingestFunctionUrl, {
+      const invokePromise = callIngestFunctionAsync(ingestFunctionUrl, {
         kind,
         storagePath,
         callbackUrl,
         callbackToken,
         jobId: ingestJob.id,
+      });
+      void invokePromise.catch(async (error) => {
+        const message = error instanceof Error ? error.message : "Ingest function failed.";
+        await prisma.ingestJob.update({
+          where: { id: ingestJob.id },
+          data: { status: "failed", errorMessage: message },
+        });
+        broadcastTeamEvent(teamId, { type: "ingest.failed", jobId: ingestJob.id, message });
       });
       return reply.status(202).send({ status: "processing", jobId: ingestJob.id });
     } catch (error) {

@@ -120,8 +120,6 @@ fi
 
 curl -fsSL \
   -X PUT \
-  -H "Content-Type:" \
-  -H "Expect:" \
   --upload-file "$FILE_PATH" \
   "$upload_url" >/dev/null
 
