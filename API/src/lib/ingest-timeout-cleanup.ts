@@ -1,3 +1,5 @@
+import { IngestJobStatus } from "@prisma/client";
+
 import { prisma } from "./prisma.js";
 import { broadcastTeamEvent } from "./realtime.js";
 
@@ -12,8 +14,9 @@ type CleanupOptions = {
 export const failStaleIngestJobs = async (options: CleanupOptions = {}) => {
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const cutoff = new Date(Date.now() - timeoutMs);
+  const staleStatuses: IngestJobStatus[] = ["queued", "processing"];
   const where = {
-    status: { in: ["queued", "processing"] as const },
+    status: { in: staleStatuses },
     updatedAt: { lt: cutoff },
     ...(options.teamId ? { teamId: options.teamId } : {}),
   };
