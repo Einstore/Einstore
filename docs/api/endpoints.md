@@ -802,7 +802,7 @@ Optional tracking metadata shared by download/install endpoints.
 - Purpose: List team tariff overrides
 - Auth scope: Superuser
 - Request schema: query `{ page?: number, perPage?: number, limit?: number, offset?: number, search?: string }` (search supports team name, slug, or owner email)
-- Response schema: `{ items: [{ id, name, slug, ownerEmail, limits: { maxUsers, maxApps, storageLimitBytes, transferLimitBytes } }], page, perPage, total, totalPages }`
+- Response schema: `{ items: [{ id, name, slug, ownerEmail, usage: { users, apps, storageBytes, transferBytes }, limits: { maxUsers, maxApps, storageLimitBytes, transferLimitBytes } }], page, perPage, total, totalPages }`
 - Side effects: none
 - Platform relevance: all
 

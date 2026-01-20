@@ -122,6 +122,7 @@ export async function settingsRoutes(app: FastifyInstance) {
     const resolvedOffset = parsed.data.offset ?? (parsed.data.page ? (parsed.data.page - 1) * resolvedPerPage : 0);
     const resolvedPage = parsed.data.page ?? Math.floor(resolvedOffset / resolvedPerPage) + 1;
     const search = parsed.data.search;
+    const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
     const matchedUsers = search
       ? await prisma.user.findMany({
@@ -160,12 +161,60 @@ export async function settingsRoutes(app: FastifyInstance) {
       }),
     ]);
 
+    const teamIds = teams.map((team) => team.id);
+    const [memberCounts, appCounts] = await Promise.all([
+      prisma.teamMember.groupBy({
+        by: ["teamId"],
+        where: { teamId: { in: teamIds } },
+        _count: { _all: true },
+      }),
+      prisma.app.groupBy({
+        by: ["teamId"],
+        where: { teamId: { in: teamIds } },
+        _count: { _all: true },
+      }),
+    ]);
+
+    const storageRows = teamIds.length
+      ? await prisma.$queryRaw<{ teamId: string; bytes: number | null }[]>`
+          SELECT a."teamId" as "teamId", COALESCE(SUM(b."sizeBytes"), 0) as "bytes"
+          FROM "Build" b
+          JOIN "Version" v ON v."id" = b."versionId"
+          JOIN "App" a ON a."id" = v."appId"
+          WHERE a."teamId" IN (${Prisma.join(teamIds)})
+          GROUP BY a."teamId"`
+      : [];
+
+    const transferRows = teamIds.length
+      ? await prisma.$queryRaw<{ teamId: string; bytes: number | null }[]>`
+          SELECT a."teamId" as "teamId", COALESCE(SUM(b."sizeBytes"), 0) as "bytes"
+          FROM "BuildEvent" e
+          JOIN "Build" b ON b."id" = e."buildId"
+          JOIN "Version" v ON v."id" = b."versionId"
+          JOIN "App" a ON a."id" = v."appId"
+          WHERE e."kind" = 'download'
+            AND e."createdAt" >= ${monthStart}
+            AND a."teamId" IN (${Prisma.join(teamIds)})
+          GROUP BY a."teamId"`
+      : [];
+
+    const usersByTeamId = new Map(memberCounts.map((row) => [row.teamId, row._count._all]));
+    const appsByTeamId = new Map(appCounts.map((row) => [row.teamId, row._count._all]));
+    const storageByTeamId = new Map(storageRows.map((row) => [row.teamId, Number(row.bytes ?? 0)]));
+    const transferByTeamId = new Map(transferRows.map((row) => [row.teamId, Number(row.bytes ?? 0)]));
+
     const totalPages = Math.max(1, Math.ceil(total / resolvedPerPage));
     const items = teams.map((team) => ({
       id: team.id,
       name: team.name,
       slug: team.slug,
       ownerEmail: team.createdBy?.email ?? null,
+      usage: {
+        users: usersByTeamId.get(team.id) ?? 0,
+        apps: appsByTeamId.get(team.id) ?? 0,
+        storageBytes: storageByTeamId.get(team.id) ?? 0,
+        transferBytes: transferByTeamId.get(team.id) ?? 0,
+      },
       limits: {
         maxUsers: team.limitOverride?.maxUsers ?? null,
         maxApps: team.limitOverride?.maxApps ?? null,

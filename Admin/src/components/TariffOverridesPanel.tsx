@@ -23,6 +23,12 @@ type TariffOverrideTeam = {
   name: string;
   slug: string;
   ownerEmail?: string | null;
+  usage?: {
+    users: number;
+    apps: number;
+    storageBytes: number;
+    transferBytes: number;
+  };
   limits: TariffOverrideLimits;
 };
 
@@ -39,6 +45,9 @@ const formatLimit = (value: number | null, locale: string) => {
   if (value === null) return null;
   return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(value);
 };
+
+const formatUsagePair = (used: string, limit: string | null, fallback: string) =>
+  `${used}/${limit ?? fallback}`;
 
 const toGbInput = (bytes: number | null) => {
   if (bytes === null) return "";
@@ -369,10 +378,22 @@ const TariffOverridesPanel = () => {
             <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
               {teams.map((team) => {
                 const limits = team.limits;
-                const users = formatLimit(limits.maxUsers, locale);
-                const apps = formatLimit(limits.maxApps, locale);
-                const storage = limits.storageLimitBytes === null ? null : formatBytes(limits.storageLimitBytes, locale);
-                const transfer = limits.transferLimitBytes === null ? null : formatBytes(limits.transferLimitBytes, locale);
+                const usage = team.usage;
+                const usersLimit = formatLimit(limits.maxUsers, locale);
+                const appsLimit = formatLimit(limits.maxApps, locale);
+                const storageLimit =
+                  limits.storageLimitBytes === null ? null : formatBytes(limits.storageLimitBytes, locale);
+                const transferLimit =
+                  limits.transferLimitBytes === null ? null : formatBytes(limits.transferLimitBytes, locale);
+                const usersUsed = new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(
+                  usage?.users ?? 0
+                );
+                const appsUsed = new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(
+                  usage?.apps ?? 0
+                );
+                const storageUsed = formatBytes(usage?.storageBytes ?? 0, locale);
+                const transferUsed = formatBytes(usage?.transferBytes ?? 0, locale);
+                const defaultLabel = t("settings.tariffOverrides.value.default", "Default");
                 return (
                   <tr key={team.id} className="text-slate-700 dark:text-slate-200">
                     <td className="px-4 py-3">
@@ -382,10 +403,10 @@ const TariffOverridesPanel = () => {
                     <td className="px-4 py-3">
                       {team.ownerEmail ?? t("settings.tariffOverrides.value.unknown", "Unknown")}
                     </td>
-                    <td className="px-4 py-3">{users ?? t("settings.tariffOverrides.value.default", "Default")}</td>
-                    <td className="px-4 py-3">{apps ?? t("settings.tariffOverrides.value.default", "Default")}</td>
-                    <td className="px-4 py-3">{storage ?? t("settings.tariffOverrides.value.default", "Default")}</td>
-                    <td className="px-4 py-3">{transfer ?? t("settings.tariffOverrides.value.default", "Default")}</td>
+                    <td className="px-4 py-3">{formatUsagePair(usersUsed, usersLimit, defaultLabel)}</td>
+                    <td className="px-4 py-3">{formatUsagePair(appsUsed, appsLimit, defaultLabel)}</td>
+                    <td className="px-4 py-3">{formatUsagePair(storageUsed, storageLimit, defaultLabel)}</td>
+                    <td className="px-4 py-3">{formatUsagePair(transferUsed, transferLimit, defaultLabel)}</td>
                     <td className="px-4 py-3">
                       <button
                         type="button"

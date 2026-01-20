@@ -3123,7 +3123,114 @@
         ],
         "responses": {
           "200": {
-            "description": "Tariff overrides"
+            "description": "Tariff overrides",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "slug": {
+                            "type": "string"
+                          },
+                          "ownerEmail": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "usage": {
+                            "type": "object",
+                            "properties": {
+                              "users": {
+                                "type": "number"
+                              },
+                              "apps": {
+                                "type": "number"
+                              },
+                              "storageBytes": {
+                                "type": "number"
+                              },
+                              "transferBytes": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "users",
+                              "apps",
+                              "storageBytes",
+                              "transferBytes"
+                            ]
+                          },
+                          "limits": {
+                            "type": "object",
+                            "properties": {
+                              "maxUsers": {
+                                "type": "number",
+                                "nullable": true
+                              },
+                              "maxApps": {
+                                "type": "number",
+                                "nullable": true
+                              },
+                              "storageLimitBytes": {
+                                "type": "number",
+                                "nullable": true
+                              },
+                              "transferLimitBytes": {
+                                "type": "number",
+                                "nullable": true
+                              }
+                            },
+                            "required": [
+                              "maxUsers",
+                              "maxApps",
+                              "storageLimitBytes",
+                              "transferLimitBytes"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "slug",
+                          "ownerEmail",
+                          "usage",
+                          "limits"
+                        ]
+                      }
+                    },
+                    "page": {
+                      "type": "number"
+                    },
+                    "perPage": {
+                      "type": "number"
+                    },
+                    "total": {
+                      "type": "number"
+                    },
+                    "totalPages": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "items",
+                    "page",
+                    "perPage",
+                    "total",
+                    "totalPages"
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid query"
