@@ -53,6 +53,7 @@ psql service=einstore
 - A master Caddy runs locally in Docker for all projects and is always on; check that config first for local domain routing.
 - Never stage or commit files you didn’t edit.
 - If a required file already has unrelated changes, edit only what’s needed for the current request and leave everything else untouched.
+- Debug DigitalOcean Spaces with: `aws --profile einstore --endpoint-url https://lon1.digitaloceanspaces.com s3 ls s3://einstore/ --recursive`
 - Third-party libraries: use only the latest stable release (no beta) unless no stable release exists; libraries from `rafiki270` are allowed.
 - Code files must not exceed 500 lines unless explicitly requested by the developer.
 - Worktree safety: never discard/revert uncommitted changes, especially ones not created in the current task context.
