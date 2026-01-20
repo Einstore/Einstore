@@ -1,4 +1,5 @@
 import AppAvatar from "./AppAvatar";
+import PlatformIcon from "./PlatformIcon";
 
 export type AppRowProps = {
   name: string;
@@ -28,7 +29,8 @@ const AppRow = ({
       <div className="flex items-center gap-3">
         <AppAvatar name={name} iconUrl={iconUrl} platform={platform} />
         <div className="flex flex-col">
-          <span className="font-semibold text-slate-900 dark:text-slate-100">
+          <span className="flex items-center gap-2 font-semibold text-slate-900 dark:text-slate-100">
+            <PlatformIcon platform={platform} className="h-3.5 w-3.5 text-slate-400 dark:text-slate-300" />
             {name}
           </span>
           <span className="text-slate-500 dark:text-slate-400">{identifier}</span>

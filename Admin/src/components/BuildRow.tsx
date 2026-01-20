@@ -1,4 +1,5 @@
 import AppAvatar from "./AppAvatar";
+import PlatformIcon from "./PlatformIcon";
 import { getClientPlatform, shouldShowInstall } from "../lib/device";
 import { useI18n } from "../lib/i18n";
 
@@ -43,7 +44,10 @@ const BuildRow = ({
       <div className="flex items-center gap-3">
         <AppAvatar name={name} size="sm" iconUrl={iconUrl} platform={platform} />
         <div>
-          <p className="font-semibold text-slate-900 dark:text-slate-100">{name}</p>
+          <p className="flex items-center gap-2 font-semibold text-slate-900 dark:text-slate-100">
+            <PlatformIcon platform={platform} className="h-3.5 w-3.5 text-slate-400 dark:text-slate-300" />
+            {name}
+          </p>
           <p className="text-slate-500 dark:text-slate-400">
             {t("build.row.number", "Build #{number}", { number: buildNumber })}
           </p>

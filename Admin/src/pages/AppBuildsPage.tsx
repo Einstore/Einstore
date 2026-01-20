@@ -1,6 +1,7 @@
 import { useState } from "react";
 import ActionButton from "../components/ActionButton";
 import AppAvatar from "../components/AppAvatar";
+import PlatformIcon from "../components/PlatformIcon";
 import BuildQueueList from "../components/BuildQueueList";
 import ConfirmDialog from "../components/ConfirmDialog";
 import Panel from "../components/Panel";
@@ -71,7 +72,8 @@ const AppBuildsPage = ({
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                   {app?.identifier ?? t("app.fallback", "App")}
                 </p>
-                <p className="mt-1 text-xl font-semibold text-slate-900 dark:text-slate-100">
+                <p className="mt-1 flex items-center gap-2 text-xl font-semibold text-slate-900 dark:text-slate-100">
+                  <PlatformIcon platform={app?.platform} className="h-4 w-4 text-slate-400 dark:text-slate-300" />
                   {app?.name ?? latestBuild?.displayName ?? t("app.fallback", "App")}
                 </p>
                 <p className="text-sm text-slate-500 dark:text-slate-400">

@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 
 import AppAvatar from "../components/AppAvatar";
 import Icon from "../components/Icon";
+import PlatformIcon from "../components/PlatformIcon";
 import Panel from "../components/Panel";
 import Pagination from "../components/Pagination";
 import { apiFetch } from "../lib/api";
@@ -48,6 +49,13 @@ const SearchPage = ({ apps, appIcons, activeTeamId }: SearchPageProps) => {
 
   const selectedApp = sortedApps.find((app) => app.id === selectedAppId) ?? null;
   const selectedIcon = selectedApp ? appIcons[selectedApp.id] : null;
+  const appPlatformById = useMemo(() => {
+    const map = new Map<string, string | null | undefined>();
+    for (const app of apps) {
+      map.set(app.id, app.platform);
+    }
+    return map;
+  }, [apps]);
 
   useEffect(() => {
     if (!isDropdownOpen) return;
@@ -162,7 +170,11 @@ const SearchPage = ({ apps, appIcons, activeTeamId }: SearchPageProps) => {
                     <Icon name="apps" className="h-4 w-4" />
                   </span>
                 )}
-                <span className="font-medium">
+                <span className="flex items-center gap-2 font-medium">
+                  <PlatformIcon
+                    platform={selectedApp?.platform}
+                    className="h-3.5 w-3.5 text-slate-400 dark:text-slate-300"
+                  />
                   {selectedApp ? selectedApp.name : t("search.apps.all", "All apps")}
                 </span>
               </span>
@@ -214,7 +226,13 @@ const SearchPage = ({ apps, appIcons, activeTeamId }: SearchPageProps) => {
                           platform={app.platform}
                           size="sm"
                         />
-                        {app.name}
+                        <span className="flex items-center gap-2">
+                          <PlatformIcon
+                            platform={app.platform}
+                            className="h-3.5 w-3.5 text-slate-400 dark:text-slate-300"
+                          />
+                          {app.name}
+                        </span>
                       </button>
                     );
                   })}
@@ -251,7 +269,11 @@ const SearchPage = ({ apps, appIcons, activeTeamId }: SearchPageProps) => {
                     size="sm"
                   />
                   <div>
-                    <p className="font-semibold text-slate-900 dark:text-slate-100">
+                    <p className="flex items-center gap-2 font-semibold text-slate-900 dark:text-slate-100">
+                      <PlatformIcon
+                        platform={appPlatformById.get(build.appId)}
+                        className="h-3.5 w-3.5 text-slate-400 dark:text-slate-300"
+                      />
                       {build.displayName}
                     </p>
                     <p className="text-xs text-slate-500 dark:text-slate-400">

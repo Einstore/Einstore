@@ -1,4 +1,5 @@
 import AppAvatar from "../AppAvatar";
+import PlatformIcon from "../PlatformIcon";
 import Panel from "../Panel";
 import StatusPill from "../StatusPill";
 
@@ -41,7 +42,10 @@ const BuildHeaderCard = ({
         <AppAvatar name={appName} iconUrl={iconUrl} platform={platform} size="lg" />
       </div>
       <div className="space-y-1">
-        <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{appName}</p>
+        <p className="flex items-center justify-center gap-2 text-lg font-semibold text-slate-900 dark:text-slate-100">
+          <PlatformIcon platform={platform} className="h-4 w-4 text-slate-400 dark:text-slate-300" />
+          {appName}
+        </p>
         <p className="text-sm text-slate-500 dark:text-slate-400">{identifier}</p>
       </div>
       <div className="flex flex-wrap justify-center gap-2">
