@@ -14,6 +14,7 @@ import { broadcastBadgesUpdate, broadcastTeamEvent } from "../lib/realtime.js";
 import { prisma } from "../lib/prisma.js";
 import { resolveS3Client, presignPutObject } from "../lib/storage-presign.js";
 import { resolveStorageLimitOverrideBytes } from "../lib/limit-overrides.js";
+import { failStaleIngestJobs } from "../lib/ingest-timeout-cleanup.js";
 
 type BillingGuard = {
   assertCanUploadBytes?: (payload: { teamId: string; requiredBytes: bigint | number }) => Promise<void>;
@@ -629,26 +630,7 @@ export async function pipelineRoutes(app: FastifyInstance) {
     if (!teamId) {
       return reply.status(403).send({ error: "team_required", message: "Team context required" });
     }
-    const timeoutCutoff = new Date(Date.now() - 10 * 60 * 1000);
-    const staleJobs = await prisma.ingestJob.findMany({
-      where: {
-        teamId,
-        status: { in: ["queued", "processing"] },
-        updatedAt: { lt: timeoutCutoff },
-      },
-      select: { id: true },
-    });
-    for (const job of staleJobs) {
-      await prisma.ingestJob.update({
-        where: { id: job.id },
-        data: { status: "failed", errorMessage: "processing_timeout" },
-      });
-      broadcastTeamEvent(teamId, {
-        type: "ingest.failed",
-        jobId: job.id,
-        message: "processing_timeout",
-      });
-    }
+    await failStaleIngestJobs({ teamId });
     const processingCount = await prisma.ingestJob.count({
       where: { teamId, status: { in: ["queued", "processing"] } },
     });

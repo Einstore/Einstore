@@ -5,6 +5,7 @@ import websocket from "@fastify/websocket";
 import { loadConfig } from "./lib/config.js";
 import { prisma } from "./lib/prisma.js";
 import { registerRoutes } from "./routes/index.js";
+import { startIngestTimeoutCleanup } from "./lib/ingest-timeout-cleanup.js";
 
 const config = loadConfig();
 const app = Fastify({ logger: true });
@@ -22,7 +23,10 @@ app.register(multipart, {
 });
 app.register(websocket);
 
+const stopIngestCleanup = startIngestTimeoutCleanup();
+
 app.addHook("onClose", async () => {
+  stopIngestCleanup();
   await prisma.$disconnect();
 });
 
