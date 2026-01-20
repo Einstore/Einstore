@@ -9,9 +9,9 @@ export type NavItem = {
   label: string;
   icon: IconName;
   badge?: string;
-  auxLabel?: string;
-  auxBadge?: string;
+  auxPillLabel?: string;
   auxTone?: "info" | "muted";
+  auxOffset?: "settings";
   featureFlag?: FeatureFlagKey;
 };
 
@@ -64,6 +64,7 @@ const Sidebar = ({
               item.auxTone === "info"
                 ? "bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-200"
                 : "bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-300";
+            const auxOffsetClass = item.auxOffset === "settings" ? "mt-9" : "mt-1";
             return (
               <div key={item.id} className="flex flex-col gap-1">
                 <button
@@ -84,11 +85,10 @@ const Sidebar = ({
                     </span>
                   ) : null}
                 </button>
-                {item.auxLabel && item.auxBadge ? (
-                  <div className="flex items-center gap-2 px-6 text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                    <span>{item.auxLabel}</span>
-                    <span className={`rounded-full px-2 py-0.5 ${auxToneClass}`}>
-                      {item.auxBadge}
+                {item.auxPillLabel ? (
+                  <div className={`px-6 ${auxOffsetClass}`}>
+                    <span className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold ${auxToneClass}`}>
+                      {item.auxPillLabel}
                     </span>
                   </div>
                 ) : null}

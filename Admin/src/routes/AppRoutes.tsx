@@ -902,9 +902,16 @@ const AppRoutes = () => {
       if (item.id === "settings" && processingBuildsCount > 0) {
         return {
           ...item,
-          auxLabel: t("nav.settings.processing", "Processing"),
-          auxBadge: String(processingBuildsCount),
+          auxPillLabel: t(
+            "nav.settings.processingPill",
+            {
+              one: "Processing {count} build",
+              other: "Processing {count} builds",
+            },
+            { count: processingBuildsCount }
+          ),
           auxTone: "info" as const,
+          auxOffset: "settings" as const,
         };
       }
       return item;
