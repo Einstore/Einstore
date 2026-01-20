@@ -6,6 +6,12 @@
 postgresql://postgres@localhost:8102/einstore?schema=public
 ```
 
+## Prod DB (debug, read-only)
+
+```
+psql service=einstore
+```
+
 ## Documentation hygiene
 
 - Keep `postman_collection.json` in the repo root up to date.
