@@ -2,7 +2,7 @@ import { prisma } from "./prisma.js";
 import { broadcastTeamEvent } from "./realtime.js";
 
 const DEFAULT_TIMEOUT_MS = 10 * 60 * 1000;
-const DEFAULT_INTERVAL_MS = 60 * 1000;
+const DEFAULT_INTERVAL_MS = 5 * 60 * 1000;
 
 type CleanupOptions = {
   teamId?: string | null;
