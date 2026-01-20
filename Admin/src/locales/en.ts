@@ -341,6 +341,7 @@ export const enMessages: Record<string, MessageValue> = {
   "team.members.email": "Email",
   "team.members.name": "Name",
   "team.members.role": "Role",
+  "team.role.updateError": "Unable to update role.",
   "team.role.admin": "Admin",
   "team.role.owner": "Owner",
   "team.role.user": "User",

@@ -24,6 +24,7 @@ type SettingsPageProps = {
   isSuperUser: boolean;
   initialTab?: string;
   onAnalyticsKeySaved?: (key: string | null) => void;
+  onRefreshTeamMembers?: () => void;
 };
 
 const SettingsPage = ({
@@ -34,6 +35,7 @@ const SettingsPage = ({
   isSuperUser,
   initialTab,
   onAnalyticsKeySaved,
+  onRefreshTeamMembers,
 }: SettingsPageProps) => {
   const { t } = useI18n();
   const [activeTab, setActiveTab] = useState(initialTab ?? "team");
@@ -224,7 +226,12 @@ const SettingsPage = ({
               {t("settings.users.invite", "Invite user")}
             </button>
           </div>
-          <TeamMembersTable members={teamMembers} />
+          <TeamMembersTable
+            members={teamMembers}
+            teamId={activeTeam?.id}
+            currentUserRole={activeTeam?.memberRole}
+            onUpdated={onRefreshTeamMembers}
+          />
         </div>
       ) : (
         <Panel>

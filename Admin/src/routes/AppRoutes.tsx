@@ -143,6 +143,7 @@ const AppRoutes = () => {
     teams,
     activeTeamId,
     teamMembers,
+    refreshTeamMembers,
     isAdmin,
     selectTeam,
     createTeam,
@@ -748,6 +749,7 @@ const AppRoutes = () => {
           apps={apps}
           appIcons={appIcons}
           teamMembers={teamMembers}
+          onRefreshTeamMembers={refreshTeamMembers}
           activeTeamId={activeTeamId ?? ""}
         />
       ),
@@ -852,6 +854,7 @@ const AppRoutes = () => {
           teams={teams}
           activeTeamId={activeTeamId}
           teamMembers={teamMembers}
+          onRefreshTeamMembers={refreshTeamMembers}
           isSaas={isSaas}
           isSuperUser={isSuperUser}
           onAnalyticsKeySaved={setAnalyticsKey}
@@ -868,6 +871,7 @@ const AppRoutes = () => {
           teams={teams}
           activeTeamId={activeTeamId}
           teamMembers={teamMembers}
+          onRefreshTeamMembers={refreshTeamMembers}
           isSaas={isSaas}
           isSuperUser={isSuperUser}
           onAnalyticsKeySaved={setAnalyticsKey}

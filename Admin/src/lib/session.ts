@@ -199,31 +199,27 @@ export const useSessionState = (refreshKey?: string) => {
     };
   }, [hasToken, activeTeam?.id]);
 
-  useEffect(() => {
+  const refreshTeamMembers = useCallback(() => {
     if (!activeTeam?.id || !isAdmin || !hasToken) {
       setTeamMembers([]);
-      return;
+      return Promise.resolve();
     }
-    let isMounted = true;
-    apiFetch<{ users: TeamMember[] }>(`/teams/${activeTeam.id}/users`, {
+    return apiFetch<{ users: TeamMember[] }>(`/teams/${activeTeam.id}/users`, {
       headers: {
         "x-team-id": activeTeam.id,
       },
     })
       .then((payload) => {
-        if (isMounted) {
-          setTeamMembers(Array.isArray(payload?.users) ? payload.users : []);
-        }
+        setTeamMembers(Array.isArray(payload?.users) ? payload.users : []);
       })
       .catch(() => {
-        if (isMounted) {
-          setTeamMembers([]);
-        }
+        setTeamMembers([]);
       });
-    return () => {
-      isMounted = false;
-    };
   }, [activeTeam?.id, isAdmin, hasToken]);
+
+  useEffect(() => {
+    refreshTeamMembers().catch(() => undefined);
+  }, [refreshTeamMembers]);
 
   const selectTeam = useCallback((teamId: string) => {
     setActiveTeamId(teamId);
@@ -269,6 +265,7 @@ export const useSessionState = (refreshKey?: string) => {
     activeTeam,
     isAdmin,
     teamMembers,
+    refreshTeamMembers,
     badges,
     ingestEventsNonce,
     processingBuildsCount,
