@@ -77,6 +77,11 @@ enum TeamMemberRole {
   member
 }
 
+enum ApiKeyType {
+  upload
+  updates
+}
+
 enum TeamVertical {
   regular
   hospitality
@@ -336,6 +341,7 @@ model ApiKey {
   id              String   @id @default(uuid())
   teamId          String
   name            String
+  type            ApiKeyType @default(upload)
   tokenHash       String   @unique
   tokenPrefix     String
   createdByUserId String?

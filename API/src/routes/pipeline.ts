@@ -359,6 +359,11 @@ export async function pipelineRoutes(app: FastifyInstance) {
     if (!teamId) {
       return reply.status(403).send({ error: "team_required", message: "Team context required" });
     }
+    if (request.apiKey && request.apiKey.type !== "upload") {
+      return reply
+        .status(403)
+        .send({ error: "api_key_forbidden", message: "API key scope denied" });
+    }
     const spaces = resolveSpacesConfig();
     if (!spaces) {
       return reply.status(500).send({ error: "storage_not_configured" });
@@ -415,6 +420,11 @@ export async function pipelineRoutes(app: FastifyInstance) {
     const teamId = request.team?.id;
     if (!teamId) {
       return reply.status(403).send({ error: "team_required", message: "Team context required" });
+    }
+    if (request.apiKey && request.apiKey.type !== "upload") {
+      return reply
+        .status(403)
+        .send({ error: "api_key_forbidden", message: "API key scope denied" });
     }
     const spaces = resolveSpacesConfig();
     if (!spaces) {

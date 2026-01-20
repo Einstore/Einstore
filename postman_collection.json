@@ -235,9 +235,83 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"name\": \"CI uploads\"\n}"
+          "raw": "{\n  \"name\": \"CI uploads\",\n  \"type\": \"upload\"\n}"
         },
         "url": "{{baseUrl}}/api-keys"
+      }
+    },
+    {
+      "name": "Create Updates API Key",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json?.token) { pm.environment.set('apiUpdatesKeyToken', json.token); }",
+              "pm.test('Create updates API key ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(201);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-team-id",
+            "value": "{{teamId}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"App update checks\",\n  \"type\": \"updates\"\n}"
+        },
+        "url": "{{baseUrl}}/api-keys"
+      }
+    },
+    {
+      "name": "Check Updates",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Check updates ok', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{apiUpdatesKeyToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"bundleId\": \"com.example.app\",\n  \"version\": \"1.0.0\",\n  \"build\": \"1\",\n  \"lastUpdated\": \"2025-01-10T12:00:00Z\"\n}"
+        },
+        "url": "{{baseUrl}}/updates/check"
       }
     },
     {

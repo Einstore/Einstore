@@ -13,6 +13,7 @@ import {
 const createSchema = z.object({
   name: z.string().trim().min(1).max(64),
   expiresAt: z.string().datetime().optional(),
+  type: z.enum(["upload", "updates"]).optional(),
 });
 
 const resolveSecret = () =>
@@ -49,6 +50,7 @@ export async function apiKeyRoutes(app: FastifyInstance) {
     const { apiKey, token } = await createApiKey(prisma, {
       teamId,
       name: parsed.data.name,
+      type: parsed.data.type ?? "upload",
       createdByUserId,
       expiresAt,
       prefix: "ei_",

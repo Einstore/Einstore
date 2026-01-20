@@ -22,6 +22,7 @@ Team-scoped endpoints:
 - `/ingest/processing-count`
 - `/badges`
 - `/api-keys`, `/api-keys/:id`
+- `/updates/check`
 - `/ws`
 - `/usage/storage/users`
 - `/teams/stats`
@@ -138,15 +139,15 @@ Team-scoped endpoints:
 - Purpose: List API keys for the active team (admin/owner only)
 - Auth scope: Bearer (rafiki270/auth) + Team admin membership
 - Request schema: none
-- Response schema: `{ apiKeys: Array<{ id: string, name: string, prefix: string, createdAt: string, lastUsedAt: string | null, revokedAt: string | null, expiresAt: string | null, createdBy: { id: string, name: string | null, email: string | null, username: string } | null }> }`
+- Response schema: `{ apiKeys: Array<{ id: string, name: string, type: "upload" | "updates", prefix: string, createdAt: string, lastUsedAt: string | null, revokedAt: string | null, expiresAt: string | null, createdBy: { id: string, name: string | null, email: string | null, username: string } | null }> }`
 - Side effects: none
 - Platform relevance: all
 
 ## POST /api-keys
-- Purpose: Create a new API key for CI uploads (admin/owner only)
+- Purpose: Create a new API key (admin/owner only)
 - Auth scope: Bearer (rafiki270/auth) + Team admin membership
-- Request schema: `{ name: string, expiresAt?: string }`
-- Response schema: `{ apiKey: { id: string, name: string, prefix: string, createdAt: string, lastUsedAt: string | null, revokedAt: string | null, expiresAt: string | null, createdBy: { id: string, name: string | null, email: string | null, username: string } | null }, token: string }`
+- Request schema: `{ name: string, expiresAt?: string, type?: "upload" | "updates" }`
+- Response schema: `{ apiKey: { id: string, name: string, type: "upload" | "updates", prefix: string, createdAt: string, lastUsedAt: string | null, revokedAt: string | null, expiresAt: string | null, createdBy: { id: string, name: string | null, email: string | null, username: string } | null }, token: string }`
 - Side effects: Stores a hashed API key; token returned once
 - Platform relevance: all
 
@@ -157,6 +158,14 @@ Team-scoped endpoints:
 - Response schema: `{ revoked: true }`
 - Side effects: Marks the key revoked; CI uploads will stop
 - Platform relevance: all
+
+## POST /updates/check
+- Purpose: Check whether a newer build exists for a bundle identifier
+- Auth scope: `x-api-key` (type `updates`)
+- Request schema: `{ bundleId: string, version?: string, build?: string, lastUpdated?: string }`
+- Response schema: `{ updateAvailable: boolean, latest: { appId: string, versionId: string, buildId: string, version: string, buildNumber: string, displayName: string, createdAt: string, platform: string | null } | null, storeUrl: string | null, downloadUrl: string | null, expiresAt: string | null }`
+- Side effects: none
+- Platform relevance: iOS, Android
 
 ## POST /builds/{id}/downloads
 - Purpose: Record a build download event

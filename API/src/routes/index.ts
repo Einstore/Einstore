@@ -23,6 +23,7 @@ import { trackingEventRoutes } from "./tracking-events.js";
 import { apiKeyRoutes } from "./api-keys.js";
 import { teamStatsRoutes } from "./team-stats.js";
 import { settingsRoutes } from "./settings.js";
+import { updatesRoutes } from "./updates.js";
 import { registerTeamInviteRoutes, registerTeamRoutes, registerUserTeamSettingsRoutes } from "@rafiki270/teams";
 import { prisma } from "../lib/prisma.js";
 import { loadConfig } from "../lib/config.js";
@@ -66,6 +67,7 @@ export async function registerRoutes(app: FastifyInstance) {
   await app.register(iosInstallRoutes);
   await app.register(trackingEventRoutes);
   await app.register(apiKeyRoutes);
+  await app.register(updatesRoutes);
   await app.register(settingsRoutes);
   await app.register(searchRoutes);
   await app.register(buildTagRoutes);

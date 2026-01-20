@@ -10,6 +10,28 @@ const devBypassUserId = process.env.AUTH_DEV_USER_ID ?? "dev-user";
 const devBypassTeamId = process.env.AUTH_DEV_TEAM_ID ?? "dev-team";
 const devBypassRole = process.env.AUTH_DEV_ROLE ?? "owner";
 
+const resolveApiKeyToken = (request: FastifyRequest) => {
+  const apiKeyHeader = request.headers["x-api-key"];
+  const queryToken =
+    typeof request.query === "object" && request.query !== null && "token" in request.query
+      ? (request.query as Record<string, unknown>).token
+      : undefined;
+  return (
+    (typeof apiKeyHeader === "string" && apiKeyHeader.trim()) ||
+    (typeof queryToken === "string" && queryToken.trim()) ||
+    null
+  );
+};
+
+const verifyApiKeyToken = async (token: string) => {
+  const secret = resolveApiKeySecret({
+    env: process.env,
+    fallbackEnvKeys: ["AUTH_JWT_SECRET"],
+    defaultSecret: "dev-api-key-secret",
+  });
+  return verifyApiKey(prisma, token.trim(), { secret });
+};
+
 export async function requireAuth(request: FastifyRequest, reply: FastifyReply) {
   if (devBypassEnabled) {
     request.auth = {
@@ -121,23 +143,9 @@ export async function requireTeamAdmin(request: FastifyRequest, reply: FastifyRe
 }
 
 export async function requireTeamOrApiKey(request: FastifyRequest, reply: FastifyReply) {
-  const apiKeyHeader = request.headers["x-api-key"];
-  const queryToken =
-    typeof request.query === "object" && request.query !== null && "token" in request.query
-      ? (request.query as Record<string, unknown>).token
-      : undefined;
-  const apiKeyToken =
-    (typeof apiKeyHeader === "string" && apiKeyHeader.trim()) ||
-    (typeof queryToken === "string" && queryToken.trim());
+  const apiKeyToken = resolveApiKeyToken(request);
   if (apiKeyToken) {
-    const secret = resolveApiKeySecret({
-      env: process.env,
-      fallbackEnvKeys: ["AUTH_JWT_SECRET"],
-      defaultSecret: "dev-api-key-secret",
-    });
-    const { apiKey, error } = await verifyApiKey(prisma, apiKeyToken.trim(), {
-      secret,
-    });
+    const { apiKey, error } = await verifyApiKeyToken(apiKeyToken);
     if (!apiKey || error === "api_key_invalid") {
       return reply
         .status(401)
@@ -154,3 +162,31 @@ export async function requireTeamOrApiKey(request: FastifyRequest, reply: Fastif
   }
   await requireTeam(request, reply);
 }
+
+export const requireApiKey =
+  (options?: { types?: string[] }) => async (request: FastifyRequest, reply: FastifyReply) => {
+    const apiKeyToken = resolveApiKeyToken(request);
+    if (!apiKeyToken) {
+      return reply
+        .status(401)
+        .send({ error: "api_key_missing", message: "Missing API key" });
+    }
+    const { apiKey, error } = await verifyApiKeyToken(apiKeyToken);
+    if (!apiKey || error === "api_key_invalid") {
+      return reply
+        .status(401)
+        .send({ error: "api_key_invalid", message: "Invalid API key" });
+    }
+    if (error === "api_key_expired") {
+      return reply
+        .status(401)
+        .send({ error: "api_key_expired", message: "API key expired" });
+    }
+    if (options?.types?.length && !options.types.includes(apiKey.type)) {
+      return reply
+        .status(403)
+        .send({ error: "api_key_forbidden", message: "API key scope denied" });
+    }
+    request.team = apiKey.team;
+    request.apiKey = apiKey;
+  };

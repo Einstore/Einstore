@@ -33,6 +33,7 @@ const IntegrationsPage = ({ teams, activeTeamId }: IntegrationsPageProps) => {
   );
   const [apiKeys, setApiKeys] = useState<ApiKeyRecord[]>([]);
   const [apiKeyName, setApiKeyName] = useState("");
+  const [apiKeyType, setApiKeyType] = useState<"upload" | "updates">("upload");
   const [apiKeyToken, setApiKeyToken] = useState<string | null>(null);
   const [apiKeyError, setApiKeyError] = useState("");
   const [isLoadingKeys, setIsLoadingKeys] = useState(false);
@@ -91,7 +92,7 @@ const IntegrationsPage = ({ teams, activeTeamId }: IntegrationsPageProps) => {
       const payload = await apiFetch<CreateApiKeyResponse>("/api-keys", {
         method: "POST",
         headers,
-        body: JSON.stringify({ name: trimmed }),
+        body: JSON.stringify({ name: trimmed, type: apiKeyType }),
       });
       setApiKeys((current) => [payload.apiKey, ...current]);
       if (payload.token) {
@@ -100,6 +101,7 @@ const IntegrationsPage = ({ teams, activeTeamId }: IntegrationsPageProps) => {
       }
       setSelectedKeyId(payload.apiKey.id);
       setApiKeyName("");
+      setApiKeyType("upload");
     } catch {
       setApiKeyError(t("integrations.apiKeys.error.create", "Unable to create API key."));
     } finally {
@@ -166,6 +168,29 @@ const IntegrationsPage = ({ teams, activeTeamId }: IntegrationsPageProps) => {
                 placeholder={t("integrations.apiKeys.placeholder", "CI uploads")}
               />
             </div>
+            <div>
+              <label
+                htmlFor="integrations-api-key-type"
+                className="text-xs font-semibold uppercase tracking-wide text-slate-500"
+              >
+                {t("integrations.apiKeys.type.label", "Key type")}
+              </label>
+              <select
+                id="integrations-api-key-type"
+                value={apiKeyType}
+                onChange={(event) =>
+                  setApiKeyType(event.target.value === "updates" ? "updates" : "upload")
+                }
+                className="mt-2 h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+              >
+                <option value="upload">
+                  {t("integrations.apiKeys.type.upload", "Upload builds")}
+                </option>
+                <option value="updates">
+                  {t("integrations.apiKeys.type.updates", "Check updates")}
+                </option>
+              </select>
+            </div>
             <div className="flex flex-wrap items-center gap-3">
               <button
                 type="button"
@@ -217,6 +242,7 @@ const IntegrationsPage = ({ teams, activeTeamId }: IntegrationsPageProps) => {
           scriptUrl={SCRIPT_URL}
           apiKeyToken={selectedToken}
           selectedKeyName={selectedKey?.name ?? null}
+          selectedKeyType={selectedKey?.type ?? null}
         />
       </div>
 

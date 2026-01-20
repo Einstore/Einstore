@@ -65,6 +65,13 @@
           "name": {
             "type": "string"
           },
+          "type": {
+            "enum": [
+              "upload",
+              "updates"
+            ],
+            "type": "string"
+          },
           "prefix": {
             "type": "string"
           },
@@ -1053,6 +1060,13 @@
                   },
                   "name": {
                     "type": "string"
+                  },
+                  "type": {
+                    "enum": [
+                      "upload",
+                      "updates"
+                    ],
+                    "type": "string"
                   }
                 },
                 "required": [
@@ -1111,6 +1125,107 @@
           }
         ],
         "summary": "Revoke API key"
+      }
+    },
+    "/updates/check": {
+      "post": {
+        "description": "Requires an updates API key.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "build": {
+                    "type": "string"
+                  },
+                  "bundleId": {
+                    "type": "string"
+                  },
+                  "lastUpdated": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "bundleId"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "downloadUrl": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "expiresAt": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "latest": {
+                      "nullable": true,
+                      "properties": {
+                        "appId": {
+                          "type": "string"
+                        },
+                        "buildId": {
+                          "type": "string"
+                        },
+                        "buildNumber": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "displayName": {
+                          "type": "string"
+                        },
+                        "platform": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "version": {
+                          "type": "string"
+                        },
+                        "versionId": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "storeUrl": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "updateAvailable": {
+                      "type": "boolean"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Update status"
+          }
+        },
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "summary": "Check for newer builds"
       }
     },
     "/apps": {

@@ -2,6 +2,7 @@ declare module "@rafiki270/api-keys" {
   export type ApiKeyResponse = {
     id: string;
     name: string;
+    type: string;
     prefix: string;
     createdAt: Date;
     lastUsedAt: Date | null;
@@ -44,6 +45,7 @@ declare module "@rafiki270/api-keys" {
     input: {
       teamId: string;
       name: string;
+      type?: string;
       createdByUserId?: string | null;
       expiresAt?: Date | null;
       prefix?: string;
