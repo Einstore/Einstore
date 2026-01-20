@@ -8,6 +8,7 @@ import { broadcastBadgesUpdate } from "../lib/realtime.js";
 import { buildPaginationMeta, resolvePagination } from "../lib/pagination.js";
 import { resolveS3Client } from "../lib/storage-presign.js";
 import { PlatformKind } from "@prisma/client";
+import { resolveMaxAppsOverride } from "../lib/limit-overrides.js";
 
 type BillingGuard = {
   assertCanCreateApp?: (payload: { teamId: string; userId?: string; identifier?: string }) => Promise<void>;
@@ -85,7 +86,17 @@ export async function appRoutes(app: FastifyInstance) {
     if (!teamId) {
       return reply.status(403).send({ error: "team_required", message: "Team context required" });
     }
-    if (billingGuard?.assertCanCreateApp) {
+    const maxAppsOverride = await resolveMaxAppsOverride(teamId);
+    if (maxAppsOverride !== null) {
+      const currentApps = await prisma.app.count({ where: { teamId } });
+      if (currentApps >= maxAppsOverride) {
+        return reply.status(403).send({
+          error: "app_limit_exceeded",
+          message: "App limit reached.",
+          details: { limit: maxAppsOverride, current: currentApps },
+        });
+      }
+    } else if (billingGuard?.assertCanCreateApp) {
       try {
         await billingGuard.assertCanCreateApp({
           teamId,

@@ -13,6 +13,7 @@ import { requireTeam, requireTeamOrApiKey } from "../auth/guard.js";
 import { broadcastBadgesUpdate, broadcastTeamEvent } from "../lib/realtime.js";
 import { prisma } from "../lib/prisma.js";
 import { resolveS3Client, presignPutObject } from "../lib/storage-presign.js";
+import { resolveStorageLimitOverrideBytes } from "../lib/limit-overrides.js";
 
 type BillingGuard = {
   assertCanUploadBytes?: (payload: { teamId: string; requiredBytes: bigint | number }) => Promise<void>;
@@ -90,11 +91,15 @@ const formatBytes = (value: bigint) => {
 };
 
 const resolveStorageLimitBytes = async (teamId: string) => {
+  const overrideBytes = await resolveStorageLimitOverrideBytes(teamId);
+  if (overrideBytes !== null) {
+    return overrideBytes;
+  }
   const team = await prisma.team.findUnique({
     where: { id: teamId },
     select: { storageLimitBytes: true },
   });
-  if (team?.storageLimitBytes) {
+  if (team?.storageLimitBytes !== null && team?.storageLimitBytes !== undefined) {
     return BigInt(team.storageLimitBytes);
   }
   const setting = await prisma.siteSetting.findUnique({

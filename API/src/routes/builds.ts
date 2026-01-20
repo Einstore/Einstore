@@ -7,6 +7,7 @@ import { broadcastBadgesUpdate } from "../lib/realtime.js";
 import { buildPaginationMeta, resolvePagination } from "../lib/pagination.js";
 import { presignStorageObject } from "../lib/storage-presign.js";
 import { deleteBuildsWithDependencies } from "../lib/build-cleanup.js";
+import { resolveMaxAppsOverride } from "../lib/limit-overrides.js";
 
 const groupArtifactsByKind = <T extends { kind: string; createdAt: Date }>(items: T[]) => {
   const grouped: Record<string, T[]> = {};
@@ -164,15 +165,31 @@ export async function buildRoutes(app: FastifyInstance) {
       return reply.status(403).send({ error: "team_required", message: "Team context required" });
     }
 
-    if (billingGuard?.assertCanCreateApp) {
-      try {
-        await billingGuard.assertCanCreateApp({
-          teamId,
-          userId: request.auth?.user?.id,
-          identifier: input.appIdentifier,
-        });
-      } catch (error) {
-        return sendBillingError(reply, error);
+    const existingApp = await prisma.app.findUnique({
+      where: { teamId_identifier: { teamId, identifier: input.appIdentifier } },
+      select: { id: true },
+    });
+    if (!existingApp) {
+      const maxAppsOverride = await resolveMaxAppsOverride(teamId);
+      if (maxAppsOverride !== null) {
+        const currentApps = await prisma.app.count({ where: { teamId } });
+        if (currentApps >= maxAppsOverride) {
+          return reply.status(403).send({
+            error: "app_limit_exceeded",
+            message: "App limit reached.",
+            details: { limit: maxAppsOverride, current: currentApps },
+          });
+        }
+      } else if (billingGuard?.assertCanCreateApp) {
+        try {
+          await billingGuard.assertCanCreateApp({
+            teamId,
+            userId: request.auth?.user?.id,
+            identifier: input.appIdentifier,
+          });
+        } catch (error) {
+          return sendBillingError(reply, error);
+        }
       }
     }
 

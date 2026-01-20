@@ -61,6 +61,7 @@ $4.99 / month
   - Reject if still over storage limit
 - Reject downloads/install when transfer quota exceeded
 - Team invites allowed within user limit
+- If `TeamLimitOverride.maxUsers` is set, treat it as the hard cap for invites and direct member adds.
 
 ---
 
