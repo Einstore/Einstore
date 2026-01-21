@@ -40,6 +40,8 @@ const IntegrationsPage = ({ teams, activeTeamId }: IntegrationsPageProps) => {
   const [isCreatingKey, setIsCreatingKey] = useState(false);
   const [pendingRevoke, setPendingRevoke] = useState<ApiKeyRecord | null>(null);
   const [isRevoking, setIsRevoking] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<ApiKeyRecord | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [selectedKeyId, setSelectedKeyId] = useState<string | null>(null);
   const [tokenById, setTokenById] = useState<Record<string, string>>({});
 
@@ -128,6 +130,24 @@ const IntegrationsPage = ({ teams, activeTeamId }: IntegrationsPageProps) => {
       setPendingRevoke(null);
     }
   }, [activeTeam?.id, headers, pendingRevoke]);
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!pendingDelete || !activeTeam?.id) return;
+    setIsDeleting(true);
+    try {
+      await apiFetch(`/api-keys/${pendingDelete.id}`, {
+        method: "DELETE",
+        headers,
+      });
+      setApiKeys((current) => current.filter((key) => key.id !== pendingDelete.id));
+      if (selectedKeyId === pendingDelete.id) {
+        setSelectedKeyId(null);
+      }
+    } finally {
+      setIsDeleting(false);
+      setPendingDelete(null);
+    }
+  }, [activeTeam?.id, headers, pendingDelete, selectedKeyId]);
 
   const handleCopyKey = useCallback(() => {
     if (!apiKeyToken) return;
@@ -232,6 +252,7 @@ const IntegrationsPage = ({ teams, activeTeamId }: IntegrationsPageProps) => {
                 selectedId={selectedKeyId}
                 onSelect={(key) => setSelectedKeyId(key.id)}
                 onRevoke={(key) => setPendingRevoke(key)}
+                onDelete={(key) => setPendingDelete(key)}
               />
             </div>
           )}
@@ -306,6 +327,43 @@ const IntegrationsPage = ({ teams, activeTeamId }: IntegrationsPageProps) => {
                 {isRevoking
                   ? t("integrations.apiKeys.revoke.busy", "Revoking...")
                   : t("integrations.apiKeys.revoke.cta", "Revoke key")}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {pendingDelete ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-slate-900">
+              {t("integrations.apiKeys.delete.title", "Delete API key?")}
+            </h3>
+            <p className="mt-2 text-sm text-slate-500">
+              {t(
+                "integrations.apiKeys.delete.subtitle",
+                "This will remove \"{name}\" from the list.",
+                { name: pendingDelete.name }
+              )}
+            </p>
+            <div className="mt-5 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                className="h-10 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-slate-600"
+                onClick={() => setPendingDelete(null)}
+                disabled={isDeleting}
+              >
+                {t("common.cancel", "Cancel")}
+              </button>
+              <button
+                type="button"
+                className="h-10 rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white"
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting
+                  ? t("integrations.apiKeys.delete.busy", "Deleting...")
+                  : t("integrations.apiKeys.delete.cta", "Delete key")}
               </button>
             </div>
           </div>

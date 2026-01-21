@@ -16,6 +16,7 @@ type ApiKeysTableProps = {
   selectedId?: string | null;
   onSelect: (key: ApiKeyRecord) => void;
   onRevoke: (key: ApiKeyRecord) => void;
+  onDelete?: (key: ApiKeyRecord) => void;
 };
 
 const formatDateTime = (value: string | null | undefined, locale: string, fallback: string) => {
@@ -25,7 +26,7 @@ const formatDateTime = (value: string | null | undefined, locale: string, fallba
   return new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(date);
 };
 
-const ApiKeysTable = ({ apiKeys, selectedId, onSelect, onRevoke }: ApiKeysTableProps) => {
+const ApiKeysTable = ({ apiKeys, selectedId, onSelect, onRevoke, onDelete }: ApiKeysTableProps) => {
   const { t, locale } = useI18n();
   const dash = t("common.emptyDash", "—");
   return (
@@ -80,9 +81,22 @@ const ApiKeysTable = ({ apiKeys, selectedId, onSelect, onRevoke }: ApiKeysTableP
                 </div>
                 <div className="flex justify-end">
                   {key.revokedAt ? (
-                    <span className="text-xs text-slate-400 dark:text-slate-500">
-                      {t("apiKeys.status.revoked", "Revoked")}
-                    </span>
+                    onDelete ? (
+                      <button
+                        type="button"
+                        className="h-9 rounded-lg border border-slate-200 px-3 text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onDelete(key);
+                        }}
+                      >
+                        {t("apiKeys.action.delete", "Delete")}
+                      </button>
+                    ) : (
+                      <span className="text-xs text-slate-400 dark:text-slate-500">
+                        {t("apiKeys.status.revoked", "Revoked")}
+                      </span>
+                    )
                   ) : (
                     <button
                       type="button"
