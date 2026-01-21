@@ -1,7 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { requireApiKey } from "../auth/guard.js";
-import { config } from "../lib/config.js";
 import { generateInstallToken } from "../lib/install-links.js";
 import { prisma } from "../lib/prisma.js";
 
@@ -16,8 +15,8 @@ const INSTALL_TTL_SECONDS = 300;
 const versionCollator = new Intl.Collator("en", { numeric: true, sensitivity: "base" });
 
 const resolveBaseUrl = (request: { headers: Record<string, string | string[] | undefined> }) => {
-  if (config.INSTALL_BASE_URL) {
-    return config.INSTALL_BASE_URL.replace(/\/$/, "");
+  if (process.env.INSTALL_BASE_URL) {
+    return process.env.INSTALL_BASE_URL.replace(/\/$/, "");
   }
   const protoHeader = request.headers["x-forwarded-proto"];
   const hostHeader = request.headers["x-forwarded-host"] ?? request.headers["host"];
