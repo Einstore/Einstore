@@ -2,5 +2,9 @@ API/tests/app-debug.apk filter=lfs diff=lfs merge=lfs -text
 API/tests/app-debug.ipa filter=lfs diff=lfs merge=lfs -text
 Admin/public/*.png filter=lfs diff=lfs merge=lfs -text
 Admin/public/*.ico filter=lfs diff=lfs merge=lfs -text
+Admin/public/favicon.ico -filter -diff -merge -text
+Admin/public/favicon-16x16.png -filter -diff -merge -text
+Admin/public/favicon-32x32.png -filter -diff -merge -text
+Admin/public/favicon-48x48.png -filter -diff -merge -text
 Web/public/*.png filter=lfs diff=lfs merge=lfs -text
 Web/public/*.ico filter=lfs diff=lfs merge=lfs -text
