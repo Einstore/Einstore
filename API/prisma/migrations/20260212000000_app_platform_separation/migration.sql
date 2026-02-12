@@ -15,6 +15,10 @@ SET "platform" = sp."platform"
 FROM app_single_platform sp
 WHERE a."id" = sp."appId";
 
+-- Drop the old unique index BEFORE inserting split rows, because the
+-- new rows share the same (teamId, identifier) but differ on platform.
+DROP INDEX "App_teamId_identifier_key";
+
 -- Split apps that have builds from multiple platforms
 DO $$
 DECLARE
@@ -98,6 +102,5 @@ UPDATE "App" SET "platform" = 'ios' WHERE "platform" IS NULL;
 -- Make column NOT NULL
 ALTER TABLE "App" ALTER COLUMN "platform" SET NOT NULL;
 
--- Replace the old unique index with the new one
-DROP INDEX "App_teamId_identifier_key";
+-- Add the new unique index
 CREATE UNIQUE INDEX "App_teamId_identifier_platform_key" ON "App"("teamId", "identifier", "platform");
