@@ -166,6 +166,7 @@ const AppRoutes = () => {
     isAdmin,
     selectTeam,
     createTeam,
+    updateTeam,
     badges,
     ingestEventsNonce,
     processingBuildsCount,
@@ -873,6 +874,7 @@ const AppRoutes = () => {
           isSaas={isSaas}
           isSuperUser={isSuperUser}
           onAnalyticsKeySaved={setAnalyticsKey}
+          onTeamUpdated={updateTeam}
         />
       ),
       navId: "settings",
@@ -890,6 +892,7 @@ const AppRoutes = () => {
           isSaas={isSaas}
           isSuperUser={isSuperUser}
           onAnalyticsKeySaved={setAnalyticsKey}
+          onTeamUpdated={updateTeam}
           initialTab="api-keys"
         />
       ),

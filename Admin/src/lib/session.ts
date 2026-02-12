@@ -234,6 +234,14 @@ export const useSessionState = (refreshKey?: string) => {
     }).catch(() => undefined);
   }, []);
 
+  const updateTeam = useCallback((teamId: string, updates: Partial<Pick<TeamSummary, "name" | "slug">>) => {
+    setTeams((current) =>
+      current.map((team) =>
+        team.id === teamId ? { ...team, ...updates } : team,
+      ),
+    );
+  }, []);
+
   const createTeam = useCallback(async (name: string) => {
     const trimmed = name.trim();
     if (!trimmed) {
@@ -271,5 +279,6 @@ export const useSessionState = (refreshKey?: string) => {
     processingBuildsCount,
     selectTeam,
     createTeam,
+    updateTeam,
   };
 };

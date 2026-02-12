@@ -33,6 +33,7 @@ import { searchRoutes } from "./search.js";
 import { buildTagRoutes } from "./build-tags.js";
 import { tagRoutes } from "./tags.js";
 import { teamLogoRoutes } from "./team-logo.js";
+import { teamSlugRoutes } from "./team-slug.js";
 import { commentRoutes } from "./comments.js";
 
 export async function registerRoutes(app: FastifyInstance) {
@@ -54,6 +55,7 @@ export async function registerRoutes(app: FastifyInstance) {
   await app.register(realtimeRoutes);
   await app.register(authRoutes);
   await app.register(featureFlagRoutes);
+  await app.register(teamSlugRoutes);
   await registerTeamRoutes(app, {
     prisma,
     inboundEmailDomain: config.INBOUND_EMAIL_DOMAIN,

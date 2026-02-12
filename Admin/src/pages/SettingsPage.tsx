@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 
 import ActionButton from "../components/ActionButton";
 import Panel from "../components/Panel";
@@ -15,6 +15,7 @@ import { useRef } from "react";
 import { useI18n } from "../lib/i18n";
 
 const GA_KEY_PATTERN = /^G-[A-Z0-9]{8,}$/i;
+const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 type SettingsPageProps = {
   teams: TeamSummary[];
@@ -25,6 +26,7 @@ type SettingsPageProps = {
   initialTab?: string;
   onAnalyticsKeySaved?: (key: string | null) => void;
   onRefreshTeamMembers?: () => void;
+  onTeamUpdated?: (teamId: string, updates: Partial<Pick<TeamSummary, "name" | "slug">>) => void;
 };
 
 const SettingsPage = ({
@@ -36,6 +38,7 @@ const SettingsPage = ({
   initialTab,
   onAnalyticsKeySaved,
   onRefreshTeamMembers,
+  onTeamUpdated,
 }: SettingsPageProps) => {
   const { t } = useI18n();
   const [activeTab, setActiveTab] = useState(initialTab ?? "team");
@@ -53,6 +56,137 @@ const SettingsPage = ({
     [teams, activeTeamId]
   );
   const hasTeam = Boolean(activeTeam);
+
+  // Team name/slug editing state
+  const [teamName, setTeamName] = useState(activeTeam?.name ?? "");
+  const [teamSlug, setTeamSlug] = useState(activeTeam?.slug ?? "");
+  const [isSavingTeam, setIsSavingTeam] = useState(false);
+  const [teamMessage, setTeamMessage] = useState("");
+  const [teamError, setTeamError] = useState("");
+  const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
+  const [isCheckingSlug, setIsCheckingSlug] = useState(false);
+  const slugCheckTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Sync local state when the active team changes
+  useEffect(() => {
+    setTeamName(activeTeam?.name ?? "");
+    setTeamSlug(activeTeam?.slug ?? "");
+    setSlugAvailable(null);
+    setTeamMessage("");
+    setTeamError("");
+  }, [activeTeam?.id, activeTeam?.name, activeTeam?.slug]);
+
+  const hasTeamChanges =
+    (teamName.trim() !== (activeTeam?.name ?? "")) ||
+    (teamSlug.trim() !== (activeTeam?.slug ?? ""));
+
+  // Debounced slug availability check
+  const checkSlugAvailability = useCallback(
+    (slug: string) => {
+      if (slugCheckTimer.current) {
+        clearTimeout(slugCheckTimer.current);
+      }
+      const trimmed = slug.trim().toLowerCase();
+      if (!trimmed || trimmed === activeTeam?.slug) {
+        setSlugAvailable(null);
+        setIsCheckingSlug(false);
+        return;
+      }
+      if (!SLUG_PATTERN.test(trimmed)) {
+        setSlugAvailable(false);
+        setIsCheckingSlug(false);
+        return;
+      }
+      setIsCheckingSlug(true);
+      slugCheckTimer.current = setTimeout(() => {
+        apiFetch<{ available: boolean }>(`/teams/slug-check?slug=${encodeURIComponent(trimmed)}&excludeTeamId=${encodeURIComponent(activeTeam?.id ?? "")}`)
+          .then((payload) => {
+            setSlugAvailable(payload?.available ?? false);
+          })
+          .catch(() => {
+            setSlugAvailable(null);
+          })
+          .finally(() => {
+            setIsCheckingSlug(false);
+          });
+      }, 400);
+    },
+    [activeTeam?.slug, activeTeam?.id],
+  );
+
+  const handleSlugChange = (value: string) => {
+    const normalized = value.toLowerCase().replace(/[^a-z0-9-]/g, "");
+    setTeamSlug(normalized);
+    setTeamMessage("");
+    setTeamError("");
+    checkSlugAvailability(normalized);
+  };
+
+  const handleNameChange = (value: string) => {
+    setTeamName(value);
+    setTeamMessage("");
+    setTeamError("");
+  };
+
+  const handleSaveTeam = async () => {
+    const trimmedName = teamName.trim();
+    const trimmedSlug = teamSlug.trim().toLowerCase();
+    if (!trimmedName) {
+      setTeamError(t("settings.team.error.nameRequired", "Team name is required."));
+      return;
+    }
+    if (trimmedSlug && !SLUG_PATTERN.test(trimmedSlug)) {
+      setTeamError(t("settings.team.error.slugInvalid", "Slug can only contain lowercase letters, numbers, and hyphens."));
+      return;
+    }
+    if (slugAvailable === false) {
+      setTeamError(t("settings.team.error.slugTaken", "This slug is already taken."));
+      return;
+    }
+    setIsSavingTeam(true);
+    setTeamError("");
+    setTeamMessage("");
+    try {
+      const body: Record<string, string> = {};
+      if (trimmedName !== (activeTeam?.name ?? "")) {
+        body.name = trimmedName;
+      }
+      if (trimmedSlug && trimmedSlug !== (activeTeam?.slug ?? "")) {
+        body.slug = trimmedSlug;
+      }
+      if (!Object.keys(body).length) {
+        setIsSavingTeam(false);
+        return;
+      }
+      const payload = await apiFetch<{ team?: { name: string; slug: string } }>(
+        `/teams/${activeTeam?.id}`,
+        {
+          method: "PATCH",
+          headers: { "x-team-id": activeTeam?.id ?? "" },
+          body: JSON.stringify(body),
+        },
+      );
+      const updated = payload?.team;
+      if (updated && onTeamUpdated) {
+        onTeamUpdated(activeTeam?.id ?? "", {
+          name: updated.name,
+          slug: updated.slug,
+        });
+      }
+      if (updated) {
+        setTeamName(updated.name);
+        setTeamSlug(updated.slug);
+      }
+      setSlugAvailable(null);
+      setTeamMessage(t("settings.team.saved", "Team settings saved."));
+    } catch (err) {
+      setTeamError(
+        err instanceof Error ? err.message : t("settings.team.error.save", "Unable to save team settings.")
+      );
+    } finally {
+      setIsSavingTeam(false);
+    }
+  };
 
   useEffect(() => {
     if (!isSuperUser) {
@@ -115,6 +249,24 @@ const SettingsPage = ({
     }
   };
 
+  const slugHint = (() => {
+    const trimmed = teamSlug.trim().toLowerCase();
+    if (!trimmed || trimmed === activeTeam?.slug) return undefined;
+    if (!SLUG_PATTERN.test(trimmed)) {
+      return t("settings.team.slug.hintInvalid", "Only lowercase letters, numbers, and hyphens allowed.");
+    }
+    if (isCheckingSlug) {
+      return t("settings.team.slug.hintChecking", "Checking availability...");
+    }
+    if (slugAvailable === true) {
+      return t("settings.team.slug.hintAvailable", "This slug is available.");
+    }
+    if (slugAvailable === false) {
+      return t("settings.team.slug.hintTaken", "This slug is already taken.");
+    }
+    return undefined;
+  })();
+
   const tabs = [
     {
       id: "team",
@@ -124,15 +276,32 @@ const SettingsPage = ({
           <TextInput
             id="team-name"
             label={t("settings.team.name.label", "Team name")}
-            value={activeTeam?.name ?? ""}
+            value={teamName}
+            onChange={handleNameChange}
             placeholder={t("settings.team.name.placeholder", "Team name")}
           />
           <TextInput
             id="team-slug"
             label={t("settings.team.slug.label", "Team slug")}
-            value={activeTeam?.slug ?? ""}
+            value={teamSlug}
+            onChange={handleSlugChange}
             placeholder={t("settings.team.slug.placeholder", "team-slug")}
+            hint={slugHint}
           />
+          {teamMessage ? <p className="text-xs text-green-600">{teamMessage}</p> : null}
+          {teamError ? <p className="text-xs text-red-500">{teamError}</p> : null}
+          {hasTeamChanges ? (
+            <ActionButton
+              label={
+                isSavingTeam
+                  ? t("settings.team.saving", "Saving...")
+                  : t("settings.team.save", "Save changes")
+              }
+              variant="primary"
+              onClick={handleSaveTeam}
+              disabled={isSavingTeam || isCheckingSlug || slugAvailable === false}
+            />
+          ) : null}
           <div className="space-y-2">
             <SectionHeader
               title={t("settings.team.logo.title", "Team logo")}
