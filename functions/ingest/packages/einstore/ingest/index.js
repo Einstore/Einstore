@@ -408,17 +408,31 @@ const withZipfile = async (client, bucket, key, handler, stats) => {
     );
   };
 
+  const isJunkIconName = (filename) => {
+    const lower = filename.toLowerCase();
+    const base = lower.endsWith(".png") ? lower.slice(0, -4) : lower;
+    return (
+      base.endsWith("_foreground") ||
+      base.endsWith("_background") ||
+      base.endsWith("_monochrome") ||
+      base.includes("notification") ||
+      base.includes("splash") ||
+      base.includes("bg_")
+    );
+  };
+
   const buildIconCandidates = (entryNames, rootPrefix, preferredNames) => {
     const preferred = Array.isArray(preferredNames) && preferredNames.length ? preferredNames : null;
     const candidates = [];
     for (const name of entryNames) {
       if (!name.startsWith(rootPrefix) || !name.toLowerCase().endsWith(".png")) continue;
+      const filename = name.split("/").pop() || "";
       if (preferred) {
-        const filename = name.split("/").pop() || "";
         if (!preferred.some((iconName) => matchesIconName(filename, iconName))) {
           continue;
         }
       }
+      if (isJunkIconName(filename)) continue;
       candidates.push({ name, score: scoreIconCandidate(name) });
     }
     return candidates;
@@ -442,10 +456,14 @@ const withZipfile = async (client, bucket, key, handler, stats) => {
       if (!buffer) continue;
       const dimensions = readPngDimensions(buffer);
       if (!dimensions) continue;
+      // Skip suspiciously small files: a real icon PNG needs at least
+      // ~0.1 bytes per pixel after compression. 909 bytes for 860x860 is junk.
+      const pixels = dimensions.width * dimensions.height;
+      if (pixels > 0 && buffer.length / pixels < 0.05) continue;
       if (
         !best ||
-        dimensions.width * dimensions.height > best.width * best.height ||
-        (dimensions.width * dimensions.height === best.width * best.height &&
+        pixels > best.width * best.height ||
+        (pixels === best.width * best.height &&
           candidate.score > best.score)
       ) {
         best = {

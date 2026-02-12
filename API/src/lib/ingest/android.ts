@@ -100,6 +100,19 @@ const readPngDimensions = (buffer: Buffer) => {
   return { width, height };
 };
 
+const isJunkIconName = (filename: string) => {
+  const lower = filename.toLowerCase();
+  const base = lower.endsWith(".png") ? lower.slice(0, -4) : lower;
+  return (
+    base.endsWith("_foreground") ||
+    base.endsWith("_background") ||
+    base.endsWith("_monochrome") ||
+    base.includes("notification") ||
+    base.includes("splash") ||
+    base.includes("bg_")
+  );
+};
+
 const extractBestIconBitmap = async (
   apkPath: string,
   outputDir: string,
@@ -112,6 +125,7 @@ const extractBestIconBitmap = async (
   }
 
   const candidates = entries
+    .filter((name) => !isJunkIconName(name.split("/").pop() || ""))
     .map((name) => {
       const lower = name.toLowerCase();
       const filename = lower.split("/").pop() || "";
@@ -140,12 +154,15 @@ const extractBestIconBitmap = async (
     async (entryName, buffer) => {
       const dimensions = readPngDimensions(buffer);
       if (!dimensions) return;
+      const pixels = dimensions.width * dimensions.height;
+      // Skip suspiciously small files for their declared dimensions
+      if (pixels > 0 && buffer.length / pixels < 0.05) return;
       const size = buffer.length;
       const score = candidateScores.get(entryName) ?? 0;
       if (
         !best ||
-        dimensions.width * dimensions.height > best.width * best.height ||
-        (dimensions.width * dimensions.height === best.width * best.height && score > best.score)
+        pixels > best.width * best.height ||
+        (pixels === best.width * best.height && score > best.score)
       ) {
         best = {
           name: entryName,
