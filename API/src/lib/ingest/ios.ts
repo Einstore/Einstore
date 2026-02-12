@@ -340,9 +340,9 @@ export async function ingestIosIpa(
   }
 
   const appRecord = await prisma.app.upsert({
-    where: { teamId_identifier: { teamId, identifier: mainTarget.bundleId } },
+    where: { teamId_identifier_platform: { teamId, identifier: mainTarget.bundleId, platform: PlatformKind.ios } },
     update: { name: resolvedAppName },
-    create: { identifier: mainTarget.bundleId, name: resolvedAppName, teamId },
+    create: { identifier: mainTarget.bundleId, name: resolvedAppName, platform: PlatformKind.ios, teamId },
   });
 
   if (billingGuard?.assertCanCreateBuild) {

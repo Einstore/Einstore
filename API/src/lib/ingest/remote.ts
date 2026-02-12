@@ -102,10 +102,12 @@ export async function ingestIosFromFunction(
     });
   }
 
+  const mainPlatform = (mainTarget.platform as PlatformKind) ?? PlatformKind.ios;
+
   const appRecord = await prisma.app.upsert({
-    where: { teamId_identifier: { teamId, identifier: payload.identifier } },
+    where: { teamId_identifier_platform: { teamId, identifier: payload.identifier, platform: mainPlatform } },
     update: { name: payload.appName },
-    create: { identifier: payload.identifier, name: payload.appName, teamId },
+    create: { identifier: payload.identifier, name: payload.appName, platform: mainPlatform, teamId },
   });
 
   if (billingGuard?.assertCanCreateBuild) {
@@ -234,9 +236,9 @@ export async function ingestAndroidFromFunction(
   }
 
   const appRecord = await prisma.app.upsert({
-    where: { teamId_identifier: { teamId, identifier: payload.packageName } },
+    where: { teamId_identifier_platform: { teamId, identifier: payload.packageName, platform: PlatformKind.android } },
     update: { name: appName },
-    create: { identifier: payload.packageName, name: appName, teamId },
+    create: { identifier: payload.packageName, name: appName, platform: PlatformKind.android, teamId },
   });
 
   if (billingGuard?.assertCanCreateBuild) {

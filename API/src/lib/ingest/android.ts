@@ -4,6 +4,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import ApkReader from "@devicefarmer/adbkit-apkreader";
+import { PlatformKind } from "@prisma/client";
 import { prisma } from "../prisma.js";
 import { listZipEntries, scanZipEntries } from "../zip.js";
 
@@ -301,9 +302,9 @@ export async function ingestAndroidApk(
   }
 
   const appRecord = await prisma.app.upsert({
-    where: { teamId_identifier: { teamId, identifier: packageName } },
+    where: { teamId_identifier_platform: { teamId, identifier: packageName, platform: PlatformKind.android } },
     update: { name: resolvedAppNameNormalized },
-    create: { identifier: packageName, name: resolvedAppNameNormalized, teamId },
+    create: { identifier: packageName, name: resolvedAppNameNormalized, platform: PlatformKind.android, teamId },
   });
 
   if (billingGuard?.assertCanCreateBuild) {

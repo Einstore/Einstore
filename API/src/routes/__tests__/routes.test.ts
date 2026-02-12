@@ -568,6 +568,7 @@ describe("routes", () => {
     const createResponse = await postJson("/builds", {
       appIdentifier: "com.example.app",
       appName: "Test App",
+      platform: "ios",
       version: "1.0.0",
       buildNumber: "1",
       displayName: "Test App",
@@ -582,7 +583,7 @@ describe("routes", () => {
     expect(getResponse.statusCode).toBe(200);
     expect(prismaMock.app.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { teamId_identifier: { teamId: "team-1", identifier: "com.example.app" } },
+        where: { teamId_identifier_platform: { teamId: "team-1", identifier: "com.example.app", platform: "ios" } },
       }),
     );
     expect(prismaMock.build.findMany).toHaveBeenCalledWith(

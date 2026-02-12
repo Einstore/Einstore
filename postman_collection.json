@@ -839,7 +839,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"name\": \"Sample App\",\n  \"identifier\": \"{{appIdentifier}}\"\n}"
+          "raw": "{\n  \"name\": \"Sample App\",\n  \"identifier\": \"{{appIdentifier}}\",\n  \"platform\": \"ios\"\n}"
         },
         "url": "{{baseUrl}}/apps"
       }
@@ -919,7 +919,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"appIdentifier\": \"{{appIdentifier}}\",\n  \"appName\": \"Sample App\",\n  \"version\": \"1.0.0\",\n  \"buildNumber\": \"1\",\n  \"displayName\": \"Sample App\",\n  \"storageKind\": \"local\",\n  \"storagePath\": \"/tmp/sample.ipa\",\n  \"sizeBytes\": 12345\n}"
+          "raw": "{\n  \"appIdentifier\": \"{{appIdentifier}}\",\n  \"appName\": \"Sample App\",\n  \"platform\": \"ios\",\n  \"version\": \"1.0.0\",\n  \"buildNumber\": \"1\",\n  \"displayName\": \"Sample App\",\n  \"storageKind\": \"local\",\n  \"storagePath\": \"/tmp/sample.ipa\",\n  \"sizeBytes\": 12345\n}"
         },
         "url": "{{baseUrl}}/builds"
       }

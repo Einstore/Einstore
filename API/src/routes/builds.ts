@@ -8,6 +8,7 @@ import { buildPaginationMeta, resolvePagination } from "../lib/pagination.js";
 import { presignStorageObject } from "../lib/storage-presign.js";
 import { deleteBuildsWithDependencies } from "../lib/build-cleanup.js";
 import { resolveMaxAppsOverride } from "../lib/limit-overrides.js";
+import { PlatformKind } from "@prisma/client";
 
 const groupArtifactsByKind = <T extends { kind: string; createdAt: Date }>(items: T[]) => {
   const grouped: Record<string, T[]> = {};
@@ -72,6 +73,7 @@ const extractIconBitmap = (metadata: unknown): IconBitmap | null => {
 const createBuildSchema = z.object({
   appIdentifier: z.string().min(1),
   appName: z.string().min(1),
+  platform: z.nativeEnum(PlatformKind),
   version: z.string().min(1),
   buildNumber: z.string().min(1),
   displayName: z.string().min(1),
@@ -166,7 +168,7 @@ export async function buildRoutes(app: FastifyInstance) {
     }
 
     const existingApp = await prisma.app.findUnique({
-      where: { teamId_identifier: { teamId, identifier: input.appIdentifier } },
+      where: { teamId_identifier_platform: { teamId, identifier: input.appIdentifier, platform: input.platform } },
       select: { id: true },
     });
     if (!existingApp) {
@@ -194,9 +196,9 @@ export async function buildRoutes(app: FastifyInstance) {
     }
 
     const appRecord = await prisma.app.upsert({
-      where: { teamId_identifier: { teamId, identifier: input.appIdentifier } },
+      where: { teamId_identifier_platform: { teamId, identifier: input.appIdentifier, platform: input.platform } },
       update: { name: input.appName },
-      create: { identifier: input.appIdentifier, name: input.appName, teamId },
+      create: { identifier: input.appIdentifier, name: input.appName, platform: input.platform, teamId },
     });
 
     if (billingGuard?.assertCanCreateBuild) {

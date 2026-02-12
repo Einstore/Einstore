@@ -51,7 +51,7 @@ describe("ingestAndroidApk", () => {
     expect(result.versionCode).toBe("121");
     expect(prismaMock.app.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { teamId_identifier: { teamId: "team-test", identifier: "ai.unlikeother.gpteen" } },
+        where: { teamId_identifier_platform: { teamId: "team-test", identifier: "ai.unlikeother.gpteen", platform: "android" } },
       }),
     );
     expect(prismaMock.build.create).toHaveBeenCalledWith(

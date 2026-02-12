@@ -17,6 +17,7 @@ type BillingGuard = {
 const createAppSchema = z.object({
   name: z.string().min(1),
   identifier: z.string().min(1),
+  platform: z.nativeEnum(PlatformKind),
 });
 
 const listQuerySchema = z.object({
@@ -128,14 +129,7 @@ export async function appRoutes(app: FastifyInstance) {
       offset: parsed.data.offset,
     });
     const where = parsed.data.platform
-      ? {
-          teamId,
-          versions: {
-            some: {
-              builds: { some: { targets: { some: { platform: parsed.data.platform } } } },
-            },
-          },
-        }
+      ? { teamId, platform: parsed.data.platform }
       : { teamId };
     const [total, items] = await prisma.$transaction([
       prisma.app.count({ where }),
@@ -146,38 +140,13 @@ export async function appRoutes(app: FastifyInstance) {
         orderBy: { createdAt: "desc" },
       }),
     ]);
-    const appIds = items.map((item) => item.id);
-    const builds = appIds.length
-      ? await prisma.build.findMany({
-          where: { version: { appId: { in: appIds } } },
-          select: {
-            createdAt: true,
-            version: { select: { appId: true } },
-            targets: { select: { platform: true, role: true } },
-          },
-          orderBy: { createdAt: "desc" },
-        })
-      : [];
-    const buildList = Array.isArray(builds) ? builds : [];
-    const appPlatformMap = new Map<string, PlatformKind>();
-    for (const build of buildList) {
-      const appId = build.version.appId;
-      if (appPlatformMap.has(appId)) continue;
-      const target = build.targets.find((entry) => entry.role === "app") ?? build.targets[0];
-      if (target?.platform) {
-        appPlatformMap.set(appId, target.platform);
-      }
-    }
     const meta = buildPaginationMeta({
       page: pagination.page,
       perPage: pagination.perPage,
       total,
     });
     return reply.send({
-      items: items.map((item) => ({
-        ...item,
-        platform: appPlatformMap.get(item.id) ?? null,
-      })),
+      items,
       ...meta,
     });
   });

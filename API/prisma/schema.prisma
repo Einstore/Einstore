@@ -111,17 +111,18 @@ enum IngestJobStatus {
 }
 
 model App {
-  id        String   @id @default(uuid())
+  id        String       @id @default(uuid())
   teamId    String
   name      String
   identifier String
+  platform  PlatformKind
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   versions  Version[]
   team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
-  @@unique([teamId, identifier])
+  @@unique([teamId, identifier, platform])
   @@index([teamId])
 }
 

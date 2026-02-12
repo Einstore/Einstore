@@ -49,7 +49,7 @@ describe("ingestIosIpa", () => {
     expect(result.buildNumber).toBe("121");
     expect(prismaMock.app.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { teamId_identifier: { teamId: "team-test", identifier: "ai.pocketpal" } },
+        where: { teamId_identifier_platform: { teamId: "team-test", identifier: "ai.pocketpal", platform: "ios" } },
       }),
     );
     expect(prismaMock.build.create).toHaveBeenCalledWith(
