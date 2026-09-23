@@ -122,8 +122,8 @@ migrate:
 		psql "$$ADMIN_URL" -v ON_ERROR_STOP=1 -q -c "DROP DATABASE IF EXISTS \"$$TARGET_DB\";" >/dev/null || exit 1; \
 		psql "$$ADMIN_URL" -v ON_ERROR_STOP=1 -q -c "CREATE DATABASE \"$$TARGET_DB\";" >/dev/null || exit 1; \
 		echo "Applying migrations to '$$TARGET_DB'..."; \
-		DATABASE_URL="$$TEST_URL" npm --prefix API run prisma:generate; \
-		DATABASE_URL="$$TEST_URL" npm --prefix API run prisma:deploy; \
+		DATABASE_URL="$$TEST_URL" DIRECT_DATABASE_URL="$$TEST_URL" npm --prefix API run prisma:generate; \
+		DATABASE_URL="$$TEST_URL" DIRECT_DATABASE_URL="$$TEST_URL" npm --prefix API run prisma:deploy; \
 		echo "Migration test complete."; \
 	else \
 		npm --prefix API run prisma:generate; \
@@ -190,6 +190,7 @@ test:
 		AUTH_REFRESH_TTL_DAYS=30 \
 		AUTH_ACCESS_TTL_MINUTES=15 \
 		DATABASE_URL="$$TEST_URL" \
+		DIRECT_DATABASE_URL="$$TEST_URL" \
 		NODE_ENV=test \
 		npm --prefix API run prisma:deploy; \
 		PORT=8103 \

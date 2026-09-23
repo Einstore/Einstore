@@ -4,7 +4,7 @@ This mirrors the App Platform build/run flow locally to reproduce failures witho
 
 ## Setup
 - Copy `scripts/app-platform.env.example` to `scripts/app-platform.env` and fill in secrets.
-- `DATABASE_URL` in the example points at the local Docker Postgres (`do-db`).
+- `DATABASE_URL` in the example points at the local Docker Postgres (`do-db`). `DIRECT_DATABASE_URL` is the same database: Prisma CLI commands (`prisma:deploy`, `prisma:ensure-schema`) connect through it and must never go through a connection pooler.
 - Export `BILLING_DEPLOY_KEY` before build commands if you need the Billing clone step (clones into `../Billing`).
 
 ## API build (mirrors DO buildpack)
