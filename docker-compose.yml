@@ -10,6 +10,7 @@ services:
       NODE_ENV: development
       PORT: 8100
       DATABASE_URL: postgresql://einstore:einstore@db:5432/einstore?schema=public
+      DIRECT_DATABASE_URL: postgresql://einstore:einstore@db:5432/einstore?schema=public
       AAPT_PATH: /usr/local/bin/aapt2
       AUTH_JWT_SECRET: change-me
       AUTH_JWT_ISSUER: einstore

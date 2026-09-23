@@ -2,9 +2,15 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// DATABASE_URL serves application queries and may go through a
+// transaction-pooling PgBouncer (with `pgbouncer=true`). Prisma CLI commands —
+// migrate deploy/dev, db execute — connect through directUrl, which must always
+// reach PostgreSQL directly: `migrate deploy` holds a session-level advisory
+// lock that a transaction pooler cannot keep.
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
 }
 
 enum PlatformKind {
